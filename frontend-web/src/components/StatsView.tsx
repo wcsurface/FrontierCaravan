@@ -47,6 +47,8 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
     { year: 2023, count: 11 },
     { year: 2022, count: 8 },
     { year: 2021, count: 4 },
+    { year: 2019, count: 3 },
+    { year: 2018, count: 2 },
   ];
 
   const daysList = stats.topDaysOfWeek.length > 0 ? stats.topDaysOfWeek : [
@@ -64,15 +66,15 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
 
   return (
     <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines">
-      {/* 1. DETAIL SUB-VIEWS */}
+      {/* 1. FULL DATA DETAIL SUB-VIEWS */}
       {activeSubView === 'venues' && (
-        <div className="flex flex-col w-full max-w-md mx-auto space-y-4">
+        <div className="flex flex-col w-full max-w-md mx-auto space-y-4 pb-8">
           <header className="relative flex items-center justify-between w-full pt-3 pb-5 mb-2">
             <button onClick={() => setActiveSubView('main')} className="p-2 text-slate-200 hover:text-white transition rounded-full z-10">
               <ArrowLeft size={24} />
             </button>
             <h1 className="absolute inset-0 flex items-center justify-center text-2xl sm:text-3xl font-black tracking-widest uppercase text-white font-sans pointer-events-none gap-2">
-              <MapPin size={22} className="text-[#00E676]" /> ALL TOP VENUES
+              <MapPin size={22} className="text-[#00E676]" /> ALL VENUES
             </h1>
             <div className="w-10 z-10" />
           </header>
@@ -93,13 +95,13 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
       )}
 
       {activeSubView === 'artists' && (
-        <div className="flex flex-col w-full max-w-md mx-auto space-y-4">
+        <div className="flex flex-col w-full max-w-md mx-auto space-y-4 pb-8">
           <header className="relative flex items-center justify-between w-full pt-3 pb-5 mb-2">
             <button onClick={() => setActiveSubView('main')} className="p-2 text-slate-200 hover:text-white transition rounded-full z-10">
               <ArrowLeft size={24} />
             </button>
             <h1 className="absolute inset-0 flex items-center justify-center text-2xl sm:text-3xl font-black tracking-widest uppercase text-white font-sans pointer-events-none gap-2">
-              <Music size={22} className="text-[#FFB300]" /> ALL TOP ARTISTS
+              <Music size={22} className="text-[#FFB300]" /> ALL ARTISTS
             </h1>
             <div className="w-10 z-10" />
           </header>
@@ -120,13 +122,13 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
       )}
 
       {activeSubView === 'years' && (
-        <div className="flex flex-col w-full max-w-md mx-auto space-y-4">
+        <div className="flex flex-col w-full max-w-md mx-auto space-y-4 pb-8">
           <header className="relative flex items-center justify-between w-full pt-3 pb-5 mb-2">
             <button onClick={() => setActiveSubView('main')} className="p-2 text-slate-200 hover:text-white transition rounded-full z-10">
               <ArrowLeft size={24} />
             </button>
             <h1 className="absolute inset-0 flex items-center justify-center text-2xl sm:text-3xl font-black tracking-widest uppercase text-white font-sans pointer-events-none gap-2">
-              <Calendar size={22} className="text-[#00B0FF]" /> ALL TOP YEARS
+              <Calendar size={22} className="text-[#00B0FF]" /> ALL YEARS
             </h1>
             <div className="w-10 z-10" />
           </header>
@@ -134,7 +136,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
             {yearsList.map((y, i) => (
               <div key={i} className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-1.5 shadow-sm">
                 <div className="flex justify-between items-center text-sm font-bold">
-                  <span className="text-slate-100">{y.year}</span>
+                  <span className="text-slate-100">Year {y.year}</span>
                   <span className="text-[#00B0FF] font-mono">{y.count} Concerts</span>
                 </div>
                 <div className="w-full h-2 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
@@ -147,7 +149,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
       )}
 
       {activeSubView === 'days' && (
-        <div className="flex flex-col w-full max-w-md mx-auto space-y-4">
+        <div className="flex flex-col w-full max-w-md mx-auto space-y-4 pb-8">
           <header className="relative flex items-center justify-between w-full pt-3 pb-5 mb-2">
             <button onClick={() => setActiveSubView('main')} className="p-2 text-slate-200 hover:text-white transition rounded-full z-10">
               <ArrowLeft size={24} />
@@ -173,9 +175,9 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
         </div>
       )}
 
-      {/* 2. MAIN STATS OVERVIEW SCREEN */}
+      {/* 2. MAIN STATS OVERVIEW SCREEN (SHOWS FULL TOP 10 IN EACH CARD) */}
       {activeSubView === 'main' && (
-        <div className="flex flex-col w-full max-w-md mx-auto space-y-6">
+        <div className="flex flex-col w-full max-w-md mx-auto space-y-6 pb-8">
           {/* Larger & Centered Header */}
           <header className="relative flex items-center justify-between w-full pt-3 pb-5 mb-2">
             <button onClick={onBack} className="p-2 text-slate-200 hover:text-white transition rounded-full z-10">
@@ -194,25 +196,27 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
             </h2>
           </div>
 
-          {/* Top 10 Ranked Sections (Clickable) */}
-          <div className="space-y-5">
-            {/* Top Venues Card (Top 10) */}
+          {/* Top 10 Ranked Sections */}
+          <div className="space-y-6">
+            {/* Top Venues Card (Shows Full Top 10) */}
             <div
               onClick={() => setActiveSubView('venues')}
-              className="bg-[#121619] p-4 rounded-2xl border border-[#222B30] hover:border-[#00E676]/60 transition cursor-pointer shadow-lg group"
+              className="bg-[#121619] p-4.5 rounded-2xl border border-[#222B30] hover:border-[#00E676]/60 transition cursor-pointer shadow-lg group"
             >
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-xs font-black text-[#00E676] uppercase tracking-widest flex items-center gap-1.5">
-                  <MapPin size={14} /> TOP VENUES (TOP 10)
+              <div className="flex justify-between items-center mb-3.5 pb-2 border-b border-[#222B30]">
+                <h3 className="text-xs sm:text-sm font-black text-[#00E676] uppercase tracking-widest flex items-center gap-1.5">
+                  <MapPin size={16} /> TOP VENUES (TOP 10)
                 </h3>
-                <ChevronRight size={16} className="text-slate-500 group-hover:text-[#00E676] transition" />
+                <div className="flex items-center gap-1 text-[11px] font-extrabold text-slate-400 group-hover:text-[#00E676] transition">
+                  SEE ALL <ChevronRight size={16} />
+                </div>
               </div>
               <div className="space-y-2.5">
-                {venuesList.slice(0, 5).map((v, i) => (
+                {venuesList.slice(0, 10).map((v, i) => (
                   <div key={i} className="space-y-1">
-                    <div className="flex justify-between text-xs font-semibold text-slate-300">
-                      <span>{v.name}</span>
-                      <span className="text-slate-400 font-mono">{v.visitCount}</span>
+                    <div className="flex justify-between text-xs font-semibold text-slate-200">
+                      <span>{i + 1}. {v.name}</span>
+                      <span className="text-[#00E676] font-mono font-extrabold">{v.visitCount}</span>
                     </div>
                     <div className="w-full h-1.5 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
                       <div className="h-full bg-[#00E676] rounded-full" style={{ width: `${(v.visitCount / maxVenueVisits) * 100}%` }} />
@@ -222,23 +226,25 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
               </div>
             </div>
 
-            {/* Top Artists Card (Top 10) */}
+            {/* Top Artists Card (Shows Full Top 10) */}
             <div
               onClick={() => setActiveSubView('artists')}
-              className="bg-[#121619] p-4 rounded-2xl border border-[#222B30] hover:border-[#FFB300]/60 transition cursor-pointer shadow-lg group"
+              className="bg-[#121619] p-4.5 rounded-2xl border border-[#222B30] hover:border-[#FFB300]/60 transition cursor-pointer shadow-lg group"
             >
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-xs font-black text-[#FFB300] uppercase tracking-widest flex items-center gap-1.5">
-                  <Music size={14} /> TOP ARTISTS (TOP 10)
+              <div className="flex justify-between items-center mb-3.5 pb-2 border-b border-[#222B30]">
+                <h3 className="text-xs sm:text-sm font-black text-[#FFB300] uppercase tracking-widest flex items-center gap-1.5">
+                  <Music size={16} /> TOP ARTISTS (TOP 10)
                 </h3>
-                <ChevronRight size={16} className="text-slate-500 group-hover:text-[#FFB300] transition" />
+                <div className="flex items-center gap-1 text-[11px] font-extrabold text-slate-400 group-hover:text-[#FFB300] transition">
+                  SEE ALL <ChevronRight size={16} />
+                </div>
               </div>
               <div className="space-y-2.5">
-                {artistsList.slice(0, 5).map((a, i) => (
+                {artistsList.slice(0, 10).map((a, i) => (
                   <div key={i} className="space-y-1">
-                    <div className="flex justify-between text-xs font-semibold text-slate-300">
-                      <span>{a.name}</span>
-                      <span className="text-slate-400 font-mono">{a.timesSeen}</span>
+                    <div className="flex justify-between text-xs font-semibold text-slate-200">
+                      <span>{i + 1}. {a.name}</span>
+                      <span className="text-[#FFB300] font-mono font-extrabold">{a.timesSeen}</span>
                     </div>
                     <div className="w-full h-1.5 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
                       <div className="h-full bg-[#FFB300] rounded-full" style={{ width: `${(a.timesSeen / maxArtistSeen) * 100}%` }} />
@@ -248,23 +254,25 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
               </div>
             </div>
 
-            {/* Top Years Card (Top 10) */}
+            {/* Top Years Card (Shows Full Top 10) */}
             <div
               onClick={() => setActiveSubView('years')}
-              className="bg-[#121619] p-4 rounded-2xl border border-[#222B30] hover:border-[#00B0FF]/60 transition cursor-pointer shadow-lg group"
+              className="bg-[#121619] p-4.5 rounded-2xl border border-[#222B30] hover:border-[#00B0FF]/60 transition cursor-pointer shadow-lg group"
             >
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-xs font-black text-[#00B0FF] uppercase tracking-widest flex items-center gap-1.5">
-                  <Calendar size={14} /> TOP YEARS (TOP 10)
+              <div className="flex justify-between items-center mb-3.5 pb-2 border-b border-[#222B30]">
+                <h3 className="text-xs sm:text-sm font-black text-[#00B0FF] uppercase tracking-widest flex items-center gap-1.5">
+                  <Calendar size={16} /> TOP YEARS (TOP 10)
                 </h3>
-                <ChevronRight size={16} className="text-slate-500 group-hover:text-[#00B0FF] transition" />
+                <div className="flex items-center gap-1 text-[11px] font-extrabold text-slate-400 group-hover:text-[#00B0FF] transition">
+                  SEE ALL <ChevronRight size={16} />
+                </div>
               </div>
               <div className="space-y-2.5">
-                {yearsList.slice(0, 4).map((y, i) => (
+                {yearsList.slice(0, 10).map((y, i) => (
                   <div key={i} className="space-y-1">
-                    <div className="flex justify-between text-xs font-semibold text-slate-300">
-                      <span>Year {y.year}</span>
-                      <span className="text-slate-400 font-mono">{y.count} shows</span>
+                    <div className="flex justify-between text-xs font-semibold text-slate-200">
+                      <span>{i + 1}. Year {y.year}</span>
+                      <span className="text-[#00B0FF] font-mono font-extrabold">{y.count} shows</span>
                     </div>
                     <div className="w-full h-1.5 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
                       <div className="h-full bg-[#00B0FF] rounded-full" style={{ width: `${(y.count / maxYearShows) * 100}%` }} />
@@ -277,20 +285,22 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
             {/* Days of Week Card */}
             <div
               onClick={() => setActiveSubView('days')}
-              className="bg-[#121619] p-4 rounded-2xl border border-[#222B30] hover:border-[#E040FB]/60 transition cursor-pointer shadow-lg group"
+              className="bg-[#121619] p-4.5 rounded-2xl border border-[#222B30] hover:border-[#E040FB]/60 transition cursor-pointer shadow-lg group"
             >
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-xs font-black text-[#E040FB] uppercase tracking-widest flex items-center gap-1.5">
-                  <Clock size={14} /> DAYS OF THE WEEK
+              <div className="flex justify-between items-center mb-3.5 pb-2 border-b border-[#222B30]">
+                <h3 className="text-xs sm:text-sm font-black text-[#E040FB] uppercase tracking-widest flex items-center gap-1.5">
+                  <Clock size={16} /> DAYS OF THE WEEK
                 </h3>
-                <ChevronRight size={16} className="text-slate-500 group-hover:text-[#E040FB] transition" />
+                <div className="flex items-center gap-1 text-[11px] font-extrabold text-slate-400 group-hover:text-[#E040FB] transition">
+                  SEE ALL <ChevronRight size={16} />
+                </div>
               </div>
               <div className="space-y-2.5">
-                {daysList.slice(0, 3).map((d, i) => (
+                {daysList.map((d, i) => (
                   <div key={i} className="space-y-1">
-                    <div className="flex justify-between text-xs font-semibold text-slate-300">
-                      <span>{d.day}</span>
-                      <span className="text-slate-400 font-mono">{d.percentage}%</span>
+                    <div className="flex justify-between text-xs font-semibold text-slate-200">
+                      <span>{i + 1}. {d.day}</span>
+                      <span className="text-[#E040FB] font-mono font-extrabold">{d.count} ({d.percentage}%)</span>
                     </div>
                     <div className="w-full h-1.5 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
                       <div className="h-full bg-[#E040FB] rounded-full" style={{ width: `${(d.count / maxDayShows) * 100}%` }} />
