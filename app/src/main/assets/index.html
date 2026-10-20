@@ -13,7 +13,7 @@
     .screen-view.active { display: flex; }
 
     /* Centered Header with 2X Larger LiveLore Logo */
-    .header { position: relative; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 0 24px 0; min-height: 100px; }
+    .header { position: relative; width: 100%; display: flex; justify-between: align-items: center; padding: 12px 0 24px 0; min-height: 100px; }
     .header-logo-box { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
     .header-logo-img { height: 100px; width: auto; object-fit: contain; filter: drop-shadow(0 0 16px rgba(0,230,118,0.4)); }
     .nav-btn-icon { position: absolute; z-index: 10; background: none; border: none; padding: 8px 12px; cursor: pointer; color: #00E676; font-size: 28px; font-weight: bold; }
@@ -126,7 +126,7 @@
       </div>
     </div>
 
-    <form style="flex:1; display:flex; flex-direction:column; padding-bottom:20px;" onsubmit="saveNewShow(event)">
+    <form id="log-show-form" style="flex:1; display:flex; flex-direction:column; padding-bottom:20px;" onsubmit="saveNewShow(event)">
       <label class="input-label">Headline Band *</label>
       <input type="text" id="input-headline" class="input-field" placeholder="Headline Band" required />
 
@@ -163,7 +163,7 @@
 
       <!-- Action Buttons: Large + ADD & CANCEL Below -->
       <button type="submit" class="btn-cta">+ ADD</button>
-      <button type="button" class="btn-cancel" onclick="showScreen('diary')">CANCEL</button>
+      <button type="button" class="btn-cancel" onclick="cancelShowLog()">CANCEL</button>
     </form>
   </div>
 
@@ -338,6 +338,17 @@
       document.getElementById('venue-dropdown').style.display = 'none';
     }
 
+    function resetLogForm() {
+      document.getElementById('log-show-form').reset();
+      document.getElementById('venue-dropdown').style.display = 'none';
+      document.getElementById('openers-container').innerHTML = '<input type="text" class="input-field input-opener" placeholder="Opener" />';
+    }
+
+    function cancelShowLog() {
+      resetLogForm();
+      showScreen('diary');
+    }
+
     function updateStatsDisplay() {
       const count = userShows.length;
       document.getElementById('stats-total-count').innerText = count + (count === 1 ? ' SHOW' : ' SHOWS');
@@ -457,6 +468,9 @@
           </div>
         `;
         list.prepend(card);
+
+        // Reset form for next new show entry
+        resetLogForm();
         showScreen('diary');
       }
     }

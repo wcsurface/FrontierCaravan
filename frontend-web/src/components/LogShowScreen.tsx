@@ -27,6 +27,20 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
   const [venueSuggestions, setVenueSuggestions] = useState<VenueRecord[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  // Helper function to reset all form fields to pristine blank state
+  const resetForm = () => {
+    setHeadlineBand('');
+    setOpeners(['']);
+    setDateStr('');
+    setVenueName('');
+    setCity('');
+    setStateProvince('');
+    setCountry('');
+    setNotesText('');
+    setVenueSuggestions([]);
+    setIsDropdownOpen(false);
+  };
+
   const handleOpenerChange = (index: number, value: string) => {
     const updated = [...openers];
     updated[index] = value;
@@ -72,7 +86,6 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
       setVenueSuggestions(results);
       setIsDropdownOpen(true);
 
-      // Instant Auto-Fill best matching venue location info on keystroke
       const exactOrStartMatch = PRESET_VENUES.find(
         v => v.venue.toLowerCase() === q || v.venue.toLowerCase().startsWith(q)
       );
@@ -131,7 +144,14 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
       ticketPrice: 45,
     });
 
+    // Reset form fields to clean state for next show entry
+    resetForm();
     onSaved();
+  };
+
+  const handleCancel = () => {
+    resetForm();
+    onBack();
   };
 
   return (
@@ -139,7 +159,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
       {/* Header with 2X Larger LiveLore Logo */}
       <header className="relative flex items-center justify-between w-full pt-3 pb-6 my-1">
         <button
-          onClick={onBack}
+          onClick={handleCancel}
           className="p-2 text-slate-200 hover:text-white transition rounded-full z-10"
         >
           <ArrowLeft size={26} />
@@ -223,7 +243,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
           />
         </div>
 
-        {/* Venue Input with Instant Keystroke Auto-Fill & Dropdown */}
+        {/* Venue Input */}
         <div className="relative">
           <label className="block text-[11px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
             Venue *
@@ -259,7 +279,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
           )}
         </div>
 
-        {/* Location Info Fields (Auto-filled on keystroke or custom) */}
+        {/* Location Info Fields */}
         <div className="grid grid-cols-3 gap-2">
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
@@ -326,7 +346,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
 
           <button
             type="button"
-            onClick={onBack}
+            onClick={handleCancel}
             className="w-full py-3.5 bg-[#121619] hover:bg-[#1C2328] text-slate-300 hover:text-white font-extrabold text-sm uppercase tracking-wider rounded-full border border-[#222B30] active:scale-[0.98] transition"
           >
             CANCEL
