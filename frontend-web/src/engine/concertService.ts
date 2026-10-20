@@ -69,8 +69,8 @@ export interface ConcertStats {
   totalInvestment: number;
   topArtists: { name: string; timesSeen: number }[];
   topVenues: { name: string; city: string; visitCount: number }[];
-  yearBreakdown: { year: number; count: number }[];
-  dayOfWeekDistribution: { day: string; percentage: number }[];
+  topYears: { year: number; count: number }[];
+  topDaysOfWeek: { day: string; count: number; percentage: number }[];
 }
 
 export class AnalyticsEngine {
@@ -99,7 +99,7 @@ export class AnalyticsEngine {
     // Total Financial Investment
     const totalInvestment = concerts.reduce((acc, curr) => acc + (curr.ticketPrice || 0), 0);
 
-    // Top Artists
+    // Top Artists (Headline + Opener) - Top 10 Ranked
     const artistCountMap = new Map<string, number>();
     concerts.forEach(c => {
       const currentHead = artistCountMap.get(c.headlineArtistId) || 0;
@@ -116,9 +116,9 @@ export class AnalyticsEngine {
         return { name: artistObj?.name || 'Unknown Artist', timesSeen: count };
       })
       .sort((a, b) => b.timesSeen - a.timesSeen)
-      .slice(0, 5);
+      .slice(0, 10);
 
-    // Top Venues
+    // Top Venues - Top 10 Ranked
     const venueCountMap = new Map<string, number>();
     concerts.forEach(c => {
       const current = venueCountMap.get(c.venueId) || 0;
@@ -131,20 +131,21 @@ export class AnalyticsEngine {
         return { name: vObj?.name || 'Unknown Venue', city: vObj?.city || '', visitCount: count };
       })
       .sort((a, b) => b.visitCount - a.visitCount)
-      .slice(0, 5);
+      .slice(0, 10);
 
-    // Year Breakdown
+    // Top Years - Ranked by concert count
     const yearMap = new Map<number, number>();
     concerts.forEach(c => {
       const yr = new Date(c.date).getFullYear();
       yearMap.set(yr, (yearMap.get(yr) || 0) + 1);
     });
 
-    const yearBreakdown = Array.from(yearMap.entries())
+    const topYears = Array.from(yearMap.entries())
       .map(([year, count]) => ({ year, count }))
-      .sort((a, b) => a.year - b.year);
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
 
-    // Day of Week Distribution
+    // Top Days of Week
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const dayCounts = [0, 0, 0, 0, 0, 0, 0];
     concerts.forEach(c => {
@@ -152,10 +153,13 @@ export class AnalyticsEngine {
       dayCounts[dayIndex]++;
     });
 
-    const dayOfWeekDistribution = days.map((day, idx) => ({
-      day,
-      percentage: totalShows > 0 ? Math.round((dayCounts[idx] / totalShows) * 100) : 0,
-    }));
+    const topDaysOfWeek = days
+      .map((day, idx) => ({
+        day,
+        count: dayCounts[idx],
+        percentage: totalShows > 0 ? Math.round((dayCounts[idx] / totalShows) * 100) : 0,
+      }))
+      .sort((a, b) => b.count - a.count);
 
     return {
       totalShows,
@@ -165,8 +169,8 @@ export class AnalyticsEngine {
       totalInvestment,
       topArtists,
       topVenues,
-      yearBreakdown,
-      dayOfWeekDistribution,
+      topYears,
+      topDaysOfWeek,
     };
   }
 }
