@@ -5,7 +5,6 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.Window
@@ -25,7 +24,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 class MainActivity : ComponentActivity() {
 
     private lateinit var webView: WebView
-    private lateinit var bridge: AndroidNativeBridge
+    private lateinit var bridge: NativeSpaceBridge
     private var connectivityManager: ConnectivityManager? = null
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
 
@@ -42,11 +41,11 @@ class MainActivity : ComponentActivity() {
             WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
         )
 
-        // Configure edge-to-edge & fullscreen
+        // Configure edge-to-edge & immersive landscape fullscreen
         WindowCompat.setDecorFitsSystemWindows(window, false)
         hideSystemUI(window)
 
-        // Initialize WebView
+        // Initialize WebGL/WebGPU-capable WebView
         webView = WebView(this).apply {
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
         }
@@ -54,7 +53,7 @@ class MainActivity : ComponentActivity() {
 
         setupWebViewSettings()
 
-        bridge = AndroidNativeBridge(this, webView)
+        bridge = NativeSpaceBridge(this, webView)
         webView.addJavascriptInterface(bridge, "AndroidBridge")
 
         setupWebViewClients()
@@ -71,6 +70,7 @@ class MainActivity : ComponentActivity() {
         webView.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
+            databaseEnabled = true
             allowFileAccess = true
             allowContentAccess = true
             useWideViewPort = true
@@ -80,9 +80,8 @@ class MainActivity : ComponentActivity() {
             displayZoomControls = false
             mediaPlaybackRequiresUserGesture = false
 
-            // Mixed Content security flag
+            // WebGL & Hardware Performance Options
             mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
-
             cacheMode = WebSettings.LOAD_DEFAULT
         }
     }
@@ -110,11 +109,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    private fun loadLiveUrl() {
-        isUsingOfflineFallback = false
-        webView.loadUrl(liveUrl)
     }
 
     private fun loadOfflineFallback() {
