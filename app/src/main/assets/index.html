@@ -6,10 +6,10 @@
   <title>Encore: Concert & Setlist Vault</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
-    body { background-color: #0A0D0E; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 12px; }
+    body { background-color: #0A0D0E; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 16px; }
 
     /* Screen Views */
-    .screen-view { display: none; width: 100%; max-width: 420px; height: 100%; flex-direction: column; justify-between; }
+    .screen-view { display: none; width: 100%; max-width: 420px; height: 100%; flex-direction: column; justify-content: space-between; }
     .screen-view.active { display: flex; }
 
     /* Headers */
@@ -17,7 +17,8 @@
     .header-title { font-weight: 900; font-size: 22px; letter-spacing: 2px; text-transform: uppercase; color: #ffffff; }
     .nav-btn-icon { background: none; border: none; padding: 10px 16px; cursor: pointer; color: #00E676; font-size: 24px; font-weight: bold; }
 
-    /* Ticket Card */
+    /* Ticket Container & Card */
+    #ticket-list { width: 100%; flex: 1; max-height: calc(100vh - 160px); overflow-y: auto; margin-bottom: 12px; }
     .ticket-card { position: relative; width: 100%; aspect-ratio: 2.85 / 1; background: #f4e4bc; color: #2b1c0e; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; display: flex; justify-content: space-between; box-shadow: 0 10px 25px rgba(0,0,0,0.6); border: 2px solid #d6c294; cursor: pointer; }
     .ticket-left { width: 70%; display: flex; flex-direction: column; justify-content: space-between; border-right: 2px dashed #423220; padding-right: 8px; }
     .ticket-artist { font-weight: 900; font-size: 20px; text-align: center; text-transform: uppercase; font-family: serif; color: #1c1208; margin: auto 0; }
@@ -31,7 +32,7 @@
     textarea.input-field { min-height: 160px; resize: none; font-family: monospace; }
 
     /* Action CTA Buttons */
-    .btn-cta { width: 100%; background: linear-gradient(90deg, #00E676, #00C853); color: #0a0a0a; font-weight: 900; font-size: 14px; padding: 16px; border-radius: 9999px; border: none; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; box-shadow: 0 0 20px rgba(0,230,118,0.4); margin-top: auto; margin-bottom: 8px; }
+    .btn-cta { width: 100%; z-index: 50; background: linear-gradient(90deg, #00E676, #00C853); color: #0a0a0a; font-weight: 900; font-size: 14px; padding: 16px; border-radius: 9999px; border: none; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; box-shadow: 0 0 20px rgba(0,230,118,0.4); margin-top: auto; margin-bottom: 8px; }
   </style>
 </head>
 <body>
@@ -44,7 +45,7 @@
       <button class="nav-btn-icon" onclick="showScreen('stats')">★</button>
     </div>
 
-    <div id="ticket-list" style="flex:1; width:100%; overflow-y:auto;">
+    <div id="ticket-list">
       <div class="ticket-card" onclick="openSetlist('THE CURE')">
         <div class="ticket-left">
           <div class="ticket-artist">THE CURE</div>
