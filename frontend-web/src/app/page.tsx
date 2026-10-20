@@ -66,26 +66,23 @@ export default function HomeView() {
             </button>
           </header>
 
-          {/* Ticket Stubs Feed OR Fun Empty State for New Users */}
+          {/* Ticket Stubs Feed OR Clean Empty State for New Users */}
           <div className="flex-1 overflow-y-auto pr-1 flex flex-col">
             {concerts.length === 0 ? (
-              <div className="flex flex-col items-center justify-center text-center my-auto py-8 px-4 space-y-4">
+              <div className="flex flex-col items-center justify-center text-center my-auto py-8 px-4 space-y-6">
                 <div className="w-16 h-16 bg-[#FFB300]/10 text-[#FFB300] rounded-full flex items-center justify-center border border-[#FFB300]/30 shadow-[0_0_20px_rgba(255,179,0,0.2)] mb-1">
                   <Sparkles size={32} />
                 </div>
-                <h2 className="text-xl sm:text-2xl font-black uppercase text-white tracking-wide font-sans">
-                  Your Concert Vault Is Waiting! 🎸
+                <h2 className="text-2xl sm:text-3xl font-black uppercase text-white tracking-wide font-sans">
+                  Your Concert Vault Is Empty! 🎸
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-400 max-w-xs font-medium leading-relaxed">
-                  Every legendary show starts with a single ticket stub. Start building your ultimate live music diary!
-                </p>
 
-                {/* Fun Animated Pointer Arrow */}
-                <div className="pt-6 flex flex-col items-center gap-2 text-[#00E676] animate-bounce">
-                  <span className="text-xs font-black uppercase tracking-widest text-[#FFB300]">
+                {/* Larger Bouncing Text & Green Arrow */}
+                <div className="pt-4 flex flex-col items-center gap-3 text-[#00E676] animate-bounce">
+                  <span className="text-base sm:text-lg font-black uppercase tracking-widest text-[#FFB300]">
                     Start adding your concerts below!
                   </span>
-                  <ArrowDown size={32} className="stroke-[3] text-[#00E676] drop-shadow-[0_0_10px_rgba(0,230,118,0.6)]" />
+                  <ArrowDown size={44} className="stroke-[3.5] text-[#00E676] drop-shadow-[0_0_15px_rgba(0,230,118,0.8)]" />
                 </div>
               </div>
             ) : (
