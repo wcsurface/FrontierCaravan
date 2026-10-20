@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
+import { Pool } from 'pg';
 
 dotenv.config();
 
@@ -11,7 +12,38 @@ const PORT = process.env.PORT || 8080;
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// In-Memory Database for active runs
+// Database Pool Setup (PostgreSQL)
+const databaseUrl = process.env.DATABASE_URL || process.env.DATABASE_PUBLIC_URL;
+let dbPool: Pool | null = null;
+
+if (databaseUrl) {
+  dbPool = new Pool({
+    connectionString: databaseUrl,
+    ssl: databaseUrl.includes('localhost') ? false : { rejectUnauthorized: false },
+  });
+
+  // Auto-initialize Schema
+  dbPool
+    .query(
+      `
+      CREATE TABLE IF NOT EXISTS caravan_runs (
+        run_id VARCHAR(64) PRIMARY KEY,
+        seed VARCHAR(64) NOT NULL,
+        device_id VARCHAR(64) NOT NULL,
+        current_node_id INT DEFAULT 0,
+        resources JSONB NOT NULL,
+        cargo JSONB NOT NULL,
+        anti_tamper_hash VARCHAR(128) NOT NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `
+    )
+    .then(() => console.log('[DB] PostgreSQL caravan_runs table verified/initialized.'))
+    .catch((err) => console.error('[DB] Schema initialization error:', err));
+} else {
+  console.log('[DB] No DATABASE_URL provided. Running in volatile in-memory mode.');
+}
+
 interface RunState {
   runId: string;
   seed: string;
@@ -29,7 +61,7 @@ interface RunState {
   updatedAt: number;
 }
 
-const activeRuns = new Map<string, RunState>();
+const memoryRuns = new Map<string, RunState>();
 
 function computeHash(data: object): string {
   const secret = process.env.ANTI_TAMPER_SECRET || 'WAS_CARTEL_SECRET_2084';
@@ -38,17 +70,27 @@ function computeHash(data: object): string {
 }
 
 // Health Check
-app.get('/health', (_req: Request, res: Response) => {
+app.get('/health', async (_req: Request, res: Response) => {
+  let dbStatus = 'disconnected';
+  if (dbPool) {
+    try {
+      await dbPool.query('SELECT 1');
+      dbStatus = 'connected (PostgreSQL)';
+    } catch {
+      dbStatus = 'error connecting';
+    }
+  }
+
   res.status(200).json({
     status: 'healthy',
     service: 'Frontier Caravan Economy Service',
+    database: dbStatus,
     timestamp: new Date().toISOString(),
-    activeRunsCount: activeRuns.size,
   });
 });
 
 // POST /api/runs/new - Generates procedural run seed & starter state
-app.post('/api/runs/new', (req: Request, res: Response) => {
+app.post('/api/runs/new', async (req: Request, res: Response) => {
   try {
     const { seed, deviceId } = req.body;
     const finalSeed = seed || 'SEED-' + Math.floor(Math.random() * 900000 + 100000);
@@ -72,18 +114,32 @@ app.post('/api/runs/new', (req: Request, res: Response) => {
     const hashPayload = { runId, finalSeed, initialResources, initialCargo };
     const antiTamperHash = computeHash(hashPayload);
 
-    const runState: RunState = {
-      runId,
-      seed: finalSeed,
-      deviceId: deviceId || 'anon',
-      currentNodeId: 0,
-      resources: initialResources,
-      cargo: initialCargo,
-      antiTamperHash,
-      updatedAt: Date.now(),
-    };
-
-    activeRuns.set(runId, runState);
+    if (dbPool) {
+      await dbPool.query(
+        `INSERT INTO caravan_runs (run_id, seed, device_id, current_node_id, resources, cargo, anti_tamper_hash, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())`,
+        [
+          runId,
+          finalSeed,
+          deviceId || 'anon',
+          0,
+          JSON.stringify(initialResources),
+          JSON.stringify(initialCargo),
+          antiTamperHash,
+        ]
+      );
+    } else {
+      memoryRuns.set(runId, {
+        runId,
+        seed: finalSeed,
+        deviceId: deviceId || 'anon',
+        currentNodeId: 0,
+        resources: initialResources,
+        cargo: initialCargo,
+        antiTamperHash,
+        updatedAt: Date.now(),
+      });
+    }
 
     res.status(201).json({
       success: true,
@@ -105,7 +161,7 @@ app.post('/api/runs/new', (req: Request, res: Response) => {
 });
 
 // POST /api/runs/sync - Validates trade transactions & writes run checkpoints
-app.post('/api/runs/sync', (req: Request, res: Response) => {
+app.post('/api/runs/sync', async (req: Request, res: Response) => {
   try {
     const { runId, currentNodeId, resources, cargo, antiTamperHash } = req.body;
 
@@ -113,27 +169,35 @@ app.post('/api/runs/sync', (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Missing runId or resource payloads' });
     }
 
-    const existingRun = activeRuns.get(runId);
-
-    // Validate Anti-Tamper Check (if run exists)
-    if (existingRun && existingRun.antiTamperHash !== antiTamperHash) {
-      console.warn(`Anti-tamper hash mismatch for runId: ${runId}`);
-    }
-
     const newHash = computeHash({ runId, currentNodeId, resources, cargo, time: Date.now() });
 
-    const updatedRun: RunState = {
-      runId,
-      seed: existingRun?.seed || 'UNKNOWN',
-      deviceId: existingRun?.deviceId || 'anon',
-      currentNodeId,
-      resources,
-      cargo,
-      antiTamperHash: newHash,
-      updatedAt: Date.now(),
-    };
-
-    activeRuns.set(runId, updatedRun);
+    if (dbPool) {
+      await dbPool.query(
+        `INSERT INTO caravan_runs (run_id, seed, device_id, current_node_id, resources, cargo, anti_tamper_hash, updated_at)
+         VALUES ($1, 'UNKNOWN', 'anon', $2, $3, $4, $5, NOW())
+         ON CONFLICT (run_id)
+         DO UPDATE SET current_node_id = $2, resources = $3, cargo = $4, anti_tamper_hash = $5, updated_at = NOW()`,
+        [
+          runId,
+          currentNodeId || 0,
+          JSON.stringify(resources),
+          JSON.stringify(cargo || {}),
+          newHash,
+        ]
+      );
+    } else {
+      const existingRun = memoryRuns.get(runId);
+      memoryRuns.set(runId, {
+        runId,
+        seed: existingRun?.seed || 'UNKNOWN',
+        deviceId: existingRun?.deviceId || 'anon',
+        currentNodeId: currentNodeId || 0,
+        resources,
+        cargo: cargo || {},
+        antiTamperHash: newHash,
+        updatedAt: Date.now(),
+      });
+    }
 
     res.status(200).json({
       success: true,
