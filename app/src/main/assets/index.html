@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Encore: Concert & Setlist Vault</title>
+  <title>LiveLore: Concert & Setlist Vault</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
     body { background-color: #0A0D0E; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; align-items: center; justify-between; padding: 12px; }
@@ -29,11 +29,12 @@
 
     /* Inputs with Amber Borders (#FFB300) */
     .input-label { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #FFB300; margin-bottom: 4px; display: block; }
-    .input-field { width: 100%; background: #111618; border: 1.5px solid #FFB300; border-radius: 8px; padding: 12px 14px; color: #f1f5f9; font-size: 14px; outline: none; margin-bottom: 12px; box-shadow: 0 0 10px rgba(255,179,0,0.15); }
-    textarea.input-field { min-height: 160px; resize: none; }
+    .input-field { width: 100%; background: #111618; border: 1.5px solid #FFB300; border-radius: 8px; padding: 12px 14px; color: #f1f5f9; font-size: 14px; outline: none; margin-bottom: 8px; box-shadow: 0 0 10px rgba(255,179,0,0.15); }
+    textarea.input-field { min-height: 140px; resize: none; }
 
     /* Action CTA Buttons */
     .btn-cta { width: 100%; background: linear-gradient(90deg, #00E676, #00C853); color: #0a0a0a; font-weight: 900; font-size: 14px; padding: 16px; border-radius: 9999px; border: none; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; box-shadow: 0 0 20px rgba(0,230,118,0.4); margin-top: 12px; margin-bottom: 12px; }
+    .btn-add-opener { background: none; border: none; color: #FFB300; font-weight: 800; font-size: 12px; cursor: pointer; margin-bottom: 12px; text-align: left; padding: 2px 0; }
   </style>
 </head>
 <body>
@@ -42,7 +43,7 @@
   <div id="view-diary" class="screen-view active">
     <div class="header">
       <button class="nav-btn-icon" onclick="showScreen('stats')">☰</button>
-      <div class="header-title">DIARY</div>
+      <div class="header-title">LIVELORE</div>
       <button class="nav-btn-icon" onclick="showScreen('stats')">★</button>
     </div>
 
@@ -91,8 +92,11 @@
       <label class="input-label">Headline Band *</label>
       <input type="text" id="input-headline" class="input-field" placeholder="Headline Band" required />
 
-      <label class="input-label">Opening Band</label>
-      <input type="text" id="input-opener" class="input-field" placeholder="Opening Band (Opener)" />
+      <label class="input-label">Opener</label>
+      <div id="openers-container">
+        <input type="text" class="input-field input-opener" placeholder="Opener" />
+      </div>
+      <button type="button" class="btn-add-opener" onclick="addOpenerField()">+ Add Another Opener</button>
 
       <label class="input-label">Date</label>
       <input type="text" id="input-date" class="input-field" placeholder="Date (DD/MM/YY)" />
@@ -168,6 +172,16 @@
     function openSetlist(artistName) {
       document.getElementById('setlist-artist-name').innerText = artistName.toUpperCase();
       showScreen('setlist');
+    }
+
+    function addOpenerField() {
+      const container = document.getElementById('openers-container');
+      const count = container.querySelectorAll('.input-opener').length + 1;
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'input-field input-opener';
+      input.placeholder = 'Opener ' + count;
+      container.appendChild(input);
     }
 
     function saveNewShow(e) {

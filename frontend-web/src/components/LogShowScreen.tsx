@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useEncoreStore } from '../store/useEncoreStore';
 import { parseRawSetlist } from '../engine/setlistParser';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 
 interface LogShowScreenProps {
   onBack: () => void;
@@ -14,10 +14,28 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
   const { saveConcert } = useEncoreStore();
 
   const [headlineBand, setHeadlineBand] = useState('');
-  const [openingBand, setOpeningBand] = useState('');
+  const [openers, setOpeners] = useState<string[]>(['']); // Array for multiple openers
   const [dateStr, setDateStr] = useState('');
   const [venueName, setVenueName] = useState('');
   const [notesText, setNotesText] = useState('');
+
+  const handleOpenerChange = (index: number, value: string) => {
+    const updated = [...openers];
+    updated[index] = value;
+    setOpeners(updated);
+  };
+
+  const handleAddOpenerField = () => {
+    setOpeners([...openers, '']);
+  };
+
+  const handleRemoveOpenerField = (index: number) => {
+    if (openers.length > 1) {
+      setOpeners(openers.filter((_, i) => i !== index));
+    } else {
+      setOpeners(['']);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,13 +55,16 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
       }
     }
 
-    // Parse raw setlist text from combined notes field
+    // Join multiple openers with commas
+    const combinedOpeners = openers.filter(o => o.trim().length > 0).join(', ');
+
+    // Parse raw setlist text from notes
     const parsedTracks = parseRawSetlist(notesText);
 
     saveConcert({
       date: dateMs,
       headlineArtistName: headlineBand.trim(),
-      openingArtistName: openingBand.trim(),
+      openingArtistName: combinedOpeners,
       venueName: venueName.trim(),
       venueCity: 'Local City',
       setlist: parsedTracks,
@@ -87,18 +108,42 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
           />
         </div>
 
-        {/* Opening Band */}
+        {/* Dynamic Opener Fields */}
         <div>
           <label className="block text-[11px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
-            Opening Band
+            Opener
           </label>
-          <input
-            type="text"
-            placeholder="Opening Band (Opener)"
-            value={openingBand}
-            onChange={(e) => setOpeningBand(e.target.value)}
-            className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-4 py-3 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition"
-          />
+          <div className="space-y-2">
+            {openers.map((opener, idx) => (
+              <div key={idx} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder={idx === 0 ? "Opener" : `Opener ${idx + 1}`}
+                  value={opener}
+                  onChange={(e) => handleOpenerChange(idx, e.target.value)}
+                  className="flex-1 bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-4 py-3 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition"
+                />
+                {openers.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveOpenerField(idx)}
+                    className="p-3 text-slate-400 hover:text-rose-400 transition"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Add Another Opener Button */}
+          <button
+            type="button"
+            onClick={handleAddOpenerField}
+            className="mt-2 flex items-center gap-1.5 text-xs font-extrabold text-[#FFB300] hover:text-amber-300 transition py-1"
+          >
+            <Plus size={14} className="stroke-[3]" /> + Add Another Opener
+          </button>
         </div>
 
         {/* Date Input */}
@@ -139,7 +184,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
             placeholder="Notes (Setlist, who were you with, venue vibe, crowd energy)"
             value={notesText}
             onChange={(e) => setNotesText(e.target.value)}
-            rows={7}
+            rows={6}
             className="w-full flex-1 bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg p-4 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition resize-none text-sm leading-relaxed"
           />
         </div>
