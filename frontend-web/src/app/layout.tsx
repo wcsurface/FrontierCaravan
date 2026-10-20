@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Frontier Caravan: Wasteland Cartel',
-  description: 'Post-apocalyptic trading and tactical combat mobile game',
+  title: 'Midnight Mart: Neon Bodega',
+  description: 'Juicy spatial-fit inventory packing puzzle with a shop renovation meta-game',
   manifest: '/manifest.json',
 };
 
@@ -13,7 +13,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: 'cover',
-  themeColor: '#0a0b0d',
+  themeColor: '#070112',
 };
 
 export default function RootLayout({
@@ -23,7 +23,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-wasteland-900 text-slate-200 antialiased h-screen w-screen overflow-hidden flex flex-col">
+      <body className="bg-[#070112] text-slate-100 antialiased h-screen w-screen overflow-hidden select-none">
         {children}
       </body>
     </html>

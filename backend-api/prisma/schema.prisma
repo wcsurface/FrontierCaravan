@@ -1,0 +1,48 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Player {
+  id                String         @id @default(uuid())
+  deviceFingerprint String         @unique
+  username          String         @default("MidnightShopper")
+  coins             Int            @default(250)
+  stars             Int            @default(5)
+  currentLevel      Int            @default(1)
+  lives             Int            @default(5)
+  lastLifeRefill    DateTime       @default(now())
+  decorState        Json           @default("{}")
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  runs              LevelRun[]
+  scores            Leaderboard[]
+}
+
+model LevelRun {
+  id            String   @id @default(uuid())
+  playerId      String
+  player        Player   @relation(fields: [playerId], references: [id])
+  levelNumber   Int
+  movesUsed     Int
+  timeElapsedSec Int
+  starsAwarded  Int
+  scoreChecksum String
+  verified      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+}
+
+model Leaderboard {
+  id          String   @id @default(uuid())
+  playerId    String
+  player      Player   @relation(fields: [playerId], references: [id])
+  weeklyScore Int      @default(0)
+  rankTier    String   @default("Bronze")
+  updatedAt   DateTime @updatedAt
+
+  @@index([weeklyScore(sort: Desc)])
+}

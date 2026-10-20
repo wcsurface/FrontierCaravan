@@ -1,7 +1,7 @@
 {
-  "name": "frontier-caravan-backend",
-  "version": "1.0.0",
-  "description": "Backend Economy and Run Coordinator for Frontier Caravan",
+  "name": "midnight-mart-backend",
+  "version": "4.0.0",
+  "description": "Backend Microservice & HMAC Run Ledger for Midnight Mart: Neon Bodega",
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
@@ -9,6 +9,7 @@
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts"
   },
   "dependencies": {
+    "@prisma/client": "^5.21.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
@@ -19,6 +20,7 @@
     "@types/express": "^4.17.21",
     "@types/node": "^20.17.0",
     "@types/pg": "^8.11.10",
+    "prisma": "^5.21.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.6.3"
   }

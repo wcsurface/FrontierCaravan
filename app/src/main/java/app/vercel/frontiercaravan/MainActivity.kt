@@ -1,181 +1,131 @@
 package app.vercel.frontiercaravan
 
 import android.annotation.SuppressLint
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.view.View
-import android.view.Window
-import android.view.WindowManager
+import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
-import androidx.activity.OnBackPressedCallback
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 
 class MainActivity : ComponentActivity() {
 
     private lateinit var webView: WebView
-    private lateinit var bridge: NativeSpaceBridge
-    private var connectivityManager: ConnectivityManager? = null
-    private var networkCallback: ConnectivityManager.NetworkCallback? = null
 
-    private val offlineAssetUrl = "file:///android_asset/index.html"
-    private var isUsingOfflineFallback = true
-
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Force hardware acceleration for 60 FPS WebGL 2.0 rendering
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
-            WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
-        )
+        // Force immersive fullscreen sticky mode
+        hideSystemUI()
 
-        // Configure edge-to-edge & immersive landscape fullscreen
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        hideSystemUI(window)
-
-        // Initialize WebGL/WebGPU-capable WebView with priority tuning
-        webView = WebView(this).apply {
-            setLayerType(View.LAYER_TYPE_HARDWARE, null)
-            setRendererPriorityPolicy(WebView.RENDERER_PRIORITY_IMPORTANT, true)
-        }
+        webView = WebView(this)
         setContentView(webView)
 
-        setupWebViewSettings()
+        val settings: WebSettings = webView.settings
+        settings.javaScriptEnabled = true
+        settings.domStorageEnabled = true
+        settings.databaseEnabled = true
+        settings.allowFileAccess = true
+        settings.allowContentAccess = true
+        settings.setSupportZoom(false)
+        settings.builtInZoomControls = false
+        settings.displayZoomControls = false
 
-        bridge = NativeSpaceBridge(this, webView)
-        webView.addJavascriptInterface(bridge, "AndroidBridge")
-
-        setupWebViewClients()
-        setupOnBackPressed()
-
-        // Load offline asset instantly for 0ms startup
-        loadOfflineFallback()
-
-        setupNetworkMonitoring()
-    }
-
-    @SuppressLint("SetJavaScriptEnabled")
-    private fun setupWebViewSettings() {
-        webView.settings.apply {
-            javaScriptEnabled = true
-            domStorageEnabled = true
-            allowFileAccess = true
-            allowContentAccess = true
-            useWideViewPort = true
-            loadWithOverviewMode = true
-            setSupportZoom(false)
-            builtInZoomControls = false
-            displayZoomControls = false
-            mediaPlaybackRequiresUserGesture = false
-
-            // WebGL & High Performance Rendering Options
-            mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
-            cacheMode = WebSettings.LOAD_DEFAULT
-        }
-    }
-
-    private fun setupWebViewClients() {
-        webView.webChromeClient = object : WebChromeClient() {}
-
+        // Hardware acceleration flags
+        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
+        webView.webChromeClient = WebChromeClient()
         webView.webViewClient = object : WebViewClient() {
-            override fun shouldOverrideUrlLoading(
-                view: WebView?,
-                request: WebResourceRequest?
-            ): Boolean {
-                val url = request?.url?.toString() ?: return false
-                return !(url.startsWith("http://") || url.startsWith("https://") || url.startsWith("file:///"))
-            }
-
-            override fun onReceivedError(
-                view: WebView?,
-                request: WebResourceRequest?,
-                error: WebResourceError?
-            ) {
-                super.onReceivedError(view, request, error)
-                if (request?.isForMainFrame == true && !isUsingOfflineFallback) {
-                    loadOfflineFallback()
-                }
-            }
-        }
-    }
-
-    private fun loadOfflineFallback() {
-        isUsingOfflineFallback = true
-        webView.loadUrl(offlineAssetUrl)
-    }
-
-    private fun setupNetworkMonitoring() {
-        connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-        val request = NetworkRequest.Builder()
-            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            .build()
-
-        networkCallback = object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) {
-                runOnUiThread {
-                    bridge.notifyOnlineStatusChanged(true)
-                }
-            }
-
-            override fun onLost(network: Network) {
-                runOnUiThread {
-                    bridge.notifyOnlineStatusChanged(false)
-                    if (!isUsingOfflineFallback) {
-                        loadOfflineFallback()
-                    }
-                }
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
             }
         }
 
-        connectivityManager?.registerNetworkCallback(request, networkCallback!!)
+        // Expose Native Haptics Bridge
+        webView.addJavascriptInterface(AndroidHapticsInterface(this), "AndroidHaptics")
+
+        // Load offline fallback bundle directly
+        val targetUrl = "file:///android_asset/index.html"
+        webView.loadUrl(targetUrl)
     }
 
-    private fun setupOnBackPressed() {
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (webView.canGoBack()) {
-                    webView.goBack()
-                } else {
-                    finish()
-                }
-            }
-        })
+    private fun hideSystemUI() {
+        @Suppress("DEPRECATION")
+        window.decorView.systemUiVisibility = (
+            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+            or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+            or View.SYSTEM_UI_FLAG_FULLSCREEN
+        )
     }
 
-    private fun hideSystemUI(window: Window) {
-        val controller = WindowCompat.getInsetsController(window, window.decorView)
-        controller.systemBarsBehavior =
-            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        controller.hide(WindowInsetsCompat.Type.systemBars())
-    }
-
-    override fun onResume() {
-        super.onResume()
-        hideSystemUI(window)
-        webView.onResume()
-    }
-
-    override fun onPause() {
-        webView.onPause()
-        super.onPause()
-    }
-
-    override fun onDestroy() {
-        networkCallback?.let {
-            connectivityManager?.unregisterNetworkCallback(it)
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            hideSystemUI()
         }
-        webView.destroy()
-        super.onDestroy()
+    }
+
+    inner class AndroidHapticsInterface(private val context: Context) {
+        private val vibrator: Vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val manager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            manager.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        }
+
+        @JavascriptInterface
+        fun vibrateLight() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(12, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                @Suppress("DEPRECATION")
+                vibrator.vibrate(12)
+            }
+        }
+
+        @JavascriptInterface
+        fun vibrateMedium() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(28, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                @Suppress("DEPRECATION")
+                vibrator.vibrate(28)
+            }
+        }
+
+        @JavascriptInterface
+        fun vibrateHeavy() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(
+                    VibrationEffect.createWaveform(longArrayOf(0, 30, 40, 60), intArrayOf(0, 180, 0, 255), -1)
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                vibrator.vibrate(60)
+            }
+        }
+
+        @JavascriptInterface
+        fun vibrateReject() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(
+                    VibrationEffect.createWaveform(longArrayOf(0, 20, 40, 20), intArrayOf(0, 200, 0, 200), -1)
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                vibrator.vibrate(longArrayOf(0, 20, 40, 20), -1)
+            }
+        }
     }
 }

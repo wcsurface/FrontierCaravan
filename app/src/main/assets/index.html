@@ -3,203 +3,183 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Telos: Infinite Horizon (Offline Fallback Engine)</title>
+  <title>Midnight Mart: Neon Bodega</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
-    body { background-color: #030712; color: #f3f4f6; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; }
+    body { background-color: #070112; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 12px; }
 
-    /* Top Navigation HUD */
-    #hud { background: #0f172a; border-bottom: 2px solid #1e293b; padding: 8px 16px; display: flex; justify-between: align-items: center; z-index: 10; height: 50px; }
-    .hud-stat { display: flex; align-items: center; gap: 6px; font-weight: bold; font-size: 13px; }
-    .stat-val { color: #38bdf8; }
-    .stat-badge { background: #1e293b; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155; }
+    /* Top HUD Header */
+    #hud { width: 100%; max-width: 420px; background: rgba(15, 9, 31, 0.8); border: 1px solid rgba(147, 51, 234, 0.4); border-radius: 16px; padding: 8px 16px; display: flex; justify-between: align-items: center; z-index: 10; }
+    .hud-stat { font-weight: 800; font-size: 13px; color: #f43f5e; display: flex; align-items: center; gap: 4px; }
+    .hud-badge { background: rgba(88, 28, 135, 0.5); padding: 3px 10px; border-radius: 8px; border: 1px solid rgba(126, 34, 206, 0.4); font-size: 11px; font-weight: 700; color: #e9d5ff; }
 
-    /* Main Container */
-    #app-content { flex: 1; position: relative; display: flex; flex-direction: column; background: #030712; }
-    .tab-view { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
-    .tab-view.active { display: flex; flex-direction: column; }
+    /* Canvas Container */
+    #canvas-container { relative: width: 100%; max-width: 420px; height: 480px; display: flex; justify-content: center; align-items: center; }
+    canvas { width: 100%; height: 100%; border-radius: 20px; border: 1px solid rgba(147, 51, 234, 0.3); background: #0f091f; box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
 
-    /* Bottom Navigation Bar */
-    #nav-bar { height: 56px; background: #0f172a; border-top: 2px solid #1e293b; display: flex; justify-around: align-items: center; }
-    .nav-btn { background: none; border: none; color: #94a3b8; font-weight: bold; font-size: 12px; padding: 8px 16px; border-radius: 6px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-    .nav-btn.active { color: #38bdf8; background: #1e293b; border-bottom: 2px solid #38bdf8; }
-
-    /* UI Panels & Containers */
-    .panel-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 12px; margin: 8px; }
-    .btn-primary { background: #0284c7; color: #fff; border: none; padding: 10px 18px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-size: 12px; }
-    .btn-primary:active { background: #0369a1; }
-
-    canvas { width: 100%; height: 100%; display: block; }
-    #offline-banner { background: #0284c7; color: #fff; text-align: center; font-size: 11px; padding: 2px 0; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-
-    .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
-    .modal-overlay.open { opacity: 1; pointer-events: auto; }
-    .modal-box { background: #0f172a; border: 2px solid #0284c7; border-radius: 10px; max-width: 90%; width: 440px; padding: 20px; text-align: center; }
+    /* Bottom Navigation Dock */
+    #nav-bar { width: 100%; max-width: 420px; background: rgba(15, 9, 31, 0.9); border: 1px solid rgba(147, 51, 234, 0.4); border-radius: 24px; padding: 8px; display: flex; justify-around: align-items: center; }
+    .nav-btn { background: none; border: none; color: #ec4899; font-weight: 900; font-size: 11px; letter-spacing: 1px; padding: 6px 16px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
   </style>
 </head>
 <body>
 
-  <div id="offline-banner">TELOS: INFINITE HORIZON - STANDBY FOR CLOUD SYNC</div>
-
-  <!-- HUD -->
+  <!-- Top HUD -->
   <div id="hud">
-    <div class="hud-stat">💰 Units: <span id="stat-units" class="stat-val">125,000</span></div>
-    <div class="hud-stat">🔮 Nanites: <span id="stat-nanites" class="stat-val">1,200</span></div>
-    <div class="hud-stat">🛡️ Hazard: <span id="stat-hazard" class="stat-val">85%</span></div>
-    <div class="hud-stat">⚡ O2: <span id="stat-o2" class="stat-val">100%</span></div>
-    <div class="hud-stat">👁️ Wardens: <span id="stat-warden" class="stat-val" style="color:#ef4444">L1 Scout</span></div>
+    <div class="hud-stat">❤️ <span id="stat-lives">5</span></div>
+    <div class="hud-badge">Moves: <span id="stat-moves">12</span></div>
+    <div class="hud-badge" style="border-color:rgba(6,182,212,0.4); color:#a5f3fc;">Coins: 💰 <span id="stat-coins">250</span></div>
   </div>
 
-  <!-- App Views -->
-  <div id="app-content">
-
-    <!-- SPACE FLIGHT TAB -->
-    <div id="view-space" class="tab-view active">
-      <div style="position: absolute; top: 10px; left: 10px; z-index: 5;" class="stat-badge">
-        System: <span id="current-system-name">Telos Prime</span> | Biome: <span id="current-biome">Lush Overgrowth</span>
-      </div>
-      <canvas id="space-canvas"></canvas>
-    </div>
-
-    <!-- DISCOVERY CODEX TAB -->
-    <div id="view-codex" class="tab-view" style="padding: 16px; overflow-y: auto;">
-      <h2 style="color: #38bdf8; margin-bottom: 12px;">Galactic Discovery Codex</h2>
-      <div id="codex-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
-    </div>
-
-    <!-- BASE BUILDER TAB -->
-    <div id="view-base" class="tab-view" style="padding: 16px; overflow-y: auto;">
-      <h2 style="color: #38bdf8; margin-bottom: 12px;">Planetary Base Construction</h2>
-      <div id="base-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
-    </div>
-
+  <!-- Canvas Game Viewport -->
+  <div id="canvas-container">
+    <canvas id="game-canvas"></canvas>
   </div>
 
   <!-- Bottom Navigation -->
   <div id="nav-bar">
-    <button class="nav-btn active" onclick="switchTab('space')">🚀 Flight</button>
-    <button class="nav-btn" onclick="switchTab('codex')">📖 Discovery Codex</button>
-    <button class="nav-btn" onclick="switchTab('base')">🏗️ Base Building</button>
+    <button class="nav-btn">✦ MIDNIGHT MART PWA ✦</button>
   </div>
 
   <script>
-    // Native Space Bridge Helper
-    const bridge = {
-      vibrate: (ms) => window.AndroidBridge ? window.AndroidBridge.vibrate(ms) : (navigator.vibrate && navigator.vibrate(ms)),
-      playAudioCue: (snd) => window.AndroidBridge ? window.AndroidBridge.playAudioCue(snd) : console.log('Audio cue:', snd),
-      saveState: (state) => window.AndroidBridge ? window.AndroidBridge.saveLocalState(JSON.stringify(state)) : localStorage.setItem('telos_state', JSON.stringify(state)),
-      loadState: () => {
-        const raw = window.AndroidBridge ? window.AndroidBridge.loadLocalState() : localStorage.getItem('telos_state');
-        return raw ? JSON.parse(raw) : null;
-      }
+    // Audio Synthesizer
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playPop() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(320, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(780, audioCtx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.08);
+    }
+
+    function playSnap(combo) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      const baseFreq = 440 * Math.pow(2, Math.min(combo, 12) / 12);
+      osc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, audioCtx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.12);
+    }
+
+    // Native Haptics Bridge
+    const haptics = {
+      light: () => window.AndroidHaptics ? window.AndroidHaptics.vibrateLight() : (navigator.vibrate && navigator.vibrate(10)),
+      medium: () => window.AndroidHaptics ? window.AndroidHaptics.vibrateMedium() : (navigator.vibrate && navigator.vibrate(25)),
+      heavy: () => window.AndroidHaptics ? window.AndroidHaptics.vibrateHeavy() : (navigator.vibrate && navigator.vibrate([40,30,60])),
+      reject: () => window.AndroidHaptics ? window.AndroidHaptics.vibrateReject() : (navigator.vibrate && navigator.vibrate([20,50,20]))
     };
 
-    let gameState = bridge.loadState() || {
-      units: 125000, nanites: 1200, hazard: 85, o2: 100, wardenLevel: 1,
-      discoveries: [
-        { name: 'Telos Prime', type: 'System', reward: 50000 },
-        { name: 'Zephyr-9 Planet A', type: 'Planet', reward: 25000 }
-      ],
-      baseParts: ['Wood Habitat Module', 'Solar Panel Array', 'Exocraft Bay']
-    };
+    // Canvas & Game Loop
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
 
-    function updateHUD() {
-      document.getElementById('stat-units').innerText = gameState.units.toLocaleString();
-      document.getElementById('stat-nanites').innerText = gameState.nanites.toLocaleString();
-      document.getElementById('stat-hazard').innerText = gameState.hazard + '%';
-      document.getElementById('stat-o2').innerText = gameState.o2 + '%';
-      bridge.saveState(gameState);
+    function resize() {
+      width = canvas.width = canvas.parentElement.clientWidth || 380;
+      height = canvas.height = canvas.parentElement.clientHeight || 480;
     }
+    resize();
 
-    function switchTab(tabName) {
-      bridge.vibrate(30);
-      bridge.playAudioCue('click');
-      document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+    // 4x4 Grid State
+    const grid = Array.from({ length: 4 }, () => Array(4).fill(0));
+    let moves = 12;
+    let coins = 250;
+    let combo = 0;
 
-      document.getElementById('view-' + tabName).classList.add('active');
-      event.currentTarget.classList.add('active');
+    const items = [
+      { name: 'Bento', color: '#ff7043', shape: [[0,0],[0,1],[1,0],[1,1]], w:2, h:2 },
+      { name: 'Soda', color: '#00ffa3', shape: [[0,0],[1,0]], w:1, h:2 },
+      { name: 'Gummy', color: '#ff2a85', shape: [[0,0]], w:1, h:1 }
+    ];
+    let stagedIndex = 0;
 
-      if (tabName === 'space') startSpaceLoop();
-      if (tabName === 'codex') renderCodex();
-      if (tabName === 'base') renderBase();
-    }
+    const CELL = 60;
+    const ORIGIN_X = (width - 4 * CELL) / 2 || 35;
+    const ORIGIN_Y = 80;
 
-    // 2D Space Simulation Fallback
-    const spaceCanvas = document.getElementById('space-canvas');
-    const spaceCtx = spaceCanvas.getContext('2d');
-    let animActive = false;
+    function render() {
+      ctx.fillStyle = '#0f091f';
+      ctx.fillRect(0, 0, width, height);
 
-    function startSpaceLoop() {
-      spaceCanvas.width = spaceCanvas.parentElement.clientWidth || window.innerWidth;
-      spaceCanvas.height = spaceCanvas.parentElement.clientHeight || (window.innerHeight - 110);
-      animActive = true;
-      requestAnimationFrame(spaceLoop);
-    }
+      // Basket Backdrop
+      ctx.fillStyle = '#160829';
+      ctx.strokeStyle = '#00f0ff';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(ORIGIN_X - 10, ORIGIN_Y - 10, 4 * CELL + 20, 4 * CELL + 20);
+      ctx.fillRect(ORIGIN_X - 10, ORIGIN_Y - 10, 4 * CELL + 20, 4 * CELL + 20);
 
-    function spaceLoop() {
-      if (!animActive) return;
-
-      spaceCtx.fillStyle = '#030712';
-      spaceCtx.fillRect(0, 0, spaceCanvas.width, spaceCanvas.height);
-
-      // Stars
-      spaceCtx.fillStyle = '#ffffff';
-      for (let i = 0; i < 40; i++) {
-        const x = (Math.sin(i * 99 + Date.now() * 0.001) * 0.5 + 0.5) * spaceCanvas.width;
-        const y = (Math.cos(i * 33 + Date.now() * 0.001) * 0.5 + 0.5) * spaceCanvas.height;
-        spaceCtx.fillRect(x, y, 2, 2);
+      // Grid Cells
+      for (let r = 0; r < 4; r++) {
+        for (let c = 0; c < 4; c++) {
+          const x = ORIGIN_X + c * CELL;
+          const y = ORIGIN_Y + r * CELL;
+          ctx.fillStyle = grid[r][c] ? '#ff2a85' : 'rgba(255,255,255,0.05)';
+          ctx.fillRect(x + 2, y + 2, CELL - 4, CELL - 4);
+          ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+          ctx.strokeRect(x + 2, y + 2, CELL - 4, CELL - 4);
+        }
       }
 
-      // Planet
-      spaceCtx.fillStyle = '#10b981';
-      spaceCtx.beginPath();
-      spaceCtx.arc(spaceCanvas.width - 120, spaceCanvas.height / 2, 70, 0, Math.PI * 2);
-      spaceCtx.fill();
+      // Render Staged Item Below
+      const staged = items[stagedIndex];
+      if (staged) {
+        ctx.fillStyle = staged.color;
+        const sx = width / 2 - (staged.w * CELL) / 2;
+        const sy = ORIGIN_Y + 4 * CELL + 40;
+        staged.shape.forEach(([dr, dc]) => {
+          ctx.fillRect(sx + dc * CELL + 2, sy + dr * CELL + 2, CELL - 4, CELL - 4);
+        });
+      }
 
-      // Ship
-      spaceCtx.fillStyle = '#38bdf8';
-      spaceCtx.beginPath();
-      spaceCtx.moveTo(100, spaceCanvas.height / 2 - 15);
-      spaceCtx.lineTo(150, spaceCanvas.height / 2);
-      spaceCtx.lineTo(100, spaceCanvas.height / 2 + 15);
-      spaceCtx.closePath();
-      spaceCtx.fill();
-
-      requestAnimationFrame(spaceLoop);
+      requestAnimationFrame(render);
     }
 
-    function renderCodex() {
-      const container = document.getElementById('codex-list');
-      container.innerHTML = gameState.discoveries.map(d => `
-        <div class="panel-card" style="display:flex; justify-content:space-between;">
-          <div>
-            <div style="font-weight:bold; color:#38bdf8;">${d.name} (${d.type})</div>
-            <div style="font-size:12px; color:#94a3b8;">First Discovered by Traveler-2084</div>
-          </div>
-          <div style="font-weight:bold; color:#10b981;">+${d.reward} Units</div>
-        </div>
-      `).join('');
-    }
+    canvas.addEventListener('pointerdown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const px = e.clientX - rect.left;
+      const py = e.clientY - rect.top;
 
-    function renderBase() {
-      const container = document.getElementById('base-list');
-      container.innerHTML = gameState.baseParts.map(bp => `
-        <div class="panel-card" style="display:flex; justify-content:space-between;">
-          <div style="font-weight:bold; color:#f3f4f6;">${bp}</div>
-          <button class="btn-primary" style="padding:4px 10px; font-size:11px;" onclick="placePart('${bp}')">Construct</button>
-        </div>
-      `).join('');
-    }
+      const col = Math.floor((px - ORIGIN_X) / CELL);
+      const row = Math.floor((py - ORIGIN_Y) / CELL);
 
-    function placePart(name) {
-      bridge.vibrate(40);
-      bridge.playAudioCue('click');
-      alert('Constructed ' + name + ' on planetary surface grid!');
-    }
+      const staged = items[stagedIndex];
+      if (staged && row >= 0 && row < 4 && col >= 0 && col < 4) {
+        let valid = true;
+        staged.shape.forEach(([dr, dc]) => {
+          const r = row + dr, c = col + dc;
+          if (r < 0 || r >= 4 || c < 0 || c >= 4 || grid[r][c] !== 0) valid = false;
+        });
 
-    updateHUD();
-    startSpaceLoop();
+        if (valid) {
+          staged.shape.forEach(([dr, dc]) => { grid[row + dr][col + dc] = 1; });
+          combo++;
+          moves--;
+          coins += 15;
+          stagedIndex = (stagedIndex + 1) % items.length;
+          document.getElementById('stat-moves').innerText = moves;
+          document.getElementById('stat-coins').innerText = coins;
+          playSnap(combo);
+          haptic.medium();
+        } else {
+          combo = 0;
+          haptic.reject();
+        }
+      }
+    });
+
+    render();
   </script>
 </body>
 </html>

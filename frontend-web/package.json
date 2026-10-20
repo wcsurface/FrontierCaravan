@@ -1,6 +1,6 @@
 {
-  "name": "telos-infinite-horizon-web",
-  "version": "2.0.0",
+  "name": "midnight-mart-web",
+  "version": "4.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,23 +9,20 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@react-three/drei": "^9.115.0",
-    "@react-three/fiber": "^8.17.10",
+    "canvas-confetti": "^1.9.3",
     "clsx": "^2.1.1",
     "lucide-react": "^0.453.0",
     "next": "^14.2.15",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "simplex-noise": "^4.0.3",
     "tailwind-merge": "^2.5.4",
-    "three": "^0.169.0",
     "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20.17.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "@types/three": "^0.169.0",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
