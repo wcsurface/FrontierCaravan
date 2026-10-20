@@ -20,6 +20,10 @@
     .nav-btn-left { left: 0; }
     .nav-btn-right { right: 0; }
 
+    /* Sort Control Bar */
+    .sort-control-bar { display: flex; justify-between; align-items: center; width: 100%; margin-bottom: 10px; padding: 0 4px; }
+    .sort-dropdown { background: #121619; border: 1px solid #222B30; color: #f1f5f9; font-size: 11px; font-weight: 800; border-radius: 8px; padding: 6px 10px; outline: none; text-transform: uppercase; cursor: pointer; }
+
     /* Auth Tab Switcher */
     .auth-tab-box { display: flex; background: #121619; padding: 4px; border-radius: 9999px; border: 1px solid #222B30; margin-bottom: 20px; width: 100%; }
     .auth-tab-btn { flex: 1; padding: 12px; border-radius: 9999px; border: none; background: none; color: #94a3b8; font-weight: 900; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
@@ -102,6 +106,16 @@
       <button class="nav-btn-icon nav-btn-right" onclick="showScreen('auth')">★</button>
     </div>
 
+    <!-- Sort Control Bar -->
+    <div class="sort-control-bar" id="sort-control-bar" style="display:none;">
+      <div style="font-size:11px; font-weight:800; color:#94a3b8; text-transform:uppercase;" id="shows-count-label">0 SHOWS</div>
+      <select class="sort-dropdown" id="sort-dropdown-select" onchange="handleSortChange(this.value)">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="band">Band (A-Z)</option>
+      </select>
+    </div>
+
     <div id="ticket-list">
       <!-- Dynamic persisted tickets container -->
     </div>
@@ -168,10 +182,19 @@
       </div>
     </div>
 
-    <div style="text-align:center; font-weight:900; font-size:14px; color:#FFB300; margin-bottom:16px;" id="setlist-artist-name">CONCERT SETLIST</div>
+    <div style="text-align:center; font-weight:900; font-size:14px; color:#FFB300; margin-bottom:16px;" id="setlist-artist-name">THE CURE</div>
 
-    <div style="flex:1; font-family:monospace; font-size:14px; line-height:2; color:#e2e8f0;" id="setlist-content">
-      <div style="color:#94a3b8; font-style:italic;">No setlist tracks recorded yet.</div>
+    <div style="flex:1; font-family:monospace; font-size:14px; line-height:2; color:#e2e8f0;">
+      <div>1. Plainsong</div>
+      <div>2. Pictures of You</div>
+      <div>3. Fascination Street</div>
+      <div>4. Deep Green Sea</div>
+      <div>5. In Between Days</div>
+      <div style="margin: 12px 0;">
+        <span style="background:#00E676; color:#0a0a0a; font-weight:900; padding:3px 10px; border-radius:9999px; font-size:11px;">ENCORE</span>
+      </div>
+      <div>6. Boys Don't Cry</div>
+      <div>7. 10:15 Saturday Night</div>
     </div>
   </div>
 
@@ -248,93 +271,7 @@
 
     let authMode = 'login';
     let userShows = [];
-
-    // Load persisted shows on launch
-    function loadSavedShows() {
-      try {
-        const raw = localStorage.getItem('livelore_local_shows');
-        if (raw) {
-          userShows = JSON.parse(raw);
-        } else {
-          // Include user's Aerosmith & Guns N' Roses show if fresh vault
-          userShows = [
-            {
-              headline: 'Aerosmith',
-              openersList: ['Guns N Roses'],
-              date: '08/02/88',
-              venue: 'Market Square Arena',
-              notes: 'My first concert.'
-            }
-          ];
-          saveShowsToStorage();
-        }
-      } catch (e) {
-        userShows = [];
-      }
-      renderShowsFeed();
-      updateStatsDisplay();
-    }
-
-    function saveShowsToStorage() {
-      try {
-        localStorage.setItem('livelore_local_shows', JSON.stringify(userShows));
-      } catch (e) {}
-    }
-
-    function renderShowsFeed() {
-      const list = document.getElementById('ticket-list');
-      if (!list) return;
-
-      if (userShows.length === 0) {
-        list.style.display = 'flex';
-        list.style.flexDirection = 'column';
-        list.style.justifyContent = 'center';
-        list.style.alignItems = 'center';
-        list.innerHTML = `
-          <div id="empty-state-box" style="text-align:center; padding: 30px 16px; margin: auto 0;">
-            <div style="font-size:36px; margin-bottom:12px;">🎸</div>
-            <div style="font-weight:900; font-size:24px; color:#ffffff; text-transform:uppercase; margin-bottom:16px;">YOUR CONCERT VAULT IS EMPTY!</div>
-            <div class="bounce-pointer" style="color:#FFB300; font-weight:900; font-size:16px; text-transform:uppercase; letter-spacing:1px; margin-top:20px;">
-              START ADDING YOUR CONCERTS BELOW!
-              <div style="font-size:42px; color:#00E676; margin-top:8px; font-weight:900;">↓</div>
-            </div>
-          </div>
-        `;
-      } else {
-        list.style.display = 'block';
-        list.innerHTML = '';
-        userShows.forEach(show => {
-          const card = document.createElement('div');
-          card.className = 'ticket-card';
-          card.onclick = () => openSetlist(show.headline, show.notes);
-
-          let bandStackHtml = `<div class="ticket-artist-head">${show.headline.toUpperCase()}</div>`;
-          if (show.openersList && show.openersList.length > 0) {
-            bandStackHtml += `
-              <div class="ticket-artist-and">and</div>
-              <div class="ticket-artist-openers">${show.openersList.join(', ')}</div>
-            `;
-          }
-
-          card.innerHTML = `
-            <div class="ticket-left">
-              <div class="ticket-artist-box">
-                ${bandStackHtml}
-              </div>
-              <div class="ticket-footer">
-                <span class="ticket-venue">${show.venue}</span>
-                <span class="ticket-date">${show.date}</span>
-              </div>
-            </div>
-            <div class="ticket-stub">
-              <div>ADMIT ONE</div>
-              <div style="font-size:8px; color:#64748b; margin-top:4px;">SEC 7</div>
-            </div>
-          `;
-          list.appendChild(card);
-        });
-      }
-    }
+    let currentSort = 'newest';
 
     function showScreen(screenId) {
       document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
@@ -423,6 +360,103 @@
     function cancelShowLog() {
       resetLogForm();
       showScreen('diary');
+    }
+
+    function handleSortChange(val) {
+      currentSort = val;
+      renderShowsFeed();
+    }
+
+    function loadSavedShows() {
+      try {
+        const raw = localStorage.getItem('livelore_local_shows');
+        if (raw) {
+          userShows = JSON.parse(raw);
+        } else {
+          userShows = [];
+        }
+      } catch (e) {
+        userShows = [];
+      }
+      renderShowsFeed();
+      updateStatsDisplay();
+    }
+
+    function saveShowsToStorage() {
+      try {
+        localStorage.setItem('livelore_local_shows', JSON.stringify(userShows));
+      } catch (e) {}
+    }
+
+    function renderShowsFeed() {
+      const list = document.getElementById('ticket-list');
+      const sortBar = document.getElementById('sort-control-bar');
+      const countLabel = document.getElementById('shows-count-label');
+      if (!list) return;
+
+      if (userShows.length === 0) {
+        if (sortBar) sortBar.style.display = 'none';
+        list.style.display = 'flex';
+        list.style.flexDirection = 'column';
+        list.style.justifyContent = 'center';
+        list.style.alignItems = 'center';
+        list.innerHTML = `
+          <div id="empty-state-box" style="text-align:center; padding: 30px 16px; margin: auto 0;">
+            <div style="font-size:36px; margin-bottom:12px;">🎸</div>
+            <div style="font-weight:900; font-size:24px; color:#ffffff; text-transform:uppercase; margin-bottom:16px;">YOUR CONCERT VAULT IS EMPTY!</div>
+            <div class="bounce-pointer" style="color:#FFB300; font-weight:900; font-size:16px; text-transform:uppercase; letter-spacing:1px; margin-top:20px;">
+              START ADDING YOUR CONCERTS BELOW!
+              <div style="font-size:42px; color:#00E676; margin-top:8px; font-weight:900;">↓</div>
+            </div>
+          </div>
+        `;
+      } else {
+        if (sortBar) sortBar.style.display = 'flex';
+        if (countLabel) countLabel.innerText = userShows.length + (userShows.length === 1 ? ' SHOW LOGGED' : ' SHOWS LOGGED');
+
+        // Copy and sort array according to currentSort
+        let displayList = [...userShows];
+        if (currentSort === 'newest') {
+          displayList.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        } else if (currentSort === 'oldest') {
+          displayList.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        } else if (currentSort === 'band') {
+          displayList.sort((a, b) => a.headline.localeCompare(b.headline));
+        }
+
+        list.style.display = 'block';
+        list.innerHTML = '';
+        displayList.forEach(show => {
+          const card = document.createElement('div');
+          card.className = 'ticket-card';
+          card.onclick = () => openSetlist(show.headline, show.notes);
+
+          let bandStackHtml = `<div class="ticket-artist-head">${show.headline.toUpperCase()}</div>`;
+          if (show.openersList && show.openersList.length > 0) {
+            bandStackHtml += `
+              <div class="ticket-artist-and">and</div>
+              <div class="ticket-artist-openers">${show.openersList.join(', ')}</div>
+            `;
+          }
+
+          card.innerHTML = `
+            <div class="ticket-left">
+              <div class="ticket-artist-box">
+                ${bandStackHtml}
+              </div>
+              <div class="ticket-footer">
+                <span class="ticket-venue">${show.venue}</span>
+                <span class="ticket-date">${show.date}</span>
+              </div>
+            </div>
+            <div class="ticket-stub">
+              <div>ADMIT ONE</div>
+              <div style="font-size:8px; color:#64748b; margin-top:4px;">SEC 7</div>
+            </div>
+          `;
+          list.appendChild(card);
+        });
+      }
     }
 
     function updateStatsDisplay() {
@@ -520,7 +554,6 @@
       }
     }
 
-    // Initialize saved shows on page load
     document.addEventListener('DOMContentLoaded', loadSavedShows);
     loadSavedShows();
   </script>
