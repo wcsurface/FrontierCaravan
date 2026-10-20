@@ -39,19 +39,19 @@ export default function HomeView() {
       {/* SCREEN 1: DIARY VIEW */}
       {currentView === 'diary' && (
         <div className="flex flex-col w-full max-w-md h-screen p-4 overflow-y-auto">
-          {/* Header with LiveLore Logo */}
-          <header className="relative flex items-center justify-between w-full pt-2 pb-4">
+          {/* Header with 2X Larger LiveLore Logo */}
+          <header className="relative flex items-center justify-between w-full pt-3 pb-6 my-1">
             <button
               onClick={() => setCurrentView('stats')}
               className="p-2 text-slate-200 hover:text-white transition rounded-full z-10"
             >
-              <Menu size={24} />
+              <Menu size={26} />
             </button>
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-12">
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-10">
               <img
                 src="/assets/livelore_logo.png"
                 alt="LiveLore"
-                className="h-14 sm:h-16 w-auto object-contain drop-shadow-[0_0_15px_rgba(0,230,118,0.3)] filter contrast-105"
+                className="h-24 sm:h-28 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.4)] filter contrast-105"
               />
             </div>
             <button
@@ -59,9 +59,9 @@ export default function HomeView() {
               className="p-2 text-[#00E676] hover:text-white transition rounded-full z-10 flex items-center gap-1"
             >
               {user ? (
-                <CheckCircle2 size={22} className="text-[#00E676]" />
+                <CheckCircle2 size={24} className="text-[#00E676]" />
               ) : (
-                <User size={24} className="text-[#FFB300]" />
+                <User size={26} className="text-[#FFB300]" />
               )}
             </button>
           </header>
