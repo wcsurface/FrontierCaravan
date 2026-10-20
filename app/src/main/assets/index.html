@@ -6,64 +6,185 @@
   <title>Encore: Concert & Setlist Vault</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
-    body { background-color: #121212; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 16px; }
+    body { background-color: #0A0D0E; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 16px; }
 
-    /* Header */
-    #header { width: 100%; max-width: 420px; display: flex; justify-between: align-items: center; padding-bottom: 12px; }
-    .title { font-weight: 900; font-size: 22px; letter-spacing: 2px; text-transform: uppercase; color: #ffffff; }
+    /* Screen Views */
+    .screen-view { display: none; width: 100%; max-width: 420px; height: 100%; flex-direction: column; justify-between; }
+    .screen-view.active { display: flex; }
 
-    /* Authentic Clean Blank Vintage Ticket Stub Card */
-    .ticket-card { position: relative; width: 100%; max-width: 420px; aspect-ratio: 2.85 / 1; background: #f4e4bc; color: #2b1c0e; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; display: flex; justify-content: space-between; box-shadow: 0 10px 25px rgba(0,0,0,0.6); border: 2px solid #d6c294; cursor: pointer; }
+    /* Headers */
+    .header { width: 100%; display: flex; justify-between: align-items: center; padding-bottom: 12px; }
+    .header-title { font-weight: 900; font-size: 22px; letter-spacing: 2px; text-transform: uppercase; color: #ffffff; }
+
+    /* Ticket Card */
+    .ticket-card { position: relative; width: 100%; aspect-ratio: 2.85 / 1; background: #f4e4bc; color: #2b1c0e; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; display: flex; justify-between; box-shadow: 0 10px 25px rgba(0,0,0,0.6); border: 2px solid #d6c294; cursor: pointer; }
     .ticket-left { width: 70%; display: flex; flex-direction: column; justify-content: space-between; border-right: 2px dashed #423220; padding-right: 8px; }
-    .ticket-artist { font-weight: 900; font-size: 22px; text-align: center; text-transform: uppercase; font-family: serif; color: #1c1208; margin: auto 0; }
-    .ticket-footer { display: flex; justify-content: space-between; border-top: 2px solid rgba(66,50,32,0.5); pt: 4px; font-weight: 900; font-size: 11px; }
+    .ticket-artist { font-weight: 900; font-size: 20px; text-align: center; text-transform: uppercase; font-family: serif; color: #1c1208; margin: auto 0; }
+    .ticket-footer { display: flex; justify-between; border-top: 2px solid rgba(66,50,32,0.5); pt: 4px; font-weight: 900; font-size: 11px; }
     .ticket-venue { color: #2b1c0e; text-transform: uppercase; }
     .ticket-date { color: #d97706; text-transform: uppercase; }
     .ticket-stub { width: 28%; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 900; font-size: 10px; text-transform: uppercase; }
 
-    /* Action CTA */
-    .btn-cta { width: 100%; max-width: 420px; background: #00E676; color: #0a0a0a; font-weight: 900; font-size: 13px; padding: 14px; border-radius: 16px; border: none; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; box-shadow: 0 0 20px rgba(0,230,118,0.4); }
+    /* Inputs with Amber Borders (#FFB300) */
+    .input-field { width: 100%; background: #111618; border: 1.5px solid #FFB300; border-radius: 8px; padding: 12px 16px; color: #f1f5f9; font-size: 14px; outline: none; margin-bottom: 12px; box-shadow: 0 0 10px rgba(255,179,0,0.15); }
+    textarea.input-field { min-height: 160px; resize: none; font-family: monospace; }
+
+    /* Action CTA Buttons */
+    .btn-cta { width: 100%; background: linear-gradient(90deg, #00E676, #00C853); color: #0a0a0a; font-weight: 900; font-size: 13px; padding: 14px; border-radius: 9999px; border: none; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; box-shadow: 0 0 20px rgba(0,230,118,0.4); margin-top: auto; margin-bottom: 8px; }
   </style>
 </head>
 <body>
 
-  <div id="header">
-    <div style="color:#00E676; font-size:20px;">☰</div>
-    <div class="title">DIARY</div>
-    <div style="color:#00E676; font-size:20px;">★</div>
-  </div>
+  <!-- SCREEN 1: DIARY -->
+  <div id="view-diary" class="screen-view active">
+    <div class="header">
+      <div style="color:#00E676; font-size:20px; cursor:pointer;" onclick="showScreen('stats')">☰</div>
+      <div class="header-title">DIARY</div>
+      <div style="color:#00E676; font-size:20px; cursor:pointer;" onclick="showScreen('stats')">★</div>
+    </div>
 
-  <div style="flex:1; width:100%; max-width:420px; overflow-y:auto;">
-    <div class="ticket-card">
-      <div class="ticket-left">
-        <div class="ticket-artist">THE CURE</div>
-        <div class="ticket-footer">
-          <span class="ticket-venue">Red Rocks</span>
-          <span class="ticket-date">OCT 12, 2026</span>
+    <div id="ticket-list" style="flex:1; width:100%; overflow-y:auto;">
+      <div class="ticket-card" onclick="openSetlist('THE CURE')">
+        <div class="ticket-left">
+          <div class="ticket-artist">THE CURE</div>
+          <div class="ticket-footer">
+            <span class="ticket-venue">Red Rocks</span>
+            <span class="ticket-date">OCT 12, 2026</span>
+          </div>
+        </div>
+        <div class="ticket-stub">
+          <div>ADMIT ONE</div>
+          <div style="font-size:8px; color:#64748b; margin-top:4px;">SEC 7</div>
         </div>
       </div>
-      <div class="ticket-stub">
-        <div>ADMIT ONE</div>
-        <div style="font-size:8px; color:#64748b; margin-top:4px;">SEC 7</div>
+
+      <div class="ticket-card" onclick="openSetlist('PIXIES')">
+        <div class="ticket-left">
+          <div class="ticket-artist">PIXIES</div>
+          <div class="ticket-footer">
+            <span class="ticket-venue">The Fillmore</span>
+            <span class="ticket-date">OCT 12, 2026</span>
+          </div>
+        </div>
+        <div class="ticket-stub">
+          <div>ADMIT ONE</div>
+          <div style="font-size:8px; color:#64748b; margin-top:4px;">SEC 7</div>
+        </div>
       </div>
     </div>
 
-    <div class="ticket-card">
-      <div class="ticket-left">
-        <div class="ticket-artist">PIXIES</div>
-        <div class="ticket-footer">
-          <span class="ticket-venue">The Fillmore</span>
-          <span class="ticket-date">OCT 12, 2026</span>
-        </div>
+    <button class="btn-cta" onclick="showScreen('log')">+ LOG NEW SHOW</button>
+  </div>
+
+  <!-- SCREEN 2: LOG SHOW -->
+  <div id="view-log" class="screen-view">
+    <div class="header">
+      <div style="color:#ffffff; font-size:22px; cursor:pointer;" onclick="showScreen('diary')">←</div>
+      <div class="header-title">LOG SHOW</div>
+      <div style="width:22px;"></div>
+    </div>
+
+    <form style="flex:1; display:flex; flex-direction:column;" onsubmit="saveNewShow(event)">
+      <input type="text" id="input-artist" class="input-field" placeholder="Artist" required />
+      <input type="text" id="input-date" class="input-field" placeholder="Date (DD/MM/YY)" />
+      <input type="text" id="input-venue" class="input-field" placeholder="Venue" required />
+      <textarea id="input-setlist" class="input-field" placeholder="Setlist / Notes"></textarea>
+
+      <button type="submit" class="btn-cta">+ ADD TO DIARY</button>
+    </form>
+  </div>
+
+  <!-- SCREEN 3: SETLIST -->
+  <div id="view-setlist" class="screen-view">
+    <div class="header">
+      <div style="color:#ffffff; font-size:22px; cursor:pointer;" onclick="showScreen('diary')">←</div>
+      <div class="header-title">SETLIST</div>
+      <div style="width:22px;"></div>
+    </div>
+
+    <div style="text-align:center; font-weight:900; font-size:14px; color:#94a3b8; margin-bottom:16px;" id="setlist-artist-name">THE CURE</div>
+
+    <div style="flex:1; font-family:monospace; font-size:14px; line-height:2; color:#e2e8f0;">
+      <div>1. Plainsong</div>
+      <div>2. Pictures of You</div>
+      <div>3. Fascination Street</div>
+      <div>4. Deep Green Sea</div>
+      <div>5. In Between Days</div>
+      <div style="margin: 12px 0;">
+        <span style="background:#00E676; color:#0a0a0a; font-weight:900; padding:3px 10px; border-radius:9999px; font-size:11px;">ENCORE</span>
       </div>
-      <div class="ticket-stub">
-        <div>ADMIT ONE</div>
-        <div style="font-size:8px; color:#64748b; margin-top:4px;">SEC 7</div>
+      <div>6. Boys Don't Cry</div>
+      <div>7. 10:15 Saturday Night</div>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: STATS -->
+  <div id="view-stats" class="screen-view">
+    <div class="header">
+      <div style="color:#ffffff; font-size:22px; cursor:pointer;" onclick="showScreen('diary')">←</div>
+      <div class="header-title">STATS</div>
+      <div style="width:22px;"></div>
+    </div>
+
+    <div style="text-align:center; font-weight:900; font-size:48px; color:#ffffff; margin: 20px 0;">78 SHOWS</div>
+
+    <div style="display:flex; justify-content:space-between; gap:20px; font-size:12px;">
+      <div style="flex:1;">
+        <div style="color:#94a3b8; font-weight:900; margin-bottom:10px;">TOP VENUES</div>
+        <div style="margin-bottom:8px;">Red Rocks - 12</div>
+        <div style="background:#00E676; height:6px; border-radius:4px; width:100%; margin-bottom:12px;"></div>
+        <div style="margin-bottom:8px;">The Fillmore - 8</div>
+        <div style="background:#00E676; height:6px; border-radius:4px; width:65%; margin-bottom:12px;"></div>
+      </div>
+      <div style="flex:1;">
+        <div style="color:#94a3b8; font-weight:900; margin-bottom:10px;">TOP ARTISTS</div>
+        <div style="margin-bottom:8px;">The Cure - 6</div>
+        <div style="background:#FFB300; height:6px; border-radius:4px; width:100%; margin-bottom:12px;"></div>
+        <div style="margin-bottom:8px;">Radiohead - 4</div>
+        <div style="background:#FFB300; height:6px; border-radius:4px; width:65%; margin-bottom:12px;"></div>
       </div>
     </div>
   </div>
 
-  <button class="btn-cta">+ LOG NEW SHOW</button>
+  <script>
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
+      document.getElementById('view-' + screenId).classList.add('active');
+    }
 
+    function openSetlist(artistName) {
+      document.getElementById('setlist-artist-name').innerText = artistName.toUpperCase();
+      showScreen('setlist');
+    }
+
+    function saveNewShow(e) {
+      e.preventDefault();
+      const artist = document.getElementById('input-artist').value;
+      const venue = document.getElementById('input-venue').value;
+      const date = document.getElementById('input-date').value || 'OCT 12, 2026';
+
+      if (artist && venue) {
+        const list = document.getElementById('ticket-list');
+        const card = document.createElement('div');
+        card.className = 'ticket-card';
+        card.onclick = () => openSetlist(artist);
+        card.innerHTML = `
+          <div class="ticket-left">
+            <div class="ticket-artist">${artist.toUpperCase()}</div>
+            <div class="ticket-footer">
+              <span class="ticket-venue">${venue}</span>
+              <span class="ticket-date">${date}</span>
+            </div>
+          </div>
+          <div class="ticket-stub">
+            <div>ADMIT ONE</div>
+            <div style="font-size:8px; color:#64748b; margin-top:4px;">SEC 7</div>
+          </div>
+        `;
+        list.prepend(card);
+        showScreen('diary');
+      }
+    }
+  </script>
 </body>
 </html>
