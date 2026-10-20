@@ -49,6 +49,7 @@
 
     /* Action CTA Buttons */
     .btn-cta { width: 100%; background: linear-gradient(90deg, #00E676, #00C853); color: #0a0a0a; font-weight: 900; font-size: 20px; padding: 16px; border-radius: 9999px; border: none; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; box-shadow: 0 0 22px rgba(0,230,118,0.5); margin-top: 12px; margin-bottom: 8px; }
+    .btn-edit { width: 100%; background: linear-gradient(90deg, #FFB300, #FFA000); color: #0a0a0a; font-weight: 900; font-size: 15px; padding: 14px; border-radius: 9999px; border: none; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; box-shadow: 0 0 15px rgba(255,179,0,0.3); margin-top: 12px; margin-bottom: 8px; }
     .btn-cancel { width: 100%; background: #121619; color: #cbd5e1; font-weight: 800; font-size: 14px; padding: 14px; border-radius: 9999px; border: 1px solid #222B30; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-bottom: 16px; }
     .btn-add-opener { background: none; border: none; color: #FFB300; font-weight: 800; font-size: 12px; cursor: pointer; margin-bottom: 12px; text-align: left; padding: 2px 0; }
 
@@ -60,7 +61,7 @@
     .bounce-pointer { animation: bounceDown 1.5s infinite; }
 
     /* Detail Card Box */
-    .detail-card { background: #121619; border: 1px solid #222B30; border-radius: 16px; padding: 20px; margin-bottom: 16px; width: 100%; }
+    .detail-card { background: #121619; border: 1px solid #222B30; border-radius: 16px; padding: 20px; margin-bottom: 12px; width: 100%; }
     .detail-label { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; color: #FFB300; margin-bottom: 4px; }
     .detail-val-headline { font-size: 22px; font-weight: 900; text-transform: uppercase; font-family: serif; color: #ffffff; margin-bottom: 12px; }
     .detail-val-text { font-size: 14px; font-weight: 700; color: #e2e8f0; margin-bottom: 12px; }
@@ -209,7 +210,7 @@
       <div style="margin-top:12px; border-top:1px solid #222B30; padding-top:8px;">
         <div class="detail-label">VENUE & LOCATION</div>
         <div class="detail-val-text" id="detail-venue" style="margin-bottom:2px;">Deer Creek Music Center</div>
-        <div style="font-size:12px; color:#94a3b8;" id="detail-location">Noblesville, Indiana, USA</div>
+        <div style="font-size:13px; font-weight:800; color:#00E676; margin-top:2px;" id="detail-location">Noblesville, Indiana, USA</div>
       </div>
 
       <div id="detail-notes-box" style="display:none; margin-top:12px; border-top:1px solid #222B30; padding-top:8px;">
@@ -218,6 +219,7 @@
       </div>
     </div>
 
+    <button class="btn-edit" id="btn-edit-show" onclick="triggerEditShow()">✏ EDIT SHOW</button>
     <button class="btn-cancel" onclick="showScreen('diary')">← BACK TO DIARY</button>
   </div>
 
@@ -300,6 +302,7 @@
     let authMode = 'login';
     let userShows = [];
     let currentSort = 'newest';
+    let activeDetailIndex = -1;
 
     function showScreen(screenId) {
       document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
@@ -320,13 +323,17 @@
     }
 
     function openShowDetails(showIndex) {
+      activeDetailIndex = showIndex;
       const show = userShows[showIndex];
       if (!show) return;
 
       document.getElementById('detail-headline').innerText = show.headline.toUpperCase();
       document.getElementById('detail-date').innerText = show.date;
       document.getElementById('detail-venue').innerText = show.venue;
-      document.getElementById('detail-location').innerText = (show.city || '') + (show.state ? `, ${show.state}` : '') + (show.country ? `, ${show.country}` : '');
+
+      // Location formatting (City, State, Country)
+      const locParts = [show.city, show.state, show.country].filter(Boolean);
+      document.getElementById('detail-location').innerText = locParts.length > 0 ? locParts.join(', ') : 'Indianapolis, Indiana, USA';
 
       const openersBox = document.getElementById('detail-openers-box');
       if (show.openersList && show.openersList.length > 0) {
@@ -370,6 +377,28 @@
       `;
 
       showScreen('setlist');
+    }
+
+    function triggerEditShow() {
+      if (activeDetailIndex < 0 || activeDetailIndex >= userShows.length) return;
+      const show = userShows[activeDetailIndex];
+
+      document.getElementById('input-headline').value = show.headline || '';
+      document.getElementById('input-venue').value = show.venue || '';
+      document.getElementById('input-city').value = show.city || '';
+      document.getElementById('input-state').value = show.state || '';
+      document.getElementById('input-country').value = show.country || '';
+      document.getElementById('input-date').value = show.date || '';
+      document.getElementById('input-notes').value = show.notes || '';
+
+      if (show.openersList && show.openersList.length > 0) {
+        const openersContainer = document.getElementById('openers-container');
+        openersContainer.innerHTML = show.openersList.map(op => `
+          <input type="text" class="input-field input-opener" value="${op}" placeholder="Opener" />
+        `).join('');
+      }
+
+      showScreen('log');
     }
 
     function formatDateOnInput(elem) {

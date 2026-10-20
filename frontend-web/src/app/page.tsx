@@ -14,9 +14,7 @@ export default function HomeView() {
   const { user, token, checkMe } = useAuthStore();
   const { concerts, artists, venues } = useEncoreStore();
 
-  const [currentView, setCurrentView] = useState<'diary' | 'log' | 'setlist' | 'stats' | 'auth'>(
-    user ? 'diary' : 'auth'
-  );
+  const [currentView, setCurrentView] = useState<'diary' | 'log' | 'setlist' | 'stats' | 'auth'>('diary');
   const [selectedConcertId, setSelectedConcertId] = useState<string>('');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'band'>('newest');
 
@@ -33,6 +31,11 @@ export default function HomeView() {
   const handleOpenSetlist = (concertId: string) => {
     setSelectedConcertId(concertId);
     setCurrentView('setlist');
+  };
+
+  const handleEditConcert = (concertId: string) => {
+    setSelectedConcertId(concertId);
+    setCurrentView('log');
   };
 
   // Sort Concerts Feed: Newest First, Oldest First, or Band (A-Z)
@@ -140,7 +143,10 @@ export default function HomeView() {
           {/* Bottom Floating CTA Button */}
           <div className="pt-2 pb-4 flex justify-center items-center w-full z-20">
             <button
-              onClick={() => setCurrentView('log')}
+              onClick={() => {
+                setSelectedConcertId('');
+                setCurrentView('log');
+              }}
               className="w-full py-4 bg-gradient-to-r from-[#00E676] to-[#00C853] hover:from-[#00FFA3] hover:to-[#00E676] text-slate-950 font-black text-sm uppercase tracking-wider rounded-full shadow-[0_0_20px_rgba(0,230,118,0.4)] active:scale-[0.98] transition-transform"
             >
               + LOG NEW SHOW
@@ -162,6 +168,7 @@ export default function HomeView() {
         <SetlistDetailView
           concertId={selectedConcertId}
           onBack={() => setCurrentView('diary')}
+          onEdit={(concertId) => handleEditConcert(concertId)}
         />
       )}
 

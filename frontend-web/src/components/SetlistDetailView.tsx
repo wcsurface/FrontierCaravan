@@ -3,14 +3,15 @@
 import React from 'react';
 import { useEncoreStore } from '../store/useEncoreStore';
 import { TicketStubCard } from './TicketStubCard';
-import { ArrowLeft, MapPin, Calendar, Users, FileText, Music } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Users, FileText, Music, Edit3 } from 'lucide-react';
 
 interface SetlistDetailViewProps {
   concertId: string;
   onBack: () => void;
+  onEdit: (concertId: string) => void;
 }
 
-export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId, onBack }) => {
+export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId, onBack, onEdit }) => {
   const { concerts, artists, venues, setlistItems } = useEncoreStore();
 
   const concert = concerts.find((c) => c.id === concertId) || concerts[0];
@@ -34,6 +35,10 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
     year: 'numeric',
   });
 
+  // Location string (City, State/Province, Country) for International Support
+  const locationParts = [venue?.city, venue?.stateProvince, venue?.country].filter(Boolean);
+  const locationString = locationParts.length > 0 ? locationParts.join(', ') : 'Indianapolis, Indiana, USA';
+
   const mainTracks = items.filter((s) => !s.isEncore);
   const encoreTracks = items.filter((s) => s.isEncore);
 
@@ -54,7 +59,12 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
             className="h-24 sm:h-28 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.4)] filter contrast-105"
           />
         </div>
-        <div className="w-10 z-10" />
+        <button
+          onClick={() => onEdit(concert.id)}
+          className="p-2 text-[#FFB300] hover:text-amber-300 transition rounded-full z-10 flex items-center gap-1 font-bold text-xs"
+        >
+          <Edit3 size={22} />
+        </button>
       </header>
 
       {/* Featured Ticket Stub Graphic */}
@@ -96,16 +106,16 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
           </p>
         </div>
 
-        {/* Venue & Location */}
+        {/* Venue & International Location (City, State, Country) */}
         <div className="border-t border-[#222B30] pt-3">
           <span className="text-[10px] font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-1">
             <MapPin size={12} /> VENUE & LOCATION
           </span>
-          <p className="text-sm font-extrabold text-slate-200">
+          <p className="text-base font-black text-white uppercase font-sans">
             {venue?.name || 'Market Square Arena'}
           </p>
-          <p className="text-xs text-slate-400 font-medium mt-0.5">
-            {venue?.city || 'Indianapolis'}, {venue?.country || 'USA'}
+          <p className="text-xs sm:text-sm font-extrabold text-[#00E676] tracking-wide mt-1">
+            {locationString}
           </p>
         </div>
 
@@ -121,7 +131,7 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
           </div>
         )}
 
-        {/* Tracklist / Setlist Songs if parsed */}
+        {/* Parsed Setlist Tracks if present */}
         {items.length > 0 && (
           <div className="border-t border-[#222B30] pt-3">
             <span className="text-[10px] font-black uppercase tracking-widest text-[#00E676] flex items-center gap-1.5 mb-2">
@@ -150,11 +160,18 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
         )}
       </div>
 
-      {/* Back CTA Button */}
-      <div className="max-w-md mx-auto w-full my-3">
+      {/* Action Buttons: EDIT SHOW & BACK TO DIARY */}
+      <div className="max-w-md mx-auto w-full my-3 flex flex-col gap-3">
+        <button
+          onClick={() => onEdit(concert.id)}
+          className="w-full py-3.5 bg-gradient-to-r from-[#FFB300] to-[#FFA000] hover:from-[#FFC107] hover:to-[#FFB300] text-slate-950 font-black text-sm uppercase tracking-wider rounded-full shadow-[0_0_15px_rgba(255,179,0,0.3)] active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+        >
+          <Edit3 size={18} /> EDIT SHOW
+        </button>
+
         <button
           onClick={onBack}
-          className="w-full py-3.5 bg-[#121619] hover:bg-[#1C2328] text-slate-200 hover:text-white font-extrabold text-sm uppercase tracking-wider rounded-full border border-[#222B30] transition"
+          className="w-full py-3.5 bg-[#121619] hover:bg-[#1C2328] text-slate-300 hover:text-white font-extrabold text-sm uppercase tracking-wider rounded-full border border-[#222B30] transition"
         >
           ← BACK TO DIARY
         </button>
