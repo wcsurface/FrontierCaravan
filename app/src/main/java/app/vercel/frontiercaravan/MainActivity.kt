@@ -28,14 +28,13 @@ class MainActivity : ComponentActivity() {
     private var connectivityManager: ConnectivityManager? = null
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
 
-    private val liveUrl = "https://frontiercaravan.vercel.app"
     private val offlineAssetUrl = "file:///android_asset/index.html"
     private var isUsingOfflineFallback = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Enable Hardware Acceleration explicitly on window
+        // Force hardware acceleration for 60 FPS WebGL 2.0 rendering
         window.setFlags(
             WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
             WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
@@ -45,9 +44,10 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         hideSystemUI(window)
 
-        // Initialize WebGL/WebGPU-capable WebView
+        // Initialize WebGL/WebGPU-capable WebView with priority tuning
         webView = WebView(this).apply {
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
+            setRendererPriorityPolicy(WebView.RENDERER_PRIORITY_IMPORTANT, true)
         }
         setContentView(webView)
 
@@ -70,7 +70,6 @@ class MainActivity : ComponentActivity() {
         webView.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
-            databaseEnabled = true
             allowFileAccess = true
             allowContentAccess = true
             useWideViewPort = true
@@ -80,7 +79,7 @@ class MainActivity : ComponentActivity() {
             displayZoomControls = false
             mediaPlaybackRequiresUserGesture = false
 
-            // WebGL & Hardware Performance Options
+            // WebGL & High Performance Rendering Options
             mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
             cacheMode = WebSettings.LOAD_DEFAULT
         }
