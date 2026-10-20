@@ -15,7 +15,8 @@ export const BodegaCanvas: React.FC<Props> = ({ onLevelComplete }) => {
     stagedItem,
     attemptPlacement,
     isWon,
-    isGameOver
+    isGameOver,
+    shopCatName
   } = useGameStore();
 
   const [hoverCell, setHoverCell] = useState<[number, number] | null>(null);
@@ -23,9 +24,9 @@ export const BodegaCanvas: React.FC<Props> = ({ onLevelComplete }) => {
   const [isDragging, setIsDragging] = useState(false);
 
   // Layout Constants
-  const CELL_SIZE = 54;
-  const GRID_ORIGIN_X = 40;
-  const GRID_ORIGIN_Y = 120;
+  const CELL_SIZE = 52;
+  const GRID_ORIGIN_X = 55;
+  const GRID_ORIGIN_Y = 220;
 
   const render = useCallback(() => {
     const canvas = canvasRef.current;
@@ -44,34 +45,108 @@ export const BodegaCanvas: React.FC<Props> = ({ onLevelComplete }) => {
     ctx.resetTransform();
     ctx.scale(dpr, dpr);
 
-    // 1. Clear & Background Gradient (Neon Cyber Bodega counter)
+    // 1. Clear & Deep Purple Cyber-Bodega Ambient Background
     const bgGrad = ctx.createLinearGradient(0, 0, width, height);
-    bgGrad.addColorStop(0, '#0F091F');
-    bgGrad.addColorStop(0.5, '#1A0B2E');
-    bgGrad.addColorStop(1, '#080114');
+    bgGrad.addColorStop(0, '#1c0838');
+    bgGrad.addColorStop(0.4, '#15062c');
+    bgGrad.addColorStop(1, '#090216');
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, width, height);
 
-    // 2. Draw Basket Container Backdrop (Acrylic Pink / Teal Edge)
-    const basketW = grid.cols * CELL_SIZE + 20;
-    const basketH = grid.rows * CELL_SIZE + 20;
+    // 2. Draw Background Environment (Isometric Counter, Slushie Machine & Shop Cat)
+    // Slushie Machine (Top Left)
     ctx.save();
-    ctx.fillStyle = '#160829';
-    ctx.strokeStyle = '#00F0FF';
-    ctx.lineWidth = 3;
-    ctx.shadowColor = '#00F0FF';
-    ctx.shadowBlur = 12;
+    ctx.fillStyle = '#1e103d';
+    ctx.strokeStyle = '#00f0ff';
+    ctx.lineWidth = 2;
     ctx.beginPath();
     if (typeof (ctx as any).roundRect === 'function') {
-      (ctx as any).roundRect(GRID_ORIGIN_X - 10, GRID_ORIGIN_Y - 10, basketW, basketH, 16);
+      (ctx as any).roundRect(15, 65, 90, 110, 12);
     } else {
-      ctx.rect(GRID_ORIGIN_X - 10, GRID_ORIGIN_Y - 10, basketW, basketH);
+      ctx.rect(15, 65, 90, 110);
     }
     ctx.fill();
     ctx.stroke();
+
+    // Dual Slushie Bowls (Rainbow Glow)
+    const slushGrad1 = ctx.createLinearGradient(25, 75, 55, 125);
+    slushGrad1.addColorStop(0, '#ff007f');
+    slushGrad1.addColorStop(1, '#00e5ff');
+    ctx.fillStyle = slushGrad1;
+    ctx.fillRect(23, 75, 34, 45);
+
+    const slushGrad2 = ctx.createLinearGradient(60, 75, 90, 125);
+    slushGrad2.addColorStop(0, '#ffe600');
+    slushGrad2.addColorStop(1, '#00ffa3');
+    ctx.fillStyle = slushGrad2;
+    ctx.fillRect(58, 75, 34, 45);
     ctx.restore();
 
-    // 3. Draw Grid Slots
+    // Shop Cat "Mochi" sitting on Stool (Top Right)
+    ctx.save();
+    const catX = width - 75;
+    const catY = 120;
+    // Stool
+    ctx.fillStyle = '#581c87';
+    ctx.fillRect(catX - 20, catY + 25, 40, 30);
+    // Cat Body
+    ctx.fillStyle = '#fde047';
+    ctx.beginPath();
+    ctx.arc(catX, catY, 24, 0, Math.PI * 2);
+    ctx.fill();
+    // Ears
+    ctx.fillStyle = '#f97316';
+    ctx.beginPath();
+    ctx.moveTo(catX - 18, catY - 15);
+    ctx.lineTo(catX - 8, catY - 30);
+    ctx.lineTo(catX - 2, catY - 15);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(catX + 18, catY - 15);
+    ctx.lineTo(catX + 8, catY - 30);
+    ctx.lineTo(catX + 2, catY - 15);
+    ctx.fill();
+    // Visor Hat
+    ctx.fillStyle = '#0284c7';
+    ctx.fillRect(catX - 22, catY - 18, 44, 8);
+    // Face
+    ctx.fillStyle = '#1e1b4b';
+    ctx.beginPath();
+    ctx.arc(catX - 8, catY - 2, 3, 0, Math.PI * 2);
+    ctx.arc(catX + 8, catY - 2, 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // 3. Draw Isometric Glowing Neon Shopping Basket Container
+    const basketW = grid.cols * CELL_SIZE + 24;
+    const basketH = grid.rows * CELL_SIZE + 24;
+    ctx.save();
+    ctx.fillStyle = 'rgba(22, 8, 41, 0.9)';
+    ctx.strokeStyle = '#00F0FF';
+    ctx.lineWidth = 4;
+    ctx.shadowColor = '#00F0FF';
+    ctx.shadowBlur = 18;
+    ctx.beginPath();
+    if (typeof (ctx as any).roundRect === 'function') {
+      (ctx as any).roundRect(GRID_ORIGIN_X - 12, GRID_ORIGIN_Y - 12, basketW, basketH, 20);
+    } else {
+      ctx.rect(GRID_ORIGIN_X - 12, GRID_ORIGIN_Y - 12, basketW, basketH);
+    }
+    ctx.fill();
+    ctx.stroke();
+
+    // Plastic Mesh Grid Lines (Glowing Basket Texture)
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.25)';
+    ctx.lineWidth = 1.5;
+    for (let i = 0; i <= basketW; i += 18) {
+      ctx.beginPath();
+      ctx.moveTo(GRID_ORIGIN_X - 12 + i, GRID_ORIGIN_Y - 12);
+      ctx.lineTo(GRID_ORIGIN_X - 12 + i, GRID_ORIGIN_Y - 12 + basketH);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // 4. Draw Grid Slots Inside Basket
     for (let r = 0; r < grid.rows; r++) {
       for (let c = 0; c < grid.cols; c++) {
         const x = GRID_ORIGIN_X + c * CELL_SIZE;
@@ -80,19 +155,19 @@ export const BodegaCanvas: React.FC<Props> = ({ onLevelComplete }) => {
 
         ctx.save();
         if (val === 1) {
-          // Obstacle slot (cardboard)
-          ctx.fillStyle = '#301844';
+          // Obstacle slot
+          ctx.fillStyle = '#2e1052';
           ctx.fillRect(x + 2, y + 2, CELL_SIZE - 4, CELL_SIZE - 4);
-          ctx.strokeStyle = '#632c8d';
+          ctx.strokeStyle = '#7e22ce';
           ctx.strokeRect(x + 2, y + 2, CELL_SIZE - 4, CELL_SIZE - 4);
         } else {
-          // Empty playable slot
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+          // Playable slot
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+          ctx.strokeStyle = 'rgba(0, 240, 255, 0.2)';
           ctx.lineWidth = 1;
           ctx.beginPath();
           if (typeof (ctx as any).roundRect === 'function') {
-            (ctx as any).roundRect(x + 2, y + 2, CELL_SIZE - 4, CELL_SIZE - 4, 8);
+            (ctx as any).roundRect(x + 2, y + 2, CELL_SIZE - 4, CELL_SIZE - 4, 10);
           } else {
             ctx.rect(x + 2, y + 2, CELL_SIZE - 4, CELL_SIZE - 4);
           }
@@ -103,7 +178,7 @@ export const BodegaCanvas: React.FC<Props> = ({ onLevelComplete }) => {
       }
     }
 
-    // 4. Render Placed Items with Chunky 3D Border & Neon Accents
+    // 5. Render High-Detail Placed Items with Cute Cat Graphics & Neon Emblems
     for (const item of placedItems) {
       for (const [dr, dc] of item.shape) {
         const x = GRID_ORIGIN_X + (item.gridX + dc) * CELL_SIZE;
@@ -112,29 +187,49 @@ export const BodegaCanvas: React.FC<Props> = ({ onLevelComplete }) => {
         ctx.save();
         ctx.fillStyle = item.color;
         ctx.shadowColor = item.color;
-        ctx.shadowBlur = 8;
+        ctx.shadowBlur = 10;
         ctx.beginPath();
         if (typeof (ctx as any).roundRect === 'function') {
-          (ctx as any).roundRect(x + 3, y + 3, CELL_SIZE - 6, CELL_SIZE - 6, 10);
+          (ctx as any).roundRect(x + 3, y + 3, CELL_SIZE - 6, CELL_SIZE - 6, 12);
         } else {
           ctx.rect(x + 3, y + 3, CELL_SIZE - 6, CELL_SIZE - 6);
         }
         ctx.fill();
 
-        // Chunky light bevel (top/left)
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-        ctx.lineWidth = 2;
+        // Top glossy highlight
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
         ctx.beginPath();
-        ctx.moveTo(x + 6, y + CELL_SIZE - 6);
-        ctx.lineTo(x + 6, y + 6);
-        ctx.lineTo(x + CELL_SIZE - 6, y + 6);
-        ctx.stroke();
+        if (typeof (ctx as any).roundRect === 'function') {
+          (ctx as any).roundRect(x + 5, y + 5, CELL_SIZE - 10, (CELL_SIZE - 10) / 2, 6);
+        } else {
+          ctx.rect(x + 5, y + 5, CELL_SIZE - 10, (CELL_SIZE - 10) / 2);
+        }
+        ctx.fill();
+
+        // Cute Cat Emblem in center of single blocks
+        if (item.shape.length === 1 || (dr === 0 && dc === 0)) {
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(x + CELL_SIZE / 2, y + CELL_SIZE / 2, 8, 0, Math.PI * 2);
+          ctx.fill();
+          // Cat Ears
+          ctx.beginPath();
+          ctx.moveTo(x + CELL_SIZE / 2 - 8, y + CELL_SIZE / 2 - 4);
+          ctx.lineTo(x + CELL_SIZE / 2 - 4, y + CELL_SIZE / 2 - 12);
+          ctx.lineTo(x + CELL_SIZE / 2, y + CELL_SIZE / 2 - 6);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.moveTo(x + CELL_SIZE / 2 + 8, y + CELL_SIZE / 2 - 4);
+          ctx.lineTo(x + CELL_SIZE / 2 + 4, y + CELL_SIZE / 2 - 12);
+          ctx.lineTo(x + CELL_SIZE / 2, y + CELL_SIZE / 2 - 6);
+          ctx.fill();
+        }
 
         ctx.restore();
       }
     }
 
-    // 5. Draw Placement Target Ghost if Dragging
+    // 6. Draw Placement Target Ghost if Dragging
     if (isDragging && stagedItem && hoverCell) {
       const [hr, hc] = hoverCell;
       const isValid = grid.canPlace(stagedItem, hr, hc);
@@ -147,14 +242,14 @@ export const BodegaCanvas: React.FC<Props> = ({ onLevelComplete }) => {
 
         if (tr >= 0 && tr < grid.rows && tc >= 0 && tc < grid.cols) {
           ctx.save();
-          ctx.fillStyle = isValid ? 'rgba(0, 255, 163, 0.45)' : 'rgba(255, 0, 85, 0.45)';
+          ctx.fillStyle = isValid ? 'rgba(0, 255, 163, 0.5)' : 'rgba(255, 0, 85, 0.5)';
           ctx.strokeStyle = isValid ? '#00FFA3' : '#FF0055';
-          ctx.lineWidth = 2;
+          ctx.lineWidth = 3;
           ctx.shadowColor = isValid ? '#00FFA3' : '#FF0055';
-          ctx.shadowBlur = 10;
+          ctx.shadowBlur = 12;
           ctx.beginPath();
           if (typeof (ctx as any).roundRect === 'function') {
-            (ctx as any).roundRect(x + 2, y + 2, CELL_SIZE - 4, CELL_SIZE - 4, 8);
+            (ctx as any).roundRect(x + 2, y + 2, CELL_SIZE - 4, CELL_SIZE - 4, 10);
           } else {
             ctx.rect(x + 2, y + 2, CELL_SIZE - 4, CELL_SIZE - 4);
           }
@@ -165,15 +260,15 @@ export const BodegaCanvas: React.FC<Props> = ({ onLevelComplete }) => {
       }
     }
 
-    // 6. Draw Staged/Held Item under Pointer with Elastic Drag Scale
+    // 7. Draw Staged/Held Item under Pointer
     if (isDragging && stagedItem) {
       ctx.save();
-      const scale = 1.08;
+      const scale = 1.1;
       ctx.translate(pointerPos.x, pointerPos.y);
       ctx.scale(scale, scale);
 
       ctx.shadowColor = stagedItem.glowColor;
-      ctx.shadowBlur = 20;
+      ctx.shadowBlur = 24;
 
       for (const [dr, dc] of stagedItem.shape) {
         const ox = dc * CELL_SIZE - (stagedItem.width * CELL_SIZE) / 2;
@@ -182,14 +277,14 @@ export const BodegaCanvas: React.FC<Props> = ({ onLevelComplete }) => {
         ctx.fillStyle = stagedItem.color;
         ctx.beginPath();
         if (typeof (ctx as any).roundRect === 'function') {
-          (ctx as any).roundRect(ox + 3, oy + 3, CELL_SIZE - 6, CELL_SIZE - 6, 10);
+          (ctx as any).roundRect(ox + 3, oy + 3, CELL_SIZE - 6, CELL_SIZE - 6, 12);
         } else {
           ctx.rect(ox + 3, oy + 3, CELL_SIZE - 6, CELL_SIZE - 6);
         }
         ctx.fill();
 
         ctx.strokeStyle = '#FFFFFF';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 2.5;
         ctx.stroke();
       }
       ctx.restore();
@@ -264,10 +359,10 @@ export const BodegaCanvas: React.FC<Props> = ({ onLevelComplete }) => {
   };
 
   return (
-    <div className="relative w-full h-[520px] flex justify-center items-center select-none touch-none">
+    <div className="relative w-full h-[580px] flex justify-center items-center select-none touch-none">
       <canvas
         ref={canvasRef}
-        className="w-full h-full max-w-[420px] rounded-2xl shadow-2xl border border-purple-900/50"
+        className="w-full h-full max-w-[420px] rounded-3xl shadow-2xl border-2 border-purple-800/60"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
