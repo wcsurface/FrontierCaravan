@@ -59,6 +59,12 @@
     }
     .bounce-pointer { animation: bounceDown 1.5s infinite; }
 
+    /* Detail Card Box */
+    .detail-card { background: #121619; border: 1px solid #222B30; border-radius: 16px; padding: 20px; margin-bottom: 16px; width: 100%; }
+    .detail-label { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; color: #FFB300; margin-bottom: 4px; }
+    .detail-val-headline { font-size: 22px; font-weight: 900; text-transform: uppercase; font-family: serif; color: #ffffff; margin-bottom: 12px; }
+    .detail-val-text { font-size: 14px; font-weight: 700; color: #e2e8f0; margin-bottom: 12px; }
+
     /* Stats Card Box */
     .stats-card { background: #121619; border: 1px solid #222B30; border-radius: 16px; padding: 16px; margin-bottom: 16px; cursor: pointer; }
     .stats-card-title { font-weight: 900; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid #222B30; display: flex; justify-between; align-items: center; }
@@ -173,7 +179,7 @@
     </form>
   </div>
 
-  <!-- SCREEN 3: SETLIST -->
+  <!-- SCREEN 3: SHOW DETAILS & SETLIST -->
   <div id="view-setlist" class="screen-view">
     <div class="header">
       <button class="nav-btn-icon nav-btn-left" style="color:#ffffff;" onclick="showScreen('diary')">←</button>
@@ -182,20 +188,37 @@
       </div>
     </div>
 
-    <div style="text-align:center; font-weight:900; font-size:14px; color:#FFB300; margin-bottom:16px;" id="setlist-artist-name">THE CURE</div>
+    <!-- Featured Ticket Stub Preview -->
+    <div id="detail-ticket-preview" style="margin-bottom:12px;"></div>
 
-    <div style="flex:1; font-family:monospace; font-size:14px; line-height:2; color:#e2e8f0;">
-      <div>1. Plainsong</div>
-      <div>2. Pictures of You</div>
-      <div>3. Fascination Street</div>
-      <div>4. Deep Green Sea</div>
-      <div>5. In Between Days</div>
-      <div style="margin: 12px 0;">
-        <span style="background:#00E676; color:#0a0a0a; font-weight:900; padding:3px 10px; border-radius:9999px; font-size:11px;">ENCORE</span>
+    <!-- Detailed Show Info Card -->
+    <div class="detail-card">
+      <div class="detail-label">HEADLINE BAND</div>
+      <div class="detail-val-headline" id="detail-headline">STEVIE RAY VAUGHAN</div>
+
+      <div id="detail-openers-box" style="display:none; margin-top:12px; border-top:1px solid #222B30; padding-top:8px;">
+        <div class="detail-label">OPENER(S)</div>
+        <div class="detail-val-text" id="detail-openers">The Stray Cats, Duke Tumatoe</div>
       </div>
-      <div>6. Boys Don't Cry</div>
-      <div>7. 10:15 Saturday Night</div>
+
+      <div style="margin-top:12px; border-top:1px solid #222B30; padding-top:8px;">
+        <div class="detail-label">DATE</div>
+        <div class="detail-val-text" id="detail-date">07/22/89</div>
+      </div>
+
+      <div style="margin-top:12px; border-top:1px solid #222B30; padding-top:8px;">
+        <div class="detail-label">VENUE & LOCATION</div>
+        <div class="detail-val-text" id="detail-venue" style="margin-bottom:2px;">Deer Creek Music Center</div>
+        <div style="font-size:12px; color:#94a3b8;" id="detail-location">Noblesville, Indiana, USA</div>
+      </div>
+
+      <div id="detail-notes-box" style="display:none; margin-top:12px; border-top:1px solid #222B30; padding-top:8px;">
+        <div class="detail-label">NOTES & MEMORIES</div>
+        <div style="font-size:13px; color:#f1f5f9; background:#0A0D0E; padding:12px; border-radius:8px; border:1px solid #222B30; line-height:1.6; white-space:pre-wrap;" id="detail-notes">My first concert.</div>
+      </div>
     </div>
+
+    <button class="btn-cancel" onclick="showScreen('diary')">← BACK TO DIARY</button>
   </div>
 
   <!-- SCREEN 4: STATS -->
@@ -268,7 +291,6 @@
       { v: "The Fillmore", c: "San Francisco", s: "California", co: "USA" },
       { v: "Hollywood Bowl", c: "Los Angeles", s: "California", co: "USA" },
       { v: "Ryman Auditorium", c: "Nashville", s: "Tennessee", co: "USA" },
-      { v: "Alpine Valley Music Theatre", c: "East Troy", s: "Wisconsin", co: "USA" },
       { v: "First Avenue", c: "Minneapolis", s: "Minnesota", co: "USA" },
       { v: "9:30 Club", c: "Washington", s: "DC", co: "USA" },
       { v: "The Stone Pony", c: "Asbury Park", s: "New Jersey", co: "USA" },
@@ -297,14 +319,56 @@
       showScreen('diary');
     }
 
-    function openSetlist(artistName, notesText) {
-      document.getElementById('setlist-artist-name').innerText = artistName.toUpperCase();
-      const content = document.getElementById('setlist-content');
-      if (notesText && notesText.trim().length > 0) {
-        content.innerHTML = `<div style="padding:12px; background:#121619; border-radius:8px; border:1px solid #222B30; font-family:sans-serif; line-height:1.6;">${notesText}</div>`;
+    function openShowDetails(showIndex) {
+      const show = userShows[showIndex];
+      if (!show) return;
+
+      document.getElementById('detail-headline').innerText = show.headline.toUpperCase();
+      document.getElementById('detail-date').innerText = show.date;
+      document.getElementById('detail-venue').innerText = show.venue;
+      document.getElementById('detail-location').innerText = (show.city || '') + (show.state ? `, ${show.state}` : '') + (show.country ? `, ${show.country}` : '');
+
+      const openersBox = document.getElementById('detail-openers-box');
+      if (show.openersList && show.openersList.length > 0) {
+        openersBox.style.display = 'block';
+        document.getElementById('detail-openers').innerText = show.openersList.join(', ');
       } else {
-        content.innerHTML = `<div style="color:#94a3b8; font-style:italic;">No setlist tracks recorded yet.</div>`;
+        openersBox.style.display = 'none';
       }
+
+      const notesBox = document.getElementById('detail-notes-box');
+      if (show.notes && show.notes.trim().length > 0) {
+        notesBox.style.display = 'block';
+        document.getElementById('detail-notes').innerText = show.notes;
+      } else {
+        notesBox.style.display = 'none';
+      }
+
+      // Ticket preview
+      let bandStackHtml = `<div class="ticket-artist-head">${show.headline.toUpperCase()}</div>`;
+      if (show.openersList && show.openersList.length > 0) {
+        bandStackHtml += `
+          <div class="ticket-artist-and">and</div>
+          <div class="ticket-artist-openers">${show.openersList.join(', ')}</div>
+        `;
+      }
+
+      document.getElementById('detail-ticket-preview').innerHTML = `
+        <div class="ticket-card" style="margin-bottom:0;">
+          <div class="ticket-left">
+            <div class="ticket-artist-box">${bandStackHtml}</div>
+            <div class="ticket-footer">
+              <span class="ticket-venue">${show.venue}</span>
+              <span class="ticket-date">${show.date}</span>
+            </div>
+          </div>
+          <div class="ticket-stub">
+            <div>ADMIT ONE</div>
+            <div style="font-size:8px; color:#64748b; margin-top:4px;">SEC 7</div>
+          </div>
+        </div>
+      `;
+
       showScreen('setlist');
     }
 
@@ -431,10 +495,10 @@
 
         list.style.display = 'block';
         list.innerHTML = '';
-        displayList.forEach(show => {
+        displayList.forEach((show, idx) => {
           const card = document.createElement('div');
           card.className = 'ticket-card';
-          card.onclick = () => openSetlist(show.headline, show.notes);
+          card.onclick = () => openShowDetails(idx);
 
           let bandStackHtml = `<div class="ticket-artist-head">${show.headline.toUpperCase()}</div>`;
           if (show.openersList && show.openersList.length > 0) {
@@ -542,6 +606,9 @@
       e.preventDefault();
       const headline = document.getElementById('input-headline').value;
       const venue = document.getElementById('input-venue').value;
+      const city = document.getElementById('input-city').value || '';
+      const state = document.getElementById('input-state').value || '';
+      const country = document.getElementById('input-country').value || '';
       const date = document.getElementById('input-date').value || '08/02/88';
       const notes = document.getElementById('input-notes').value || '';
 
@@ -549,7 +616,7 @@
       const openersList = Array.from(openerInputs).map(inp => inp.value.trim()).filter(Boolean);
 
       if (headline && venue) {
-        userShows.unshift({ headline, venue, date, openersList, notes });
+        userShows.unshift({ headline, venue, city, state, country, date, openersList, notes });
         saveShowsToStorage();
         renderShowsFeed();
         updateStatsDisplay();

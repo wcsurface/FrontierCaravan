@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { useEncoreStore } from '../store/useEncoreStore';
-import { ArrowLeft } from 'lucide-react';
+import { TicketStubCard } from './TicketStubCard';
+import { ArrowLeft, MapPin, Calendar, Users, FileText, Music } from 'lucide-react';
 
 interface SetlistDetailViewProps {
   concertId: string;
@@ -10,17 +11,34 @@ interface SetlistDetailViewProps {
 }
 
 export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId, onBack }) => {
-  const { concerts, artists, setlistItems } = useEncoreStore();
+  const { concerts, artists, venues, setlistItems } = useEncoreStore();
 
   const concert = concerts.find((c) => c.id === concertId) || concerts[0];
-  const artist = artists.find((a) => a.id === concert?.headlineArtistId);
-  const items = setlistItems.filter((s) => s.concertId === concert?.id);
+  if (!concert) {
+    return (
+      <div className="p-4 text-center text-slate-400">
+        Show not found. <button onClick={onBack} className="text-[#00E676] underline">Go Back</button>
+      </div>
+    );
+  }
+
+  const headliner = artists.find((a) => a.id === concert.headlineArtistId);
+  const opener = artists.find((a) => a.id === concert.openingArtistId);
+  const venue = venues.find((v) => v.id === concert.venueId);
+  const items = setlistItems.filter((s) => s.concertId === concert.id);
+
+  const formattedDate = new Date(concert.date).toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
 
   const mainTracks = items.filter((s) => !s.isEncore);
   const encoreTracks = items.filter((s) => s.isEncore);
 
   return (
-    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto font-mono bg-grid-lines">
+    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines">
       {/* Header with 2X Larger LiveLore Logo */}
       <header className="relative flex items-center justify-between w-full pt-2 pb-6 my-1">
         <button
@@ -39,39 +57,107 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
         <div className="w-10 z-10" />
       </header>
 
-      {/* Artist Subtitle */}
-      <div className="text-center my-3">
-        <h2 className="text-lg font-extrabold text-[#FFB300] uppercase tracking-widest font-sans">
-          {artist?.name || 'THE CURE'}
-        </h2>
+      {/* Featured Ticket Stub Graphic */}
+      <div className="max-w-md mx-auto w-full my-2">
+        <TicketStubCard concert={concert} artist={headliner} venue={venue} />
       </div>
 
-      {/* Track List */}
-      <div className="max-w-md mx-auto w-full space-y-2.5 my-4 px-2">
-        {mainTracks.map((track) => (
-          <div key={track.id} className="text-sm font-semibold text-slate-200 flex items-center gap-3">
-            <span className="text-slate-500 font-mono min-w-[24px]">{track.position}.</span>
-            <span className="text-slate-100">{track.songTitle}</span>
+      {/* Show Details Card */}
+      <div className="max-w-md mx-auto w-full bg-[#121619] p-5 rounded-2xl border border-[#222B30] shadow-xl space-y-4 my-3">
+        {/* Headline Band */}
+        <div>
+          <span className="text-[10px] font-black uppercase tracking-widest text-[#FFB300] block mb-1">
+            HEADLINE BAND
+          </span>
+          <h2 className="text-2xl font-black text-white uppercase tracking-tight font-serif">
+            {headliner?.name || 'AEROSMITH'}
+          </h2>
+        </div>
+
+        {/* Opener(s) */}
+        {opener?.name && (
+          <div className="border-t border-[#222B30] pt-3">
+            <span className="text-[10px] font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-1">
+              <Users size={12} /> OPENER(S)
+            </span>
+            <p className="text-sm font-bold text-slate-200 font-serif">
+              {opener.name}
+            </p>
           </div>
-        ))}
-
-        {/* Encore Section Pill Badge */}
-        {encoreTracks.length > 0 && (
-          <>
-            <div className="my-5">
-              <span className="inline-block bg-[#00E676] text-slate-950 font-black text-xs px-3 py-1 rounded-full shadow-[0_0_12px_rgba(0,230,118,0.5)] tracking-wider uppercase font-sans">
-                ENCORE
-              </span>
-            </div>
-
-            {encoreTracks.map((track) => (
-              <div key={track.id} className="text-sm font-semibold text-slate-200 flex items-center gap-3">
-                <span className="text-slate-500 font-mono min-w-[24px]">{track.position}.</span>
-                <span className="text-slate-100">{track.songTitle}</span>
-              </div>
-            ))}
-          </>
         )}
+
+        {/* Date & Day of Week */}
+        <div className="border-t border-[#222B30] pt-3">
+          <span className="text-[10px] font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-1">
+            <Calendar size={12} /> DATE
+          </span>
+          <p className="text-sm font-extrabold text-slate-200">
+            {formattedDate}
+          </p>
+        </div>
+
+        {/* Venue & Location */}
+        <div className="border-t border-[#222B30] pt-3">
+          <span className="text-[10px] font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-1">
+            <MapPin size={12} /> VENUE & LOCATION
+          </span>
+          <p className="text-sm font-extrabold text-slate-200">
+            {venue?.name || 'Market Square Arena'}
+          </p>
+          <p className="text-xs text-slate-400 font-medium mt-0.5">
+            {venue?.city || 'Indianapolis'}, {venue?.country || 'USA'}
+          </p>
+        </div>
+
+        {/* Show Notes */}
+        {concert.generalNotes && (
+          <div className="border-t border-[#222B30] pt-3">
+            <span className="text-[10px] font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-1">
+              <FileText size={12} /> NOTES & MEMORIES
+            </span>
+            <p className="text-sm text-slate-200 leading-relaxed font-sans bg-[#0A0D0E] p-3 rounded-xl border border-[#222B30] whitespace-pre-wrap">
+              {concert.generalNotes}
+            </p>
+          </div>
+        )}
+
+        {/* Tracklist / Setlist Songs if parsed */}
+        {items.length > 0 && (
+          <div className="border-t border-[#222B30] pt-3">
+            <span className="text-[10px] font-black uppercase tracking-widest text-[#00E676] flex items-center gap-1.5 mb-2">
+              <Music size={12} /> PARSED SETLIST TRACKS
+            </span>
+            <div className="space-y-1.5 font-mono text-xs text-slate-300 bg-[#0A0D0E] p-3 rounded-xl border border-[#222B30]">
+              {mainTracks.map((t) => (
+                <div key={t.id} className="flex gap-2">
+                  <span className="text-slate-500">{t.position}.</span>
+                  <span>{t.songTitle}</span>
+                </div>
+              ))}
+              {encoreTracks.length > 0 && (
+                <>
+                  <div className="text-[10px] font-black text-[#00E676] uppercase pt-2">ENCORE</div>
+                  {encoreTracks.map((t) => (
+                    <div key={t.id} className="flex gap-2">
+                      <span className="text-slate-500">{t.position}.</span>
+                      <span>{t.songTitle}</span>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Back CTA Button */}
+      <div className="max-w-md mx-auto w-full my-3">
+        <button
+          onClick={onBack}
+          className="w-full py-3.5 bg-[#121619] hover:bg-[#1C2328] text-slate-200 hover:text-white font-extrabold text-sm uppercase tracking-wider rounded-full border border-[#222B30] transition"
+        >
+          ← BACK TO DIARY
+        </button>
       </div>
     </div>
   );
