@@ -23,7 +23,10 @@
     #ticket-list { width: 100%; flex: 1; max-height: calc(100vh - 160px); overflow-y: auto; margin-bottom: 12px; }
     .ticket-card { position: relative; width: 100%; aspect-ratio: 2.85 / 1; background: #f4e4bc; color: #2b1c0e; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; display: flex; justify-between; box-shadow: 0 10px 25px rgba(0,0,0,0.6); border: 2px solid #d6c294; cursor: pointer; }
     .ticket-left { width: 70%; display: flex; flex-direction: column; justify-between; border-right: 2px dashed #423220; padding-right: 8px; }
-    .ticket-artist { font-weight: 900; font-size: 20px; text-align: center; text-transform: uppercase; font-family: serif; color: #1c1208; margin: auto 0; }
+    .ticket-artist-box { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; margin: auto 0; }
+    .ticket-artist-head { font-weight: 900; font-size: 19px; text-transform: uppercase; font-family: serif; color: #1c1208; line-height: 1.1; }
+    .ticket-artist-and { font-family: serif; font-style: italic; font-weight: bold; font-size: 11px; color: rgba(66,50,32,0.8); margin: 2px 0; }
+    .ticket-artist-openers { font-weight: 800; font-size: 12px; font-family: serif; color: #2b1c0e; }
     .ticket-footer { display: flex; justify-between; border-top: 2px solid rgba(66,50,32,0.5); padding-top: 4px; font-weight: 900; font-size: 11px; }
     .ticket-venue { color: #2b1c0e; text-transform: uppercase; }
     .ticket-date { color: #d97706; text-transform: uppercase; }
@@ -57,7 +60,9 @@
     <div id="ticket-list">
       <div class="ticket-card" onclick="openSetlist('THE CURE')">
         <div class="ticket-left">
-          <div class="ticket-artist">THE CURE</div>
+          <div class="ticket-artist-box">
+            <div class="ticket-artist-head">THE CURE</div>
+          </div>
           <div class="ticket-footer">
             <span class="ticket-venue">Red Rocks</span>
             <span class="ticket-date">OCT 12, 2026</span>
@@ -71,7 +76,11 @@
 
       <div class="ticket-card" onclick="openSetlist('PIXIES')">
         <div class="ticket-left">
-          <div class="ticket-artist">PIXIES</div>
+          <div class="ticket-artist-box">
+            <div class="ticket-artist-head">PIXIES</div>
+            <div class="ticket-artist-and">and</div>
+            <div class="ticket-artist-openers">The Cure</div>
+          </div>
           <div class="ticket-footer">
             <span class="ticket-venue">The Fillmore</span>
             <span class="ticket-date">OCT 12, 2026</span>
@@ -355,14 +364,29 @@
       const venue = document.getElementById('input-venue').value;
       const date = document.getElementById('input-date').value || 'OCT 12, 2026';
 
+      // Read opener inputs
+      const openerInputs = document.querySelectorAll('.input-opener');
+      const openersList = Array.from(openerInputs).map(inp => inp.value.trim()).filter(Boolean);
+
       if (headline && venue) {
         const list = document.getElementById('ticket-list');
         const card = document.createElement('div');
         card.className = 'ticket-card';
         card.onclick = () => openSetlist(headline);
+
+        let bandStackHtml = `<div class="ticket-artist-head">${headline.toUpperCase()}</div>`;
+        if (openersList.length > 0) {
+          bandStackHtml += `
+            <div class="ticket-artist-and">and</div>
+            <div class="ticket-artist-openers">${openersList.join(', ')}</div>
+          `;
+        }
+
         card.innerHTML = `
           <div class="ticket-left">
-            <div class="ticket-artist">${headline.toUpperCase()}</div>
+            <div class="ticket-artist-box">
+              ${bandStackHtml}
+            </div>
             <div class="ticket-footer">
               <span class="ticket-venue">${venue}</span>
               <span class="ticket-date">${date}</span>

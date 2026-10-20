@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Concert, Artist, Venue } from '../engine/concertService';
+import { useEncoreStore } from '../store/useEncoreStore';
 
 interface TicketStubCardProps {
   concert: Concert;
@@ -16,6 +17,8 @@ export const TicketStubCard: React.FC<TicketStubCardProps> = ({
   venue,
   onClick,
 }) => {
+  const { artists } = useEncoreStore();
+
   const formattedDate = new Date(concert.date)
     .toLocaleDateString('en-US', {
       month: 'short',
@@ -24,7 +27,37 @@ export const TicketStubCard: React.FC<TicketStubCardProps> = ({
     })
     .toUpperCase();
 
-  const artistName = artist?.name || 'THE CURE';
+  // Headliner always on top
+  const headlinerObj = artist || artists.find(a => a.id === concert.headlineArtistId);
+  const headlinerName = headlinerObj?.name || 'THE CURE';
+
+  // Openers list (up to 4 openers = 5 bands total)
+  let openersList: string[] = [];
+  if (concert.openingArtistId) {
+    const openerObj = artists.find(a => a.id === concert.openingArtistId);
+    if (openerObj?.name) {
+      openersList = openerObj.name.split(',').map(s => s.trim()).filter(Boolean);
+    }
+  }
+
+  const totalBands = 1 + openersList.length;
+
+  // Dynamic font scaling to guarantee perfect vertical centering and no clipping
+  let headlinerSize = 'text-xl sm:text-2xl';
+  let openerSize = 'text-xs sm:text-sm';
+  let andSize = 'text-[10px] sm:text-xs';
+
+  if (totalBands === 2) {
+    headlinerSize = 'text-lg sm:text-xl';
+    openerSize = 'text-xs sm:text-sm';
+  } else if (totalBands === 3) {
+    headlinerSize = 'text-base sm:text-lg';
+    openerSize = 'text-[11px] sm:text-xs';
+  } else if (totalBands >= 4) {
+    headlinerSize = 'text-sm sm:text-base';
+    openerSize = 'text-[10px] sm:text-[11px]';
+  }
+
   const venueName = venue?.name || 'Red Rocks';
 
   return (
@@ -59,21 +92,38 @@ export const TicketStubCard: React.FC<TicketStubCardProps> = ({
 
         {/* Center Section: Main Ticket Frame */}
         <div className="w-[58%] h-full flex flex-col justify-between pl-1 pr-2 py-1">
-          {/* Top Main Box: HEADLINE ARTIST */}
-          <div className="flex-1 flex flex-col items-center justify-center text-center px-1 my-0.5">
-            <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-[#1c1208] leading-none font-serif drop-shadow-sm">
-              {artistName}
+          {/* Top Main Box: DYNAMICALLY CENTERED BANDS (Headliner on top) */}
+          <div className="flex-1 flex flex-col items-center justify-center text-center px-1 my-0.5 overflow-hidden">
+            {/* Always Headliner on Top */}
+            <h3 className={`${headlinerSize} font-black uppercase tracking-tight text-[#1c1208] leading-none font-serif drop-shadow-sm`}>
+              {headlinerName}
             </h3>
-            <p className="text-[11px] font-bold text-[#475569] mt-0.5 uppercase tracking-wide">
-              {venueName}
-            </p>
+
+            {/* If there are openers */}
+            {openersList.length > 0 && (
+              <div className="flex flex-col items-center justify-center mt-0.5">
+                <span className={`${andSize} font-serif italic font-bold text-[#423220]/80 my-0.5`}>
+                  and
+                </span>
+                <div className="flex flex-wrap items-center justify-center gap-x-1.5 leading-tight">
+                  {openersList.slice(0, 4).map((opener, i) => (
+                    <span key={i} className={`${openerSize} font-extrabold text-[#2b1c0e] font-serif`}>
+                      {opener}{i < Math.min(openersList.length, 4) - 1 ? ',' : ''}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Bottom Box: HIGHLIGHTED CONCERT DATE BADGE */}
-          <div className="h-[32%] flex border-t-2 border-[#423220]/50 pt-0.5 items-center justify-center">
-            <div className="bg-[#FFB300] text-[#0A0D0E] font-black text-xs uppercase tracking-wider px-3 py-0.5 rounded shadow-sm border border-[#ffa000]">
+          {/* Bottom Box: VENUE & HIGHLIGHTED CONCERT DATE BADGE */}
+          <div className="h-[28%] flex border-t-2 border-[#423220]/50 pt-0.5 items-center justify-between px-1">
+            <span className="text-[10px] sm:text-xs font-black uppercase text-[#2b1c0e] truncate max-w-[55%]">
+              {venueName}
+            </span>
+            <span className="text-[10px] sm:text-xs font-black uppercase text-[#d97706] tracking-wider">
               {formattedDate}
-            </div>
+            </span>
           </div>
         </div>
 
