@@ -30,14 +30,39 @@ export const BodegaCanvas: React.FC<Props> = ({ onLevelComplete }) => {
     attemptPlacement,
     isWon,
     isGameOver,
-    comboCount,
-    undoLastPlacement
   } = useGameStore();
 
   const [hoverCell, setHoverCell] = useState<[number, number] | null>(null);
   const [pointerPos, setPointerPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const particlesRef = useRef<Particle[]>([]);
+
+  // Preloaded PNG Asset Sprites (with procedural fallback)
+  const assetsRef = useRef<Record<string, HTMLImageElement>>({});
+
+  useEffect(() => {
+    const assetNames = [
+      'mockup.png',
+      'bg_bodega_counter.png',
+      'basket_isometric_frame.png',
+      'prop_mochi_cat.png',
+      'prop_slushie_machine.png',
+      'item_soda_cat.png',
+      'item_bento_box.png',
+      'item_bread_bun.png',
+      'item_snack_purple.png',
+      'item_snack_neon.png',
+      'item_snack_cyan.png',
+    ];
+
+    assetNames.forEach((name) => {
+      const img = new Image();
+      img.src = `/assets/${name}`;
+      img.onload = () => {
+        assetsRef.current[name] = img;
+      };
+    });
+  }, []);
 
   // Drag physics tracking
   const dragVelocity = useRef({ x: 0, y: 0 });
@@ -99,18 +124,38 @@ export const BodegaCanvas: React.FC<Props> = ({ onLevelComplete }) => {
     const itemId = 'defId' in item ? item.defId : item.id;
     const color = item.color || '#FF2A85';
 
+    // Try drawing loaded sprite first
+    const spriteName = itemId.includes('BENTO')
+      ? 'item_bento_box.png'
+      : itemId.includes('SODA')
+      ? 'item_soda_cat.png'
+      : itemId.includes('VINYL')
+      ? 'item_snack_purple.png'
+      : 'item_snack_neon.png';
+
+    const spriteImg = assetsRef.current[spriteName];
+    if (spriteImg && spriteImg.complete) {
+      ctx.drawImage(spriteImg, -24, -24, 48, 48);
+      ctx.restore();
+      return;
+    }
+
     if (itemId.includes('BENTO')) {
       // Bento Box: Rounded black container, white rice, red plum, edamame, salmon fillet
       ctx.fillStyle = '#111827';
       ctx.shadowColor = '#000000';
       ctx.shadowBlur = 8;
       ctx.beginPath();
-      ctx.roundRect(-24, -20, 48, 40, 8);
+      if (typeof (ctx as any).roundRect === 'function') {
+        (ctx as any).roundRect(-24, -20, 48, 40, 8);
+      } else {
+        ctx.rect(-24, -20, 48, 40);
+      }
       ctx.fill();
 
       // Inner compartments
       ctx.fillStyle = '#1f2937';
-      ctx.fillRect(-20, -16, 20, 32); // Rice compartment
+      ctx.fillRect(-20, -16, 20, 32); // Rice
       ctx.fillRect(2, -16, 18, 14);  // Edamame
       ctx.fillRect(2, 0, 18, 16);   // Salmon
 
@@ -147,7 +192,11 @@ export const BodegaCanvas: React.FC<Props> = ({ onLevelComplete }) => {
       grad.addColorStop(1, '#00b894');
       ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.roundRect(-14, -22, 28, 44, 6);
+      if (typeof (ctx as any).roundRect === 'function') {
+        (ctx as any).roundRect(-14, -22, 28, 44, 6);
+      } else {
+        ctx.rect(-14, -22, 28, 44);
+      }
       ctx.fill();
 
       // Pull Tab
@@ -167,28 +216,17 @@ export const BodegaCanvas: React.FC<Props> = ({ onLevelComplete }) => {
       ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
       ctx.fillRect(-10, -20, 4, 40);
 
-    } else if (itemId.includes('VINYL') || itemId.includes('TAPE')) {
-      // Synthwave Tape Pack
-      ctx.fillStyle = '#7928ca';
-      ctx.shadowColor = '#7928ca';
-      ctx.shadowBlur = 10;
-      ctx.beginPath();
-      ctx.roundRect(-16, -26, 32, 52, 6);
-      ctx.fill();
-
-      // Cassette Windows
-      ctx.fillStyle = '#0f091f';
-      ctx.fillRect(-10, -14, 20, 10);
-      ctx.fillStyle = '#ff007f';
-      ctx.fillRect(-10, 6, 20, 12);
-
     } else {
       // Neon Cat Snack Pack (Default/Gummy/Melon Milk)
       ctx.fillStyle = color;
       ctx.shadowColor = color;
       ctx.shadowBlur = 10;
       ctx.beginPath();
-      ctx.roundRect(-16, -16, 32, 32, 8);
+      if (typeof (ctx as any).roundRect === 'function') {
+        (ctx as any).roundRect(-16, -16, 32, 32, 8);
+      } else {
+        ctx.rect(-16, -16, 32, 32);
+      }
       ctx.fill();
 
       // Cat Ears on Bag
@@ -247,91 +285,110 @@ export const BodegaCanvas: React.FC<Props> = ({ onLevelComplete }) => {
 
     // Slushie Machine (Left Counter)
     ctx.save();
-    ctx.fillStyle = '#1e103d';
-    ctx.strokeStyle = '#00f0ff';
-    ctx.lineWidth = 2.5;
-    ctx.shadowColor = '#00f0ff';
-    ctx.shadowBlur = 12;
-    ctx.beginPath();
-    if (typeof (ctx as any).roundRect === 'function') {
-      (ctx as any).roundRect(14, 55, 80, 105, 12);
+    const slushieImg = assetsRef.current['prop_slushie_machine.png'];
+    if (slushieImg && slushieImg.complete) {
+      ctx.drawImage(slushieImg, 14, 55, 80, 105);
     } else {
-      ctx.rect(14, 55, 80, 105);
+      ctx.fillStyle = '#1e103d';
+      ctx.strokeStyle = '#00f0ff';
+      ctx.lineWidth = 2.5;
+      ctx.shadowColor = '#00f0ff';
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      if (typeof (ctx as any).roundRect === 'function') {
+        (ctx as any).roundRect(14, 55, 80, 105, 12);
+      } else {
+        ctx.rect(14, 55, 80, 105);
+      }
+      ctx.fill();
+      ctx.stroke();
+
+      // Swirling Dual Slushie Bowls
+      const slush1 = ctx.createLinearGradient(20, 65, 50, 110);
+      slush1.addColorStop(0, '#ff007f');
+      slush1.addColorStop(1, '#00e5ff');
+      ctx.fillStyle = slush1;
+      ctx.fillRect(22, 65, 30, 42);
+
+      const slush2 = ctx.createLinearGradient(54, 65, 84, 110);
+      slush2.addColorStop(0, '#ffe600');
+      slush2.addColorStop(1, '#00ffa3');
+      ctx.fillStyle = slush2;
+      ctx.fillRect(52, 65, 30, 42);
     }
-    ctx.fill();
-    ctx.stroke();
-
-    // Swirling Dual Slushie Bowls
-    const slush1 = ctx.createLinearGradient(20, 65, 50, 110);
-    slush1.addColorStop(0, '#ff007f');
-    slush1.addColorStop(1, '#00e5ff');
-    ctx.fillStyle = slush1;
-    ctx.fillRect(22, 65, 30, 42);
-
-    const slush2 = ctx.createLinearGradient(54, 65, 84, 110);
-    slush2.addColorStop(0, '#ffe600');
-    slush2.addColorStop(1, '#00ffa3');
-    ctx.fillStyle = slush2;
-    ctx.fillRect(52, 65, 30, 42);
     ctx.restore();
 
     // Shop Cat Mochi sitting on Stool with Sinusoidal Breathing Bob (2.4s cycle)
     ctx.save();
     const catX = width - 65;
     const catBobY = 105 + Math.sin(Date.now() / 380) * 3; // 3px vertical bob
-    // Stool
-    ctx.fillStyle = '#581c87';
-    ctx.fillRect(catX - 18, catBobY + 22, 36, 28);
-    // Cat Body
-    ctx.fillStyle = '#fde047';
-    ctx.beginPath();
-    ctx.arc(catX, catBobY, 22, 0, Math.PI * 2);
-    ctx.fill();
-    // Ears
-    ctx.fillStyle = '#f97316';
-    ctx.beginPath();
-    ctx.moveTo(catX - 16, catBobY - 14);
-    ctx.lineTo(catX - 6, catBobY - 28);
-    ctx.lineTo(catX, catBobY - 14);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(catX + 16, catBobY - 14);
-    ctx.lineTo(catX + 6, catBobY - 28);
-    ctx.lineTo(catX, catBobY - 14);
-    ctx.fill();
-    // Visor Hat
-    ctx.fillStyle = '#0284c7';
-    ctx.fillRect(catX - 20, catBobY - 16, 40, 7);
-    // Face
-    ctx.fillStyle = '#1e1b4b';
-    ctx.beginPath();
-    ctx.arc(catX - 7, catBobY - 2, 2.8, 0, Math.PI * 2);
-    ctx.arc(catX + 7, catBobY - 2, 2.8, 0, Math.PI * 2);
-    ctx.fill();
+    const catImg = assetsRef.current['prop_mochi_cat.png'];
+
+    if (catImg && catImg.complete) {
+      ctx.drawImage(catImg, catX - 35, catBobY - 30, 70, 95);
+    } else {
+      // Stool
+      ctx.fillStyle = '#581c87';
+      ctx.fillRect(catX - 18, catBobY + 22, 36, 28);
+      // Cat Body
+      ctx.fillStyle = '#fde047';
+      ctx.beginPath();
+      ctx.arc(catX, catBobY, 22, 0, Math.PI * 2);
+      ctx.fill();
+      // Ears
+      ctx.fillStyle = '#f97316';
+      ctx.beginPath();
+      ctx.moveTo(catX - 16, catBobY - 14);
+      ctx.lineTo(catX - 6, catBobY - 28);
+      ctx.lineTo(catX, catBobY - 14);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(catX + 16, catBobY - 14);
+      ctx.lineTo(catX + 6, catBobY - 28);
+      ctx.lineTo(catX, catBobY - 14);
+      ctx.fill();
+      // Visor Hat
+      ctx.fillStyle = '#0284c7';
+      ctx.fillRect(catX - 20, catBobY - 16, 40, 7);
+      // Face
+      ctx.fillStyle = '#1e1b4b';
+      ctx.beginPath();
+      ctx.arc(catX - 7, catBobY - 2, 2.8, 0, Math.PI * 2);
+      ctx.arc(catX + 7, catBobY - 2, 2.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
     ctx.restore();
 
     // PASS 2: ISOMETRIC BASKET & GRID SLOTS
     ctx.save();
-    ctx.fillStyle = 'rgba(22, 8, 41, 0.92)';
-    ctx.strokeStyle = '#00F0FF';
-    ctx.lineWidth = 4;
-    ctx.shadowColor = '#00F0FF';
-    ctx.shadowBlur = 20;
+    const basketImg = assetsRef.current['basket_isometric_frame.png'];
+    const basketW = grid.cols * TILE_WIDTH + 24;
+    const basketH = grid.rows * TILE_HEIGHT + 24;
 
-    // Draw Isometric Acrylic Shopping Basket Frame
-    ctx.beginPath();
-    const p0 = toIso(-0.5, -0.5);
-    const p1 = toIso(-0.5, grid.cols - 0.5);
-    const p2 = toIso(grid.rows - 0.5, grid.cols - 0.5);
-    const p3 = toIso(grid.rows - 0.5, -0.5);
+    if (basketImg && basketImg.complete) {
+      ctx.drawImage(basketImg, ORIGIN_X - 100, ORIGIN_Y - 40, 200, 160);
+    } else {
+      ctx.fillStyle = 'rgba(22, 8, 41, 0.92)';
+      ctx.strokeStyle = '#00F0FF';
+      ctx.lineWidth = 4;
+      ctx.shadowColor = '#00F0FF';
+      ctx.shadowBlur = 20;
 
-    ctx.moveTo(p0.x, p0.y);
-    ctx.lineTo(p1.x, p1.y);
-    ctx.lineTo(p2.x, p2.y);
-    ctx.lineTo(p3.x, p3.y);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
+      // Draw Isometric Acrylic Shopping Basket Frame
+      ctx.beginPath();
+      const p0 = toIso(-0.5, -0.5);
+      const p1 = toIso(-0.5, grid.cols - 0.5);
+      const p2 = toIso(grid.rows - 0.5, grid.cols - 0.5);
+      const p3 = toIso(grid.rows - 0.5, -0.5);
+
+      ctx.moveTo(p0.x, p0.y);
+      ctx.lineTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.lineTo(p3.x, p3.y);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
 
     // Recessed Isometric Grid Slots
     for (let r = 0; r < grid.rows; r++) {
@@ -383,7 +440,7 @@ export const BodegaCanvas: React.FC<Props> = ({ onLevelComplete }) => {
       ctx.fill();
       ctx.restore();
 
-      // Render Procedural Item
+      // Render Procedural or Sprite Item
       drawProceduralItem(ctx, item, isoPos.x, isoPos.y - 12);
 
       // Top-down Gloss Spot-Light Highlight
@@ -400,7 +457,7 @@ export const BodegaCanvas: React.FC<Props> = ({ onLevelComplete }) => {
 
     // PASS 4: DRAGGING & ELASTIC SNAP PHYSICS
     if (isDragging && stagedItem) {
-      // Calculate Drag velocity vector for squash/stretch
+      // Calculate Drag velocity vector
       const vx = pointerPos.x - lastPointerPos.current.x;
       const vy = pointerPos.y - lastPointerPos.current.y;
       dragVelocity.current = { x: vx, y: vy };
@@ -445,7 +502,7 @@ export const BodegaCanvas: React.FC<Props> = ({ onLevelComplete }) => {
     }
 
     // Render Particle Burst Explosions
-    particlesRef.current.forEach((p, idx) => {
+    particlesRef.current.forEach((p) => {
       p.x += p.vx;
       p.y += p.vy;
       p.life++;
