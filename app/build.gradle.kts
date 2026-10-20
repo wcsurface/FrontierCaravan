@@ -1,0 +1,70 @@
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.compose)
+}
+
+android {
+    namespace = "app.vercel.frontiercaravan"
+    compileSdk = 37
+
+    defaultConfig {
+        applicationId = "app.vercel.frontiercaravan"
+        minSdk = 26
+        targetSdk = 35
+        versionCode = 1
+        versionName = "1.0.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        buildConfigField("String", "VERCEL_LIVE_URL", "\"https://frontiercaravan.vercel.app\"")
+        buildConfigField("String", "OFFLINE_ASSET_URL", "\"file:///android_asset/index.html\"")
+    }
+
+    buildTypes {
+        debug {
+            isMinifyEnabled = false
+            isDebuggable = true
+            buildConfigField("Boolean", "ENABLE_DEBUG_LOGS", "true")
+        }
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            buildConfigField("Boolean", "ENABLE_DEBUG_LOGS", "false")
+        }
+    }
+    
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
+}
+
+dependencies {
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    
+    // WebView & AndroidX Utilities
+    implementation("androidx.webkit:webkit:1.12.1")
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.code.gson:gson:2.11.0")
+    
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    debugImplementation(libs.androidx.compose.ui.tooling)
+}

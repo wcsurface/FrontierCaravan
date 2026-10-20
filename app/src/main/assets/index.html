@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Frontier Caravan: Wasteland Cartel (Offline Mode)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    body { background-color: #0d0f12; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; }
+
+    /* Top Navigation HUD */
+    #hud { background: #171923; border-bottom: 2px solid #2d3748; padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; z-index: 10; height: 50px; }
+    .hud-stat { display: flex; align-items: center; gap: 6px; font-weight: bold; font-size: 14px; }
+    .stat-val { color: #f6ad55; }
+    .stat-badge { background: #2d3748; padding: 2px 8px; border-radius: 4px; border: 1px solid #4a5568; }
+
+    /* Main Container */
+    #app-content { flex: 1; position: relative; display: flex; flex-direction: column; background: #0a0b0d; }
+    .tab-view { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+    .tab-view.active { display: flex; flex-direction: column; }
+
+    /* Bottom Navigation Bar */
+    #nav-bar { height: 56px; background: #1a202c; border-top: 2px solid #2d3748; display: flex; justify-content: space-around; align-items: center; }
+    .nav-btn { background: none; border: none; color: #a0aec0; font-weight: bold; font-size: 13px; padding: 8px 16px; border-radius: 6px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .nav-btn.active { color: #ed8936; background: #2d3748; border-bottom: 2px solid #ed8936; }
+
+    /* UI Panels & Containers */
+    .panel-card { background: #171923; border: 1px solid #2d3748; border-radius: 8px; padding: 12px; margin: 8px; }
+    .btn-primary { background: #dd6b20; color: #fff; border: none; padding: 10px 18px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-size: 13px; }
+    .btn-primary:active { background: #c05621; }
+
+    /* Canvas Containers */
+    canvas { width: 100%; height: 100%; display: block; }
+
+    /* Offline banner */
+    #offline-banner { background: #c53030; color: #fff; text-align: center; font-size: 11px; padding: 2px 0; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* Modal */
+    .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal-box { background: #1a202c; border: 2px solid #ed8936; border-radius: 10px; max-width: 90%; width: 440px; padding: 20px; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <div id="offline-banner">Offline Local Fallback Engine - Standby for live sync</div>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div class="hud-stat">⛽ Fuel: <span id="stat-fuel" class="stat-val">100</span></div>
+    <div class="hud-stat">🍞 Food: <span id="stat-food" class="stat-val">50</span></div>
+    <div class="hud-stat">⚙️ Scrap: <span id="stat-scrap" class="stat-val">200</span></div>
+    <div class="hud-stat">🛡️ Armor: <span id="stat-armor" class="stat-val">100%</span></div>
+    <div class="hud-stat">⚡ Morale: <span id="stat-morale" class="stat-val">85%</span></div>
+  </div>
+
+  <!-- App Views -->
+  <div id="app-content">
+
+    <!-- MAP TAB -->
+    <div id="view-map" class="tab-view active">
+      <div style="position: absolute; top: 10px; left: 10px; z-index: 5;" class="stat-badge">
+        Node <span id="current-node-name">#1 Safe Haven</span> | Biome: <span id="current-biome">Safe Highway</span>
+      </div>
+      <canvas id="map-canvas"></canvas>
+    </div>
+
+    <!-- COMBAT TAB -->
+    <div id="view-combat" class="tab-view">
+      <div style="position: absolute; top: 10px; left: 10px; z-index: 5; display: flex; gap: 8px;">
+        <button class="btn-primary" onclick="triggerAbility('nitro')">⚡ Nitro</button>
+        <button class="btn-primary" style="background:#3182ce" onclick="triggerAbility('smoke')">💨 Smoke</button>
+        <button class="btn-primary" style="background:#38a169" onclick="triggerAbility('repair')">🔧 Repair</button>
+      </div>
+      <canvas id="combat-canvas"></canvas>
+    </div>
+
+    <!-- MARKET TAB -->
+    <div id="view-market" class="tab-view" style="padding: 16px; overflow-y: auto;">
+      <h2 style="color: #ed8936; margin-bottom: 12px;">Wasteland Trade Ledger</h2>
+      <div id="market-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
+    </div>
+
+    <!-- CREW TAB -->
+    <div id="view-crew" class="tab-view" style="padding: 16px; overflow-y: auto;">
+      <h2 style="color: #ed8936; margin-bottom: 12px;">Convoy Roster & Garage</h2>
+      <div id="crew-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
+    </div>
+
+  </div>
+
+  <!-- Event Modal -->
+  <div id="event-modal" class="modal-overlay">
+    <div class="modal-box">
+      <h3 id="modal-title" style="color:#f6ad55; margin-bottom:10px;">Encounter Event</h3>
+      <p id="modal-desc" style="font-size:14px; color:#cbd5e0; margin-bottom:18px;">A stranded trader signals from behind an abandoned tanker.</p>
+      <div id="modal-actions" style="display:flex; gap:10px; justify-content:center;">
+        <button class="btn-primary" onclick="resolveEvent('help')">Help Trader</button>
+        <button class="btn-primary" style="background:#4a5568" onclick="resolveEvent('ignore')">Ignore</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div id="nav-bar">
+    <button class="nav-btn active" onclick="switchTab('map')">🗺️ Map</button>
+    <button class="nav-btn" onclick="switchTab('combat')">⚔️ Skirmish</button>
+    <button class="nav-btn" onclick="switchTab('market')">⚖️ Market</button>
+    <button class="nav-btn" onclick="switchTab('crew')">🧑‍🔧 Roster</button>
+  </div>
+
+  <script>
+    // Native Bridge Helper
+    const bridge = {
+      vibrate: (ms) => window.AndroidBridge ? window.AndroidBridge.vibrate(ms) : (navigator.vibrate && navigator.vibrate(ms)),
+      playAudioCue: (snd) => window.AndroidBridge ? window.AndroidBridge.playAudioCue(snd) : console.log('Audio cue:', snd),
+      saveState: (state) => window.AndroidBridge ? window.AndroidBridge.saveLocalState(JSON.stringify(state)) : localStorage.setItem('fc_state', JSON.stringify(state)),
+      loadState: () => {
+        const raw = window.AndroidBridge ? window.AndroidBridge.loadLocalState() : localStorage.getItem('fc_state');
+        return raw ? JSON.parse(raw) : null;
+      }
+    };
+
+    // State Management
+    let gameState = bridge.loadState() || {
+      fuel: 100, food: 50, scrap: 200, armor: 100, morale: 85,
+      currentNode: 0,
+      cargo: { bioFuel: 10, water: 20, scrapMetal: 50, preFallTech: 2 },
+      crew: [
+        { role: 'Driver', name: 'Kael', hp: 100, perk: 'Nitro Duration +20%' },
+        { role: 'Gunner', name: 'Vex', hp: 90, perk: 'Turret Damage +15%' },
+        { role: 'Mechanic', name: 'Doc', hp: 100, perk: 'Auto Repair +5%' },
+        { role: 'Quartermaster', name: 'Jett', hp: 80, perk: 'Trade Margin +10%' }
+      ]
+    };
+
+    function updateHUD() {
+      document.getElementById('stat-fuel').innerText = Math.max(0, gameState.fuel);
+      document.getElementById('stat-food').innerText = Math.max(0, gameState.food);
+      document.getElementById('stat-scrap').innerText = gameState.scrap;
+      document.getElementById('stat-armor').innerText = Math.max(0, gameState.armor) + '%';
+      document.getElementById('stat-morale').innerText = Math.max(0, gameState.morale) + '%';
+      bridge.saveState(gameState);
+    }
+
+    function switchTab(tabName) {
+      bridge.vibrate(30);
+      bridge.playAudioCue('click');
+      document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+
+      document.getElementById('view-' + tabName).classList.add('active');
+      event.currentTarget.classList.add('active');
+
+      if (tabName === 'combat') startCombatLoop();
+      if (tabName === 'market') renderMarket();
+      if (tabName === 'crew') renderCrew();
+    }
+
+    // MAP CANVAS (20-Node Graph)
+    const mapCanvas = document.getElementById('map-canvas');
+    const mapCtx = mapCanvas.getContext('2d');
+    let nodes = [];
+
+    function initMap() {
+      const width = mapCanvas.parentElement.clientWidth || window.innerWidth;
+      const height = mapCanvas.parentElement.clientHeight || (window.innerHeight - 110);
+      mapCanvas.width = width;
+      mapCanvas.height = height;
+
+      nodes = [];
+      const cols = 5;
+      const rows = 4;
+      const dx = width / (cols + 1);
+      const dy = height / (rows + 1);
+
+      let id = 0;
+      const biomes = ['Safe Highway', 'Contested Pass', 'Toxic Mire'];
+      for (let c = 0; c < cols; c++) {
+        for (let r = 0; r < rows; r++) {
+          nodes.push({
+            id: id,
+            name: `Sector-${id + 1}`,
+            x: dx * (c + 1) + (Math.random() - 0.5) * 30,
+            y: dy * (r + 1) + (Math.random() - 0.5) * 30,
+            biome: biomes[Math.floor(Math.random() * biomes.length)],
+            connections: []
+          });
+          id++;
+        }
+      }
+
+      // Interconnect nodes
+      nodes.forEach((n, idx) => {
+        if (idx + 1 < nodes.length && (idx + 1) % rows !== 0) n.connections.push(idx + 1);
+        if (idx + rows < nodes.length) n.connections.push(idx + rows);
+      });
+
+      renderMap();
+    }
+
+    function renderMap() {
+      mapCtx.clearRect(0, 0, mapCanvas.width, mapCanvas.height);
+
+      // Draw connections
+      mapCtx.strokeStyle = '#2d3748';
+      mapCtx.lineWidth = 2;
+      nodes.forEach(n => {
+        n.connections.forEach(targetId => {
+          const target = nodes[targetId];
+          mapCtx.beginPath();
+          mapCtx.moveTo(n.x, n.y);
+          mapCtx.lineTo(target.x, target.y);
+          mapCtx.stroke();
+        });
+      });
+
+      // Draw nodes
+      nodes.forEach(n => {
+        const isCurrent = n.id === gameState.currentNode;
+        mapCtx.beginPath();
+        mapCtx.arc(n.x, n.y, isCurrent ? 14 : 9, 0, Math.PI * 2);
+        mapCtx.fillStyle = isCurrent ? '#ed8936' : (n.biome === 'Toxic Mire' ? '#38a169' : '#3182ce');
+        mapCtx.fill();
+        mapCtx.strokeStyle = isCurrent ? '#fff' : '#1a202c';
+        mapCtx.lineWidth = isCurrent ? 3 : 1;
+        mapCtx.stroke();
+      });
+    }
+
+    mapCanvas.addEventListener('click', (e) => {
+      const rect = mapCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const currentNode = nodes[gameState.currentNode];
+      if (!currentNode) return;
+
+      currentNode.connections.forEach(targetId => {
+        const target = nodes[targetId];
+        const dist = Math.hypot(target.x - x, target.y - y);
+        if (dist < 20) {
+          // Travel to node
+          gameState.currentNode = target.id;
+          gameState.fuel -= 8;
+          gameState.food -= 4;
+          gameState.armor -= 2;
+          updateHUD();
+          renderMap();
+          bridge.vibrate(50);
+          bridge.playAudioCue('click');
+          showEventModal(target);
+        }
+      });
+    });
+
+    function showEventModal(node) {
+      document.getElementById('current-node-name').innerText = `#${node.id + 1} ${node.name}`;
+      document.getElementById('current-biome').innerText = node.biome;
+      document.getElementById('modal-title').innerText = `Arrival: ${node.biome}`;
+      document.getElementById('modal-desc').innerText = `Arrived at ${node.name}. Local scavengers offer trade or challenge your right of passage.`;
+      document.getElementById('event-modal').classList.add('open');
+    }
+
+    function resolveEvent(choice) {
+      document.getElementById('event-modal').classList.remove('open');
+      if (choice === 'help') {
+        gameState.scrap += 40;
+        gameState.morale = Math.min(100, gameState.morale + 5);
+      } else {
+        gameState.morale = Math.max(0, gameState.morale - 3);
+      }
+      updateHUD();
+    }
+
+    // COMBAT CANVAS (HTML5 Top-down Skirmish)
+    const combatCanvas = document.getElementById('combat-canvas');
+    const combatCtx = combatCanvas.getContext('2d');
+    let combatActive = false;
+    let playerPos = { x: 100, y: 150 };
+    let raiders = [{ x: 500, y: 120, hp: 50 }, { x: 500, y: 180, hp: 50 }];
+    let bullets = [];
+
+    function startCombatLoop() {
+      combatCanvas.width = combatCanvas.parentElement.clientWidth || window.innerWidth;
+      combatCanvas.height = combatCanvas.parentElement.clientHeight || (window.innerHeight - 110);
+      combatActive = true;
+      requestAnimationFrame(combatLoop);
+    }
+
+    function combatLoop() {
+      if (!combatActive) return;
+
+      combatCtx.fillStyle = '#111827';
+      combatCtx.fillRect(0, 0, combatCanvas.width, combatCanvas.height);
+
+      // Draw Highway Lane
+      combatCtx.strokeStyle = '#374151';
+      combatCtx.lineWidth = 4;
+      combatCtx.setLineDash([20, 15]);
+      combatCtx.beginPath();
+      combatCtx.moveTo(0, combatCanvas.height / 2);
+      combatCtx.lineTo(combatCanvas.width, combatCanvas.height / 2);
+      combatCtx.stroke();
+      combatCtx.setLineDash([]);
+
+      // Draw Player Convoy
+      combatCtx.fillStyle = '#ed8936';
+      combatCtx.fillRect(playerPos.x, playerPos.y - 15, 50, 30);
+      combatCtx.fillStyle = '#3182ce';
+      combatCtx.fillRect(playerPos.x + 35, playerPos.y - 10, 10, 20); // Turret
+
+      // Auto Turret Fire
+      if (Math.random() < 0.05) {
+        bullets.push({ x: playerPos.x + 45, y: playerPos.y, vx: 8, vy: (Math.random() - 0.5) * 2 });
+        bridge.playAudioCue('shoot');
+      }
+
+      // Draw & Update Bullets
+      combatCtx.fillStyle = '#ecc94b';
+      bullets.forEach((b, i) => {
+        b.x += b.vx;
+        b.y += b.vy;
+        combatCtx.beginPath();
+        combatCtx.arc(b.x, b.y, 3, 0, Math.PI * 2);
+        combatCtx.fill();
+
+        // Check collision
+        raiders.forEach(r => {
+          if (Math.hypot(r.x - b.x, r.y - b.y) < 18) {
+            r.hp -= 15;
+            b.x = 9999;
+            bridge.playAudioCue('explosion');
+          }
+        });
+      });
+      bullets = bullets.filter(b => b.x < combatCanvas.width);
+
+      // Draw & Update Raiders
+      raiders.forEach(r => {
+        r.x -= 1.2;
+        if (r.x < 10) r.x = combatCanvas.width;
+        combatCtx.fillStyle = '#e53e3e';
+        combatCtx.fillRect(r.x, r.y - 12, 35, 24);
+
+        // Raider HP
+        combatCtx.fillStyle = '#38a169';
+        combatCtx.fillRect(r.x, r.y - 18, (r.hp / 50) * 35, 4);
+      });
+
+      requestAnimationFrame(combatLoop);
+    }
+
+    function triggerAbility(type) {
+      bridge.vibrate(80);
+      if (type === 'nitro') {
+        playerPos.x = Math.min(combatCanvas.width - 100, playerPos.x + 60);
+        gameState.fuel = Math.max(0, gameState.fuel - 5);
+      } else if (type === 'repair') {
+        gameState.armor = Math.min(100, gameState.armor + 15);
+        gameState.scrap = Math.max(0, gameState.scrap - 20);
+      }
+      updateHUD();
+    }
+
+    // MARKET VIEW
+    function renderMarket() {
+      const items = [
+        { name: 'Bio-Fuel', key: 'bioFuel', price: 15, unit: 'L' },
+        { name: 'Water Rations', key: 'water', price: 8, unit: 'pack' },
+        { name: 'Scrap Metal', key: 'scrapMetal', price: 25, unit: 'ton' },
+        { name: 'Pre-Fall Tech', key: 'preFallTech', price: 120, unit: 'unit' }
+      ];
+
+      const container = document.getElementById('market-list');
+      container.innerHTML = items.map(item => `
+        <div class="panel-card" style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-weight:bold; color:#f6ad55;">${item.name}</div>
+            <div style="font-size:12px; color:#a0aec0;">Owned: ${gameState.cargo[item.key] || 0} ${item.unit}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-weight:bold; color:#ecc94b;">💰 ${item.price} Scrap</span>
+            <button class="btn-primary" style="padding:6px 12px; font-size:11px;" onclick="buyItem('${item.key}', ${item.price})">Buy</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function buyItem(key, price) {
+      if (gameState.scrap >= price) {
+        gameState.scrap -= price;
+        gameState.cargo[key] = (gameState.cargo[key] || 0) + 1;
+        updateHUD();
+        renderMarket();
+        bridge.vibrate(40);
+        bridge.playAudioCue('buy');
+      }
+    }
+
+    // CREW VIEW
+    function renderCrew() {
+      const container = document.getElementById('crew-list');
+      container.innerHTML = gameState.crew.map(c => `
+        <div class="panel-card">
+          <div style="display:flex; justify-content:space-between;">
+            <span style="font-weight:bold; color:#ed8936;">${c.role}: ${c.name}</span>
+            <span style="font-size:12px; color:#38a169;">HP: ${c.hp}%</span>
+          </div>
+          <div style="font-size:12px; color:#cbd5e0; margin-top:4px;">Perk: ${c.perk}</div>
+        </div>
+      `).join('');
+    }
+
+    // Initialization
+    window.addEventListener('resize', () => {
+      initMap();
+    });
+
+    updateHUD();
+    initMap();
+  </script>
+</body>
+</html>
