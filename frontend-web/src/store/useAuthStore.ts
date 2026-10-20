@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { useEncoreStore } from './useEncoreStore';
 
 export interface UserProfile {
   id: string;
@@ -43,6 +44,9 @@ export const useAuthStore = create<AuthState>()(
 
           if (res.ok && data.token && data.user) {
             set({ user: data.user, token: data.token, isLoading: false, error: null });
+
+            // Immediately pull user's saved concerts vault from Railway PostgreSQL DB
+            useEncoreStore.getState().syncCloudPull(data.user.id);
             return true;
           } else {
             set({ error: data.error || 'Login failed', isLoading: false });
@@ -67,6 +71,9 @@ export const useAuthStore = create<AuthState>()(
 
           if (res.ok && data.token && data.user) {
             set({ user: data.user, token: data.token, isLoading: false, error: null });
+
+            // Immediately pull / initialize user's concerts vault in Railway PostgreSQL
+            useEncoreStore.getState().syncCloudPull(data.user.id);
             return true;
           } else {
             set({ error: data.error || 'Registration failed', isLoading: false });
@@ -80,6 +87,7 @@ export const useAuthStore = create<AuthState>()(
 
       logout: () => {
         set({ user: null, token: null, error: null });
+        useEncoreStore.getState().clearAllData();
       },
 
       clearError: () => set({ error: null }),
@@ -97,13 +105,14 @@ export const useAuthStore = create<AuthState>()(
             const data = await res.json();
             if (data.user) {
               set({ user: data.user });
+              // Pull user's latest vault from Railway PostgreSQL DB
+              useEncoreStore.getState().syncCloudPull(data.user.id);
             }
           } else {
-            // Token expired or invalid
             set({ user: null, token: null });
           }
         } catch (e) {
-          // Network error - retain offline token
+          // Offline mode
         }
       },
     }),

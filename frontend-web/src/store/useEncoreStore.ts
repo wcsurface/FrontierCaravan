@@ -9,6 +9,7 @@ import {
   AnalyticsEngine,
   ConcertStats,
 } from '../engine/concertService';
+import { useAuthStore } from './useAuthStore';
 
 interface EncoreState {
   // Vault Relational Tables
@@ -17,7 +18,7 @@ interface EncoreState {
   venues: Venue[];
   setlistItems: SetlistItem[];
 
-  // User Preferences & Developer BYOK Settings
+  // User Preferences & Developer Settings
   setlistFmApiKey: string;
   isCloudSyncEnabled: boolean;
   cloudSyncStatus: 'synced' | 'syncing' | 'offline';
@@ -30,8 +31,11 @@ interface EncoreState {
   getConcertStats: () => ConcertStats;
   exportVaultJson: () => string;
   importVaultJson: (jsonStr: string) => boolean;
-  syncCloud: () => Promise<void>;
+  syncCloudPush: () => Promise<void>;
+  syncCloudPull: (userId: string) => Promise<void>;
 }
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'https://frontiercaravan-production.up.railway.app';
 
 export const useEncoreStore = create<EncoreState>()(
   persist(
@@ -121,10 +125,11 @@ export const useEncoreStore = create<EncoreState>()(
           artists: [...artists],
           venues: [...venues],
           setlistItems: [...setlistItems, ...newSetlistItems],
-          cloudSyncStatus: 'pending_insert' as any,
+          cloudSyncStatus: 'syncing',
         });
 
-        get().syncCloud();
+        // Automatically push update to Railway PostgreSQL Cloud DB
+        get().syncCloudPush();
 
         return concertId;
       },
@@ -135,6 +140,7 @@ export const useEncoreStore = create<EncoreState>()(
           concerts: concerts.filter(c => c.id !== concertId),
           setlistItems: setlistItems.filter(s => s.concertId !== concertId),
         });
+        get().syncCloudPush();
       },
 
       clearAllData: () => {
@@ -144,6 +150,7 @@ export const useEncoreStore = create<EncoreState>()(
           venues: [],
           setlistItems: [],
         });
+        get().syncCloudPush();
       },
 
       setSetlistFmApiKey: (key) => set({ setlistFmApiKey: key }),
@@ -168,6 +175,7 @@ export const useEncoreStore = create<EncoreState>()(
               venues: parsed.venues,
               setlistItems: parsed.setlistItems || [],
             });
+            get().syncCloudPush();
             return true;
           }
         } catch (e) {
@@ -176,20 +184,56 @@ export const useEncoreStore = create<EncoreState>()(
         return false;
       },
 
-      syncCloud: async () => {
-        const { concerts } = get();
-        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'https://frontiercaravan-production.up.railway.app';
+      syncCloudPush: async () => {
+        const { concerts, artists, venues, setlistItems } = get();
+        const user = useAuthStore.getState().user;
+
+        if (!user || !user.id) {
+          set({ cloudSyncStatus: 'offline' });
+          return;
+        }
+
         set({ cloudSyncStatus: 'syncing' });
 
         try {
-          const res = await fetch(`${backendUrl}/api/sync/push`, {
+          const res = await fetch(`${BACKEND_URL}/api/sync/push`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ deviceId: 'device_pwa_01', concerts }),
+            body: JSON.stringify({
+              userId: user.id,
+              concertsData: { concerts, artists, venues, setlistItems },
+            }),
           });
 
           if (res.ok) {
             set({ cloudSyncStatus: 'synced' });
+          } else {
+            set({ cloudSyncStatus: 'offline' });
+          }
+        } catch (e) {
+          set({ cloudSyncStatus: 'offline' });
+        }
+      },
+
+      syncCloudPull: async (userId: string) => {
+        if (!userId) return;
+        set({ cloudSyncStatus: 'syncing' });
+
+        try {
+          const res = await fetch(`${BACKEND_URL}/api/sync/pull?userId=${userId}`);
+
+          if (res.ok) {
+            const data = await res.json();
+            if (data.concertsData) {
+              const vault = data.concertsData;
+              set({
+                concerts: vault.concerts || [],
+                artists: vault.artists || [],
+                venues: vault.venues || [],
+                setlistItems: vault.setlistItems || [],
+                cloudSyncStatus: 'synced',
+              });
+            }
           } else {
             set({ cloudSyncStatus: 'offline' });
           }
