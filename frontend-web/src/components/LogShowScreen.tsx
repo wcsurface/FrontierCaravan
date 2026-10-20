@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useEncoreStore } from '../store/useEncoreStore';
 import { parseRawSetlist } from '../engine/setlistParser';
 import { searchVenues, VenueRecord } from '../engine/venueDataset';
-import { ArrowLeft, Plus, Trash2, MapPin } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, MapPin, X } from 'lucide-react';
 
 interface LogShowScreenProps {
   onBack: () => void;
@@ -239,7 +239,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
           )}
         </div>
 
-        {/* Location Info Fields (Auto-filled or Custom) */}
+        {/* Location Info Fields */}
         <div className="grid grid-cols-3 gap-2">
           {/* City */}
           <div>
@@ -298,13 +298,25 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
           />
         </div>
 
-        {/* Emerald Pill CTA Button */}
-        <button
-          type="submit"
-          className="w-full py-4 bg-gradient-to-r from-[#00E676] to-[#00C853] hover:from-[#00FFA3] hover:to-[#00E676] text-slate-950 font-black text-sm uppercase tracking-wider rounded-full shadow-[0_0_20px_rgba(0,230,118,0.4)] active:scale-[0.98] transition-transform my-2"
-        >
-          + ADD TO DIARY
-        </button>
+        {/* Action Buttons: Large + ADD CTA & CANCEL Button Below */}
+        <div className="flex flex-col gap-3 my-3">
+          {/* Primary Submit Button: Large + ADD */}
+          <button
+            type="submit"
+            className="w-full py-4.5 bg-gradient-to-r from-[#00E676] to-[#00C853] hover:from-[#00FFA3] hover:to-[#00E676] text-slate-950 font-black text-xl uppercase tracking-widest rounded-full shadow-[0_0_22px_rgba(0,230,118,0.5)] active:scale-[0.98] transition-transform"
+          >
+            + ADD
+          </button>
+
+          {/* Cancel Button Below */}
+          <button
+            type="button"
+            onClick={onBack}
+            className="w-full py-3.5 bg-[#121619] hover:bg-[#1C2328] text-slate-300 hover:text-white font-extrabold text-sm uppercase tracking-wider rounded-full border border-[#222B30] active:scale-[0.98] transition"
+          >
+            CANCEL
+          </button>
+        </div>
       </form>
     </div>
   );

@@ -39,7 +39,8 @@
     .stats-card-title { font-weight: 900; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid #222B30; display: flex; justify-between; align-items: center; }
 
     /* Action CTA Buttons */
-    .btn-cta { width: 100%; background: linear-gradient(90deg, #00E676, #00C853); color: #0a0a0a; font-weight: 900; font-size: 14px; padding: 16px; border-radius: 9999px; border: none; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; box-shadow: 0 0 20px rgba(0,230,118,0.4); margin-top: 12px; margin-bottom: 12px; }
+    .btn-cta { width: 100%; background: linear-gradient(90deg, #00E676, #00C853); color: #0a0a0a; font-weight: 900; font-size: 20px; padding: 16px; border-radius: 9999px; border: none; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; box-shadow: 0 0 22px rgba(0,230,118,0.5); margin-top: 12px; margin-bottom: 8px; }
+    .btn-cancel { width: 100%; background: #121619; color: #cbd5e1; font-weight: 800; font-size: 14px; padding: 14px; border-radius: 9999px; border: 1px solid #222B30; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-bottom: 16px; }
     .btn-add-opener { background: none; border: none; color: #FFB300; font-weight: 800; font-size: 12px; cursor: pointer; margin-bottom: 12px; text-align: left; padding: 2px 0; }
   </style>
 </head>
@@ -83,7 +84,7 @@
       </div>
     </div>
 
-    <button class="btn-cta" onclick="showScreen('log')">+ LOG NEW SHOW</button>
+    <button class="btn-cta" style="font-size:14px;" onclick="showScreen('log')">+ LOG NEW SHOW</button>
   </div>
 
   <!-- SCREEN 2: LOG SHOW -->
@@ -128,7 +129,9 @@
       <label class="input-label">Notes</label>
       <textarea id="input-notes" class="input-field" placeholder="Notes (Setlist, who were you with, venue vibe, crowd energy)"></textarea>
 
-      <button type="submit" class="btn-cta">+ ADD TO DIARY</button>
+      <!-- Action Buttons: Large + ADD & CANCEL Below -->
+      <button type="submit" class="btn-cta">+ ADD</button>
+      <button type="button" class="btn-cancel" onclick="showScreen('diary')">CANCEL</button>
     </form>
   </div>
 
@@ -309,10 +312,6 @@
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">2. The Fillmore - 8 Shows</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">3. The Paramount Theatre - 5 Shows</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">4. Madison Square Garden - 4 Shows</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">5. Ryman Auditorium - 3 Shows</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">6. First Avenue - 3 Shows</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">7. The Wiltern - 2 Shows</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">8. 9:30 Club - 2 Shows</div>
         `;
       } else if (type === 'artists') {
         title.innerText = 'ALL ARTISTS DATA';
@@ -321,8 +320,6 @@
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">2. Radiohead - 4 Times</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">3. Pixies - 4 Times</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">4. Depeche Mode - 3 Times</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">5. Nirvana - 3 Times</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">6. Smashing Pumpkins - 2 Times</div>
         `;
       } else if (type === 'years') {
         title.innerText = 'ALL YEARS DATA';
@@ -330,8 +327,6 @@
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">1. 2026 - 18 Shows</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">2. 2025 - 22 Shows</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">3. 2024 - 15 Shows</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">4. 2023 - 11 Shows</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">5. 2022 - 8 Shows</div>
         `;
       } else {
         title.innerText = 'DAYS OF THE WEEK';
@@ -339,8 +334,6 @@
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">1. Thursday - 32 Shows (42%)</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">2. Friday - 20 Shows (26%)</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">3. Saturday - 14 Shows (18%)</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">4. Wednesday - 8 Shows (10%)</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">5. Tuesday - 4 Shows (4%)</div>
         `;
       }
       showScreen('substats');
