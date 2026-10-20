@@ -6,6 +6,7 @@ export interface VenueRecord {
 }
 
 export const PRESET_VENUES: VenueRecord[] = [
+  { venue: "Market Square Arena", city: "Indianapolis", stateProvince: "Indiana", country: "USA" },
   { venue: "Red Rocks Amphitheatre", city: "Morrison", stateProvince: "Colorado", country: "USA" },
   { venue: "The Gorge Amphitheatre", city: "George", stateProvince: "Washington", country: "USA" },
   { venue: "Madison Square Garden", city: "New York", stateProvince: "New York", country: "USA" },
@@ -312,5 +313,5 @@ export function searchVenues(query: string): VenueRecord[] {
   const q = query.toLowerCase().trim();
   return PRESET_VENUES.filter(
     v => v.venue.toLowerCase().includes(q) || v.city.toLowerCase().includes(q)
-  ).slice(0, 8);
+  ).slice(0, 10);
 }
