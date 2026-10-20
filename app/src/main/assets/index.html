@@ -13,7 +13,7 @@
     .screen-view.active { display: flex; }
 
     /* Centered Header with 2X Larger LiveLore Logo */
-    .header { position: relative; width: 100%; display: flex; justify-between: align-items: center; padding: 12px 0 24px 0; min-height: 100px; }
+    .header { position: relative; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 0 24px 0; min-height: 100px; }
     .header-logo-box { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
     .header-logo-img { height: 100px; width: auto; object-fit: contain; filter: drop-shadow(0 0 16px rgba(0,230,118,0.4)); }
     .nav-btn-icon { position: absolute; z-index: 10; background: none; border: none; padding: 8px 12px; cursor: pointer; color: #00E676; font-size: 28px; font-weight: bold; }
@@ -102,16 +102,8 @@
       <button class="nav-btn-icon nav-btn-right" onclick="showScreen('auth')">★</button>
     </div>
 
-    <div id="ticket-list" style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
-      <!-- Updated Empty State according to user request -->
-      <div id="empty-state-box" style="text-align:center; padding: 30px 16px; margin: auto 0;">
-        <div style="font-size:36px; margin-bottom:12px;">🎸</div>
-        <div style="font-weight:900; font-size:24px; color:#ffffff; text-transform:uppercase; margin-bottom:16px;">YOUR CONCERT VAULT IS EMPTY!</div>
-        <div class="bounce-pointer" style="color:#FFB300; font-weight:900; font-size:16px; text-transform:uppercase; letter-spacing:1px; margin-top:20px;">
-          START ADDING YOUR CONCERTS BELOW!
-          <div style="font-size:42px; color:#00E676; margin-top:8px; font-weight:900;">↓</div>
-        </div>
-      </div>
+    <div id="ticket-list">
+      <!-- Dynamic persisted tickets container -->
     </div>
 
     <button class="btn-cta" style="font-size:14px;" onclick="showScreen('log')">+ LOG NEW SHOW</button>
@@ -176,19 +168,10 @@
       </div>
     </div>
 
-    <div style="text-align:center; font-weight:900; font-size:14px; color:#FFB300; margin-bottom:16px;" id="setlist-artist-name">THE CURE</div>
+    <div style="text-align:center; font-weight:900; font-size:14px; color:#FFB300; margin-bottom:16px;" id="setlist-artist-name">CONCERT SETLIST</div>
 
-    <div style="flex:1; font-family:monospace; font-size:14px; line-height:2; color:#e2e8f0;">
-      <div>1. Plainsong</div>
-      <div>2. Pictures of You</div>
-      <div>3. Fascination Street</div>
-      <div>4. Deep Green Sea</div>
-      <div>5. In Between Days</div>
-      <div style="margin: 12px 0;">
-        <span style="background:#00E676; color:#0a0a0a; font-weight:900; padding:3px 10px; border-radius:9999px; font-size:11px;">ENCORE</span>
-      </div>
-      <div>6. Boys Don't Cry</div>
-      <div>7. 10:15 Saturday Night</div>
+    <div style="flex:1; font-family:monospace; font-size:14px; line-height:2; color:#e2e8f0;" id="setlist-content">
+      <div style="color:#94a3b8; font-style:italic;">No setlist tracks recorded yet.</div>
     </div>
   </div>
 
@@ -266,6 +249,93 @@
     let authMode = 'login';
     let userShows = [];
 
+    // Load persisted shows on launch
+    function loadSavedShows() {
+      try {
+        const raw = localStorage.getItem('livelore_local_shows');
+        if (raw) {
+          userShows = JSON.parse(raw);
+        } else {
+          // Include user's Aerosmith & Guns N' Roses show if fresh vault
+          userShows = [
+            {
+              headline: 'Aerosmith',
+              openersList: ['Guns N Roses'],
+              date: '08/02/88',
+              venue: 'Market Square Arena',
+              notes: 'My first concert.'
+            }
+          ];
+          saveShowsToStorage();
+        }
+      } catch (e) {
+        userShows = [];
+      }
+      renderShowsFeed();
+      updateStatsDisplay();
+    }
+
+    function saveShowsToStorage() {
+      try {
+        localStorage.setItem('livelore_local_shows', JSON.stringify(userShows));
+      } catch (e) {}
+    }
+
+    function renderShowsFeed() {
+      const list = document.getElementById('ticket-list');
+      if (!list) return;
+
+      if (userShows.length === 0) {
+        list.style.display = 'flex';
+        list.style.flexDirection = 'column';
+        list.style.justifyContent = 'center';
+        list.style.alignItems = 'center';
+        list.innerHTML = `
+          <div id="empty-state-box" style="text-align:center; padding: 30px 16px; margin: auto 0;">
+            <div style="font-size:36px; margin-bottom:12px;">🎸</div>
+            <div style="font-weight:900; font-size:24px; color:#ffffff; text-transform:uppercase; margin-bottom:16px;">YOUR CONCERT VAULT IS EMPTY!</div>
+            <div class="bounce-pointer" style="color:#FFB300; font-weight:900; font-size:16px; text-transform:uppercase; letter-spacing:1px; margin-top:20px;">
+              START ADDING YOUR CONCERTS BELOW!
+              <div style="font-size:42px; color:#00E676; margin-top:8px; font-weight:900;">↓</div>
+            </div>
+          </div>
+        `;
+      } else {
+        list.style.display = 'block';
+        list.innerHTML = '';
+        userShows.forEach(show => {
+          const card = document.createElement('div');
+          card.className = 'ticket-card';
+          card.onclick = () => openSetlist(show.headline, show.notes);
+
+          let bandStackHtml = `<div class="ticket-artist-head">${show.headline.toUpperCase()}</div>`;
+          if (show.openersList && show.openersList.length > 0) {
+            bandStackHtml += `
+              <div class="ticket-artist-and">and</div>
+              <div class="ticket-artist-openers">${show.openersList.join(', ')}</div>
+            `;
+          }
+
+          card.innerHTML = `
+            <div class="ticket-left">
+              <div class="ticket-artist-box">
+                ${bandStackHtml}
+              </div>
+              <div class="ticket-footer">
+                <span class="ticket-venue">${show.venue}</span>
+                <span class="ticket-date">${show.date}</span>
+              </div>
+            </div>
+            <div class="ticket-stub">
+              <div>ADMIT ONE</div>
+              <div style="font-size:8px; color:#64748b; margin-top:4px;">SEC 7</div>
+            </div>
+          `;
+          list.appendChild(card);
+        });
+      }
+    }
+
     function showScreen(screenId) {
       document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
       document.getElementById('view-' + screenId).classList.add('active');
@@ -284,8 +354,14 @@
       showScreen('diary');
     }
 
-    function openSetlist(artistName) {
+    function openSetlist(artistName, notesText) {
       document.getElementById('setlist-artist-name').innerText = artistName.toUpperCase();
+      const content = document.getElementById('setlist-content');
+      if (notesText && notesText.trim().length > 0) {
+        content.innerHTML = `<div style="padding:12px; background:#121619; border-radius:8px; border:1px solid #222B30; font-family:sans-serif; line-height:1.6;">${notesText}</div>`;
+      } else {
+        content.innerHTML = `<div style="color:#94a3b8; font-style:italic;">No setlist tracks recorded yet.</div>`;
+      }
       showScreen('setlist');
     }
 
@@ -427,53 +503,26 @@
       e.preventDefault();
       const headline = document.getElementById('input-headline').value;
       const venue = document.getElementById('input-venue').value;
-      const date = document.getElementById('input-date').value || 'OCT 12, 2026';
+      const date = document.getElementById('input-date').value || '08/02/88';
+      const notes = document.getElementById('input-notes').value || '';
 
       const openerInputs = document.querySelectorAll('.input-opener');
       const openersList = Array.from(openerInputs).map(inp => inp.value.trim()).filter(Boolean);
 
       if (headline && venue) {
-        userShows.push({ headline, venue, date, openersList });
+        userShows.unshift({ headline, venue, date, openersList, notes });
+        saveShowsToStorage();
+        renderShowsFeed();
         updateStatsDisplay();
 
-        const list = document.getElementById('ticket-list');
-        const emptyBox = document.getElementById('empty-state-box');
-        if (emptyBox) emptyBox.style.display = 'none';
-
-        const card = document.createElement('div');
-        card.className = 'ticket-card';
-        card.onclick = () => openSetlist(headline);
-
-        let bandStackHtml = `<div class="ticket-artist-head">${headline.toUpperCase()}</div>`;
-        if (openersList.length > 0) {
-          bandStackHtml += `
-            <div class="ticket-artist-and">and</div>
-            <div class="ticket-artist-openers">${openersList.join(', ')}</div>
-          `;
-        }
-
-        card.innerHTML = `
-          <div class="ticket-left">
-            <div class="ticket-artist-box">
-              ${bandStackHtml}
-            </div>
-            <div class="ticket-footer">
-              <span class="ticket-venue">${venue}</span>
-              <span class="ticket-date">${date}</span>
-            </div>
-          </div>
-          <div class="ticket-stub">
-            <div>ADMIT ONE</div>
-            <div style="font-size:8px; color:#64748b; margin-top:4px;">SEC 7</div>
-          </div>
-        `;
-        list.prepend(card);
-
-        // Reset form for next new show entry
         resetLogForm();
         showScreen('diary');
       }
     }
+
+    // Initialize saved shows on page load
+    document.addEventListener('DOMContentLoaded', loadSavedShows);
+    loadSavedShows();
   </script>
 </body>
 </html>
