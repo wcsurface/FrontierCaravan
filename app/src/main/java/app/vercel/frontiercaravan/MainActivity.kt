@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
 
     private val liveUrl = "https://frontiercaravan.vercel.app"
     private val offlineAssetUrl = "file:///android_asset/index.html"
-    private var isUsingOfflineFallback = false
+    private var isUsingOfflineFallback = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,14 +59,11 @@ class MainActivity : ComponentActivity() {
 
         setupWebViewClients()
         setupOnBackPressed()
-        setupNetworkMonitoring()
 
-        // Initial load check
-        if (bridge.isNetworkAvailable()) {
-            loadLiveUrl()
-        } else {
-            loadOfflineFallback()
-        }
+        // Load offline asset instantly for 0ms startup
+        loadOfflineFallback()
+
+        setupNetworkMonitoring()
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -83,20 +80,15 @@ class MainActivity : ComponentActivity() {
             displayZoomControls = false
             mediaPlaybackRequiresUserGesture = false
 
-            // Safe Browsing & Mixed Content standard security flags
+            // Mixed Content security flag
             mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                safeBrowsingEnabled = true
-            }
 
             cacheMode = WebSettings.LOAD_DEFAULT
         }
     }
 
     private fun setupWebViewClients() {
-        webView.webChromeClient = object : WebChromeClient() {
-            // WebChromeClient customizations if needed
-        }
+        webView.webChromeClient = object : WebChromeClient() {}
 
         webView.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(
@@ -104,7 +96,6 @@ class MainActivity : ComponentActivity() {
                 request: WebResourceRequest?
             ): Boolean {
                 val url = request?.url?.toString() ?: return false
-                // Keep inside webview for both live site and local offline assets
                 return !(url.startsWith("http://") || url.startsWith("https://") || url.startsWith("file:///"))
             }
 
@@ -141,9 +132,6 @@ class MainActivity : ComponentActivity() {
             override fun onAvailable(network: Network) {
                 runOnUiThread {
                     bridge.notifyOnlineStatusChanged(true)
-                    if (isUsingOfflineFallback) {
-                        loadLiveUrl()
-                    }
                 }
             }
 
