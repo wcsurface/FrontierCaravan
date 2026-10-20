@@ -313,5 +313,5 @@ export function searchVenues(query: string): VenueRecord[] {
   const q = query.toLowerCase().trim();
   return PRESET_VENUES.filter(
     v => v.venue.toLowerCase().includes(q) || v.city.toLowerCase().includes(q)
-  ).slice(0, 10);
+  ).slice(0, 12);
 }

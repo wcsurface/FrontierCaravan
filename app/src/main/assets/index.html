@@ -249,6 +249,20 @@
   </div>
 
   <script>
+    const VENUE_DB = [
+      { v: "Market Square Arena", c: "Indianapolis", s: "Indiana", co: "USA" },
+      { v: "Red Rocks Amphitheatre", c: "Morrison", s: "Colorado", co: "USA" },
+      { v: "The Gorge Amphitheatre", c: "George", s: "Washington", co: "USA" },
+      { v: "Madison Square Garden", c: "New York", s: "New York", co: "USA" },
+      { v: "The Fillmore", c: "San Francisco", s: "California", co: "USA" },
+      { v: "Hollywood Bowl", c: "Los Angeles", s: "California", co: "USA" },
+      { v: "Ryman Auditorium", c: "Nashville", s: "Tennessee", co: "USA" },
+      { v: "First Avenue", c: "Minneapolis", s: "Minnesota", co: "USA" },
+      { v: "9:30 Club", c: "Washington", s: "DC", co: "USA" },
+      { v: "The Stone Pony", c: "Asbury Park", s: "New Jersey", co: "USA" },
+      { v: "The Forum (Kia Forum)", c: "Inglewood", s: "California", co: "USA" },
+    ];
+
     let authMode = 'login';
     let userShows = [];
 
@@ -290,21 +304,30 @@
       const dropdown = document.getElementById('venue-dropdown');
       if (!query || query.trim().length === 0) {
         dropdown.style.display = 'none';
+        document.getElementById('input-city').value = '';
+        document.getElementById('input-state').value = '';
+        document.getElementById('input-country').value = '';
         return;
       }
-      const q = query.toLowerCase();
+      const q = query.toLowerCase().trim();
       const matches = VENUE_DB.filter(item => item.v.toLowerCase().includes(q) || item.c.toLowerCase().includes(q));
-      if (matches.length === 0) {
+
+      if (matches.length > 0) {
+        const best = matches[0];
+        document.getElementById('input-city').value = best.c;
+        document.getElementById('input-state').value = best.s;
+        document.getElementById('input-country').value = best.co;
+
+        dropdown.style.display = 'block';
+        dropdown.innerHTML = matches.map(item => `
+          <div style="padding:8px 12px; border-bottom:1px solid #222B30; cursor:pointer;" onclick="selectVenue('${item.v.replace(/'/g, "\\'")}', '${item.c.replace(/'/g, "\\'")}', '${item.s.replace(/'/g, "\\'")}', '${item.co.replace(/'/g, "\\'")}')">
+            <div style="font-weight:bold; color:#fff;">${item.v}</div>
+            <div style="color:#94a3b8; font-size:10px;">${item.c}, ${item.s}, ${item.co}</div>
+          </div>
+        `).join('');
+      } else {
         dropdown.style.display = 'none';
-        return;
       }
-      dropdown.style.display = 'block';
-      dropdown.innerHTML = matches.map(item => `
-        <div style="padding:8px 12px; border-bottom:1px solid #222B30; cursor:pointer;" onclick="selectVenue('${item.v}', '${item.c}', '${item.s}', '${item.co}')">
-          <div style="font-weight:bold; color:#fff;">${item.v}</div>
-          <div style="color:#94a3b8; font-size:10px;">${item.c}, ${item.s}, ${item.co}</div>
-        </div>
-      `).join('');
     }
 
     function selectVenue(v, c, s, co) {
