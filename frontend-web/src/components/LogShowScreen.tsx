@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useEncoreStore } from '../store/useEncoreStore';
 import { parseRawSetlist } from '../engine/setlistParser';
-import { searchVenues, VenueRecord } from '../engine/venueDataset';
+import { searchVenues, PRESET_VENUES, VenueRecord } from '../engine/venueDataset';
 import { ArrowLeft, Plus, Trash2, MapPin } from 'lucide-react';
 
 interface LogShowScreenProps {
@@ -23,6 +23,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
   const [country, setCountry] = useState('');
   const [notesText, setNotesText] = useState('');
 
+  // Dropdown states for venue recommendations
   const [venueSuggestions, setVenueSuggestions] = useState<VenueRecord[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -44,6 +45,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
     }
   };
 
+  // Auto-format Date as DD/MM/YY as user types
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
     const digits = raw.replace(/\D/g, '');
@@ -60,15 +62,32 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
     setDateStr(formatted);
   };
 
+  // Instant Venue Search & Instant Location Auto-Fill as User Types
   const handleVenueChange = (val: string) => {
     setVenueName(val);
-    if (val.trim().length > 0) {
+    const q = val.trim().toLowerCase();
+
+    if (q.length > 0) {
       const results = searchVenues(val);
       setVenueSuggestions(results);
       setIsDropdownOpen(true);
+
+      // Instant Auto-Fill best matching venue location info on keystroke
+      const exactOrStartMatch = PRESET_VENUES.find(
+        v => v.venue.toLowerCase() === q || v.venue.toLowerCase().startsWith(q)
+      );
+
+      if (exactOrStartMatch) {
+        setCity(exactOrStartMatch.city);
+        setStateProvince(exactOrStartMatch.stateProvince);
+        setCountry(exactOrStartMatch.country);
+      }
     } else {
       setVenueSuggestions([]);
       setIsDropdownOpen(false);
+      setCity('');
+      setStateProvince('');
+      setCountry('');
     }
   };
 
@@ -204,7 +223,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
           />
         </div>
 
-        {/* Venue Input */}
+        {/* Venue Input with Instant Keystroke Auto-Fill & Dropdown */}
         <div className="relative">
           <label className="block text-[11px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
             Venue *
@@ -240,7 +259,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
           )}
         </div>
 
-        {/* Location Info Fields */}
+        {/* Location Info Fields (Auto-filled on keystroke or custom) */}
         <div className="grid grid-cols-3 gap-2">
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
