@@ -256,6 +256,11 @@
 
   <script>
     const VENUE_DB = [
+      { v: "Deer Creek Music Center", c: "Noblesville", s: "Indiana", co: "USA" },
+      { v: "Deer Creek", c: "Noblesville", s: "Indiana", co: "USA" },
+      { v: "Klipsch Music Center", c: "Noblesville", s: "Indiana", co: "USA" },
+      { v: "Ruoff Music Center", c: "Noblesville", s: "Indiana", co: "USA" },
+      { v: "Verizon Wireless Music Center (Noblesville)", c: "Noblesville", s: "Indiana", co: "USA" },
       { v: "Market Square Arena", c: "Indianapolis", s: "Indiana", co: "USA" },
       { v: "Red Rocks Amphitheatre", c: "Morrison", s: "Colorado", co: "USA" },
       { v: "The Gorge Amphitheatre", c: "George", s: "Washington", co: "USA" },
@@ -263,6 +268,7 @@
       { v: "The Fillmore", c: "San Francisco", s: "California", co: "USA" },
       { v: "Hollywood Bowl", c: "Los Angeles", s: "California", co: "USA" },
       { v: "Ryman Auditorium", c: "Nashville", s: "Tennessee", co: "USA" },
+      { v: "Alpine Valley Music Theatre", c: "East Troy", s: "Wisconsin", co: "USA" },
       { v: "First Avenue", c: "Minneapolis", s: "Minnesota", co: "USA" },
       { v: "9:30 Club", c: "Washington", s: "DC", co: "USA" },
       { v: "The Stone Pony", c: "Asbury Park", s: "New Jersey", co: "USA" },
@@ -414,7 +420,6 @@
         if (sortBar) sortBar.style.display = 'flex';
         if (countLabel) countLabel.innerText = userShows.length + (userShows.length === 1 ? ' SHOW LOGGED' : ' SHOWS LOGGED');
 
-        // Copy and sort array according to currentSort
         let displayList = [...userShows];
         if (currentSort === 'newest') {
           displayList.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
