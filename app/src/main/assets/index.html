@@ -37,24 +37,46 @@
     .input-field { width: 100%; background: #111618; border: 1.5px solid #FFB300; border-radius: 8px; padding: 12px 14px; color: #f1f5f9; font-size: 14px; outline: none; margin-bottom: 8px; box-shadow: 0 0 10px rgba(255,179,0,0.15); }
     textarea.input-field { min-height: 140px; resize: none; }
 
-    /* Stats Card Box */
-    .stats-card { background: #121619; border: 1px solid #222B30; border-radius: 16px; padding: 16px; margin-bottom: 16px; cursor: pointer; }
-    .stats-card-title { font-weight: 900; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid #222B30; display: flex; justify-between; align-items: center; }
-
     /* Action CTA Buttons */
     .btn-cta { width: 100%; background: linear-gradient(90deg, #00E676, #00C853); color: #0a0a0a; font-weight: 900; font-size: 20px; padding: 16px; border-radius: 9999px; border: none; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; box-shadow: 0 0 22px rgba(0,230,118,0.5); margin-top: 12px; margin-bottom: 8px; }
     .btn-cancel { width: 100%; background: #121619; color: #cbd5e1; font-weight: 800; font-size: 14px; padding: 14px; border-radius: 9999px; border: 1px solid #222B30; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-bottom: 16px; }
     .btn-add-opener { background: none; border: none; color: #FFB300; font-weight: 800; font-size: 12px; cursor: pointer; margin-bottom: 12px; text-align: left; padding: 2px 0; }
+
+    /* Stats Card Box */
+    .stats-card { background: #121619; border: 1px solid #222B30; border-radius: 16px; padding: 16px; margin-bottom: 16px; cursor: pointer; }
+    .stats-card-title { font-weight: 900; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid #222B30; display: flex; justify-between; align-items: center; }
   </style>
 </head>
 <body>
 
+  <!-- SCREEN 0: MANDATORY AUTH / LOG IN FIRST -->
+  <div id="view-auth" class="screen-view active">
+    <div class="header">
+      <div class="header-title">LOG IN</div>
+    </div>
+
+    <div style="text-align:center; margin-bottom:20px;">
+      <div style="font-[#FFB300]; font-size:12px; font-weight:800; text-transform:uppercase; color:#FFB300;">CONCERT DIARY & SETLIST VAULT</div>
+      <div style="font-size:13px; color:#94a3b8; margin-top:4px;">Log in to save & sync your live show diary across all devices.</div>
+    </div>
+
+    <form style="flex:1; display:flex; flex-direction:column;" onsubmit="handleLoginSubmit(event)">
+      <label class="input-label">Email Address *</label>
+      <input type="email" id="auth-email" class="input-field" placeholder="you@example.com" required />
+
+      <label class="input-label">Password *</label>
+      <input type="password" id="auth-password" class="input-field" placeholder="••••••••" required />
+
+      <button type="submit" class="btn-cta">LOG IN</button>
+    </form>
+  </div>
+
   <!-- SCREEN 1: DIARY -->
-  <div id="view-diary" class="screen-view active">
+  <div id="view-diary" class="screen-view">
     <div class="header">
       <button class="nav-btn-icon nav-btn-left" onclick="showScreen('stats')">☰</button>
       <div class="header-title">LIVELORE</div>
-      <button class="nav-btn-icon nav-btn-right" onclick="showScreen('stats')">★</button>
+      <button class="nav-btn-icon nav-btn-right" onclick="showScreen('auth')">★</button>
     </div>
 
     <div id="ticket-list">
@@ -247,22 +269,14 @@
   </div>
 
   <script>
-    const VENUE_DB = [
-      { v: "Red Rocks Amphitheatre", c: "Morrison", s: "Colorado", co: "USA" },
-      { v: "The Gorge Amphitheatre", c: "George", s: "Washington", co: "USA" },
-      { v: "Madison Square Garden", c: "New York", s: "New York", co: "USA" },
-      { v: "The Fillmore", c: "San Francisco", s: "California", co: "USA" },
-      { v: "Hollywood Bowl", c: "Los Angeles", s: "California", co: "USA" },
-      { v: "Ryman Auditorium", c: "Nashville", s: "Tennessee", co: "USA" },
-      { v: "First Avenue", c: "Minneapolis", s: "Minnesota", co: "USA" },
-      { v: "9:30 Club", c: "Washington", s: "DC", co: "USA" },
-      { v: "The Stone Pony", c: "Asbury Park", s: "New Jersey", co: "USA" },
-      { v: "The Forum (Kia Forum)", c: "Inglewood", s: "California", co: "USA" },
-    ];
-
     function showScreen(screenId) {
       document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
       document.getElementById('view-' + screenId).classList.add('active');
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      showScreen('diary');
     }
 
     function openSetlist(artistName) {
@@ -364,7 +378,6 @@
       const venue = document.getElementById('input-venue').value;
       const date = document.getElementById('input-date').value || 'OCT 12, 2026';
 
-      // Read opener inputs
       const openerInputs = document.querySelectorAll('.input-opener');
       const openersList = Array.from(openerInputs).map(inp => inp.value.trim()).filter(Boolean);
 

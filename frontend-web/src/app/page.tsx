@@ -11,15 +11,25 @@ import { AuthScreen } from '../components/AuthScreen';
 import { Menu, User, CheckCircle2 } from 'lucide-react';
 
 export default function HomeView() {
-  const [currentView, setCurrentView] = useState<'diary' | 'log' | 'setlist' | 'stats' | 'auth'>('diary');
-  const [selectedConcertId, setSelectedConcertId] = useState<string>('');
-
+  const { user, token, checkMe } = useAuthStore();
   const { concerts, artists, venues } = useEncoreStore();
-  const { user, checkMe } = useAuthStore();
+
+  // Start on Auth screen if not logged in
+  const [currentView, setCurrentView] = useState<'diary' | 'log' | 'setlist' | 'stats' | 'auth'>(
+    user ? 'diary' : 'auth'
+  );
+  const [selectedConcertId, setSelectedConcertId] = useState<string>('');
 
   useEffect(() => {
     checkMe();
   }, [checkMe]);
+
+  useEffect(() => {
+    // If no user account is active, take user to Log In / Create Account page first
+    if (!user && !token) {
+      setCurrentView('auth');
+    }
+  }, [user, token]);
 
   const handleOpenSetlist = (concertId: string) => {
     setSelectedConcertId(concertId);
@@ -31,7 +41,7 @@ export default function HomeView() {
       {/* SCREEN 1: DIARY VIEW */}
       {currentView === 'diary' && (
         <div className="flex flex-col w-full max-w-md h-screen p-4 overflow-y-auto">
-          {/* Larger & Centered Header */}
+          {/* Header */}
           <header className="relative flex items-center justify-between w-full pt-3 pb-5">
             <button
               onClick={() => setCurrentView('stats')}
@@ -110,10 +120,12 @@ export default function HomeView() {
         <StatsView onBack={() => setCurrentView('diary')} />
       )}
 
-      {/* SCREEN 5: AUTH VIEW */}
+      {/* SCREEN 5: AUTH VIEW (Mandatory First Screen) */}
       {currentView === 'auth' && (
         <AuthScreen
-          onBack={() => setCurrentView('diary')}
+          onBack={() => {
+            if (user) setCurrentView('diary');
+          }}
           onSuccess={() => setCurrentView('diary')}
         />
       )}

@@ -31,15 +31,19 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
   };
 
   return (
-    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none bg-grid-lines overflow-y-auto">
+    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none bg-grid-lines overflow-y-auto min-h-screen justify-between">
       {/* Centered & Larger Header */}
       <header className="relative flex items-center justify-between w-full pt-3 pb-5 mb-2">
-        <button
-          onClick={onBack}
-          className="p-2 text-slate-200 hover:text-white transition rounded-full z-10"
-        >
-          <ArrowLeft size={24} />
-        </button>
+        {user ? (
+          <button
+            onClick={onBack}
+            className="p-2 text-slate-200 hover:text-white transition rounded-full z-10"
+          >
+            <ArrowLeft size={24} />
+          </button>
+        ) : (
+          <div className="w-10 z-10" />
+        )}
         <h1 className="absolute inset-0 flex items-center justify-center text-3xl sm:text-4xl font-black tracking-widest uppercase text-white font-sans pointer-events-none">
           {user ? 'ACCOUNT' : mode === 'login' ? 'LOG IN' : 'REGISTER'}
         </h1>
@@ -47,6 +51,16 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
       </header>
 
       <div className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full pb-8">
+        {/* App Title Subheading */}
+        <div className="text-center mb-6">
+          <p className="text-xs font-bold uppercase tracking-widest text-[#FFB300]">
+            Concert Diary & Setlist Vault
+          </p>
+          <p className="text-sm text-slate-400 font-medium mt-1">
+            Log in to save and sync your live shows across all devices.
+          </p>
+        </div>
+
         {/* If Active User is Logged In */}
         {user ? (
           <div className="bg-[#121619] p-6 rounded-2xl border border-[#222B30] text-center space-y-4 shadow-xl">
@@ -78,7 +92,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
             <div className="flex bg-[#121619] p-1 rounded-full border border-[#222B30]">
               <button
                 onClick={() => { setMode('login'); clearError(); }}
-                className={`flex-1 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition ${
+                className={`flex-1 py-3 rounded-full text-xs font-black uppercase tracking-wider transition ${
                   mode === 'login'
                     ? 'bg-[#FFB300] text-slate-950 shadow-md'
                     : 'text-slate-400 hover:text-white'
@@ -88,7 +102,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
               </button>
               <button
                 onClick={() => { setMode('register'); clearError(); }}
-                className={`flex-1 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition ${
+                className={`flex-1 py-3 rounded-full text-xs font-black uppercase tracking-wider transition ${
                   mode === 'register'
                     ? 'bg-[#FFB300] text-slate-950 shadow-md'
                     : 'text-slate-400 hover:text-white'
@@ -173,16 +187,6 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
                 {isLoading ? 'Processing...' : mode === 'login' ? 'Log In' : 'Create Account'}
               </button>
             </form>
-
-            {/* Guest / Offline Mode Link */}
-            <div className="text-center pt-2">
-              <button
-                onClick={onBack}
-                className="text-xs text-slate-400 hover:text-white underline tracking-wide font-medium transition"
-              >
-                Continue as Guest (Local Offline Storage)
-              </button>
-            </div>
           </div>
         )}
       </div>
