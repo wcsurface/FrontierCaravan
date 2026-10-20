@@ -34,6 +34,7 @@ export interface Concert {
   date: number; // Unix Milliseconds
   venueId: string;
   headlineArtistId: string;
+  openingArtistId?: string;
   tourName?: string;
   rating: number; // 0.0 - 5.0
   ticketPrice?: number;
@@ -48,9 +49,10 @@ export interface Concert {
 
 export interface CreateConcertInput {
   date: number;
-  artistName: string;
+  headlineArtistName: string;
+  openingArtistName?: string;
   venueName: string;
-  venueCity: string;
+  venueCity?: string;
   venueCountry?: string;
   tourName?: string;
   rating?: number;
@@ -83,7 +85,10 @@ export class AnalyticsEngine {
 
     // Unique Artists
     const artistIds = new Set<string>();
-    concerts.forEach(c => artistIds.add(c.headlineArtistId));
+    concerts.forEach(c => {
+      artistIds.add(c.headlineArtistId);
+      if (c.openingArtistId) artistIds.add(c.openingArtistId);
+    });
     const uniqueArtists = artistIds.size;
 
     // Unique Venues
@@ -97,8 +102,12 @@ export class AnalyticsEngine {
     // Top Artists
     const artistCountMap = new Map<string, number>();
     concerts.forEach(c => {
-      const current = artistCountMap.get(c.headlineArtistId) || 0;
-      artistCountMap.set(c.headlineArtistId, current + 1);
+      const currentHead = artistCountMap.get(c.headlineArtistId) || 0;
+      artistCountMap.set(c.headlineArtistId, currentHead + 1);
+      if (c.openingArtistId) {
+        const currentOpener = artistCountMap.get(c.openingArtistId) || 0;
+        artistCountMap.set(c.openingArtistId, currentOpener + 1);
+      }
     });
 
     const topArtists = Array.from(artistCountMap.entries())

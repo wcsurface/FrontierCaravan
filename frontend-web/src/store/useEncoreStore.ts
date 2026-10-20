@@ -35,6 +35,7 @@ interface EncoreState {
 const INITIAL_ARTISTS: Artist[] = [
   { id: 'a_01', name: 'Nirvana', disambiguation: 'US Grunge Band', createdAt: Date.now() },
   { id: 'a_02', name: 'Radiohead', disambiguation: 'UK Alternative Rock', createdAt: Date.now() },
+  { id: 'a_03', name: 'Pixies', disambiguation: 'US Alternative Rock', createdAt: Date.now() },
 ];
 
 const INITIAL_VENUES: Venue[] = [
@@ -48,6 +49,7 @@ const INITIAL_CONCERTS: Concert[] = [
     date: new Date('1991-10-31').getTime(),
     venueId: 'v_01',
     headlineArtistId: 'a_01',
+    openingArtistId: 'a_03',
     tourName: 'Nevermind North American Tour',
     rating: 5.0,
     ticketPrice: 25,
@@ -81,37 +83,52 @@ export const useEncoreStore = create<EncoreState>()(
       saveConcert: (input) => {
         const { concerts, artists, venues, setlistItems } = get();
 
-        // 1. Find or create Artist
-        let artist = artists.find(a => a.name.toLowerCase() === input.artistName.toLowerCase());
-        if (!artist) {
-          artist = {
+        // 1. Find or create Headliner Artist
+        let headliner = artists.find(a => a.name.toLowerCase() === input.headlineArtistName.toLowerCase());
+        if (!headliner) {
+          headliner = {
             id: `a_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-            name: input.artistName,
+            name: input.headlineArtistName,
             createdAt: Date.now(),
           };
-          artists.push(artist);
+          artists.push(headliner);
         }
 
-        // 2. Find or create Venue
-        let venue = venues.find(v => v.name.toLowerCase() === input.venueName.toLowerCase() && v.city.toLowerCase() === input.venueCity.toLowerCase());
+        // 2. Find or create Opener Artist (if specified)
+        let opener: Artist | undefined = undefined;
+        if (input.openingArtistName && input.openingArtistName.trim().length > 0) {
+          opener = artists.find(a => a.name.toLowerCase() === input.openingArtistName!.toLowerCase());
+          if (!opener) {
+            opener = {
+              id: `a_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+              name: input.openingArtistName.trim(),
+              createdAt: Date.now(),
+            };
+            artists.push(opener);
+          }
+        }
+
+        // 3. Find or create Venue
+        let venue = venues.find(v => v.name.toLowerCase() === input.venueName.toLowerCase() && v.city.toLowerCase() === (input.venueCity || 'Local').toLowerCase());
         if (!venue) {
           venue = {
             id: `v_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
             name: input.venueName,
-            city: input.venueCity,
+            city: input.venueCity || 'Local City',
             country: input.venueCountry || 'USA',
             createdAt: Date.now(),
           };
           venues.push(venue);
         }
 
-        // 3. Create Concert
+        // 4. Create Concert
         const concertId = `c_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
         const newConcert: Concert = {
           id: concertId,
           date: input.date,
           venueId: venue.id,
-          headlineArtistId: artist.id,
+          headlineArtistId: headliner.id,
+          openingArtistId: opener?.id,
           tourName: input.tourName,
           rating: input.rating || 5.0,
           ticketPrice: input.ticketPrice || 0,
@@ -122,11 +139,11 @@ export const useEncoreStore = create<EncoreState>()(
           syncStatus: 'pending_insert',
         };
 
-        // 4. Create Setlist Items
+        // 5. Create Setlist Items
         const newSetlistItems: SetlistItem[] = input.setlist.map(s => ({
           id: `s_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
           concertId,
-          artistId: artist!.id,
+          artistId: headliner!.id,
           songTitle: s.songTitle,
           position: s.position,
           isEncore: s.isEncore,
