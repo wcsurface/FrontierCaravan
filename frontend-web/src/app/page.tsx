@@ -8,13 +8,16 @@ import { LogShowScreen } from '../components/LogShowScreen';
 import { SetlistDetailView } from '../components/SetlistDetailView';
 import { StatsView } from '../components/StatsView';
 import { AuthScreen } from '../components/AuthScreen';
+import { GlassNavBar } from '../components/GlassNavBar';
 import { Menu, User, CheckCircle2, Sparkles, ArrowDown, SlidersHorizontal } from 'lucide-react';
 
 export default function HomeView() {
   const { user, token, checkMe } = useAuthStore();
   const { concerts, artists, venues } = useEncoreStore();
 
-  const [currentView, setCurrentView] = useState<'diary' | 'log' | 'setlist' | 'stats' | 'auth'>('diary');
+  const [currentView, setCurrentView] = useState<'diary' | 'log' | 'setlist' | 'stats' | 'auth'>(
+    user ? 'diary' : 'auth'
+  );
   const [selectedConcertId, setSelectedConcertId] = useState<string>('');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'band'>('newest');
 
@@ -38,7 +41,6 @@ export default function HomeView() {
     setCurrentView('log');
   };
 
-  // Sort Concerts Feed: Newest First, Oldest First, or Band (A-Z)
   const sortedConcerts = [...concerts].sort((a, b) => {
     if (sortBy === 'newest') {
       return b.date - a.date;
@@ -57,7 +59,7 @@ export default function HomeView() {
       {/* SCREEN 1: DIARY VIEW */}
       {currentView === 'diary' && (
         <div className="flex flex-col w-full max-w-md h-screen p-4 overflow-y-auto justify-between">
-          {/* Header with 2X Larger LiveLore Logo */}
+          {/* Header with LiveLore Logo */}
           <header className="relative flex items-center justify-between w-full pt-3 pb-6 my-1">
             <button
               onClick={() => setCurrentView('stats')}
@@ -140,18 +142,8 @@ export default function HomeView() {
             )}
           </div>
 
-          {/* Bottom Floating CTA Button */}
-          <div className="pt-2 pb-4 flex justify-center items-center w-full z-20">
-            <button
-              onClick={() => {
-                setSelectedConcertId('');
-                setCurrentView('log');
-              }}
-              className="w-full py-4 bg-gradient-to-r from-[#00E676] to-[#00C853] hover:from-[#00FFA3] hover:to-[#00E676] text-slate-950 font-black text-sm uppercase tracking-wider rounded-full shadow-[0_0_20px_rgba(0,230,118,0.4)] active:scale-[0.98] transition-transform"
-            >
-              + LOG NEW SHOW
-            </button>
-          </div>
+          {/* Glassmorphic 4-Button Navigation Bar */}
+          <GlassNavBar currentView={currentView} onNavigate={setCurrentView} />
         </div>
       )}
 
@@ -160,6 +152,7 @@ export default function HomeView() {
         <LogShowScreen
           onBack={() => setCurrentView('diary')}
           onSaved={() => setCurrentView('diary')}
+          onNavigate={setCurrentView}
         />
       )}
 
@@ -169,12 +162,16 @@ export default function HomeView() {
           concertId={selectedConcertId}
           onBack={() => setCurrentView('diary')}
           onEdit={(concertId) => handleEditConcert(concertId)}
+          onNavigate={setCurrentView}
         />
       )}
 
       {/* SCREEN 4: STATS VIEW */}
       {currentView === 'stats' && (
-        <StatsView onBack={() => setCurrentView('diary')} />
+        <StatsView
+          onBack={() => setCurrentView('diary')}
+          onNavigate={setCurrentView}
+        />
       )}
 
       {/* SCREEN 5: AUTH VIEW */}

@@ -4,14 +4,16 @@ import React, { useState } from 'react';
 import { useEncoreStore } from '../store/useEncoreStore';
 import { parseRawSetlist } from '../engine/setlistParser';
 import { searchVenues, PRESET_VENUES, VenueRecord } from '../engine/venueDataset';
+import { GlassNavBar } from './GlassNavBar';
 import { ArrowLeft, Plus, Trash2, MapPin } from 'lucide-react';
 
 interface LogShowScreenProps {
   onBack: () => void;
   onSaved: () => void;
+  onNavigate: (view: 'diary' | 'log' | 'stats' | 'auth') => void;
 }
 
-export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved }) => {
+export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved, onNavigate }) => {
   const { saveConcert } = useEncoreStore();
 
   const [headlineBand, setHeadlineBand] = useState('');
@@ -23,11 +25,9 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
   const [country, setCountry] = useState('');
   const [notesText, setNotesText] = useState('');
 
-  // Dropdown states for venue recommendations
   const [venueSuggestions, setVenueSuggestions] = useState<VenueRecord[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // Helper function to reset all form fields to pristine blank state
   const resetForm = () => {
     setHeadlineBand('');
     setOpeners(['']);
@@ -59,7 +59,6 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
     }
   };
 
-  // Auto-format Date as DD/MM/YY as user types
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
     const digits = raw.replace(/\D/g, '');
@@ -76,7 +75,6 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
     setDateStr(formatted);
   };
 
-  // Instant Venue Search & Precise Location Auto-Fill
   const handleVenueChange = (val: string) => {
     setVenueName(val);
     const q = val.trim().toLowerCase();
@@ -86,7 +84,6 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
       setVenueSuggestions(results);
       setIsDropdownOpen(true);
 
-      // Find exact or prefix match in venue database for 100% geographic precision
       const exactOrStartMatch = PRESET_VENUES.find(
         v => v.venue.toLowerCase() === q || v.venue.toLowerCase().startsWith(q)
       );
@@ -132,7 +129,6 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
     const combinedOpeners = openers.filter(o => o.trim().length > 0).join(', ');
     const parsedTracks = parseRawSetlist(notesText);
 
-    // Save with precise venue city, state, country
     saveConcert({
       date: dateMs,
       headlineArtistName: headlineBand.trim(),
@@ -150,17 +146,12 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
     onSaved();
   };
 
-  const handleCancel = () => {
-    resetForm();
-    onBack();
-  };
-
   return (
-    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none bg-grid-lines overflow-y-auto">
-      {/* Header with 2X Larger LiveLore Logo */}
+    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none bg-grid-lines overflow-y-auto justify-between">
+      {/* Header with LiveLore Logo */}
       <header className="relative flex items-center justify-between w-full pt-3 pb-6 my-1">
         <button
-          onClick={handleCancel}
+          onClick={() => { resetForm(); onBack(); }}
           className="p-2 text-slate-200 hover:text-white transition rounded-full z-10"
         >
           <ArrowLeft size={26} />
@@ -176,7 +167,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
       </header>
 
       {/* Form Inputs */}
-      <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-4 max-w-md mx-auto w-full pb-6 pt-2">
+      <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-4 max-w-md mx-auto w-full pb-2 pt-2">
         {/* Headline Band */}
         <div>
           <label className="block text-[11px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
@@ -280,7 +271,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
           )}
         </div>
 
-        {/* Location Info Fields (Auto-filled with 100% precision) */}
+        {/* Location Info Fields */}
         <div className="grid grid-cols-3 gap-2">
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
@@ -323,7 +314,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
         </div>
 
         {/* Combined Notes / Setlist Field */}
-        <div className="flex-1 flex flex-col min-h-[160px]">
+        <div className="flex-1 flex flex-col min-h-[140px]">
           <label className="block text-[11px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
             Notes
           </label>
@@ -331,29 +322,24 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
             placeholder="Notes (Setlist, who were you with, venue vibe, crowd energy)"
             value={notesText}
             onChange={(e) => setNotesText(e.target.value)}
-            rows={5}
+            rows={4}
             className="w-full flex-1 bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg p-4 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition resize-none text-sm leading-relaxed"
           />
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col gap-3 my-3">
+        {/* Submit Button */}
+        <div className="my-2">
           <button
             type="submit"
-            className="w-full py-4.5 bg-gradient-to-r from-[#00E676] to-[#00C853] hover:from-[#00FFA3] hover:to-[#00E676] text-slate-950 font-black text-xl uppercase tracking-widest rounded-full shadow-[0_0_22px_rgba(0,230,118,0.5)] active:scale-[0.98] transition-transform"
+            className="w-full py-4 bg-gradient-to-r from-[#00E676] to-[#00C853] hover:from-[#00FFA3] hover:to-[#00E676] text-slate-950 font-black text-xl uppercase tracking-widest rounded-full shadow-[0_0_22px_rgba(0,230,118,0.5)] active:scale-[0.98] transition-transform"
           >
             + ADD
           </button>
-
-          <button
-            type="button"
-            onClick={handleCancel}
-            className="w-full py-3.5 bg-[#121619] hover:bg-[#1C2328] text-slate-300 hover:text-white font-extrabold text-sm uppercase tracking-wider rounded-full border border-[#222B30] active:scale-[0.98] transition"
-          >
-            CANCEL
-          </button>
         </div>
       </form>
+
+      {/* Glassmorphic 4-Button Navigation Bar */}
+      <GlassNavBar currentView="log" onNavigate={onNavigate} />
     </div>
   );
 };
