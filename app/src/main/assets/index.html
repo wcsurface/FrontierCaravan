@@ -12,9 +12,10 @@
     .screen-view { display: none; width: 100%; max-width: 420px; height: 100%; flex-direction: column; justify-between; overflow-y: auto; }
     .screen-view.active { display: flex; }
 
-    /* Centered & Larger Headers */
-    .header { position: relative; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 0 20px 0; }
-    .header-title { font-weight: 900; font-size: 28px; letter-spacing: 3px; text-transform: uppercase; color: #ffffff; text-align: center; margin: 0 auto; width: 100%; }
+    /* Centered Header with LiveLore Logo */
+    .header { position: relative; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 8px 0 16px 0; min-height: 60px; }
+    .header-logo-box { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+    .header-logo-img { height: 52px; width: auto; object-fit: contain; filter: drop-shadow(0 0 12px rgba(0,230,118,0.3)); }
     .nav-btn-icon { position: absolute; z-index: 10; background: none; border: none; padding: 8px 12px; cursor: pointer; color: #00E676; font-size: 26px; font-weight: bold; }
     .nav-btn-left { left: 0; }
     .nav-btn-right { right: 0; }
@@ -39,7 +40,7 @@
 
     /* Inputs with Amber Borders (#FFB300) */
     .input-label { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #FFB300; margin-bottom: 4px; display: block; }
-    .input-field { width: 100%; background: #111618; border: 1.5px solid #FFB300; border-radius: 8px; padding: 12px 14px; color: #f1f5f9; font-size: 14px; outline: none; margin-bottom: 12px; box-shadow: 0 0 10px rgba(255,179,0,0.15); }
+    .input-field { width: 100%; background: #111618; border: 1.5px solid #FFB300; border-radius: 8px; padding: 12px 14px; color: #f1f5f9; font-size: 14px; outline: none; margin-bottom: 8px; box-shadow: 0 0 10px rgba(255,179,0,0.15); }
     textarea.input-field { min-height: 140px; resize: none; }
 
     /* Action CTA Buttons */
@@ -57,22 +58,18 @@
   <!-- SCREEN 0: MANDATORY AUTH / LOG IN & CREATE ACCOUNT -->
   <div id="view-auth" class="screen-view active">
     <div class="header">
-      <div class="header-title" id="auth-header-title">LOG IN</div>
-    </div>
-
-    <div style="text-align:center; margin-bottom:16px;">
-      <div style="font-size:12px; font-weight:800; text-transform:uppercase; color:#FFB300;">CONCERT DIARY & SETLIST VAULT</div>
-      <div style="font-size:13px; color:#94a3b8; margin-top:4px;">Log in or create an account to save & sync your live show diary.</div>
+      <div class="header-logo-box">
+        <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
     </div>
 
     <!-- Mode Switcher Tabs -->
-    <div class="auth-tab-box">
+    <div class="auth-tab-box" style="margin-top:20px;">
       <button class="auth-tab-btn active" id="tab-login" onclick="switchAuthMode('login')">Log In</button>
       <button class="auth-tab-btn" id="tab-register" onclick="switchAuthMode('register')">Create Account</button>
     </div>
 
     <form style="flex:1; display:flex; flex-direction:column;" onsubmit="handleLoginSubmit(event)">
-      <!-- Display Name Field (Register Mode Only) -->
       <div id="field-name-box" style="display:none;">
         <label class="input-label">Display Name *</label>
         <input type="text" id="auth-name" class="input-field" placeholder="Your Name" />
@@ -92,7 +89,9 @@
   <div id="view-diary" class="screen-view">
     <div class="header">
       <button class="nav-btn-icon nav-btn-left" onclick="showScreen('stats')">☰</button>
-      <div class="header-title">LIVELORE</div>
+      <div class="header-logo-box">
+        <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
       <button class="nav-btn-icon nav-btn-right" onclick="showScreen('auth')">★</button>
     </div>
 
@@ -139,7 +138,9 @@
   <div id="view-log" class="screen-view">
     <div class="header">
       <button class="nav-btn-icon nav-btn-left" style="color:#ffffff;" onclick="showScreen('diary')">←</button>
-      <div class="header-title">LOG SHOW</div>
+      <div class="header-logo-box">
+        <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
     </div>
 
     <form style="flex:1; display:flex; flex-direction:column; padding-bottom:20px;" onsubmit="saveNewShow(event)">
@@ -187,10 +188,12 @@
   <div id="view-setlist" class="screen-view">
     <div class="header">
       <button class="nav-btn-icon nav-btn-left" style="color:#ffffff;" onclick="showScreen('diary')">←</button>
-      <div class="header-title">SETLIST</div>
+      <div class="header-logo-box">
+        <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
     </div>
 
-    <div style="text-align:center; font-weight:900; font-size:14px; color:#94a3b8; margin-bottom:16px;" id="setlist-artist-name">THE CURE</div>
+    <div style="text-align:center; font-weight:900; font-size:14px; color:#FFB300; margin-bottom:16px;" id="setlist-artist-name">THE CURE</div>
 
     <div style="flex:1; font-family:monospace; font-size:14px; line-height:2; color:#e2e8f0;">
       <div>1. Plainsong</div>
@@ -210,7 +213,9 @@
   <div id="view-stats" class="screen-view">
     <div class="header">
       <button class="nav-btn-icon nav-btn-left" style="color:#ffffff;" onclick="showScreen('diary')">←</button>
-      <div class="header-title">STATS</div>
+      <div class="header-logo-box">
+        <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
     </div>
 
     <div style="text-align:center; font-weight:900; font-size:48px; color:#ffffff; margin: 12px 0;">78 SHOWS</div>
@@ -279,10 +284,12 @@
   <div id="view-substats" class="screen-view">
     <div class="header">
       <button class="nav-btn-icon nav-btn-left" style="color:#ffffff;" onclick="showScreen('stats')">←</button>
-      <div class="header-title" style="font-size:20px;" id="substats-title">ALL DATA</div>
+      <div class="header-logo-box">
+        <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
     </div>
 
-    <div id="substats-container" style="flex:1; font-size:13px; font-weight:700; padding-bottom:20px;"></div>
+    <div id="substats-container" style="flex:1; font-size:13px; font-weight:700; padding-bottom:20px; margin-top:10px;"></div>
   </div>
 
   <script>
@@ -297,7 +304,6 @@
       authMode = mode;
       document.getElementById('tab-login').classList.toggle('active', mode === 'login');
       document.getElementById('tab-register').classList.toggle('active', mode === 'register');
-      document.getElementById('auth-header-title').innerText = mode === 'login' ? 'LOG IN' : 'REGISTER';
       document.getElementById('field-name-box').style.display = mode === 'register' ? 'block' : 'none';
       document.getElementById('btn-auth-submit').innerText = mode === 'login' ? 'LOG IN' : 'CREATE ACCOUNT';
     }
@@ -354,34 +360,33 @@
 
     function showSubStats(type) {
       const container = document.getElementById('substats-container');
-      const title = document.getElementById('substats-title');
 
       if (type === 'venues') {
-        title.innerText = 'ALL VENUES DATA';
         container.innerHTML = `
+          <div style="color:#00E676; font-size:14px; text-transform:uppercase; margin-bottom:10px;">ALL VENUES DATA</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">1. Red Rocks Amphitheatre - 12 Shows</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">2. The Fillmore - 8 Shows</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">3. The Paramount Theatre - 5 Shows</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">4. Madison Square Garden - 4 Shows</div>
         `;
       } else if (type === 'artists') {
-        title.innerText = 'ALL ARTISTS DATA';
         container.innerHTML = `
+          <div style="color:#FFB300; font-size:14px; text-transform:uppercase; margin-bottom:10px;">ALL ARTISTS DATA</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">1. The Cure - 6 Times</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">2. Radiohead - 4 Times</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">3. Pixies - 4 Times</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">4. Depeche Mode - 3 Times</div>
         `;
       } else if (type === 'years') {
-        title.innerText = 'ALL YEARS DATA';
         container.innerHTML = `
+          <div style="color:#00B0FF; font-size:14px; text-transform:uppercase; margin-bottom:10px;">ALL YEARS DATA</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">1. 2026 - 18 Shows</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">2. 2025 - 22 Shows</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">3. 2024 - 15 Shows</div>
         `;
       } else {
-        title.innerText = 'DAYS OF THE WEEK';
         container.innerHTML = `
+          <div style="color:#E040FB; font-size:14px; text-transform:uppercase; margin-bottom:10px;">DAYS OF THE WEEK</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">1. Thursday - 32 Shows (42%)</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">2. Friday - 20 Shows (26%)</div>
           <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">3. Saturday - 14 Shows (18%)</div>

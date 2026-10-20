@@ -66,18 +66,32 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
 
   return (
     <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines">
+      {/* Header with LiveLore Logo */}
+      <header className="relative flex items-center justify-between w-full pt-2 pb-4 mb-2">
+        <button
+          onClick={activeSubView === 'main' ? onBack : () => setActiveSubView('main')}
+          className="p-2 text-slate-200 hover:text-white transition rounded-full z-10"
+        >
+          <ArrowLeft size={24} />
+        </button>
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-12">
+          <img
+            src="/assets/livelore_logo.png"
+            alt="LiveLore"
+            className="h-14 sm:h-16 w-auto object-contain drop-shadow-[0_0_15px_rgba(0,230,118,0.3)] filter contrast-105"
+          />
+        </div>
+        <div className="w-10 z-10" />
+      </header>
+
       {/* 1. FULL DATA DETAIL SUB-VIEWS */}
       {activeSubView === 'venues' && (
         <div className="flex flex-col w-full max-w-md mx-auto space-y-4 pb-8">
-          <header className="relative flex items-center justify-between w-full pt-3 pb-5 mb-2">
-            <button onClick={() => setActiveSubView('main')} className="p-2 text-slate-200 hover:text-white transition rounded-full z-10">
-              <ArrowLeft size={24} />
-            </button>
-            <h1 className="absolute inset-0 flex items-center justify-center text-2xl sm:text-3xl font-black tracking-widest uppercase text-white font-sans pointer-events-none gap-2">
-              <MapPin size={22} className="text-[#00E676]" /> ALL VENUES
-            </h1>
-            <div className="w-10 z-10" />
-          </header>
+          <div className="text-center">
+            <h2 className="text-xl font-black uppercase text-[#00E676] font-sans flex items-center justify-center gap-2">
+              <MapPin size={22} /> ALL VENUES
+            </h2>
+          </div>
           <div className="space-y-3">
             {venuesList.map((v, i) => (
               <div key={i} className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-1.5 shadow-sm">
@@ -96,15 +110,11 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
 
       {activeSubView === 'artists' && (
         <div className="flex flex-col w-full max-w-md mx-auto space-y-4 pb-8">
-          <header className="relative flex items-center justify-between w-full pt-3 pb-5 mb-2">
-            <button onClick={() => setActiveSubView('main')} className="p-2 text-slate-200 hover:text-white transition rounded-full z-10">
-              <ArrowLeft size={24} />
-            </button>
-            <h1 className="absolute inset-0 flex items-center justify-center text-2xl sm:text-3xl font-black tracking-widest uppercase text-white font-sans pointer-events-none gap-2">
-              <Music size={22} className="text-[#FFB300]" /> ALL ARTISTS
-            </h1>
-            <div className="w-10 z-10" />
-          </header>
+          <div className="text-center">
+            <h2 className="text-xl font-black uppercase text-[#FFB300] font-sans flex items-center justify-center gap-2">
+              <Music size={22} /> ALL ARTISTS
+            </h2>
+          </div>
           <div className="space-y-3">
             {artistsList.map((a, i) => (
               <div key={i} className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-1.5 shadow-sm">
@@ -123,15 +133,11 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
 
       {activeSubView === 'years' && (
         <div className="flex flex-col w-full max-w-md mx-auto space-y-4 pb-8">
-          <header className="relative flex items-center justify-between w-full pt-3 pb-5 mb-2">
-            <button onClick={() => setActiveSubView('main')} className="p-2 text-slate-200 hover:text-white transition rounded-full z-10">
-              <ArrowLeft size={24} />
-            </button>
-            <h1 className="absolute inset-0 flex items-center justify-center text-2xl sm:text-3xl font-black tracking-widest uppercase text-white font-sans pointer-events-none gap-2">
-              <Calendar size={22} className="text-[#00B0FF]" /> ALL YEARS
-            </h1>
-            <div className="w-10 z-10" />
-          </header>
+          <div className="text-center">
+            <h2 className="text-xl font-black uppercase text-[#00B0FF] font-sans flex items-center justify-center gap-2">
+              <Calendar size={22} /> ALL YEARS
+            </h2>
+          </div>
           <div className="space-y-3">
             {yearsList.map((y, i) => (
               <div key={i} className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-1.5 shadow-sm">
@@ -150,15 +156,11 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
 
       {activeSubView === 'days' && (
         <div className="flex flex-col w-full max-w-md mx-auto space-y-4 pb-8">
-          <header className="relative flex items-center justify-between w-full pt-3 pb-5 mb-2">
-            <button onClick={() => setActiveSubView('main')} className="p-2 text-slate-200 hover:text-white transition rounded-full z-10">
-              <ArrowLeft size={24} />
-            </button>
-            <h1 className="absolute inset-0 flex items-center justify-center text-2xl sm:text-3xl font-black tracking-widest uppercase text-white font-sans pointer-events-none gap-2">
-              <Clock size={22} className="text-[#E040FB]" /> DAYS OF THE WEEK
-            </h1>
-            <div className="w-10 z-10" />
-          </header>
+          <div className="text-center">
+            <h2 className="text-xl font-black uppercase text-[#E040FB] font-sans flex items-center justify-center gap-2">
+              <Clock size={22} /> DAYS OF THE WEEK
+            </h2>
+          </div>
           <div className="space-y-3">
             {daysList.map((d, i) => (
               <div key={i} className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-1.5 shadow-sm">
@@ -175,20 +177,9 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
         </div>
       )}
 
-      {/* 2. MAIN STATS OVERVIEW SCREEN (SHOWS FULL TOP 10 IN EACH CARD) */}
+      {/* 2. MAIN STATS OVERVIEW SCREEN */}
       {activeSubView === 'main' && (
         <div className="flex flex-col w-full max-w-md mx-auto space-y-6 pb-8">
-          {/* Larger & Centered Header */}
-          <header className="relative flex items-center justify-between w-full pt-3 pb-5 mb-2">
-            <button onClick={onBack} className="p-2 text-slate-200 hover:text-white transition rounded-full z-10">
-              <ArrowLeft size={24} />
-            </button>
-            <h1 className="absolute inset-0 flex items-center justify-center text-3xl sm:text-4xl font-black tracking-widest uppercase text-white font-sans pointer-events-none">
-              STATS
-            </h1>
-            <div className="w-10 z-10" />
-          </header>
-
           {/* Hero Readout */}
           <div className="text-center my-2">
             <h2 className="text-5xl sm:text-6xl font-black tracking-tight text-white uppercase font-sans">
@@ -198,7 +189,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
 
           {/* Top 10 Ranked Sections */}
           <div className="space-y-6">
-            {/* Top Venues Card (Shows Full Top 10) */}
+            {/* Top Venues Card */}
             <div
               onClick={() => setActiveSubView('venues')}
               className="bg-[#121619] p-4.5 rounded-2xl border border-[#222B30] hover:border-[#00E676]/60 transition cursor-pointer shadow-lg group"
@@ -226,7 +217,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
               </div>
             </div>
 
-            {/* Top Artists Card (Shows Full Top 10) */}
+            {/* Top Artists Card */}
             <div
               onClick={() => setActiveSubView('artists')}
               className="bg-[#121619] p-4.5 rounded-2xl border border-[#222B30] hover:border-[#FFB300]/60 transition cursor-pointer shadow-lg group"
@@ -254,7 +245,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
               </div>
             </div>
 
-            {/* Top Years Card (Shows Full Top 10) */}
+            {/* Top Years Card */}
             <div
               onClick={() => setActiveSubView('years')}
               className="bg-[#121619] p-4.5 rounded-2xl border border-[#222B30] hover:border-[#00B0FF]/60 transition cursor-pointer shadow-lg group"

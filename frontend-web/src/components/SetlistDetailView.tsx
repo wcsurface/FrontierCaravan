@@ -21,23 +21,27 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
 
   return (
     <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto font-mono bg-grid-lines">
-      {/* Larger & Centered Header */}
-      <header className="relative flex items-center justify-between w-full pt-3 pb-5 mb-2">
+      {/* Header with LiveLore Logo */}
+      <header className="relative flex items-center justify-between w-full pt-2 pb-4 mb-2">
         <button
           onClick={onBack}
           className="p-2 text-slate-200 hover:text-white transition rounded-full z-10"
         >
           <ArrowLeft size={24} />
         </button>
-        <h1 className="absolute inset-0 flex items-center justify-center text-3xl sm:text-4xl font-black tracking-widest uppercase text-white font-sans pointer-events-none">
-          SETLIST
-        </h1>
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-12">
+          <img
+            src="/assets/livelore_logo.png"
+            alt="LiveLore"
+            className="h-14 sm:h-16 w-auto object-contain drop-shadow-[0_0_15px_rgba(0,230,118,0.3)] filter contrast-105"
+          />
+        </div>
         <div className="w-10 z-10" />
       </header>
 
       {/* Artist Subtitle */}
       <div className="text-center my-3">
-        <h2 className="text-lg font-extrabold text-slate-400 uppercase tracking-widest font-sans">
+        <h2 className="text-lg font-extrabold text-[#FFB300] uppercase tracking-widest font-sans">
           {artist?.name || 'THE CURE'}
         </h2>
       </div>

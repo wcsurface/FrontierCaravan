@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useEncoreStore } from '../store/useEncoreStore';
 import { parseRawSetlist } from '../engine/setlistParser';
 import { searchVenues, VenueRecord } from '../engine/venueDataset';
-import { ArrowLeft, Plus, Trash2, MapPin, X } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, MapPin } from 'lucide-react';
 
 interface LogShowScreenProps {
   onBack: () => void;
@@ -23,7 +23,6 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
   const [country, setCountry] = useState('');
   const [notesText, setNotesText] = useState('');
 
-  // Dropdown states for venue recommendations
   const [venueSuggestions, setVenueSuggestions] = useState<VenueRecord[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -45,7 +44,6 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
     }
   };
 
-  // Auto-format Date as DD/MM/YY as user types
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
     const digits = raw.replace(/\D/g, '');
@@ -119,17 +117,21 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
 
   return (
     <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none bg-grid-lines overflow-y-auto">
-      {/* Header */}
-      <header className="relative flex items-center justify-between w-full pt-3 pb-5 mb-2">
+      {/* Header with LiveLore Logo */}
+      <header className="relative flex items-center justify-between w-full pt-2 pb-4 mb-2">
         <button
           onClick={onBack}
           className="p-2 text-slate-200 hover:text-white transition rounded-full z-10"
         >
           <ArrowLeft size={24} />
         </button>
-        <h1 className="absolute inset-0 flex items-center justify-center text-3xl sm:text-4xl font-black tracking-widest uppercase text-white font-sans pointer-events-none">
-          LOG SHOW
-        </h1>
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-12">
+          <img
+            src="/assets/livelore_logo.png"
+            alt="LiveLore"
+            className="h-14 sm:h-16 w-auto object-contain drop-shadow-[0_0_15px_rgba(0,230,118,0.3)] filter contrast-105"
+          />
+        </div>
         <div className="w-10 z-10" />
       </header>
 
@@ -187,7 +189,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
           </button>
         </div>
 
-        {/* Auto-Formatting Date Input */}
+        {/* Date Input */}
         <div>
           <label className="block text-[11px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
             Date (DD/MM/YY)
@@ -202,7 +204,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
           />
         </div>
 
-        {/* Venue Input with Auto-Complete Dropdown */}
+        {/* Venue Input */}
         <div className="relative">
           <label className="block text-[11px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
             Venue *
@@ -217,7 +219,6 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
             className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-4 py-3 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition"
           />
 
-          {/* Dropdown Recommendations */}
           {isDropdownOpen && venueSuggestions.length > 0 && (
             <div className="absolute left-0 right-0 top-full mt-1 bg-[#121619] border border-[#FFB300]/80 rounded-xl shadow-2xl z-50 overflow-hidden max-h-56 overflow-y-auto divide-y divide-[#222B30]">
               {venueSuggestions.map((item, idx) => (
@@ -241,7 +242,6 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
 
         {/* Location Info Fields */}
         <div className="grid grid-cols-3 gap-2">
-          {/* City */}
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
               City
@@ -255,7 +255,6 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
             />
           </div>
 
-          {/* State / Province */}
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-wider text-[#FFB300] mb-1 truncate">
               State / Province
@@ -269,7 +268,6 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
             />
           </div>
 
-          {/* Country */}
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
               Country
@@ -298,9 +296,8 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
           />
         </div>
 
-        {/* Action Buttons: Large + ADD CTA & CANCEL Button Below */}
+        {/* Action Buttons */}
         <div className="flex flex-col gap-3 my-3">
-          {/* Primary Submit Button: Large + ADD */}
           <button
             type="submit"
             className="w-full py-4.5 bg-gradient-to-r from-[#00E676] to-[#00C853] hover:from-[#00FFA3] hover:to-[#00E676] text-slate-950 font-black text-xl uppercase tracking-widest rounded-full shadow-[0_0_22px_rgba(0,230,118,0.5)] active:scale-[0.98] transition-transform"
@@ -308,7 +305,6 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
             + ADD
           </button>
 
-          {/* Cancel Button Below */}
           <button
             type="button"
             onClick={onBack}

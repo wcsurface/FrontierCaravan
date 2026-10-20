@@ -14,7 +14,6 @@ export default function HomeView() {
   const { user, token, checkMe } = useAuthStore();
   const { concerts, artists, venues } = useEncoreStore();
 
-  // Start on Auth screen if not logged in
   const [currentView, setCurrentView] = useState<'diary' | 'log' | 'setlist' | 'stats' | 'auth'>(
     user ? 'diary' : 'auth'
   );
@@ -25,7 +24,6 @@ export default function HomeView() {
   }, [checkMe]);
 
   useEffect(() => {
-    // If no user account is active, take user to Log In / Create Account page first
     if (!user && !token) {
       setCurrentView('auth');
     }
@@ -41,17 +39,21 @@ export default function HomeView() {
       {/* SCREEN 1: DIARY VIEW */}
       {currentView === 'diary' && (
         <div className="flex flex-col w-full max-w-md h-screen p-4 overflow-y-auto">
-          {/* Header */}
-          <header className="relative flex items-center justify-between w-full pt-3 pb-5">
+          {/* Header with LiveLore Logo */}
+          <header className="relative flex items-center justify-between w-full pt-2 pb-4">
             <button
               onClick={() => setCurrentView('stats')}
               className="p-2 text-slate-200 hover:text-white transition rounded-full z-10"
             >
               <Menu size={24} />
             </button>
-            <h1 className="absolute inset-0 flex items-center justify-center text-3xl sm:text-4xl font-black tracking-widest uppercase text-white font-sans pointer-events-none">
-              LIVELORE
-            </h1>
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-12">
+              <img
+                src="/assets/livelore_logo.png"
+                alt="LiveLore"
+                className="h-14 sm:h-16 w-auto object-contain drop-shadow-[0_0_15px_rgba(0,230,118,0.3)] filter contrast-105"
+              />
+            </div>
             <button
               onClick={() => setCurrentView('auth')}
               className="p-2 text-[#00E676] hover:text-white transition rounded-full z-10 flex items-center gap-1"
@@ -120,7 +122,7 @@ export default function HomeView() {
         <StatsView onBack={() => setCurrentView('diary')} />
       )}
 
-      {/* SCREEN 5: AUTH VIEW (Mandatory First Screen) */}
+      {/* SCREEN 5: AUTH VIEW */}
       {currentView === 'auth' && (
         <AuthScreen
           onBack={() => {
