@@ -107,7 +107,23 @@
       <input type="text" id="input-date" class="input-field" placeholder="Date (DD/MM/YY)" />
 
       <label class="input-label">Venue *</label>
-      <input type="text" id="input-venue" class="input-field" placeholder="Venue" required />
+      <input type="text" id="input-venue" class="input-field" placeholder="Search or enter Venue" oninput="handleVenueInput(this.value)" required />
+      <div id="venue-dropdown" style="display:none; background:#121619; border:1px solid #FFB300; border-radius:8px; margin-bottom:10px; max-height:150px; overflow-y:auto; font-size:12px;"></div>
+
+      <div style="display:flex; gap:8px;">
+        <div style="flex:1;">
+          <label class="input-label">City</label>
+          <input type="text" id="input-city" class="input-field" placeholder="City" />
+        </div>
+        <div style="flex:1;">
+          <label class="input-label">State</label>
+          <input type="text" id="input-state" class="input-field" placeholder="State" />
+        </div>
+        <div style="flex:1;">
+          <label class="input-label">Country</label>
+          <input type="text" id="input-country" class="input-field" placeholder="Country" />
+        </div>
+      </div>
 
       <label class="input-label">Notes</label>
       <textarea id="input-notes" class="input-field" placeholder="Notes (Setlist, who were you with, venue vibe, crowd energy)"></textarea>
@@ -184,6 +200,19 @@
   </div>
 
   <script>
+    const VENUE_DB = [
+      { v: "Red Rocks Amphitheatre", c: "Morrison", s: "Colorado", co: "USA" },
+      { v: "The Gorge Amphitheatre", c: "George", s: "Washington", co: "USA" },
+      { v: "Madison Square Garden", c: "New York", s: "New York", co: "USA" },
+      { v: "The Fillmore", c: "San Francisco", s: "California", co: "USA" },
+      { v: "Hollywood Bowl", c: "Los Angeles", s: "California", co: "USA" },
+      { v: "Ryman Auditorium", c: "Nashville", s: "Tennessee", co: "USA" },
+      { v: "First Avenue", c: "Minneapolis", s: "Minnesota", co: "USA" },
+      { v: "9:30 Club", c: "Washington", s: "DC", co: "USA" },
+      { v: "The Stone Pony", c: "Asbury Park", s: "New Jersey", co: "USA" },
+      { v: "The Forum (Kia Forum)", c: "Inglewood", s: "California", co: "USA" },
+    ];
+
     function showScreen(screenId) {
       document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
       document.getElementById('view-' + screenId).classList.add('active');
@@ -192,6 +221,35 @@
     function openSetlist(artistName) {
       document.getElementById('setlist-artist-name').innerText = artistName.toUpperCase();
       showScreen('setlist');
+    }
+
+    function handleVenueInput(query) {
+      const dropdown = document.getElementById('venue-dropdown');
+      if (!query || query.trim().length === 0) {
+        dropdown.style.display = 'none';
+        return;
+      }
+      const q = query.toLowerCase();
+      const matches = VENUE_DB.filter(item => item.v.toLowerCase().includes(q) || item.c.toLowerCase().includes(q));
+      if (matches.length === 0) {
+        dropdown.style.display = 'none';
+        return;
+      }
+      dropdown.style.display = 'block';
+      dropdown.innerHTML = matches.map(item => `
+        <div style="padding:8px 12px; border-bottom:1px solid #222B30; cursor:pointer;" onclick="selectVenue('${item.v}', '${item.c}', '${item.s}', '${item.co}')">
+          <div style="font-weight:bold; color:#fff;">${item.v}</div>
+          <div style="color:#94a3b8; font-size:10px;">${item.c}, ${item.s}, ${item.co}</div>
+        </div>
+      `).join('');
+    }
+
+    function selectVenue(v, c, s, co) {
+      document.getElementById('input-venue').value = v;
+      document.getElementById('input-city').value = c;
+      document.getElementById('input-state').value = s;
+      document.getElementById('input-country').value = co;
+      document.getElementById('venue-dropdown').style.display = 'none';
     }
 
     function showSubStats(type) {
@@ -204,29 +262,24 @@
           <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">1. Red Rocks Amphitheatre - 12</div>
           <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">2. The Fillmore - 8</div>
           <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">3. The Paramount Theatre - 5</div>
-          <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">4. Madison Square Garden - 4</div>
         `;
       } else if (type === 'artists') {
         title.innerText = 'TOP ARTISTS';
         container.innerHTML = `
           <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">1. The Cure - 6</div>
           <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">2. Radiohead - 4</div>
-          <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">3. Pixies - 4</div>
-          <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">4. Depeche Mode - 3</div>
         `;
       } else if (type === 'years') {
         title.innerText = 'TOP YEARS';
         container.innerHTML = `
           <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">1. 2026 - 18 Shows</div>
           <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">2. 2025 - 22 Shows</div>
-          <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">3. 2024 - 15 Shows</div>
         `;
       } else {
         title.innerText = 'DAYS OF THE WEEK';
         container.innerHTML = `
           <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">1. Thursday - 32 Shows (42%)</div>
           <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">2. Friday - 20 Shows (26%)</div>
-          <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">3. Saturday - 14 Shows (18%)</div>
         `;
       }
       showScreen('substats');

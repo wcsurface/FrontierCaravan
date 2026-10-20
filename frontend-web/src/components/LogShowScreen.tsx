@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { useEncoreStore } from '../store/useEncoreStore';
 import { parseRawSetlist } from '../engine/setlistParser';
-import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { searchVenues, VenueRecord } from '../engine/venueDataset';
+import { ArrowLeft, Plus, Trash2, MapPin } from 'lucide-react';
 
 interface LogShowScreenProps {
   onBack: () => void;
@@ -17,7 +18,14 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
   const [openers, setOpeners] = useState<string[]>(['']);
   const [dateStr, setDateStr] = useState('');
   const [venueName, setVenueName] = useState('');
+  const [city, setCity] = useState('');
+  const [stateProvince, setStateProvince] = useState('');
+  const [country, setCountry] = useState('');
   const [notesText, setNotesText] = useState('');
+
+  // Dropdown states for venue recommendations
+  const [venueSuggestions, setVenueSuggestions] = useState<VenueRecord[]>([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleOpenerChange = (index: number, value: string) => {
     const updated = [...openers];
@@ -35,6 +43,26 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
     } else {
       setOpeners(['']);
     }
+  };
+
+  const handleVenueChange = (val: string) => {
+    setVenueName(val);
+    if (val.trim().length > 0) {
+      const results = searchVenues(val);
+      setVenueSuggestions(results);
+      setIsDropdownOpen(true);
+    } else {
+      setVenueSuggestions([]);
+      setIsDropdownOpen(false);
+    }
+  };
+
+  const handleSelectVenue = (record: VenueRecord) => {
+    setVenueName(record.venue);
+    setCity(record.city);
+    setStateProvince(record.stateProvince);
+    setCountry(record.country);
+    setIsDropdownOpen(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -61,7 +89,8 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
       headlineArtistName: headlineBand.trim(),
       openingArtistName: combinedOpeners,
       venueName: venueName.trim(),
-      venueCity: 'Local City',
+      venueCity: city.trim() || 'Local City',
+      venueCountry: country.trim() || 'USA',
       setlist: parsedTracks,
       notes: notesText.trim(),
       rating: 5.0,
@@ -73,7 +102,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
 
   return (
     <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none bg-grid-lines overflow-y-auto">
-      {/* Larger & Centered Header */}
+      {/* Header */}
       <header className="relative flex items-center justify-between w-full pt-3 pb-5 mb-2">
         <button
           onClick={onBack}
@@ -87,7 +116,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
         <div className="w-10 z-10" />
       </header>
 
-      {/* Form Inputs (Dark #111618 background, rounded 8px, 1.5px Amber #FFB300 border) */}
+      {/* Form Inputs */}
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-4 max-w-md mx-auto w-full pb-6">
         {/* Headline Band */}
         <div>
@@ -155,19 +184,86 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
           />
         </div>
 
-        {/* Venue Input */}
-        <div>
+        {/* Venue Input with Auto-Complete Dropdown */}
+        <div className="relative">
           <label className="block text-[11px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
             Venue *
           </label>
           <input
             type="text"
-            placeholder="Venue"
+            placeholder="Search or enter Venue"
             value={venueName}
-            onChange={(e) => setVenueName(e.target.value)}
+            onChange={(e) => handleVenueChange(e.target.value)}
+            onFocus={() => venueName.trim().length > 0 && setIsDropdownOpen(true)}
             required
             className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-4 py-3 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition"
           />
+
+          {/* Dropdown Recommendations */}
+          {isDropdownOpen && venueSuggestions.length > 0 && (
+            <div className="absolute left-0 right-0 top-full mt-1 bg-[#121619] border border-[#FFB300]/80 rounded-xl shadow-2xl z-50 overflow-hidden max-h-56 overflow-y-auto divide-y divide-[#222B30]">
+              {venueSuggestions.map((item, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => handleSelectVenue(item)}
+                  className="p-3 hover:bg-[#1C2328] cursor-pointer transition flex items-start gap-2.5"
+                >
+                  <MapPin size={16} className="text-[#FFB300] shrink-0 mt-0.5" />
+                  <div>
+                    <div className="text-sm font-bold text-slate-100">{item.venue}</div>
+                    <div className="text-xs text-slate-400 font-medium">
+                      {item.city}, {item.stateProvince}, {item.country}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Location Info Fields (Auto-filled or Custom) */}
+        <div className="grid grid-cols-3 gap-2">
+          {/* City */}
+          <div>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
+              City
+            </label>
+            <input
+              type="text"
+              placeholder="City"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-3 py-2.5 text-xs text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)]"
+            />
+          </div>
+
+          {/* State / Province */}
+          <div>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#FFB300] mb-1 truncate">
+              State / Province
+            </label>
+            <input
+              type="text"
+              placeholder="State"
+              value={stateProvince}
+              onChange={(e) => setStateProvince(e.target.value)}
+              className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-3 py-2.5 text-xs text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)]"
+            />
+          </div>
+
+          {/* Country */}
+          <div>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
+              Country
+            </label>
+            <input
+              type="text"
+              placeholder="Country"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-3 py-2.5 text-xs text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)]"
+            />
+          </div>
         </div>
 
         {/* Combined Notes / Setlist Field */}
@@ -179,7 +275,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
             placeholder="Notes (Setlist, who were you with, venue vibe, crowd energy)"
             value={notesText}
             onChange={(e) => setNotesText(e.target.value)}
-            rows={6}
+            rows={5}
             className="w-full flex-1 bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg p-4 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition resize-none text-sm leading-relaxed"
           />
         </div>
