@@ -1,18 +1,25 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useEncoreStore } from '../store/useEncoreStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { TicketStubCard } from '../components/TicketStubCard';
 import { LogShowScreen } from '../components/LogShowScreen';
 import { SetlistDetailView } from '../components/SetlistDetailView';
 import { StatsView } from '../components/StatsView';
-import { Menu, Star } from 'lucide-react';
+import { AuthScreen } from '../components/AuthScreen';
+import { Menu, User, CheckCircle2 } from 'lucide-react';
 
 export default function HomeView() {
-  const [currentView, setCurrentView] = useState<'diary' | 'log' | 'setlist' | 'stats'>('diary');
+  const [currentView, setCurrentView] = useState<'diary' | 'log' | 'setlist' | 'stats' | 'auth'>('diary');
   const [selectedConcertId, setSelectedConcertId] = useState<string>('');
 
   const { concerts, artists, venues } = useEncoreStore();
+  const { user, checkMe } = useAuthStore();
+
+  useEffect(() => {
+    checkMe();
+  }, [checkMe]);
 
   const handleOpenSetlist = (concertId: string) => {
     setSelectedConcertId(concertId);
@@ -36,10 +43,14 @@ export default function HomeView() {
               LIVELORE
             </h1>
             <button
-              onClick={() => setCurrentView('stats')}
-              className="p-2 text-[#00E676] hover:text-white transition rounded-full z-10"
+              onClick={() => setCurrentView('auth')}
+              className="p-2 text-[#00E676] hover:text-white transition rounded-full z-10 flex items-center gap-1"
             >
-              <Star size={24} className="fill-[#00E676]" />
+              {user ? (
+                <CheckCircle2 size={22} className="text-[#00E676]" />
+              ) : (
+                <User size={24} className="text-[#FFB300]" />
+              )}
             </button>
           </header>
 
@@ -97,6 +108,14 @@ export default function HomeView() {
       {/* SCREEN 4: STATS VIEW */}
       {currentView === 'stats' && (
         <StatsView onBack={() => setCurrentView('diary')} />
+      )}
+
+      {/* SCREEN 5: AUTH VIEW */}
+      {currentView === 'auth' && (
+        <AuthScreen
+          onBack={() => setCurrentView('diary')}
+          onSuccess={() => setCurrentView('diary')}
+        />
       )}
     </main>
   );

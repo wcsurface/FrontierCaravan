@@ -1,171 +1,243 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = process.env.DATABASE_URL ? new PrismaClient() : null;
 const app = express();
 const PORT = process.env.PORT || 4000;
-const HMAC_SECRET = process.env.RUN_SIGNATURE_SECRET || 'neon_bodega_secure_hmac_key_99!';
+const JWT_SECRET = process.env.JWT_SECRET || 'livelore_secret_jwt_key_2026_x89!';
 
 app.use(cors({ origin: '*' }));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
-// Anti-Cheat: Validates that move count, seconds, and score correlate mathematically
-function verifyRunHash(levelNumber: number, moves: number, timeSec: number, checksum: string): boolean {
-  const payload = `${levelNumber}:${moves}:${timeSec}`;
-  const computed = crypto.createHmac('sha256', HMAC_SECRET).update(payload).digest('hex');
-  return computed === checksum;
-}
+// In-memory user fallback if Railway DATABASE_URL is temporarily unconnected
+const memoryUsers = new Map<string, any>();
+const memoryVaults = new Map<string, any>();
 
-// In-memory player fallback when DATABASE_URL is not set
-const memoryPlayers = new Map<string, any>();
-
-// Health Check
+// Health Check Endpoint
 app.get('/health', async (_req: Request, res: Response) => {
   res.status(200).json({
     status: 'healthy',
-    service: 'Midnight Mart: Neon Bodega Microservice v4.0.0',
-    database: prisma ? 'Prisma PostgreSQL' : 'In-Memory Fallback',
+    service: 'LiveLore Backend API & Cloud Sync v5.0.0',
+    database: prisma ? 'Prisma Railway PostgreSQL' : 'In-Memory Vault Fallback',
     timestamp: new Date().toISOString(),
   });
 });
 
-// 1. Player Device Sync or Init
-app.post('/api/player/sync', async (req: Request, res: Response) => {
+// Helper: Sign JWT Token
+function generateToken(userId: string, email: string) {
+  return jwt.sign({ userId, email }, JWT_SECRET, { expiresIn: '90d' });
+}
+
+// 1. POST /api/auth/register - Create New Account
+app.post('/api/auth/register', async (req: Request, res: Response) => {
   try {
-    const { deviceFingerprint, username } = req.body;
-    if (!deviceFingerprint) {
-      return res.status(400).json({ error: 'Device fingerprint required' });
+    const { email, password, displayName } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required.' });
     }
+
+    const cleanedEmail = email.toLowerCase().trim();
+    const name = displayName?.trim() || cleanedEmail.split('@')[0];
+
+    // Password hashing
+    const passwordHash = await bcrypt.hash(password, 10);
 
     if (prisma) {
-      let player = await prisma.player.findUnique({
-        where: { deviceFingerprint },
+      // Check existing user
+      const existingUser = await prisma.user.findUnique({
+        where: { email: cleanedEmail },
       });
 
-      if (!player) {
-        player = await prisma.player.create({
-          data: {
-            deviceFingerprint,
-            username: username || `Shopper_${Math.floor(1000 + Math.random() * 9000)}`,
-          },
-        });
+      if (existingUser) {
+        return res.status(400).json({ error: 'An account with this email already exists.' });
       }
-      return res.json({ success: true, player });
-    } else {
-      let player = memoryPlayers.get(deviceFingerprint);
-      if (!player) {
-        player = {
-          id: `p_${Date.now()}`,
-          deviceFingerprint,
-          username: username || `Shopper_${Math.floor(1000 + Math.random() * 9000)}`,
-          coins: 250,
-          stars: 5,
-          currentLevel: 1,
-        };
-        memoryPlayers.set(deviceFingerprint, player);
-      }
-      return res.json({ success: true, player });
-    }
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Unknown error';
-    return res.status(500).json({ error: message });
-  }
-});
 
-// 2. Validate and Complete Level Run
-app.post('/api/levels/complete', async (req: Request, res: Response) => {
-  try {
-    const { deviceFingerprint, levelNumber, movesUsed, timeElapsedSec, checksum } = req.body;
-
-    if (checksum) {
-      const isValid = verifyRunHash(levelNumber, movesUsed, timeElapsedSec, checksum);
-      if (!isValid) {
-        return res.status(403).json({ error: 'Security verification failed: signature mismatch' });
-      }
-    }
-
-    const starsToAward = timeElapsedSec < 60 ? 3 : timeElapsedSec < 90 ? 2 : 1;
-    const coinsToAward = 100 + (30 - Math.min(movesUsed, 30)) * 5;
-
-    if (prisma) {
-      const player = await prisma.player.findUnique({ where: { deviceFingerprint } });
-      if (!player) return res.status(404).json({ error: 'Player record not found' });
-
-      const [updatedPlayer, runRecord] = await prisma.$transaction([
-        prisma.player.update({
-          where: { id: player.id },
-          data: {
-            stars: { increment: starsToAward },
-            coins: { increment: coinsToAward },
-            currentLevel: Math.max(player.currentLevel, levelNumber + 1),
-          },
-        }),
-        prisma.levelRun.create({
-          data: {
-            playerId: player.id,
-            levelNumber,
-            movesUsed,
-            timeElapsedSec,
-            starsAwarded: starsToAward,
-            scoreChecksum: checksum || 'legacy_valid',
-            verified: true,
-          },
-        }),
-      ]);
-
-      return res.json({
-        success: true,
-        starsAwarded: starsToAward,
-        coinsAwarded: coinsToAward,
-        player: updatedPlayer,
-        runId: runRecord.id,
-      });
-    } else {
-      return res.json({
-        success: true,
-        starsAwarded: starsToAward,
-        coinsAwarded: coinsToAward,
-        runId: `run_${Date.now()}`,
-      });
-    }
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Unknown error';
-    return res.status(500).json({ error: message });
-  }
-});
-
-// 3. Global Top 50 Leaderboard
-app.get('/api/leaderboard', async (_req: Request, res: Response) => {
-  try {
-    if (prisma) {
-      const top = await prisma.player.findMany({
-        take: 50,
-        orderBy: { currentLevel: 'desc' },
-        select: {
-          id: true,
-          username: true,
-          currentLevel: true,
-          stars: true,
+      // Create new user in Railway PostgreSQL
+      const user = await prisma.user.create({
+        data: {
+          email: cleanedEmail,
+          passwordHash,
+          displayName: name,
         },
       });
-      return res.json({ success: true, leaderboard: top });
-    } else {
+
+      const token = generateToken(user.id, user.email);
+
       return res.json({
         success: true,
-        leaderboard: [
-          { id: '1', username: 'Mochi_King', currentLevel: 12, stars: 36 },
-          { id: '2', username: 'Neon_Shopper', currentLevel: 9, stars: 27 },
-        ],
+        token,
+        user: { id: user.id, email: user.email, displayName: user.displayName },
+      });
+    } else {
+      // In-Memory Fallback
+      if (memoryUsers.has(cleanedEmail)) {
+        return res.status(400).json({ error: 'An account with this email already exists.' });
+      }
+
+      const userId = `u_${Date.now()}`;
+      const userObj = { id: userId, email: cleanedEmail, passwordHash, displayName: name };
+      memoryUsers.set(cleanedEmail, userObj);
+
+      const token = generateToken(userId, cleanedEmail);
+
+      return res.json({
+        success: true,
+        token,
+        user: { id: userId, email: cleanedEmail, displayName: name },
       });
     }
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Unknown error';
+    const message = err instanceof Error ? err.message : 'Registration failed';
+    return res.status(500).json({ error: message });
+  }
+});
+
+// 2. POST /api/auth/login - Log In
+app.post('/api/auth/login', async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required.' });
+    }
+
+    const cleanedEmail = email.toLowerCase().trim();
+
+    if (prisma) {
+      const user = await prisma.user.findUnique({
+        where: { email: cleanedEmail },
+      });
+
+      if (!user) {
+        return res.status(401).json({ error: 'Invalid email or password.' });
+      }
+
+      const isValid = await bcrypt.compare(password, user.passwordHash);
+      if (!isValid) {
+        return res.status(401).json({ error: 'Invalid email or password.' });
+      }
+
+      const token = generateToken(user.id, user.email);
+
+      return res.json({
+        success: true,
+        token,
+        user: { id: user.id, email: user.email, displayName: user.displayName },
+      });
+    } else {
+      // In-memory fallback
+      const user = memoryUsers.get(cleanedEmail);
+      if (!user) {
+        return res.status(401).json({ error: 'Invalid email or password.' });
+      }
+
+      const isValid = await bcrypt.compare(password, user.passwordHash);
+      if (!isValid) {
+        return res.status(401).json({ error: 'Invalid email or password.' });
+      }
+
+      const token = generateToken(user.id, user.email);
+
+      return res.json({
+        success: true,
+        token,
+        user: { id: user.id, email: user.email, displayName: user.displayName },
+      });
+    }
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Login failed';
+    return res.status(500).json({ error: message });
+  }
+});
+
+// 3. GET /api/auth/me - Verify Token & Active User
+app.get('/api/auth/me', async (req: Request, res: Response) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Authorization token required' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    const decoded: any = jwt.verify(token, JWT_SECRET);
+
+    if (prisma) {
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.userId },
+        select: { id: true, email: true, displayName: true, createdAt: true },
+      });
+
+      if (!user) return res.status(404).json({ error: 'User not found' });
+      return res.json({ success: true, user });
+    } else {
+      const user = memoryUsers.get(decoded.email);
+      if (!user) return res.status(404).json({ error: 'User not found' });
+      return res.json({
+        success: true,
+        user: { id: user.id, email: user.email, displayName: user.displayName },
+      });
+    }
+  } catch (err: unknown) {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+});
+
+// 4. POST /api/sync/push - Push Concert Vault Backup to Railway PostgreSQL
+app.post('/api/sync/push', async (req: Request, res: Response) => {
+  try {
+    const { userId, concertsData } = req.body;
+
+    if (!userId || !concertsData) {
+      return res.status(400).json({ error: 'userId and concertsData required' });
+    }
+
+    if (prisma) {
+      const vault = await prisma.concertVault.upsert({
+        where: { userId },
+        update: { concertsData },
+        create: { userId, concertsData },
+      });
+
+      return res.json({ success: true, vaultId: vault.id, updatedAt: vault.updatedAt });
+    } else {
+      memoryVaults.set(userId, concertsData);
+      return res.json({ success: true, updatedAt: new Date() });
+    }
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Sync push failed';
+    return res.status(500).json({ error: message });
+  }
+});
+
+// 5. GET /api/sync/pull - Pull Concert Vault Backup from Railway PostgreSQL
+app.get('/api/sync/pull', async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.query;
+
+    if (!userId || typeof userId !== 'string') {
+      return res.status(400).json({ error: 'userId query parameter required' });
+    }
+
+    if (prisma) {
+      const vault = await prisma.concertVault.findUnique({
+        where: { userId },
+      });
+
+      return res.json({ success: true, concertsData: vault ? vault.concertsData : [] });
+    } else {
+      const concertsData = memoryVaults.get(userId) || [];
+      return res.json({ success: true, concertsData });
+    }
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Sync pull failed';
     return res.status(500).json({ error: message });
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`[Midnight Mart Server] Running on port ${PORT}`);
+  console.log(`[LiveLore Backend API] Running on port ${PORT}`);
 });
