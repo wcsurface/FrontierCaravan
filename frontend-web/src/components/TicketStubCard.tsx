@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Concert, Artist, Venue } from '../engine/concertService';
-import { Heart } from 'lucide-react';
 
 interface TicketStubCardProps {
   concert: Concert;
@@ -31,56 +30,70 @@ export const TicketStubCard: React.FC<TicketStubCardProps> = ({
   return (
     <div
       onClick={onClick}
-      className="relative w-full bg-[#f3ebd7] text-slate-900 rounded-2xl shadow-xl hover:scale-[1.01] active:scale-[0.99] transition-transform cursor-pointer select-none overflow-hidden my-3 border border-[#e2d5b6] flex"
+      className="relative w-full aspect-[2.85/1] max-w-md mx-auto my-3 cursor-pointer select-none transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-2xl rounded-xl overflow-hidden"
     >
-      {/* Left Perforated Circular Notches */}
-      <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-[#121212] rounded-full z-10" />
+      {/* Real Authentic Clean Blank Ticket Background */}
+      <img
+        src="/assets/ticket_blank_vintage.png"
+        alt="Edited Blank Vintage Ticket Stub"
+        className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
+        onError={(e) => {
+          (e.currentTarget as HTMLImageElement).style.display = 'none';
+        }}
+      />
 
-      {/* Main Ticket Body */}
-      <div className="flex-1 p-4 pl-6 pr-3 flex flex-col justify-between border-r-2 border-dashed border-[#d1c29e]">
-        <div className="flex justify-between items-start">
-          <div>
-            <h3 className="text-2xl font-black tracking-tight text-slate-900 uppercase font-serif">
-              {artistName}
-            </h3>
-            <p className="text-sm font-semibold text-slate-700 mt-0.5">
-              {venueName}
-            </p>
-          </div>
+      {/* Styled Authentic Paper Fallback Background */}
+      <div className="absolute inset-0 bg-[#f4e4bc] border-2 border-[#d6c294] rounded-xl z-[-1]" />
 
-          {/* Green Heart Pin Notch */}
-          <div className="w-6 h-6 rounded-md bg-[#00E676] flex items-center justify-center shadow-sm">
-            <Heart size={14} className="text-slate-900 fill-slate-900" />
-          </div>
-        </div>
-
-        {/* Highlighted Amber Date Badge */}
-        <div className="mt-3">
-          <span className="inline-block bg-[#ffb300] text-slate-950 font-extrabold text-xs tracking-wider px-3 py-1 rounded-md shadow-sm border border-[#e6a100]">
-            {formattedDate}
+      {/* Text Overlay Positioned Perfectly Inside Ticket Boxes */}
+      <div className="relative z-10 w-full h-full flex px-3 py-2 text-[#322312]">
+        {/* Left Side: Barcode Margin */}
+        <div className="w-[12%] h-full flex flex-col justify-between items-center py-1 opacity-70">
+          <span className="text-[9px] font-bold font-mono rotate-90 origin-center text-[#423220]">
+            95
+          </span>
+          <span className="text-[8px] font-bold font-mono tracking-widest text-[#423220] -rotate-90">
+            ADVANCE
           </span>
         </div>
-      </div>
 
-      {/* Right Perforated Stub Section with Barcode */}
-      <div className="w-20 p-3 bg-[#ebe1c7] flex flex-col items-center justify-center gap-2 relative">
-        <div className="h-16 w-10 flex gap-0.5 items-center justify-center opacity-85">
-          {/* Simulated Vertical Barcode Lines */}
-          <div className="w-1 h-full bg-slate-900" />
-          <div className="w-0.5 h-full bg-slate-900" />
-          <div className="w-1.5 h-full bg-slate-900" />
-          <div className="w-0.5 h-full bg-slate-900" />
-          <div className="w-1 h-full bg-slate-900" />
-          <div className="w-2 h-full bg-slate-900" />
-          <div className="w-0.5 h-full bg-slate-900" />
+        {/* Center Section: Main Ticket Frame */}
+        <div className="w-[58%] h-full flex flex-col justify-between pl-1 pr-2 py-1">
+          {/* Top Main Box: ARTIST NAME */}
+          <div className="flex-1 flex items-center justify-center text-center px-1 my-1">
+            <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-[#1c1208] leading-none font-serif drop-shadow-sm">
+              {artistName}
+            </h3>
+          </div>
+
+          {/* Bottom Split Box: VENUE & DATE */}
+          <div className="h-[32%] flex border-t-2 border-[#423220]/50 pt-1">
+            {/* Bottom Left: VENUE */}
+            <div className="w-1/2 pr-1 border-r-2 border-[#423220]/50 flex items-center justify-center text-center">
+              <span className="text-[11px] sm:text-xs font-black uppercase text-[#2b1c0e] truncate">
+                {venueName}
+              </span>
+            </div>
+
+            {/* Bottom Right: DATE */}
+            <div className="w-1/2 pl-1 flex items-center justify-center text-center">
+              <span className="text-[11px] sm:text-xs font-black uppercase text-[#d97706] tracking-wider">
+                {formattedDate}
+              </span>
+            </div>
+          </div>
         </div>
-        <span className="text-[9px] font-mono font-bold text-slate-600 tracking-tighter rotate-90">
-          {concert.id.substring(0, 8)}
-        </span>
-      </div>
 
-      {/* Right Perforated Circular Notches */}
-      <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-[#121212] rounded-full z-10" />
+        {/* Right Section: Perforated Stub & ADMIT ONE */}
+        <div className="w-[30%] h-full flex flex-col justify-between items-center pl-2 py-1 border-l-2 border-dotted border-[#423220]/40">
+          <div className="text-[10px] font-black tracking-widest text-[#1c1208] uppercase rotate-90 my-auto">
+            ADMIT ONE
+          </div>
+          <div className="text-[8px] font-mono font-bold text-[#423220] tracking-tighter">
+            SEC GEN 7
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

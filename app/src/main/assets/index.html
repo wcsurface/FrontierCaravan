@@ -12,11 +12,14 @@
     #header { width: 100%; max-width: 420px; display: flex; justify-between: align-items: center; padding-bottom: 12px; }
     .title { font-weight: 900; font-size: 22px; letter-spacing: 2px; text-transform: uppercase; color: #ffffff; }
 
-    /* Ticket Card */
-    .ticket { position: relative; width: 100%; max-width: 420px; background: #f3ebd7; color: #0f172a; border-radius: 16px; padding: 14px; margin-bottom: 12px; display: flex; justify-between: align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.5); cursor: pointer; border-right: 2px dashed #d1c29e; }
-    .ticket-artist { font-weight: 900; font-size: 20px; text-transform: uppercase; }
-    .ticket-venue { font-weight: 600; font-size: 12px; color: #475569; }
-    .ticket-date { background: #ffb300; color: #0a0a0a; font-weight: 800; font-size: 11px; padding: 3px 8px; border-radius: 6px; margin-top: 6px; display: inline-block; }
+    /* Authentic Clean Blank Vintage Ticket Stub Card */
+    .ticket-card { position: relative; width: 100%; max-width: 420px; aspect-ratio: 2.85 / 1; background: #f4e4bc; color: #2b1c0e; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; display: flex; justify-content: space-between; box-shadow: 0 10px 25px rgba(0,0,0,0.6); border: 2px solid #d6c294; cursor: pointer; }
+    .ticket-left { width: 70%; display: flex; flex-direction: column; justify-content: space-between; border-right: 2px dashed #423220; padding-right: 8px; }
+    .ticket-artist { font-weight: 900; font-size: 22px; text-align: center; text-transform: uppercase; font-family: serif; color: #1c1208; margin: auto 0; }
+    .ticket-footer { display: flex; justify-content: space-between; border-top: 2px solid rgba(66,50,32,0.5); pt: 4px; font-weight: 900; font-size: 11px; }
+    .ticket-venue { color: #2b1c0e; text-transform: uppercase; }
+    .ticket-date { color: #d97706; text-transform: uppercase; }
+    .ticket-stub { width: 28%; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 900; font-size: 10px; text-transform: uppercase; }
 
     /* Action CTA */
     .btn-cta { width: 100%; max-width: 420px; background: #00E676; color: #0a0a0a; font-weight: 900; font-size: 13px; padding: 14px; border-radius: 16px; border: none; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; box-shadow: 0 0 20px rgba(0,230,118,0.4); }
@@ -31,22 +34,32 @@
   </div>
 
   <div style="flex:1; width:100%; max-width:420px; overflow-y:auto;">
-    <div class="ticket">
-      <div>
+    <div class="ticket-card">
+      <div class="ticket-left">
         <div class="ticket-artist">THE CURE</div>
-        <div class="ticket-venue">Red Rocks</div>
-        <div class="ticket-date">OCT 12, 2026</div>
+        <div class="ticket-footer">
+          <span class="ticket-venue">Red Rocks</span>
+          <span class="ticket-date">OCT 12, 2026</span>
+        </div>
       </div>
-      <div style="background:#00E676; width:24px; height:24px; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#0a0a0a; font-size:12px;">♥</div>
+      <div class="ticket-stub">
+        <div>ADMIT ONE</div>
+        <div style="font-size:8px; color:#64748b; margin-top:4px;">SEC 7</div>
+      </div>
     </div>
 
-    <div class="ticket">
-      <div>
+    <div class="ticket-card">
+      <div class="ticket-left">
         <div class="ticket-artist">PIXIES</div>
-        <div class="ticket-venue">The Fillmore</div>
-        <div class="ticket-date">OCT 12, 2026</div>
+        <div class="ticket-footer">
+          <span class="ticket-venue">The Fillmore</span>
+          <span class="ticket-date">OCT 12, 2026</span>
+        </div>
       </div>
-      <div style="background:#00E676; width:24px; height:24px; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#0a0a0a; font-size:12px;">♥</div>
+      <div class="ticket-stub">
+        <div>ADMIT ONE</div>
+        <div style="font-size:8px; color:#64748b; margin-top:4px;">SEC 7</div>
+      </div>
     </div>
   </div>
 
