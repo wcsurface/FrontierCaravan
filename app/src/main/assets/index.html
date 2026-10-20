@@ -30,7 +30,7 @@
     /* Inputs with Amber Borders (#FFB300) */
     .input-label { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #FFB300; margin-bottom: 4px; display: block; }
     .input-field { width: 100%; background: #111618; border: 1.5px solid #FFB300; border-radius: 8px; padding: 12px 14px; color: #f1f5f9; font-size: 14px; outline: none; margin-bottom: 12px; box-shadow: 0 0 10px rgba(255,179,0,0.15); }
-    textarea.input-field { min-height: 100px; resize: none; font-family: monospace; }
+    textarea.input-field { min-height: 160px; resize: none; }
 
     /* Action CTA Buttons */
     .btn-cta { width: 100%; background: linear-gradient(90deg, #00E676, #00C853); color: #0a0a0a; font-weight: 900; font-size: 14px; padding: 16px; border-radius: 9999px; border: none; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; box-shadow: 0 0 20px rgba(0,230,118,0.4); margin-top: 12px; margin-bottom: 12px; }
@@ -100,11 +100,8 @@
       <label class="input-label">Venue *</label>
       <input type="text" id="input-venue" class="input-field" placeholder="Venue" required />
 
-      <label class="input-label">Setlist</label>
-      <textarea id="input-setlist" class="input-field" placeholder="Setlist (e.g. 1. Song Name 2. Next Song)"></textarea>
-
       <label class="input-label">Notes</label>
-      <textarea id="input-notes" class="input-field" style="min-height:70px;" placeholder="Notes (Crowd energy, ticket stub, acoustic versions)"></textarea>
+      <textarea id="input-notes" class="input-field" placeholder="Notes (Setlist, who were you with, venue vibe, crowd energy)"></textarea>
 
       <button type="submit" class="btn-cta">+ ADD TO DIARY</button>
     </form>

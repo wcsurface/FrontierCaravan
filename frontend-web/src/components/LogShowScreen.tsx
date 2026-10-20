@@ -17,7 +17,6 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
   const [openingBand, setOpeningBand] = useState('');
   const [dateStr, setDateStr] = useState('');
   const [venueName, setVenueName] = useState('');
-  const [setlistText, setSetlistText] = useState('');
   const [notesText, setNotesText] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -38,8 +37,8 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
       }
     }
 
-    // Parse raw setlist text
-    const parsedTracks = parseRawSetlist(setlistText);
+    // Parse raw setlist text from combined notes field
+    const parsedTracks = parseRawSetlist(notesText);
 
     saveConcert({
       date: dateMs,
@@ -72,7 +71,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
       </header>
 
       {/* Form Inputs (Dark #111618 background, rounded 8px, 1.5px Amber #FFB300 border) */}
-      <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-3.5 max-w-md mx-auto w-full pb-6">
+      <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-4 max-w-md mx-auto w-full pb-6">
         {/* Headline Band */}
         <div>
           <label className="block text-[11px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
@@ -131,38 +130,24 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
           />
         </div>
 
-        {/* Setlist Textarea */}
-        <div>
-          <label className="block text-[11px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
-            Setlist
-          </label>
-          <textarea
-            placeholder="Setlist (e.g. 1. Song Name 2. Next Song)"
-            value={setlistText}
-            onChange={(e) => setSetlistText(e.target.value)}
-            rows={5}
-            className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg p-3.5 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition resize-none font-mono text-sm leading-relaxed"
-          />
-        </div>
-
-        {/* Notes Textarea */}
-        <div>
+        {/* Combined Notes / Setlist Field */}
+        <div className="flex-1 flex flex-col min-h-[160px]">
           <label className="block text-[11px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
             Notes
           </label>
           <textarea
-            placeholder="Notes (Crowd energy, ticket stub, acoustic versions, guest features)"
+            placeholder="Notes (Setlist, who were you with, venue vibe, crowd energy)"
             value={notesText}
             onChange={(e) => setNotesText(e.target.value)}
-            rows={3}
-            className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg p-3.5 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition resize-none text-sm leading-relaxed"
+            rows={7}
+            className="w-full flex-1 bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg p-4 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition resize-none text-sm leading-relaxed"
           />
         </div>
 
         {/* Emerald Pill CTA Button */}
         <button
           type="submit"
-          className="w-full py-4 bg-gradient-to-r from-[#00E676] to-[#00C853] hover:from-[#00FFA3] hover:to-[#00E676] text-slate-950 font-black text-sm uppercase tracking-wider rounded-full shadow-[0_0_20px_rgba(0,230,118,0.4)] active:scale-[0.98] transition-transform my-3"
+          className="w-full py-4 bg-gradient-to-r from-[#00E676] to-[#00C853] hover:from-[#00FFA3] hover:to-[#00E676] text-slate-950 font-black text-sm uppercase tracking-wider rounded-full shadow-[0_0_20px_rgba(0,230,118,0.4)] active:scale-[0.98] transition-transform my-2"
         >
           + ADD TO DIARY
         </button>
