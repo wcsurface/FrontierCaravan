@@ -3,233 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Midnight Mart: Neon Bodega</title>
+  <title>Encore: Concert & Setlist Vault</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
-    body { background-color: #070112; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 10px; }
+    body { background-color: #121212; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 16px; }
 
-    /* HUD Capsules */
-    #hud { width: 100%; max-width: 420px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
-    .hud-capsule { background: linear-gradient(90deg, rgba(88, 28, 135, 0.9), rgba(49, 46, 129, 0.9)); border: 2px solid rgba(165, 180, 252, 0.6); border-radius: 9999px; padding: 4px 10px; display: flex; align-items: center; gap: 6px; font-weight: 900; font-size: 13px; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-    .hud-btn { width: 22px; height: 22px; border-radius: 50%; background: #10b981; border: 1px solid #a7f3d0; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; }
+    /* Header */
+    #header { width: 100%; max-width: 420px; display: flex; justify-between: align-items: center; padding-bottom: 12px; }
+    .title { font-weight: 900; font-size: 22px; letter-spacing: 2px; text-transform: uppercase; color: #ffffff; }
 
-    /* Title Banner */
-    #title-banner { background: #180838; border: 2px solid #67e8f9; border-radius: 16px; padding: 4px 20px; font-weight: 900; font-size: 22px; color: #f472b6; text-transform: uppercase; text-shadow: 0 2px 8px rgba(255,0,127,0.8); margin: 4px 0; }
+    /* Ticket Card */
+    .ticket { position: relative; width: 100%; max-width: 420px; background: #f3ebd7; color: #0f172a; border-radius: 16px; padding: 14px; margin-bottom: 12px; display: flex; justify-between: align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.5); cursor: pointer; border-right: 2px dashed #d1c29e; }
+    .ticket-artist { font-weight: 900; font-size: 20px; text-transform: uppercase; }
+    .ticket-venue { font-weight: 600; font-size: 12px; color: #475569; }
+    .ticket-date { background: #ffb300; color: #0a0a0a; font-weight: 800; font-size: 11px; padding: 3px 8px; border-radius: 6px; margin-top: 6px; display: inline-block; }
 
-    /* Canvas Container */
-    #canvas-container { relative: width: 100%; max-width: 420px; height: 500px; display: flex; justify-content: center; align-items: center; }
-    canvas { width: 100%; height: 100%; border-radius: 24px; border: 2px solid rgba(147, 51, 234, 0.6); background: #0f091f; box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
-
-    /* Navigation Dock */
-    #nav-bar { width: 100%; max-width: 420px; background: rgba(22, 8, 46, 0.95); border: 2px solid rgba(147, 51, 234, 0.6); border-radius: 24px; padding: 8px; display: flex; justify-around: align-items: center; }
-    .nav-btn { background: none; border: none; color: #f472b6; font-weight: 900; font-size: 12px; letter-spacing: 1px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    /* Action CTA */
+    .btn-cta { width: 100%; max-width: 420px; background: #00E676; color: #0a0a0a; font-weight: 900; font-size: 13px; padding: 14px; border-radius: 16px; border: none; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; box-shadow: 0 0 20px rgba(0,230,118,0.4); }
   </style>
 </head>
 <body>
 
-  <!-- Top HUD Capsules -->
-  <div id="hud">
-    <div class="hud-capsule">
-      ❤️ <span id="stat-lives">5</span>
-      <div class="hud-btn">+</div>
+  <div id="header">
+    <div style="color:#00E676; font-size:20px;">☰</div>
+    <div class="title">DIARY</div>
+    <div style="color:#00E676; font-size:20px;">★</div>
+  </div>
+
+  <div style="flex:1; width:100%; max-width:420px; overflow-y:auto;">
+    <div class="ticket">
+      <div>
+        <div class="ticket-artist">THE CURE</div>
+        <div class="ticket-venue">Red Rocks</div>
+        <div class="ticket-date">OCT 12, 2026</div>
+      </div>
+      <div style="background:#00E676; width:24px; height:24px; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#0a0a0a; font-size:12px;">♥</div>
     </div>
-    <div class="hud-capsule" style="border-color: rgba(251, 191, 36, 0.6);">
-      💰 <span id="stat-coins">2,679</span>
-      <div class="hud-btn">+</div>
-    </div>
-    <div class="hud-capsule">
-      ⭐ <span id="stat-stars">2</span>
+
+    <div class="ticket">
+      <div>
+        <div class="ticket-artist">PIXIES</div>
+        <div class="ticket-venue">The Fillmore</div>
+        <div class="ticket-date">OCT 12, 2026</div>
+      </div>
+      <div style="background:#00E676; width:24px; height:24px; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#0a0a0a; font-size:12px;">♥</div>
     </div>
   </div>
 
-  <!-- Title Banner -->
-  <div id="title-banner">Midnight Mart</div>
+  <button class="btn-cta">+ LOG NEW SHOW</button>
 
-  <!-- Canvas Engine Viewport -->
-  <div id="canvas-container">
-    <canvas id="game-canvas"></canvas>
-  </div>
-
-  <!-- Bottom Navigation Dock -->
-  <div id="nav-bar">
-    <button class="nav-btn">✦ PACK & PACK ✦</button>
-  </div>
-
-  <script>
-    // Audio Synthesizer
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playPop() {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(320, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(780, audioCtx.currentTime + 0.08);
-      gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
-      osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.start(); osc.stop(audioCtx.currentTime + 0.08);
-    }
-
-    function playSnap(combo) {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'triangle';
-      const baseFreq = 440 * Math.pow(2, Math.min(combo, 12) / 12);
-      osc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, audioCtx.currentTime + 0.12);
-      gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
-      osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.start(); osc.stop(audioCtx.currentTime + 0.12);
-    }
-
-    // Native Haptics Bridge
-    const haptics = {
-      light: () => window.AndroidHaptics ? window.AndroidHaptics.vibrateLight() : (navigator.vibrate && navigator.vibrate(10)),
-      medium: () => window.AndroidHaptics ? window.AndroidHaptics.vibrateMedium() : (navigator.vibrate && navigator.vibrate(25)),
-      heavy: () => window.AndroidHaptics ? window.AndroidHaptics.vibrateHeavy() : (navigator.vibrate && navigator.vibrate([40,30,60])),
-      reject: () => window.AndroidHaptics ? window.AndroidHaptics.vibrateReject() : (navigator.vibrate && navigator.vibrate([20,50,20]))
-    };
-
-    // Canvas Engine & DPR setup
-    const canvas = document.getElementById('game-canvas');
-    const ctx = canvas.getContext('2d');
-    let width, height;
-
-    function resize() {
-      width = canvas.width = canvas.parentElement.clientWidth || 380;
-      height = canvas.height = canvas.parentElement.clientHeight || 500;
-    }
-    resize();
-
-    // 4x4 Grid Matrix State
-    const grid = Array.from({ length: 4 }, () => Array(4).fill(0));
-    let moves = 15;
-    let coins = 2679;
-    let combo = 0;
-
-    const items = [
-      { name: 'Bento', color: '#ff7043', shape: [[0,0],[0,1],[1,0],[1,1]], w:2, h:2 },
-      { name: 'Soda', color: '#00ffa3', shape: [[0,0],[1,0]], w:1, h:2 },
-      { name: 'Gummy', color: '#ff2a85', shape: [[0,0]], w:1, h:1 }
-    ];
-    let stagedIndex = 0;
-
-    // Isometric Layout Transformation
-    const TILE_W = 56;
-    const TILE_H = 32;
-    const ORIGIN_X = width / 2;
-    const ORIGIN_Y = 210;
-
-    function toIso(r, c) {
-      return {
-        x: ORIGIN_X + (c - r) * (TILE_W / 2),
-        y: ORIGIN_Y + (c + r) * (TILE_H / 2)
-      };
-    }
-
-    function render() {
-      // PASS 1: ENVIRONMENT & BACKGROUND
-      ctx.fillStyle = '#120524';
-      ctx.fillRect(0, 0, width, height);
-
-      // Slushie Machine (Left) & Cat Mochi with Sinusoidal Bobbing (Right)
-      ctx.fillStyle = '#1e103d';
-      ctx.strokeStyle = '#00f0ff';
-      ctx.lineWidth = 2;
-      ctx.fillRect(15, 20, 75, 90);
-      ctx.strokeRect(15, 20, 75, 90);
-
-      // Slushies
-      ctx.fillStyle = '#ff007f'; ctx.fillRect(22, 30, 28, 40);
-      ctx.fillStyle = '#00ffa3'; ctx.fillRect(54, 30, 28, 40);
-
-      // Cat Mochi
-      const catX = width - 60, catY = 70 + Math.sin(Date.now() / 380) * 3;
-      ctx.fillStyle = '#fde047'; ctx.beginPath(); ctx.arc(catX, catY, 20, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#0284c7'; ctx.fillRect(catX - 18, catY - 14, 36, 6);
-
-      // PASS 2: ISOMETRIC BASKET & GRID SLOTS
-      ctx.fillStyle = 'rgba(22, 8, 41, 0.92)';
-      ctx.strokeStyle = '#00f0ff';
-      ctx.lineWidth = 4;
-
-      ctx.beginPath();
-      const p0 = toIso(-0.5, -0.5), p1 = toIso(-0.5, 3.5), p2 = toIso(3.5, 3.5), p3 = toIso(3.5, -0.5);
-      ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y);
-      ctx.closePath(); ctx.fill(); ctx.stroke();
-
-      for (let r = 0; r < 4; r++) {
-        for (let c = 0; c < 4; c++) {
-          const pt = toIso(r, c);
-          ctx.beginPath();
-          ctx.moveTo(pt.x, pt.y - TILE_H / 2);
-          ctx.lineTo(pt.x + TILE_W / 2, pt.y);
-          ctx.lineTo(pt.x, pt.y + TILE_H / 2);
-          ctx.lineTo(pt.x - TILE_W / 2, pt.y);
-          ctx.closePath();
-          ctx.fillStyle = grid[r][c] ? '#ff2a85' : 'rgba(0, 240, 255, 0.08)';
-          ctx.strokeStyle = 'rgba(0, 240, 255, 0.35)';
-          ctx.lineWidth = 1.5; ctx.fill(); ctx.stroke();
-        }
-      }
-
-      // PASS 3: STAGED ITEM BELOW
-      const staged = items[stagedIndex];
-      if (staged) {
-        ctx.fillStyle = staged.color;
-        const sx = width / 2 - (staged.w * TILE_W) / 4;
-        const sy = ORIGIN_Y + 120;
-        staged.shape.forEach(([dr, dc]) => {
-          ctx.fillRect(sx + dc * 30, sy + dr * 30, 26, 26);
-        });
-      }
-
-      // PASS 5: MOVES BADGE
-      ctx.fillStyle = '#7e22ce';
-      ctx.strokeStyle = '#a855f7';
-      ctx.lineWidth = 3;
-      ctx.fillRect(width - 90, height - 70, 75, 50);
-      ctx.strokeRect(width - 90, height - 70, 75, 50);
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 20px sans-serif';
-      ctx.fillText(moves, width - 60, height - 38);
-
-      requestAnimationFrame(render);
-    }
-
-    canvas.addEventListener('pointerdown', (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const px = e.clientX - rect.left, py = e.clientY - rect.top;
-
-      // Isometric hit detection
-      const dx = px - ORIGIN_X, dy = py - ORIGIN_Y;
-      const col = Math.floor((dx / (TILE_W / 2) + dy / (TILE_H / 2)) / 2);
-      const row = Math.floor((dy / (TILE_H / 2) - dx / (TILE_W / 2)) / 2);
-
-      const staged = items[stagedIndex];
-      if (staged && row >= 0 && row < 4 && col >= 0 && col < 4) {
-        let valid = true;
-        staged.shape.forEach(([dr, dc]) => {
-          const r = row + dr, c = col + dc;
-          if (r < 0 || r >= 4 || c < 0 || c >= 4 || grid[r][c] !== 0) valid = false;
-        });
-
-        if (valid) {
-          staged.shape.forEach(([dr, dc]) => { grid[row + dr][col + dc] = 1; });
-          combo++; moves--; coins += 15;
-          stagedIndex = (stagedIndex + 1) % items.length;
-          document.getElementById('stat-coins').innerText = coins.toLocaleString();
-          playSnap(combo); haptics.medium();
-        } else {
-          combo = 0; haptics.reject();
-        }
-      }
-    });
-
-    render();
-  </script>
 </body>
 </html>
