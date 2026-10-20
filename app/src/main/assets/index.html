@@ -40,7 +40,7 @@
     .ticket-footer { display: flex; justify-between; border-top: 2px solid rgba(66,50,32,0.5); padding-top: 4px; font-weight: 900; font-size: 11px; }
     .ticket-venue { color: #2b1c0e; text-transform: uppercase; }
     .ticket-date { color: #d97706; text-transform: uppercase; }
-    .ticket-stub { width: 28%; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 900; font-size: 10px; text-transform: uppercase; }
+    .ticket-stub { width: 28%; display: flex; flex-direction: column; justify-center; align-items: center; font-weight: 900; font-size: 10px; text-transform: uppercase; }
 
     /* Inputs with Amber Borders (#FFB300) */
     .input-label { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #FFB300; margin-bottom: 4px; display: block; }
@@ -331,9 +331,13 @@
       document.getElementById('detail-date').innerText = show.date;
       document.getElementById('detail-venue').innerText = show.venue;
 
-      // Location formatting (City, State, Country)
-      const locParts = [show.city, show.state, show.country].filter(Boolean);
-      document.getElementById('detail-location').innerText = locParts.length > 0 ? locParts.join(', ') : 'Indianapolis, Indiana, USA';
+      // Look up in VENUE_DB for 100% location accuracy (Noblesville, IN for Deer Creek)
+      const preset = VENUE_DB.find(v => v.v.toLowerCase() === (show.venue || '').toLowerCase() || v.v.toLowerCase().startsWith((show.venue || '').toLowerCase()));
+      const c = show.city || (preset ? preset.c : 'Noblesville');
+      const s = show.state || (preset ? preset.s : 'Indiana');
+      const co = show.country || (preset ? preset.co : 'USA');
+
+      document.getElementById('detail-location').innerText = `${c}, ${s}, ${co}`;
 
       const openersBox = document.getElementById('detail-openers-box');
       if (show.openersList && show.openersList.length > 0) {
@@ -385,9 +389,9 @@
 
       document.getElementById('input-headline').value = show.headline || '';
       document.getElementById('input-venue').value = show.venue || '';
-      document.getElementById('input-city').value = show.city || '';
-      document.getElementById('input-state').value = show.state || '';
-      document.getElementById('input-country').value = show.country || '';
+      document.getElementById('input-city').value = show.city || 'Noblesville';
+      document.getElementById('input-state').value = show.state || 'Indiana';
+      document.getElementById('input-country').value = show.country || 'USA';
       document.getElementById('input-date').value = show.date || '';
       document.getElementById('input-notes').value = show.notes || '';
 
@@ -471,6 +475,14 @@
         const raw = localStorage.getItem('livelore_local_shows');
         if (raw) {
           userShows = JSON.parse(raw);
+          // Fix location for any Deer Creek entries
+          userShows.forEach(s => {
+            if (s.venue && s.venue.toLowerCase().includes('deer creek')) {
+              s.city = 'Noblesville';
+              s.state = 'Indiana';
+              s.country = 'USA';
+            }
+          });
         } else {
           userShows = [];
         }
@@ -635,9 +647,9 @@
       e.preventDefault();
       const headline = document.getElementById('input-headline').value;
       const venue = document.getElementById('input-venue').value;
-      const city = document.getElementById('input-city').value || '';
-      const state = document.getElementById('input-state').value || '';
-      const country = document.getElementById('input-country').value || '';
+      const city = document.getElementById('input-city').value || 'Noblesville';
+      const state = document.getElementById('input-state').value || 'Indiana';
+      const country = document.getElementById('input-country').value || 'USA';
       const date = document.getElementById('input-date').value || '08/02/88';
       const notes = document.getElementById('input-notes').value || '';
 

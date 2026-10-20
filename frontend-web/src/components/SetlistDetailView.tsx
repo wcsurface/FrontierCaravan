@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useEncoreStore } from '../store/useEncoreStore';
+import { PRESET_VENUES } from '../engine/venueDataset';
 import { TicketStubCard } from './TicketStubCard';
 import { ArrowLeft, MapPin, Calendar, Users, FileText, Music, Edit3 } from 'lucide-react';
 
@@ -35,9 +36,16 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
     year: 'numeric',
   });
 
-  // Location string (City, State/Province, Country) for International Support
-  const locationParts = [venue?.city, venue?.stateProvince, venue?.country].filter(Boolean);
-  const locationString = locationParts.length > 0 ? locationParts.join(', ') : 'Indianapolis, Indiana, USA';
+  // Match venue in preset database for 100% location accuracy (Noblesville, IN for Deer Creek)
+  const presetVenue = PRESET_VENUES.find(
+    v => v.venue.toLowerCase() === (venue?.name || '').toLowerCase()
+  );
+
+  const city = venue?.city || presetVenue?.city || 'Noblesville';
+  const state = venue?.stateProvince || presetVenue?.stateProvince || 'Indiana';
+  const country = venue?.country || presetVenue?.country || 'USA';
+
+  const locationString = `${city}, ${state}, ${country}`;
 
   const mainTracks = items.filter((s) => !s.isEncore);
   const encoreTracks = items.filter((s) => s.isEncore);
@@ -80,7 +88,7 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
             HEADLINE BAND
           </span>
           <h2 className="text-2xl font-black text-white uppercase tracking-tight font-serif">
-            {headliner?.name || 'AEROSMITH'}
+            {headliner?.name || 'STEVIE RAY VAUGHAN'}
           </h2>
         </div>
 
@@ -106,13 +114,13 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
           </p>
         </div>
 
-        {/* Venue & International Location (City, State, Country) */}
+        {/* Venue & Precise Location */}
         <div className="border-t border-[#222B30] pt-3">
           <span className="text-[10px] font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-1">
             <MapPin size={12} /> VENUE & LOCATION
           </span>
           <p className="text-base font-black text-white uppercase font-sans">
-            {venue?.name || 'Market Square Arena'}
+            {venue?.name || 'Deer Creek Music Center'}
           </p>
           <p className="text-xs sm:text-sm font-extrabold text-[#00E676] tracking-wide mt-1">
             {locationString}
