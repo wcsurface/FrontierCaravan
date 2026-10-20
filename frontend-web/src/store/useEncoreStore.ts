@@ -25,6 +25,7 @@ interface EncoreState {
   // Actions
   saveConcert: (input: CreateConcertInput) => string;
   deleteConcert: (concertId: string) => void;
+  clearAllData: () => void;
   setSetlistFmApiKey: (key: string) => void;
   getConcertStats: () => ConcertStats;
   exportVaultJson: () => string;
@@ -32,49 +33,14 @@ interface EncoreState {
   syncCloud: () => Promise<void>;
 }
 
-const INITIAL_ARTISTS: Artist[] = [
-  { id: 'a_01', name: 'Nirvana', disambiguation: 'US Grunge Band', createdAt: Date.now() },
-  { id: 'a_02', name: 'Radiohead', disambiguation: 'UK Alternative Rock', createdAt: Date.now() },
-  { id: 'a_03', name: 'Pixies', disambiguation: 'US Alternative Rock', createdAt: Date.now() },
-];
-
-const INITIAL_VENUES: Venue[] = [
-  { id: 'v_01', name: 'The Paramount Theatre', city: 'Seattle', country: 'USA', createdAt: Date.now() },
-  { id: 'v_02', name: 'Red Rocks Amphitheatre', city: 'Morrison', country: 'USA', createdAt: Date.now() },
-];
-
-const INITIAL_CONCERTS: Concert[] = [
-  {
-    id: 'c_01',
-    date: new Date('1991-10-31').getTime(),
-    venueId: 'v_01',
-    headlineArtistId: 'a_01',
-    openingArtistId: 'a_03',
-    tourName: 'Nevermind North American Tour',
-    rating: 5.0,
-    ticketPrice: 25,
-    currency: 'USD',
-    generalNotes: 'Legendary Halloween show in Seattle. High energy, broken instruments!',
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-    syncStatus: 'synced',
-  },
-];
-
-const INITIAL_SETLIST: SetlistItem[] = [
-  { id: 's_01', concertId: 'c_01', artistId: 'a_01', songTitle: 'Jesus Doesn\'t Want Me for a Sunbeam', position: 1, isEncore: false },
-  { id: 's_02', concertId: 'c_01', artistId: 'a_01', songTitle: 'Aneurysm', position: 2, isEncore: false },
-  { id: 's_03', concertId: 'c_01', artistId: 'a_01', songTitle: 'Smells Like Teen Spirit', position: 3, isEncore: false },
-  { id: 's_04', concertId: 'c_01', artistId: 'a_01', songTitle: 'Endless, Nameless', position: 4, isEncore: true, encoreNumber: 1 },
-];
-
 export const useEncoreStore = create<EncoreState>()(
   persist(
     (set, get) => ({
-      concerts: INITIAL_CONCERTS,
-      artists: INITIAL_ARTISTS,
-      venues: INITIAL_VENUES,
-      setlistItems: INITIAL_SETLIST,
+      // Clean Vault Tables for Real Data Entry
+      concerts: [],
+      artists: [],
+      venues: [],
+      setlistItems: [],
 
       setlistFmApiKey: '',
       isCloudSyncEnabled: true,
@@ -158,7 +124,6 @@ export const useEncoreStore = create<EncoreState>()(
           cloudSyncStatus: 'pending_insert' as any,
         });
 
-        // Trigger background cloud sync if enabled
         get().syncCloud();
 
         return concertId;
@@ -169,6 +134,15 @@ export const useEncoreStore = create<EncoreState>()(
         set({
           concerts: concerts.filter(c => c.id !== concertId),
           setlistItems: setlistItems.filter(s => s.concertId !== concertId),
+        });
+      },
+
+      clearAllData: () => {
+        set({
+          concerts: [],
+          artists: [],
+          venues: [],
+          setlistItems: [],
         });
       },
 
@@ -197,13 +171,13 @@ export const useEncoreStore = create<EncoreState>()(
             return true;
           }
         } catch (e) {
-          console.error('[Encore Vault] Import failed:', e);
+          console.error('[LiveLore Vault] Import failed:', e);
         }
         return false;
       },
 
       syncCloud: async () => {
-        const { concerts, setlistItems } = get();
+        const { concerts } = get();
         const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'https://frontiercaravan-production.up.railway.app';
         set({ cloudSyncStatus: 'syncing' });
 
@@ -211,7 +185,7 @@ export const useEncoreStore = create<EncoreState>()(
           const res = await fetch(`${backendUrl}/api/sync/push`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ deviceId: 'device_pwa_01', concerts, setlistItems }),
+            body: JSON.stringify({ deviceId: 'device_pwa_01', concerts }),
           });
 
           if (res.ok) {
@@ -225,7 +199,7 @@ export const useEncoreStore = create<EncoreState>()(
       },
     }),
     {
-      name: 'encore_vault_v1',
+      name: 'livelore_vault_v1',
       storage: createJSONStorage(() => localStorage),
     }
   )

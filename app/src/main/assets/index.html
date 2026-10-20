@@ -85,7 +85,7 @@
     </form>
   </div>
 
-  <!-- SCREEN 1: DIARY -->
+  <!-- SCREEN 1: DIARY (CLEAN FOR REAL USER ENTRIES) -->
   <div id="view-diary" class="screen-view">
     <div class="header">
       <button class="nav-btn-icon nav-btn-left" onclick="showScreen('stats')">☰</button>
@@ -96,39 +96,7 @@
     </div>
 
     <div id="ticket-list">
-      <div class="ticket-card" onclick="openSetlist('THE CURE')">
-        <div class="ticket-left">
-          <div class="ticket-artist-box">
-            <div class="ticket-artist-head">THE CURE</div>
-          </div>
-          <div class="ticket-footer">
-            <span class="ticket-venue">Red Rocks</span>
-            <span class="ticket-date">OCT 12, 2026</span>
-          </div>
-        </div>
-        <div class="ticket-stub">
-          <div>ADMIT ONE</div>
-          <div style="font-size:8px; color:#64748b; margin-top:4px;">SEC 7</div>
-        </div>
-      </div>
-
-      <div class="ticket-card" onclick="openSetlist('PIXIES')">
-        <div class="ticket-left">
-          <div class="ticket-artist-box">
-            <div class="ticket-artist-head">PIXIES</div>
-            <div class="ticket-artist-and">and</div>
-            <div class="ticket-artist-openers">The Cure</div>
-          </div>
-          <div class="ticket-footer">
-            <span class="ticket-venue">The Fillmore</span>
-            <span class="ticket-date">OCT 12, 2026</span>
-          </div>
-        </div>
-        <div class="ticket-stub">
-          <div>ADMIT ONE</div>
-          <div style="font-size:8px; color:#64748b; margin-top:4px;">SEC 7</div>
-        </div>
-      </div>
+      <!-- Clean feed ready for real concert entries -->
     </div>
 
     <button class="btn-cta" style="font-size:14px;" onclick="showScreen('log')">+ LOG NEW SHOW</button>
@@ -193,19 +161,10 @@
       </div>
     </div>
 
-    <div style="text-align:center; font-weight:900; font-size:14px; color:#FFB300; margin-bottom:16px;" id="setlist-artist-name">THE CURE</div>
+    <div style="text-align:center; font-weight:900; font-size:14px; color:#FFB300; margin-bottom:16px;" id="setlist-artist-name">CONCERT SETLIST</div>
 
-    <div style="flex:1; font-family:monospace; font-size:14px; line-height:2; color:#e2e8f0;">
-      <div>1. Plainsong</div>
-      <div>2. Pictures of You</div>
-      <div>3. Fascination Street</div>
-      <div>4. Deep Green Sea</div>
-      <div>5. In Between Days</div>
-      <div style="margin: 12px 0;">
-        <span style="background:#00E676; color:#0a0a0a; font-weight:900; padding:3px 10px; border-radius:9999px; font-size:11px;">ENCORE</span>
-      </div>
-      <div>6. Boys Don't Cry</div>
-      <div>7. 10:15 Saturday Night</div>
+    <div style="flex:1; font-family:monospace; font-size:14px; line-height:2; color:#e2e8f0;" id="setlist-content">
+      <div style="color:#94a3b8; font-style:italic;">No setlist tracks recorded yet.</div>
     </div>
   </div>
 
@@ -218,64 +177,37 @@
       </div>
     </div>
 
-    <div style="text-align:center; font-weight:900; font-size:48px; color:#ffffff; margin: 12px 0;">78 SHOWS</div>
+    <div style="text-align:center; font-weight:900; font-size:48px; color:#ffffff; margin: 12px 0;" id="stats-total-count">0 SHOWS</div>
 
     <!-- TOP VENUES (FULL TOP 10) -->
     <div class="stats-card" onclick="showSubStats('venues')">
       <div class="stats-card-title" style="color:#00E676;">TOP VENUES (TOP 10) <span style="font-size:10px;">SEE ALL ➔</span></div>
-      <div style="font-size:12px; space-y:6px;">
-        <div style="margin-bottom:6px;">1. Red Rocks Amphitheatre - 12</div>
-        <div style="margin-bottom:6px;">2. The Fillmore - 8</div>
-        <div style="margin-bottom:6px;">3. The Paramount Theatre - 5</div>
-        <div style="margin-bottom:6px;">4. Madison Square Garden - 4</div>
-        <div style="margin-bottom:6px;">5. Ryman Auditorium - 3</div>
-        <div style="margin-bottom:6px;">6. First Avenue - 3</div>
-        <div style="margin-bottom:6px;">7. The Wiltern - 2</div>
-        <div style="margin-bottom:6px;">8. 9:30 Club - 2</div>
-        <div style="margin-bottom:6px;">9. Stubbs BBQ - 2</div>
-        <div style="margin-bottom:6px;">10. Metro - 1</div>
+      <div style="font-size:12px;" id="stats-venues-preview">
+        <div style="color:#94a3b8; font-style:italic;">Log shows to view your top venues!</div>
       </div>
     </div>
 
     <!-- TOP ARTISTS (FULL TOP 10) -->
     <div class="stats-card" onclick="showSubStats('artists')">
       <div class="stats-card-title" style="color:#FFB300;">TOP ARTISTS (TOP 10) <span style="font-size:10px;">SEE ALL ➔</span></div>
-      <div style="font-size:12px; space-y:6px;">
-        <div style="margin-bottom:6px;">1. The Cure - 6</div>
-        <div style="margin-bottom:6px;">2. Radiohead - 4</div>
-        <div style="margin-bottom:6px;">3. Pixies - 4</div>
-        <div style="margin-bottom:6px;">4. Depeche Mode - 3</div>
-        <div style="margin-bottom:6px;">5. Nirvana - 3</div>
-        <div style="margin-bottom:6px;">6. Smashing Pumpkins - 2</div>
-        <div style="margin-bottom:6px;">7. LCD Soundsystem - 2</div>
-        <div style="margin-bottom:6px;">8. Nine Inch Nails - 2</div>
-        <div style="margin-bottom:6px;">9. Interpol - 2</div>
-        <div style="margin-bottom:6px;">10. Arcade Fire - 1</div>
+      <div style="font-size:12px;" id="stats-artists-preview">
+        <div style="color:#94a3b8; font-style:italic;">Log shows to view your top artists!</div>
       </div>
     </div>
 
     <!-- TOP YEARS (FULL TOP 10) -->
     <div class="stats-card" onclick="showSubStats('years')">
       <div class="stats-card-title" style="color:#00B0FF;">TOP YEARS (TOP 10) <span style="font-size:10px;">SEE ALL ➔</span></div>
-      <div style="font-size:12px; space-y:6px;">
-        <div style="margin-bottom:6px;">1. 2026 - 18 Shows</div>
-        <div style="margin-bottom:6px;">2. 2025 - 22 Shows</div>
-        <div style="margin-bottom:6px;">3. 2024 - 15 Shows</div>
-        <div style="margin-bottom:6px;">4. 2023 - 11 Shows</div>
-        <div style="margin-bottom:6px;">5. 2022 - 8 Shows</div>
-        <div style="margin-bottom:6px;">6. 2021 - 4 Shows</div>
+      <div style="font-size:12px;" id="stats-years-preview">
+        <div style="color:#94a3b8; font-style:italic;">Log shows to view your top years!</div>
       </div>
     </div>
 
     <!-- DAYS OF THE WEEK -->
     <div class="stats-card" onclick="showSubStats('days')">
       <div class="stats-card-title" style="color:#E040FB;">DAYS OF THE WEEK <span style="font-size:10px;">SEE ALL ➔</span></div>
-      <div style="font-size:12px; space-y:6px;">
-        <div style="margin-bottom:6px;">1. Thursday - 32 Shows (42%)</div>
-        <div style="margin-bottom:6px;">2. Friday - 20 Shows (26%)</div>
-        <div style="margin-bottom:6px;">3. Saturday - 14 Shows (18%)</div>
-        <div style="margin-bottom:6px;">4. Wednesday - 8 Shows (10%)</div>
-        <div style="margin-bottom:6px;">5. Tuesday - 4 Shows (4%)</div>
+      <div style="font-size:12px;" id="stats-days-preview">
+        <div style="color:#94a3b8; font-style:italic;">Log shows to view days of week breakdown!</div>
       </div>
     </div>
   </div>
@@ -294,6 +226,7 @@
 
   <script>
     let authMode = 'login';
+    let userShows = [];
 
     function showScreen(screenId) {
       document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
@@ -358,38 +291,65 @@
       document.getElementById('venue-dropdown').style.display = 'none';
     }
 
+    function updateStatsDisplay() {
+      const count = userShows.length;
+      document.getElementById('stats-total-count').innerText = count + (count === 1 ? ' SHOW' : ' SHOWS');
+
+      if (count > 0) {
+        const venueCounts = {};
+        const artistCounts = {};
+        userShows.forEach(s => {
+          venueCounts[s.venue] = (venueCounts[s.venue] || 0) + 1;
+          artistCounts[s.headline] = (artistCounts[s.headline] || 0) + 1;
+        });
+
+        const topV = Object.entries(venueCounts).sort((a,b) => b[1] - a[1]);
+        const topA = Object.entries(artistCounts).sort((a,b) => b[1] - a[1]);
+
+        document.getElementById('stats-venues-preview').innerHTML = topV.map((item, i) => `
+          <div style="margin-bottom:6px;">${i+1}. ${item[0]} - ${item[1]}</div>
+        `).join('');
+
+        document.getElementById('stats-artists-preview').innerHTML = topA.map((item, i) => `
+          <div style="margin-bottom:6px;">${i+1}. ${item[0]} - ${item[1]}</div>
+        `).join('');
+      }
+    }
+
     function showSubStats(type) {
       const container = document.getElementById('substats-container');
 
       if (type === 'venues') {
+        const venueCounts = {};
+        userShows.forEach(s => { venueCounts[s.venue] = (venueCounts[s.venue] || 0) + 1; });
+        const topV = Object.entries(venueCounts).sort((a,b) => b[1] - a[1]);
+
         container.innerHTML = `
           <div style="color:#00E676; font-size:14px; text-transform:uppercase; margin-bottom:10px;">ALL VENUES DATA</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">1. Red Rocks Amphitheatre - 12 Shows</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">2. The Fillmore - 8 Shows</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">3. The Paramount Theatre - 5 Shows</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">4. Madison Square Garden - 4 Shows</div>
+          ${topV.length > 0 ? topV.map((item, i) => `
+            <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">${i+1}. ${item[0]} - ${item[1]} Shows</div>
+          `).join('') : '<div style="color:#94a3b8;">No venues logged yet.</div>'}
         `;
       } else if (type === 'artists') {
+        const artistCounts = {};
+        userShows.forEach(s => { artistCounts[s.headline] = (artistCounts[s.headline] || 0) + 1; });
+        const topA = Object.entries(artistCounts).sort((a,b) => b[1] - a[1]);
+
         container.innerHTML = `
           <div style="color:#FFB300; font-size:14px; text-transform:uppercase; margin-bottom:10px;">ALL ARTISTS DATA</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">1. The Cure - 6 Times</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">2. Radiohead - 4 Times</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">3. Pixies - 4 Times</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">4. Depeche Mode - 3 Times</div>
+          ${topA.length > 0 ? topA.map((item, i) => `
+            <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">${i+1}. ${item[0]} - ${item[1]} Times</div>
+          `).join('') : '<div style="color:#94a3b8;">No artists logged yet.</div>'}
         `;
       } else if (type === 'years') {
         container.innerHTML = `
           <div style="color:#00B0FF; font-size:14px; text-transform:uppercase; margin-bottom:10px;">ALL YEARS DATA</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">1. 2026 - 18 Shows</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">2. 2025 - 22 Shows</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">3. 2024 - 15 Shows</div>
+          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">Total Concerts: ${userShows.length}</div>
         `;
       } else {
         container.innerHTML = `
           <div style="color:#E040FB; font-size:14px; text-transform:uppercase; margin-bottom:10px;">DAYS OF THE WEEK</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">1. Thursday - 32 Shows (42%)</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">2. Friday - 20 Shows (26%)</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">3. Saturday - 14 Shows (18%)</div>
+          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">Total Concerts: ${userShows.length}</div>
         `;
       }
       showScreen('substats');
@@ -415,6 +375,9 @@
       const openersList = Array.from(openerInputs).map(inp => inp.value.trim()).filter(Boolean);
 
       if (headline && venue) {
+        userShows.push({ headline, venue, date, openersList });
+        updateStatsDisplay();
+
         const list = document.getElementById('ticket-list');
         const card = document.createElement('div');
         card.className = 'ticket-card';
