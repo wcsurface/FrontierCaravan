@@ -8,7 +8,7 @@ import { LogShowScreen } from '../components/LogShowScreen';
 import { SetlistDetailView } from '../components/SetlistDetailView';
 import { StatsView } from '../components/StatsView';
 import { AuthScreen } from '../components/AuthScreen';
-import { Menu, User, CheckCircle2 } from 'lucide-react';
+import { Menu, User, CheckCircle2, Sparkles, ArrowDown } from 'lucide-react';
 
 export default function HomeView() {
   const { user, token, checkMe } = useAuthStore();
@@ -38,7 +38,7 @@ export default function HomeView() {
     <main className="flex flex-col items-center justify-between min-h-screen bg-[#0A0D0E] text-slate-100 select-none font-sans overflow-hidden bg-grid-lines">
       {/* SCREEN 1: DIARY VIEW */}
       {currentView === 'diary' && (
-        <div className="flex flex-col w-full max-w-md h-screen p-4 overflow-y-auto">
+        <div className="flex flex-col w-full max-w-md h-screen p-4 overflow-y-auto justify-between">
           {/* Header with 2X Larger LiveLore Logo */}
           <header className="relative flex items-center justify-between w-full pt-3 pb-6 my-1">
             <button
@@ -66,11 +66,27 @@ export default function HomeView() {
             </button>
           </header>
 
-          {/* Ticket Stubs Feed */}
-          <div className="flex-1 overflow-y-auto pr-1">
+          {/* Ticket Stubs Feed OR Fun Empty State for New Users */}
+          <div className="flex-1 overflow-y-auto pr-1 flex flex-col">
             {concerts.length === 0 ? (
-              <div className="text-center my-12 text-slate-500 font-medium">
-                No shows logged yet. Tap + below to log your first show!
+              <div className="flex flex-col items-center justify-center text-center my-auto py-8 px-4 space-y-4">
+                <div className="w-16 h-16 bg-[#FFB300]/10 text-[#FFB300] rounded-full flex items-center justify-center border border-[#FFB300]/30 shadow-[0_0_20px_rgba(255,179,0,0.2)] mb-1">
+                  <Sparkles size={32} />
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black uppercase text-white tracking-wide font-sans">
+                  Your Concert Vault Is Waiting! 🎸
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-400 max-w-xs font-medium leading-relaxed">
+                  Every legendary show starts with a single ticket stub. Start building your ultimate live music diary!
+                </p>
+
+                {/* Fun Animated Pointer Arrow */}
+                <div className="pt-6 flex flex-col items-center gap-2 text-[#00E676] animate-bounce">
+                  <span className="text-xs font-black uppercase tracking-widest text-[#FFB300]">
+                    Start adding your concerts below!
+                  </span>
+                  <ArrowDown size={32} className="stroke-[3] text-[#00E676] drop-shadow-[0_0_10px_rgba(0,230,118,0.6)]" />
+                </div>
               </div>
             ) : (
               concerts.map((concert) => {

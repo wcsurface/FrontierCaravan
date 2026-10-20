@@ -48,6 +48,13 @@
     .btn-cancel { width: 100%; background: #121619; color: #cbd5e1; font-weight: 800; font-size: 14px; padding: 14px; border-radius: 9999px; border: 1px solid #222B30; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-bottom: 16px; }
     .btn-add-opener { background: none; border: none; color: #FFB300; font-weight: 800; font-size: 12px; cursor: pointer; margin-bottom: 12px; text-align: left; padding: 2px 0; }
 
+    /* Empty State Pointer Animation */
+    @keyframes bounceDown {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
+    }
+    .bounce-pointer { animation: bounceDown 1.5s infinite; }
+
     /* Stats Card Box */
     .stats-card { background: #121619; border: 1px solid #222B30; border-radius: 16px; padding: 16px; margin-bottom: 16px; cursor: pointer; }
     .stats-card-title { font-weight: 900; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid #222B30; display: flex; justify-between; align-items: center; }
@@ -85,7 +92,7 @@
     </form>
   </div>
 
-  <!-- SCREEN 1: DIARY (CLEAN FOR REAL USER ENTRIES) -->
+  <!-- SCREEN 1: DIARY -->
   <div id="view-diary" class="screen-view">
     <div class="header">
       <button class="nav-btn-icon nav-btn-left" onclick="showScreen('stats')">☰</button>
@@ -95,8 +102,17 @@
       <button class="nav-btn-icon nav-btn-right" onclick="showScreen('auth')">★</button>
     </div>
 
-    <div id="ticket-list">
-      <!-- Clean feed ready for real concert entries -->
+    <div id="ticket-list" style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
+      <!-- Fun Onboarding Message for New Users -->
+      <div id="empty-state-box" style="text-align:center; padding: 30px 16px; margin: auto 0;">
+        <div style="font-size:36px; margin-bottom:12px;">🎸</div>
+        <div style="font-weight:900; font-size:20px; color:#ffffff; text-transform:uppercase; margin-bottom:8px;">YOUR CONCERT VAULT IS WAITING!</div>
+        <div style="font-size:13px; color:#94a3b8; max-width:280px; margin:0 auto 20px auto; font-weight:500; line-height:1.5;">Every legendary show starts with a single ticket stub. Start building your ultimate live music diary!</div>
+        <div class="bounce-pointer" style="color:#FFB300; font-weight:900; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin-top:16px;">
+          START ADDING YOUR CONCERTS BELOW!
+          <div style="font-size:28px; color:#00E676; margin-top:4px;">↓</div>
+        </div>
+      </div>
     </div>
 
     <button class="btn-cta" style="font-size:14px;" onclick="showScreen('log')">+ LOG NEW SHOW</button>
@@ -161,10 +177,19 @@
       </div>
     </div>
 
-    <div style="text-align:center; font-weight:900; font-size:14px; color:#FFB300; margin-bottom:16px;" id="setlist-artist-name">CONCERT SETLIST</div>
+    <div style="text-align:center; font-weight:900; font-size:14px; color:#FFB300; margin-bottom:16px;" id="setlist-artist-name">THE CURE</div>
 
-    <div style="flex:1; font-family:monospace; font-size:14px; line-height:2; color:#e2e8f0;" id="setlist-content">
-      <div style="color:#94a3b8; font-style:italic;">No setlist tracks recorded yet.</div>
+    <div style="flex:1; font-family:monospace; font-size:14px; line-height:2; color:#e2e8f0;">
+      <div>1. Plainsong</div>
+      <div>2. Pictures of You</div>
+      <div>3. Fascination Street</div>
+      <div>4. Deep Green Sea</div>
+      <div>5. In Between Days</div>
+      <div style="margin: 12px 0;">
+        <span style="background:#00E676; color:#0a0a0a; font-weight:900; padding:3px 10px; border-radius:9999px; font-size:11px;">ENCORE</span>
+      </div>
+      <div>6. Boys Don't Cry</div>
+      <div>7. 10:15 Saturday Night</div>
     </div>
   </div>
 
@@ -379,6 +404,10 @@
         updateStatsDisplay();
 
         const list = document.getElementById('ticket-list');
+        // Hide empty state if present
+        const emptyBox = document.getElementById('empty-state-box');
+        if (emptyBox) emptyBox.style.display = 'none';
+
         const card = document.createElement('div');
         card.className = 'ticket-card';
         card.onclick = () => openSetlist(headline);
