@@ -45,6 +45,23 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
     }
   };
 
+  // Auto-format Date as DD/MM/YY as user types
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    const digits = raw.replace(/\D/g, '');
+
+    let formatted = '';
+    if (digits.length <= 2) {
+      formatted = digits;
+    } else if (digits.length <= 4) {
+      formatted = `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    } else {
+      formatted = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4, 8)}`;
+    }
+
+    setDateStr(formatted);
+  };
+
   const handleVenueChange = (val: string) => {
     setVenueName(val);
     if (val.trim().length > 0) {
@@ -170,17 +187,18 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
           </button>
         </div>
 
-        {/* Date Input */}
+        {/* Auto-Formatting Date Input */}
         <div>
           <label className="block text-[11px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
-            Date
+            Date (DD/MM/YY)
           </label>
           <input
             type="text"
-            placeholder="Date (DD/MM/YY)"
+            placeholder="DD/MM/YY"
             value={dateStr}
-            onChange={(e) => setDateStr(e.target.value)}
-            className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-4 py-3 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition"
+            onChange={handleDateChange}
+            maxLength={10}
+            className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-4 py-3 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition font-mono"
           />
         </div>
 

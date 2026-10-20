@@ -103,8 +103,8 @@
       </div>
       <button type="button" class="btn-add-opener" onclick="addOpenerField()">+ Add Another Opener</button>
 
-      <label class="input-label">Date</label>
-      <input type="text" id="input-date" class="input-field" placeholder="Date (DD/MM/YY)" />
+      <label class="input-label">Date (DD/MM/YY)</label>
+      <input type="text" id="input-date" class="input-field" placeholder="DD/MM/YY" oninput="formatDateOnInput(this)" maxlength="10" />
 
       <label class="input-label">Venue *</label>
       <input type="text" id="input-venue" class="input-field" placeholder="Search or enter Venue" oninput="handleVenueInput(this.value)" required />
@@ -221,6 +221,17 @@
     function openSetlist(artistName) {
       document.getElementById('setlist-artist-name').innerText = artistName.toUpperCase();
       showScreen('setlist');
+    }
+
+    function formatDateOnInput(elem) {
+      const raw = elem.value.replace(/\D/g, '');
+      if (raw.length <= 2) {
+        elem.value = raw;
+      } else if (raw.length <= 4) {
+        elem.value = raw.slice(0, 2) + '/' + raw.slice(2);
+      } else {
+        elem.value = raw.slice(0, 2) + '/' + raw.slice(2, 4) + '/' + raw.slice(4, 8);
+      }
     }
 
     function handleVenueInput(query) {
