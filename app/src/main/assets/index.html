@@ -6,53 +6,53 @@
   <title>Midnight Mart: Neon Bodega</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
-    body { background-color: #0d0322; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 12px; }
+    body { background-color: #070112; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 10px; }
 
-    /* Top HUD Pills */
+    /* HUD Capsules */
     #hud { width: 100%; max-width: 420px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
-    .hud-pill { background: linear-gradient(90deg, rgba(88, 28, 135, 0.9), rgba(49, 46, 129, 0.9)); border: 2px solid rgba(129, 140, 248, 0.6); border-radius: 9999px; padding: 4px 12px; display: flex; align-items: center; gap: 6px; font-weight: 900; font-size: 13px; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+    .hud-capsule { background: linear-gradient(90deg, rgba(88, 28, 135, 0.9), rgba(49, 46, 129, 0.9)); border: 2px solid rgba(165, 180, 252, 0.6); border-radius: 9999px; padding: 4px 10px; display: flex; align-items: center; gap: 6px; font-weight: 900; font-size: 13px; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
     .hud-btn { width: 22px; height: 22px; border-radius: 50%; background: #10b981; border: 1px solid #a7f3d0; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; }
 
     /* Title Banner */
-    #title-banner { background: #180838; border: 2px solid #67e8f9; border-radius: 16px; padding: 4px 20px; font-weight: 900; font-size: 22px; color: #f472b6; text-transform: uppercase; text-shadow: 0 2px 8px rgba(255,0,127,0.8); margin: 6px 0; }
+    #title-banner { background: #180838; border: 2px solid #67e8f9; border-radius: 16px; padding: 4px 20px; font-weight: 900; font-size: 22px; color: #f472b6; text-transform: uppercase; text-shadow: 0 2px 8px rgba(255,0,127,0.8); margin: 4px 0; }
 
     /* Canvas Container */
     #canvas-container { relative: width: 100%; max-width: 420px; height: 500px; display: flex; justify-content: center; align-items: center; }
     canvas { width: 100%; height: 100%; border-radius: 24px; border: 2px solid rgba(147, 51, 234, 0.6); background: #0f091f; box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
 
-    /* Bottom Navigation Dock */
-    #nav-bar { width: 100%; max-width: 420px; background: rgba(22, 8, 46, 0.95); border: 2px solid rgba(147, 51, 234, 0.6); border-radius: 24px; padding: 10px; display: flex; justify-around: align-items: center; }
+    /* Navigation Dock */
+    #nav-bar { width: 100%; max-width: 420px; background: rgba(22, 8, 46, 0.95); border: 2px solid rgba(147, 51, 234, 0.6); border-radius: 24px; padding: 8px; display: flex; justify-around: align-items: center; }
     .nav-btn { background: none; border: none; color: #f472b6; font-weight: 900; font-size: 12px; letter-spacing: 1px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
   </style>
 </head>
 <body>
 
-  <!-- 1. Top HUD Pills -->
+  <!-- Top HUD Capsules -->
   <div id="hud">
-    <div class="hud-pill">
+    <div class="hud-capsule">
       ❤️ <span id="stat-lives">5</span>
       <div class="hud-btn">+</div>
     </div>
-    <div class="hud-pill" style="border-color: rgba(251,191,36,0.6);">
+    <div class="hud-capsule" style="border-color: rgba(251, 191, 36, 0.6);">
       💰 <span id="stat-coins">2,679</span>
       <div class="hud-btn">+</div>
     </div>
-    <div class="hud-pill">
+    <div class="hud-capsule">
       ⭐ <span id="stat-stars">2</span>
     </div>
   </div>
 
-  <!-- 2. Neon Bubbly Title Banner -->
+  <!-- Title Banner -->
   <div id="title-banner">Midnight Mart</div>
 
-  <!-- 3. Canvas Game Viewport -->
+  <!-- Canvas Engine Viewport -->
   <div id="canvas-container">
     <canvas id="game-canvas"></canvas>
   </div>
 
-  <!-- 4. Bottom Navigation -->
+  <!-- Bottom Navigation Dock -->
   <div id="nav-bar">
-    <button class="nav-btn">✦ PACK ✦</button>
+    <button class="nav-btn">✦ PACK & PACK ✦</button>
   </div>
 
   <script>
@@ -67,8 +67,7 @@
       osc.frequency.exponentialRampToValueAtTime(780, audioCtx.currentTime + 0.08);
       gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
+      osc.connect(gain); gain.connect(audioCtx.destination);
       osc.start(); osc.stop(audioCtx.currentTime + 0.08);
     }
 
@@ -82,8 +81,7 @@
       osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, audioCtx.currentTime + 0.12);
       gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
+      osc.connect(gain); gain.connect(audioCtx.destination);
       osc.start(); osc.stop(audioCtx.currentTime + 0.12);
     }
 
@@ -95,7 +93,7 @@
       reject: () => window.AndroidHaptics ? window.AndroidHaptics.vibrateReject() : (navigator.vibrate && navigator.vibrate([20,50,20]))
     };
 
-    // Canvas & Game Loop
+    // Canvas Engine & DPR setup
     const canvas = document.getElementById('game-canvas');
     const ctx = canvas.getContext('2d');
     let width, height;
@@ -106,7 +104,7 @@
     }
     resize();
 
-    // 4x4 Grid State
+    // 4x4 Grid Matrix State
     const grid = Array.from({ length: 4 }, () => Array(4).fill(0));
     let moves = 15;
     let coins = 2679;
@@ -119,66 +117,77 @@
     ];
     let stagedIndex = 0;
 
-    const CELL = 54;
-    const ORIGIN_X = (width - 4 * CELL) / 2 || 40;
-    const ORIGIN_Y = 160;
+    // Isometric Layout Transformation
+    const TILE_W = 56;
+    const TILE_H = 32;
+    const ORIGIN_X = width / 2;
+    const ORIGIN_Y = 210;
+
+    function toIso(r, c) {
+      return {
+        x: ORIGIN_X + (c - r) * (TILE_W / 2),
+        y: ORIGIN_Y + (c + r) * (TILE_H / 2)
+      };
+    }
 
     function render() {
-      // 1. Cyber-Bodega Background
-      ctx.fillStyle = '#15062c';
+      // PASS 1: ENVIRONMENT & BACKGROUND
+      ctx.fillStyle = '#120524';
       ctx.fillRect(0, 0, width, height);
 
-      // 2. Slushie Machine (Left) & Cat Mochi (Right)
+      // Slushie Machine (Left) & Cat Mochi with Sinusoidal Bobbing (Right)
       ctx.fillStyle = '#1e103d';
       ctx.strokeStyle = '#00f0ff';
       ctx.lineWidth = 2;
       ctx.fillRect(15, 20, 75, 90);
       ctx.strokeRect(15, 20, 75, 90);
 
-      // Slushie Bowls
-      ctx.fillStyle = '#ff007f';
-      ctx.fillRect(22, 30, 28, 40);
-      ctx.fillStyle = '#00ffa3';
-      ctx.fillRect(54, 30, 28, 40);
+      // Slushies
+      ctx.fillStyle = '#ff007f'; ctx.fillRect(22, 30, 28, 40);
+      ctx.fillStyle = '#00ffa3'; ctx.fillRect(54, 30, 28, 40);
 
       // Cat Mochi
-      const catX = width - 60, catY = 70;
-      ctx.fillStyle = '#fde047';
-      ctx.beginPath(); ctx.arc(catX, catY, 20, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#0284c7';
-      ctx.fillRect(catX - 18, catY - 14, 36, 6); // Visor
+      const catX = width - 60, catY = 70 + Math.sin(Date.now() / 380) * 3;
+      ctx.fillStyle = '#fde047'; ctx.beginPath(); ctx.arc(catX, catY, 20, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#0284c7'; ctx.fillRect(catX - 18, catY - 14, 36, 6);
 
-      // 3. Glowing Neon Shopping Basket Backdrop
-      ctx.fillStyle = 'rgba(22, 8, 41, 0.9)';
+      // PASS 2: ISOMETRIC BASKET & GRID SLOTS
+      ctx.fillStyle = 'rgba(22, 8, 41, 0.92)';
       ctx.strokeStyle = '#00f0ff';
       ctx.lineWidth = 4;
-      ctx.strokeRect(ORIGIN_X - 12, ORIGIN_Y - 12, 4 * CELL + 24, 4 * CELL + 24);
-      ctx.fillRect(ORIGIN_X - 12, ORIGIN_Y - 12, 4 * CELL + 24, 4 * CELL + 24);
 
-      // Grid Cells
+      ctx.beginPath();
+      const p0 = toIso(-0.5, -0.5), p1 = toIso(-0.5, 3.5), p2 = toIso(3.5, 3.5), p3 = toIso(3.5, -0.5);
+      ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+
       for (let r = 0; r < 4; r++) {
         for (let c = 0; c < 4; c++) {
-          const x = ORIGIN_X + c * CELL;
-          const y = ORIGIN_Y + r * CELL;
-          ctx.fillStyle = grid[r][c] ? '#ff2a85' : 'rgba(255,255,255,0.05)';
-          ctx.fillRect(x + 2, y + 2, CELL - 4, CELL - 4);
-          ctx.strokeStyle = 'rgba(0, 240, 255, 0.2)';
-          ctx.strokeRect(x + 2, y + 2, CELL - 4, CELL - 4);
+          const pt = toIso(r, c);
+          ctx.beginPath();
+          ctx.moveTo(pt.x, pt.y - TILE_H / 2);
+          ctx.lineTo(pt.x + TILE_W / 2, pt.y);
+          ctx.lineTo(pt.x, pt.y + TILE_H / 2);
+          ctx.lineTo(pt.x - TILE_W / 2, pt.y);
+          ctx.closePath();
+          ctx.fillStyle = grid[r][c] ? '#ff2a85' : 'rgba(0, 240, 255, 0.08)';
+          ctx.strokeStyle = 'rgba(0, 240, 255, 0.35)';
+          ctx.lineWidth = 1.5; ctx.fill(); ctx.stroke();
         }
       }
 
-      // Render Staged Item Below Basket
+      // PASS 3: STAGED ITEM BELOW
       const staged = items[stagedIndex];
       if (staged) {
         ctx.fillStyle = staged.color;
-        const sx = width / 2 - (staged.w * CELL) / 2;
-        const sy = ORIGIN_Y + 4 * CELL + 30;
+        const sx = width / 2 - (staged.w * TILE_W) / 4;
+        const sy = ORIGIN_Y + 120;
         staged.shape.forEach(([dr, dc]) => {
-          ctx.fillRect(sx + dc * CELL + 2, sy + dr * CELL + 2, CELL - 4, CELL - 4);
+          ctx.fillRect(sx + dc * 30, sy + dr * 30, 26, 26);
         });
       }
 
-      // 4. Draw Moves Badge (Bottom Right)
+      // PASS 5: MOVES BADGE
       ctx.fillStyle = '#7e22ce';
       ctx.strokeStyle = '#a855f7';
       ctx.lineWidth = 3;
@@ -193,11 +202,12 @@
 
     canvas.addEventListener('pointerdown', (e) => {
       const rect = canvas.getBoundingClientRect();
-      const px = e.clientX - rect.left;
-      const py = e.clientY - rect.top;
+      const px = e.clientX - rect.left, py = e.clientY - rect.top;
 
-      const col = Math.floor((px - ORIGIN_X) / CELL);
-      const row = Math.floor((py - ORIGIN_Y) / CELL);
+      // Isometric hit detection
+      const dx = px - ORIGIN_X, dy = py - ORIGIN_Y;
+      const col = Math.floor((dx / (TILE_W / 2) + dy / (TILE_H / 2)) / 2);
+      const row = Math.floor((dy / (TILE_H / 2) - dx / (TILE_W / 2)) / 2);
 
       const staged = items[stagedIndex];
       if (staged && row >= 0 && row < 4 && col >= 0 && col < 4) {
@@ -209,16 +219,12 @@
 
         if (valid) {
           staged.shape.forEach(([dr, dc]) => { grid[row + dr][col + dc] = 1; });
-          combo++;
-          moves--;
-          coins += 15;
+          combo++; moves--; coins += 15;
           stagedIndex = (stagedIndex + 1) % items.length;
           document.getElementById('stat-coins').innerText = coins.toLocaleString();
-          playSnap(combo);
-          haptics.medium();
+          playSnap(combo); haptics.medium();
         } else {
-          combo = 0;
-          haptics.reject();
+          combo = 0; haptics.reject();
         }
       }
     });

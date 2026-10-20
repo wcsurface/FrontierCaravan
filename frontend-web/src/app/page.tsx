@@ -36,45 +36,46 @@ export default function HomeView() {
   };
 
   return (
-    <main className="flex flex-col items-center justify-between min-h-screen bg-[#0d0322] text-slate-100 p-3 select-none font-sans overflow-hidden">
-      {/* 1. Top HUD Header Pills (Exact Match to Image) */}
+    <main className="flex flex-col items-center justify-between min-h-screen bg-[#070112] text-slate-100 p-2 sm:p-3 select-none font-sans overflow-hidden">
+      {/* PASS 5: GLOSSY CASUAL UI HUD OVERLAY */}
+      {/* 1. Top HUD Capsules */}
       <header className="flex items-center justify-between w-full max-w-md pt-2 px-1 z-30">
-        {/* Lives Pill */}
-        <div className="flex items-center gap-1.5 bg-gradient-to-r from-purple-900/90 to-indigo-900/90 border-2 border-indigo-400/60 rounded-full pl-1.5 pr-1 py-1 shadow-lg shadow-purple-950/60 backdrop-blur-md">
-          <div className="w-7 h-7 rounded-full bg-rose-500 border border-rose-300 flex items-center justify-center shadow">
+        {/* Glossy Red Heart Capsule */}
+        <div className="flex items-center gap-1.5 bg-gradient-to-r from-purple-950/90 to-indigo-950/90 border-2 border-pink-400/60 rounded-full pl-1.5 pr-1 py-1 shadow-xl shadow-purple-950/80 backdrop-blur-md">
+          <div className="w-7 h-7 rounded-full bg-gradient-to-b from-rose-400 to-rose-600 border border-rose-200 flex items-center justify-center shadow">
             <Heart className="w-4 h-4 text-white fill-white" />
           </div>
-          <span className="font-extrabold text-sm text-white px-1">{lives}</span>
+          <span className="font-black text-sm text-white px-1">{lives}</span>
           <button className="w-6 h-6 rounded-full bg-emerald-500 border border-emerald-300 flex items-center justify-center text-white active:scale-95 transition">
             <Plus className="w-3.5 h-3.5 stroke-[3]" />
           </button>
         </div>
 
-        {/* Coins Pill */}
-        <div className="flex items-center gap-1.5 bg-gradient-to-r from-amber-950/90 to-indigo-900/90 border-2 border-amber-400/60 rounded-full pl-1.5 pr-1 py-1 shadow-lg shadow-purple-950/60 backdrop-blur-md">
-          <div className="w-7 h-7 rounded-full bg-amber-400 border border-amber-200 flex items-center justify-center font-black text-amber-950 text-xs shadow">
+        {/* Amber Coin Capsule */}
+        <div className="flex items-center gap-1.5 bg-gradient-to-r from-amber-950/90 to-indigo-950/90 border-2 border-amber-400/60 rounded-full pl-1.5 pr-1 py-1 shadow-xl shadow-purple-950/80 backdrop-blur-md">
+          <div className="w-7 h-7 rounded-full bg-gradient-to-b from-amber-300 to-amber-500 border border-amber-200 flex items-center justify-center font-black text-amber-950 text-xs shadow">
             C
           </div>
-          <span className="font-extrabold text-sm text-amber-200 px-1">{coins.toLocaleString()}</span>
+          <span className="font-black text-sm text-amber-200 px-1">{coins.toLocaleString()}</span>
           <button className="w-6 h-6 rounded-full bg-emerald-500 border border-emerald-300 flex items-center justify-center text-white active:scale-95 transition">
             <Plus className="w-3.5 h-3.5 stroke-[3]" />
           </button>
         </div>
 
-        {/* Stars / Level Pill */}
-        <div className="flex items-center gap-2 bg-gradient-to-r from-purple-900/90 to-indigo-900/90 border-2 border-indigo-400/60 rounded-full px-2 py-1 shadow-lg shadow-purple-950/60 backdrop-blur-md">
-          <div className="w-7 h-7 rounded-full bg-amber-400 border border-amber-200 flex items-center justify-center shadow">
+        {/* Yellow Star Mastery Progress Bar */}
+        <div className="flex items-center gap-2 bg-gradient-to-r from-purple-950/90 to-indigo-950/90 border-2 border-indigo-400/60 rounded-full px-2.5 py-1 shadow-xl shadow-purple-950/80 backdrop-blur-md">
+          <div className="w-7 h-7 rounded-full bg-gradient-to-b from-yellow-300 to-amber-500 border border-yellow-200 flex items-center justify-center shadow">
             <Star className="w-4 h-4 text-amber-950 fill-amber-950" />
           </div>
           <span className="font-black text-sm text-white">{stars}</span>
           <div className="w-12 h-2.5 bg-purple-950 rounded-full overflow-hidden border border-purple-700">
-            <div className="bg-emerald-400 h-full w-3/4 rounded-full" />
+            <div className="bg-gradient-to-r from-emerald-400 to-cyan-400 h-full w-3/4 rounded-full" />
           </div>
         </div>
       </header>
 
-      {/* 2. Neon "Midnight Mart" Bubbly Title Banner */}
-      <div className="relative my-2 text-center z-20">
+      {/* 2. Puffy Rounded 3D "Midnight Mart" Logo with Sparkle Stars */}
+      <div className="relative my-1 text-center z-20">
         <div className="absolute -inset-2 bg-gradient-to-r from-pink-500 via-cyan-400 to-amber-300 rounded-2xl blur-md opacity-75 animate-pulse"></div>
         <div className="relative px-6 py-1 bg-[#180838] border-2 border-cyan-300 rounded-2xl shadow-2xl">
           <h1 className="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 via-pink-400 to-cyan-300 drop-shadow-[0_4px_10px_rgba(255,0,127,0.8)] uppercase">
@@ -89,22 +90,25 @@ export default function HomeView() {
         </div>
       </div>
 
-      {/* 3. Main Viewport (Bodega Canvas or Renovation Scene) */}
+      {/* 3. Main Viewport */}
       <div className="flex-1 w-full max-w-md my-auto flex flex-col items-center justify-center relative">
         {activeTab === 'puzzle' ? (
           <div className="w-full flex flex-col items-center relative">
             <BodegaCanvas onLevelComplete={handleNextLevel} />
 
-            {/* Bottom In-Game Booster & Moves Controls (Matching Image Layout) */}
+            {/* Bottom Booster Action Bubbles & Large 3D MOVES Badge */}
             <div className="absolute bottom-2 left-2 right-2 flex justify-between items-end pointer-events-auto z-30">
-              {/* Left Boosters: Slushie & Shuffle */}
+              {/* Circular Booster Action Bubbles */}
               <div className="flex items-center gap-2">
+                {/* Slushie Freeze */}
                 <button className="relative w-12 h-12 rounded-2xl bg-gradient-to-b from-cyan-400 to-blue-600 border-2 border-cyan-200 shadow-xl flex items-center justify-center active:scale-95 transition">
                   <span className="text-xl">🍧</span>
                   <span className="absolute -bottom-1 -right-1 bg-pink-500 text-white font-black text-[10px] px-1.5 py-0.5 rounded-full border border-white">
                     0
                   </span>
                 </button>
+
+                {/* Magic Magnet / Undo */}
                 <button
                   onClick={undoLastPlacement}
                   className="relative w-12 h-12 rounded-2xl bg-gradient-to-b from-purple-400 to-indigo-600 border-2 border-purple-200 shadow-xl flex items-center justify-center active:scale-95 transition"
@@ -116,8 +120,9 @@ export default function HomeView() {
                 </button>
               </div>
 
-              {/* Right Boosters & Big Rounded MOVES Pill */}
+              {/* Right Boosters & Large Purple-Rimmed 3D MOVES Badge */}
               <div className="flex items-center gap-3">
+                {/* Lightning Shuffle */}
                 <button className="relative w-12 h-12 rounded-2xl bg-gradient-to-b from-amber-400 to-orange-500 border-2 border-amber-200 shadow-xl flex items-center justify-center active:scale-95 transition">
                   <Zap className="w-6 h-6 text-white fill-white" />
                   <span className="absolute -bottom-1 -right-1 bg-purple-600 text-white font-black text-[10px] px-1.5 py-0.5 rounded-full border border-white">
@@ -125,8 +130,8 @@ export default function HomeView() {
                   </span>
                 </button>
 
-                {/* Big Purple Moves Container (Exact Image Match) */}
-                <div className="flex flex-col items-center justify-center bg-gradient-to-b from-purple-600 via-indigo-700 to-purple-900 border-4 border-indigo-300/90 rounded-3xl px-5 py-2 shadow-2xl min-w-[90px]">
+                {/* Large Purple 3D MOVES Badge */}
+                <div className="flex flex-col items-center justify-center bg-gradient-to-b from-purple-600 via-indigo-700 to-purple-900 border-4 border-indigo-300/90 rounded-3xl px-5 py-2 shadow-2xl min-w-[92px]">
                   <span className="text-[10px] font-black text-purple-200 uppercase tracking-widest">MOVES</span>
                   <span className="text-3xl font-black text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{movesRemaining}</span>
                 </div>
@@ -138,7 +143,7 @@ export default function HomeView() {
         )}
       </div>
 
-      {/* 4. Bottom Navigation Bar */}
+      {/* 4. Bottom Dock Navigation */}
       <nav className="flex items-center justify-around w-full max-w-md py-2.5 px-6 bg-[#16082e]/95 backdrop-blur-lg rounded-3xl border-2 border-purple-800/60 shadow-2xl z-30">
         <button
           onClick={() => setActiveTab('puzzle')}
