@@ -14,7 +14,6 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
 
   const [activeSubView, setActiveSubView] = useState<'main' | 'venues' | 'artists' | 'years' | 'days'>('main');
 
-  // Fallback demo data if vault is newly initialized
   const venuesList = stats.topVenues.length > 0 ? stats.topVenues : [
     { name: 'Red Rocks Amphitheatre', city: 'Morrison', visitCount: 12 },
     { name: 'The Fillmore', city: 'San Francisco', visitCount: 8 },
@@ -68,13 +67,14 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
       {/* 1. DETAIL SUB-VIEWS */}
       {activeSubView === 'venues' && (
         <div className="flex flex-col w-full max-w-md mx-auto space-y-4">
-          <header className="flex items-center gap-3 pt-2 pb-2">
-            <button onClick={() => setActiveSubView('main')} className="p-2 text-slate-200 hover:text-white transition rounded-full">
-              <ArrowLeft size={22} />
+          <header className="relative flex items-center justify-between w-full pt-3 pb-5 mb-2">
+            <button onClick={() => setActiveSubView('main')} className="p-2 text-slate-200 hover:text-white transition rounded-full z-10">
+              <ArrowLeft size={24} />
             </button>
-            <h1 className="text-xl font-black uppercase text-white font-sans flex items-center gap-2">
-              <MapPin size={20} className="text-[#00E676]" /> ALL TOP VENUES
+            <h1 className="absolute inset-0 flex items-center justify-center text-2xl sm:text-3xl font-black tracking-widest uppercase text-white font-sans pointer-events-none gap-2">
+              <MapPin size={22} className="text-[#00E676]" /> ALL TOP VENUES
             </h1>
+            <div className="w-10 z-10" />
           </header>
           <div className="space-y-3">
             {venuesList.map((v, i) => (
@@ -94,13 +94,14 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
 
       {activeSubView === 'artists' && (
         <div className="flex flex-col w-full max-w-md mx-auto space-y-4">
-          <header className="flex items-center gap-3 pt-2 pb-2">
-            <button onClick={() => setActiveSubView('main')} className="p-2 text-slate-200 hover:text-white transition rounded-full">
-              <ArrowLeft size={22} />
+          <header className="relative flex items-center justify-between w-full pt-3 pb-5 mb-2">
+            <button onClick={() => setActiveSubView('main')} className="p-2 text-slate-200 hover:text-white transition rounded-full z-10">
+              <ArrowLeft size={24} />
             </button>
-            <h1 className="text-xl font-black uppercase text-white font-sans flex items-center gap-2">
-              <Music size={20} className="text-[#FFB300]" /> ALL TOP ARTISTS
+            <h1 className="absolute inset-0 flex items-center justify-center text-2xl sm:text-3xl font-black tracking-widest uppercase text-white font-sans pointer-events-none gap-2">
+              <Music size={22} className="text-[#FFB300]" /> ALL TOP ARTISTS
             </h1>
+            <div className="w-10 z-10" />
           </header>
           <div className="space-y-3">
             {artistsList.map((a, i) => (
@@ -120,13 +121,14 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
 
       {activeSubView === 'years' && (
         <div className="flex flex-col w-full max-w-md mx-auto space-y-4">
-          <header className="flex items-center gap-3 pt-2 pb-2">
-            <button onClick={() => setActiveSubView('main')} className="p-2 text-slate-200 hover:text-white transition rounded-full">
-              <ArrowLeft size={22} />
+          <header className="relative flex items-center justify-between w-full pt-3 pb-5 mb-2">
+            <button onClick={() => setActiveSubView('main')} className="p-2 text-slate-200 hover:text-white transition rounded-full z-10">
+              <ArrowLeft size={24} />
             </button>
-            <h1 className="text-xl font-black uppercase text-white font-sans flex items-center gap-2">
-              <Calendar size={20} className="text-[#00B0FF]" /> ALL TOP YEARS
+            <h1 className="absolute inset-0 flex items-center justify-center text-2xl sm:text-3xl font-black tracking-widest uppercase text-white font-sans pointer-events-none gap-2">
+              <Calendar size={22} className="text-[#00B0FF]" /> ALL TOP YEARS
             </h1>
+            <div className="w-10 z-10" />
           </header>
           <div className="space-y-3">
             {yearsList.map((y, i) => (
@@ -146,13 +148,14 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
 
       {activeSubView === 'days' && (
         <div className="flex flex-col w-full max-w-md mx-auto space-y-4">
-          <header className="flex items-center gap-3 pt-2 pb-2">
-            <button onClick={() => setActiveSubView('main')} className="p-2 text-slate-200 hover:text-white transition rounded-full">
-              <ArrowLeft size={22} />
+          <header className="relative flex items-center justify-between w-full pt-3 pb-5 mb-2">
+            <button onClick={() => setActiveSubView('main')} className="p-2 text-slate-200 hover:text-white transition rounded-full z-10">
+              <ArrowLeft size={24} />
             </button>
-            <h1 className="text-xl font-black uppercase text-white font-sans flex items-center gap-2">
-              <Clock size={20} className="text-[#E040FB]" /> DAYS OF THE WEEK
+            <h1 className="absolute inset-0 flex items-center justify-center text-2xl sm:text-3xl font-black tracking-widest uppercase text-white font-sans pointer-events-none gap-2">
+              <Clock size={22} className="text-[#E040FB]" /> DAYS OF THE WEEK
             </h1>
+            <div className="w-10 z-10" />
           </header>
           <div className="space-y-3">
             {daysList.map((d, i) => (
@@ -173,14 +176,15 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
       {/* 2. MAIN STATS OVERVIEW SCREEN */}
       {activeSubView === 'main' && (
         <div className="flex flex-col w-full max-w-md mx-auto space-y-6">
-          {/* Header */}
-          <header className="flex items-center gap-4 pt-2">
-            <button onClick={onBack} className="p-2 text-slate-200 hover:text-white transition rounded-full">
-              <ArrowLeft size={22} />
+          {/* Larger & Centered Header */}
+          <header className="relative flex items-center justify-between w-full pt-3 pb-5 mb-2">
+            <button onClick={onBack} className="p-2 text-slate-200 hover:text-white transition rounded-full z-10">
+              <ArrowLeft size={24} />
             </button>
-            <h1 className="text-2xl font-black tracking-wider uppercase font-sans text-white">
+            <h1 className="absolute inset-0 flex items-center justify-center text-3xl sm:text-4xl font-black tracking-widest uppercase text-white font-sans pointer-events-none">
               STATS
             </h1>
+            <div className="w-10 z-10" />
           </header>
 
           {/* Hero Readout */}

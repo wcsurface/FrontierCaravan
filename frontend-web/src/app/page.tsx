@@ -6,7 +6,7 @@ import { TicketStubCard } from '../components/TicketStubCard';
 import { LogShowScreen } from '../components/LogShowScreen';
 import { SetlistDetailView } from '../components/SetlistDetailView';
 import { StatsView } from '../components/StatsView';
-import { Menu, Star, Plus } from 'lucide-react';
+import { Menu, Star } from 'lucide-react';
 
 export default function HomeView() {
   const [currentView, setCurrentView] = useState<'diary' | 'log' | 'setlist' | 'stats'>('diary');
@@ -24,22 +24,22 @@ export default function HomeView() {
       {/* SCREEN 1: DIARY VIEW */}
       {currentView === 'diary' && (
         <div className="flex flex-col w-full max-w-md h-screen p-4 overflow-y-auto">
-          {/* Header */}
-          <header className="flex items-center justify-between w-full pt-2 pb-4">
+          {/* Larger & Centered Header */}
+          <header className="relative flex items-center justify-between w-full pt-3 pb-5">
             <button
               onClick={() => setCurrentView('stats')}
-              className="p-2 text-slate-200 hover:text-white transition rounded-full"
+              className="p-2 text-slate-200 hover:text-white transition rounded-full z-10"
             >
-              <Menu size={22} />
+              <Menu size={24} />
             </button>
-            <h1 className="text-2xl font-black tracking-wider uppercase text-white font-sans">
-              DIARY
+            <h1 className="absolute inset-0 flex items-center justify-center text-3xl sm:text-4xl font-black tracking-widest uppercase text-white font-sans pointer-events-none">
+              LIVELORE
             </h1>
             <button
               onClick={() => setCurrentView('stats')}
-              className="p-2 text-[#00E676] hover:text-white transition rounded-full"
+              className="p-2 text-[#00E676] hover:text-white transition rounded-full z-10"
             >
-              <Star size={22} className="fill-[#00E676]" />
+              <Star size={24} className="fill-[#00E676]" />
             </button>
           </header>
 
@@ -67,7 +67,7 @@ export default function HomeView() {
           </div>
 
           {/* Bottom Floating CTA Button */}
-          <div className="pt-2 pb-4 flex justify-center items-center w-full">
+          <div className="pt-2 pb-4 flex justify-center items-center w-full z-20">
             <button
               onClick={() => setCurrentView('log')}
               className="w-full py-4 bg-gradient-to-r from-[#00E676] to-[#00C853] hover:from-[#00FFA3] hover:to-[#00E676] text-slate-950 font-black text-sm uppercase tracking-wider rounded-full shadow-[0_0_20px_rgba(0,230,118,0.4)] active:scale-[0.98] transition-transform"

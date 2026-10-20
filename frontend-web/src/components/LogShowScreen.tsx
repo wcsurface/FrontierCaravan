@@ -14,7 +14,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
   const { saveConcert } = useEncoreStore();
 
   const [headlineBand, setHeadlineBand] = useState('');
-  const [openers, setOpeners] = useState<string[]>(['']); // Array for multiple openers
+  const [openers, setOpeners] = useState<string[]>(['']);
   const [dateStr, setDateStr] = useState('');
   const [venueName, setVenueName] = useState('');
   const [notesText, setNotesText] = useState('');
@@ -41,12 +41,10 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
     e.preventDefault();
     if (!headlineBand || !venueName) return;
 
-    // Parse date or default to today
     let dateMs = Date.now();
     if (dateStr) {
       const parts = dateStr.split(/[\/\.-]/);
       if (parts.length === 3) {
-        // DD/MM/YY format
         const day = parseInt(parts[0], 10);
         const month = parseInt(parts[1], 10) - 1;
         let year = parseInt(parts[2], 10);
@@ -55,10 +53,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
       }
     }
 
-    // Join multiple openers with commas
     const combinedOpeners = openers.filter(o => o.trim().length > 0).join(', ');
-
-    // Parse raw setlist text from notes
     const parsedTracks = parseRawSetlist(notesText);
 
     saveConcert({
@@ -78,17 +73,18 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
 
   return (
     <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none bg-grid-lines overflow-y-auto">
-      {/* Header */}
-      <header className="flex items-center gap-4 mb-6 pt-2">
+      {/* Larger & Centered Header */}
+      <header className="relative flex items-center justify-between w-full pt-3 pb-5 mb-2">
         <button
           onClick={onBack}
-          className="p-2 text-slate-200 hover:text-white transition rounded-full"
+          className="p-2 text-slate-200 hover:text-white transition rounded-full z-10"
         >
-          <ArrowLeft size={22} />
+          <ArrowLeft size={24} />
         </button>
-        <h1 className="text-2xl font-black tracking-wider uppercase font-sans text-white">
+        <h1 className="absolute inset-0 flex items-center justify-center text-3xl sm:text-4xl font-black tracking-widest uppercase text-white font-sans pointer-events-none">
           LOG SHOW
         </h1>
+        <div className="w-10 z-10" />
       </header>
 
       {/* Form Inputs (Dark #111618 background, rounded 8px, 1.5px Amber #FFB300 border) */}
@@ -136,7 +132,6 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
             ))}
           </div>
 
-          {/* Add Another Opener Button */}
           <button
             type="button"
             onClick={handleAddOpenerField}

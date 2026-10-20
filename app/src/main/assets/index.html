@@ -12,10 +12,12 @@
     .screen-view { display: none; width: 100%; max-width: 420px; height: 100%; flex-direction: column; justify-between; overflow-y: auto; }
     .screen-view.active { display: flex; }
 
-    /* Headers */
-    .header { width: 100%; display: flex; justify-between: align-items: center; padding: 8px 0 16px 0; }
-    .header-title { font-weight: 900; font-size: 22px; letter-spacing: 2px; text-transform: uppercase; color: #ffffff; }
-    .nav-btn-icon { background: none; border: none; padding: 10px 16px; cursor: pointer; color: #00E676; font-size: 24px; font-weight: bold; }
+    /* Centered & Larger Headers */
+    .header { position: relative; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 0 20px 0; }
+    .header-title { font-weight: 900; font-size: 28px; letter-spacing: 3px; text-transform: uppercase; color: #ffffff; text-align: center; margin: 0 auto; width: 100%; }
+    .nav-btn-icon { position: absolute; z-index: 10; background: none; border: none; padding: 8px 12px; cursor: pointer; color: #00E676; font-size: 26px; font-weight: bold; }
+    .nav-btn-left { left: 0; }
+    .nav-btn-right { right: 0; }
 
     /* Ticket Container & Card */
     #ticket-list { width: 100%; flex: 1; max-height: calc(100vh - 160px); overflow-y: auto; margin-bottom: 12px; }
@@ -46,9 +48,9 @@
   <!-- SCREEN 1: DIARY -->
   <div id="view-diary" class="screen-view active">
     <div class="header">
-      <button class="nav-btn-icon" onclick="showScreen('stats')">☰</button>
+      <button class="nav-btn-icon nav-btn-left" onclick="showScreen('stats')">☰</button>
       <div class="header-title">LIVELORE</div>
-      <button class="nav-btn-icon" onclick="showScreen('stats')">★</button>
+      <button class="nav-btn-icon nav-btn-right" onclick="showScreen('stats')">★</button>
     </div>
 
     <div id="ticket-list">
@@ -87,9 +89,8 @@
   <!-- SCREEN 2: LOG SHOW -->
   <div id="view-log" class="screen-view">
     <div class="header">
-      <button class="nav-btn-icon" style="color:#ffffff;" onclick="showScreen('diary')">←</button>
+      <button class="nav-btn-icon nav-btn-left" style="color:#ffffff;" onclick="showScreen('diary')">←</button>
       <div class="header-title">LOG SHOW</div>
-      <div style="width:48px;"></div>
     </div>
 
     <form style="flex:1; display:flex; flex-direction:column; padding-bottom:20px;" onsubmit="saveNewShow(event)">
@@ -118,9 +119,8 @@
   <!-- SCREEN 3: SETLIST -->
   <div id="view-setlist" class="screen-view">
     <div class="header">
-      <button class="nav-btn-icon" style="color:#ffffff;" onclick="showScreen('diary')">←</button>
+      <button class="nav-btn-icon nav-btn-left" style="color:#ffffff;" onclick="showScreen('diary')">←</button>
       <div class="header-title">SETLIST</div>
-      <div style="width:48px;"></div>
     </div>
 
     <div style="text-align:center; font-weight:900; font-size:14px; color:#94a3b8; margin-bottom:16px;" id="setlist-artist-name">THE CURE</div>
@@ -142,9 +142,8 @@
   <!-- SCREEN 4: STATS -->
   <div id="view-stats" class="screen-view">
     <div class="header">
-      <button class="nav-btn-icon" style="color:#ffffff;" onclick="showScreen('diary')">←</button>
+      <button class="nav-btn-icon nav-btn-left" style="color:#ffffff;" onclick="showScreen('diary')">←</button>
       <div class="header-title">STATS</div>
-      <div style="width:48px;"></div>
     </div>
 
     <div style="text-align:center; font-weight:900; font-size:48px; color:#ffffff; margin: 12px 0;">78 SHOWS</div>
@@ -177,9 +176,8 @@
   <!-- SCREEN 5: SUB-STATS DETAIL -->
   <div id="view-substats" class="screen-view">
     <div class="header">
-      <button class="nav-btn-icon" style="color:#ffffff;" onclick="showScreen('stats')">←</button>
-      <div class="header-title" id="substats-title">FULL RANKED LIST</div>
-      <div style="width:48px;"></div>
+      <button class="nav-btn-icon nav-btn-left" style="color:#ffffff;" onclick="showScreen('stats')">←</button>
+      <div class="header-title" style="font-size:20px;" id="substats-title">FULL RANKED LIST</div>
     </div>
 
     <div id="substats-container" style="flex:1; font-size:13px; font-weight:700;"></div>
@@ -201,7 +199,7 @@
       const title = document.getElementById('substats-title');
 
       if (type === 'venues') {
-        title.innerText = 'TOP VENUES (TOP 10)';
+        title.innerText = 'TOP VENUES';
         container.innerHTML = `
           <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">1. Red Rocks Amphitheatre - 12</div>
           <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">2. The Fillmore - 8</div>
@@ -209,7 +207,7 @@
           <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">4. Madison Square Garden - 4</div>
         `;
       } else if (type === 'artists') {
-        title.innerText = 'TOP ARTISTS (TOP 10)';
+        title.innerText = 'TOP ARTISTS';
         container.innerHTML = `
           <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">1. The Cure - 6</div>
           <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">2. Radiohead - 4</div>
@@ -217,7 +215,7 @@
           <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">4. Depeche Mode - 3</div>
         `;
       } else if (type === 'years') {
-        title.innerText = 'TOP YEARS (TOP 10)';
+        title.innerText = 'TOP YEARS';
         container.innerHTML = `
           <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">1. 2026 - 18 Shows</div>
           <div style="margin-bottom:12px; padding:10px; background:#121619; border-radius:8px;">2. 2025 - 22 Shows</div>
