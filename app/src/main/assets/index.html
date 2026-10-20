@@ -19,6 +19,11 @@
     .nav-btn-left { left: 0; }
     .nav-btn-right { right: 0; }
 
+    /* Auth Tab Switcher */
+    .auth-tab-box { display: flex; background: #121619; padding: 4px; border-radius: 9999px; border: 1px solid #222B30; margin-bottom: 20px; width: 100%; }
+    .auth-tab-btn { flex: 1; padding: 12px; border-radius: 9999px; border: none; background: none; color: #94a3b8; font-weight: 900; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
+    .auth-tab-btn.active { background: #FFB300; color: #0a0a0a; box-shadow: 0 4px 10px rgba(255,179,0,0.3); }
+
     /* Ticket Container & Card */
     #ticket-list { width: 100%; flex: 1; max-height: calc(100vh - 160px); overflow-y: auto; margin-bottom: 12px; }
     .ticket-card { position: relative; width: 100%; aspect-ratio: 2.85 / 1; background: #f4e4bc; color: #2b1c0e; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; display: flex; justify-between; box-shadow: 0 10px 25px rgba(0,0,0,0.6); border: 2px solid #d6c294; cursor: pointer; }
@@ -34,7 +39,7 @@
 
     /* Inputs with Amber Borders (#FFB300) */
     .input-label { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #FFB300; margin-bottom: 4px; display: block; }
-    .input-field { width: 100%; background: #111618; border: 1.5px solid #FFB300; border-radius: 8px; padding: 12px 14px; color: #f1f5f9; font-size: 14px; outline: none; margin-bottom: 8px; box-shadow: 0 0 10px rgba(255,179,0,0.15); }
+    .input-field { width: 100%; background: #111618; border: 1.5px solid #FFB300; border-radius: 8px; padding: 12px 14px; color: #f1f5f9; font-size: 14px; outline: none; margin-bottom: 12px; box-shadow: 0 0 10px rgba(255,179,0,0.15); }
     textarea.input-field { min-height: 140px; resize: none; }
 
     /* Action CTA Buttons */
@@ -49,25 +54,37 @@
 </head>
 <body>
 
-  <!-- SCREEN 0: MANDATORY AUTH / LOG IN FIRST -->
+  <!-- SCREEN 0: MANDATORY AUTH / LOG IN & CREATE ACCOUNT -->
   <div id="view-auth" class="screen-view active">
     <div class="header">
-      <div class="header-title">LOG IN</div>
+      <div class="header-title" id="auth-header-title">LOG IN</div>
     </div>
 
-    <div style="text-align:center; margin-bottom:20px;">
-      <div style="font-[#FFB300]; font-size:12px; font-weight:800; text-transform:uppercase; color:#FFB300;">CONCERT DIARY & SETLIST VAULT</div>
-      <div style="font-size:13px; color:#94a3b8; margin-top:4px;">Log in to save & sync your live show diary across all devices.</div>
+    <div style="text-align:center; margin-bottom:16px;">
+      <div style="font-size:12px; font-weight:800; text-transform:uppercase; color:#FFB300;">CONCERT DIARY & SETLIST VAULT</div>
+      <div style="font-size:13px; color:#94a3b8; margin-top:4px;">Log in or create an account to save & sync your live show diary.</div>
+    </div>
+
+    <!-- Mode Switcher Tabs -->
+    <div class="auth-tab-box">
+      <button class="auth-tab-btn active" id="tab-login" onclick="switchAuthMode('login')">Log In</button>
+      <button class="auth-tab-btn" id="tab-register" onclick="switchAuthMode('register')">Create Account</button>
     </div>
 
     <form style="flex:1; display:flex; flex-direction:column;" onsubmit="handleLoginSubmit(event)">
+      <!-- Display Name Field (Register Mode Only) -->
+      <div id="field-name-box" style="display:none;">
+        <label class="input-label">Display Name *</label>
+        <input type="text" id="auth-name" class="input-field" placeholder="Your Name" />
+      </div>
+
       <label class="input-label">Email Address *</label>
       <input type="email" id="auth-email" class="input-field" placeholder="you@example.com" required />
 
       <label class="input-label">Password *</label>
-      <input type="password" id="auth-password" class="input-field" placeholder="••••••••" required />
+      <input type="password" id="auth-password" class="input-field" placeholder="••••••••" required minlength="6" />
 
-      <button type="submit" class="btn-cta">LOG IN</button>
+      <button type="submit" class="btn-cta" id="btn-auth-submit">LOG IN</button>
     </form>
   </div>
 
@@ -269,9 +286,20 @@
   </div>
 
   <script>
+    let authMode = 'login';
+
     function showScreen(screenId) {
       document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
       document.getElementById('view-' + screenId).classList.add('active');
+    }
+
+    function switchAuthMode(mode) {
+      authMode = mode;
+      document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+      document.getElementById('tab-register').classList.toggle('active', mode === 'register');
+      document.getElementById('auth-header-title').innerText = mode === 'login' ? 'LOG IN' : 'REGISTER';
+      document.getElementById('field-name-box').style.display = mode === 'register' ? 'block' : 'none';
+      document.getElementById('btn-auth-submit').innerText = mode === 'login' ? 'LOG IN' : 'CREATE ACCOUNT';
     }
 
     function handleLoginSubmit(e) {
