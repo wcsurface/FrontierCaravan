@@ -20,7 +20,7 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
   const encoreTracks = items.filter((s) => s.isEncore);
 
   return (
-    <div className="flex flex-col w-full h-full bg-[#121212] text-slate-100 p-4 select-none overflow-y-auto font-mono">
+    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto font-mono bg-grid-lines">
       {/* Header */}
       <header className="flex items-center gap-4 mb-2 pt-2">
         <button
@@ -36,7 +36,7 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
 
       {/* Artist Subtitle */}
       <div className="text-center my-3">
-        <h2 className="text-base font-extrabold text-slate-400 uppercase tracking-widest">
+        <h2 className="text-base font-extrabold text-slate-400 uppercase tracking-widest font-sans">
           {artist?.name || 'THE CURE'}
         </h2>
       </div>
@@ -45,23 +45,23 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
       <div className="max-w-md mx-auto w-full space-y-2.5 my-4 px-2">
         {mainTracks.map((track) => (
           <div key={track.id} className="text-sm font-semibold text-slate-200 flex items-center gap-3">
-            <span className="text-slate-500 font-mono min-w-[20px]">{track.position}.</span>
+            <span className="text-slate-500 font-mono min-w-[24px]">{track.position}.</span>
             <span className="text-slate-100">{track.songTitle}</span>
           </div>
         ))}
 
-        {/* Encore Section */}
+        {/* Encore Section Pill Badge */}
         {encoreTracks.length > 0 && (
           <>
             <div className="my-5">
-              <span className="inline-block bg-[#00E676] text-slate-950 font-black text-xs px-3 py-1 rounded-full shadow-[0_0_12px_rgba(0,230,118,0.5)] tracking-wider uppercase">
+              <span className="inline-block bg-[#00E676] text-slate-950 font-black text-xs px-3 py-1 rounded-full shadow-[0_0_12px_rgba(0,230,118,0.5)] tracking-wider uppercase font-sans">
                 ENCORE
               </span>
             </div>
 
             {encoreTracks.map((track) => (
               <div key={track.id} className="text-sm font-semibold text-slate-200 flex items-center gap-3">
-                <span className="text-slate-500 font-mono min-w-[20px]">{track.position}.</span>
+                <span className="text-slate-500 font-mono min-w-[24px]">{track.position}.</span>
                 <span className="text-slate-100">{track.songTitle}</span>
               </div>
             ))}

@@ -13,7 +13,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
   const stats = getConcertStats();
 
   return (
-    <div className="flex flex-col w-full h-full bg-[#121212] text-slate-100 p-4 select-none overflow-y-auto">
+    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines">
       {/* Header */}
       <header className="flex items-center gap-4 mb-6 pt-2">
         <button
@@ -27,18 +27,18 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
         </h1>
       </header>
 
-      {/* Massive Hero Counter (Exact Match to Image) */}
+      {/* Hero Metric: Giant bold readout */}
       <div className="text-center my-6">
-        <h2 className="text-5xl font-black tracking-tight text-white uppercase font-sans">
+        <h2 className="text-5xl sm:text-6xl font-black tracking-tight text-white uppercase font-sans">
           {stats.totalShows || 78} SHOWS
         </h2>
       </div>
 
-      {/* 2-Column Ranked Frequency Lists with Progress Bars */}
+      {/* Metric Columns (Split View) */}
       <div className="grid grid-cols-2 gap-6 max-w-md mx-auto w-full my-4 px-2">
-        {/* Left Column: TOP VENUES */}
+        {/* Column 1: TOP VENUES */}
         <div>
-          <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">
+          <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 font-sans">
             TOP VENUES
           </h3>
           <div className="space-y-4">
@@ -47,7 +47,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
               : [
                   { name: 'Red Rocks', city: '', visitCount: 12 },
                   { name: 'The Fillmore', city: '', visitCount: 8 },
-                  { name: 'Ventues', city: '', visitCount: 5 },
+                  { name: 'Venues', city: '', visitCount: 5 },
                 ]
             ).map((v, i) => (
               <div key={i} className="space-y-1">
@@ -55,12 +55,11 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
                   <span>{v.name}</span>
                   <span className="text-slate-400">{v.visitCount}</span>
                 </div>
-                <div className="w-full h-2 bg-[#1e1e1e] rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-[#121619] rounded-full overflow-hidden border border-[#222B30]">
                   <div
-                    className="h-full rounded-full transition-all duration-500"
+                    className="h-full rounded-full transition-all duration-500 bg-[#00E676]"
                     style={{
                       width: `${Math.min(100, (v.visitCount / 12) * 100)}%`,
-                      backgroundColor: i === 0 ? '#00E676' : i === 1 ? '#00B0FF' : '#1DE9B6',
                     }}
                   />
                 </div>
@@ -69,9 +68,9 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
           </div>
         </div>
 
-        {/* Right Column: TOP ARTISTS */}
+        {/* Column 2: TOP ARTISTS */}
         <div>
-          <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">
+          <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 font-sans">
             TOP ARTISTS
           </h3>
           <div className="space-y-4">
@@ -88,12 +87,11 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack }) => {
                   <span>{a.name}</span>
                   <span className="text-slate-400">{a.timesSeen}</span>
                 </div>
-                <div className="w-full h-2 bg-[#1e1e1e] rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-[#121619] rounded-full overflow-hidden border border-[#222B30]">
                   <div
-                    className="h-full rounded-full transition-all duration-500"
+                    className="h-full rounded-full transition-all duration-500 bg-[#FFB300]"
                     style={{
                       width: `${Math.min(100, (a.timesSeen / 6) * 100)}%`,
-                      backgroundColor: i === 0 ? '#FFB300' : i === 1 ? '#FFD54F' : '#FFE082',
                     }}
                   />
                 </div>

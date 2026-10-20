@@ -11,7 +11,7 @@ interface LogShowScreenProps {
 }
 
 export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved }) => {
-  const { saveConcert } = useEncoreStore();
+  const { saveConcert, artists } = useEncoreStore();
 
   const [artistName, setArtistName] = useState('');
   const [dateStr, setDateStr] = useState('');
@@ -53,7 +53,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
   };
 
   return (
-    <div className="flex flex-col w-full h-full bg-[#121212] text-slate-100 p-4 select-none">
+    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none bg-grid-lines">
       {/* Header */}
       <header className="flex items-center gap-4 mb-6 pt-2">
         <button
@@ -67,7 +67,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
         </h1>
       </header>
 
-      {/* Form Fields with Glowing Amber Borders (Exact Match to Image) */}
+      {/* Form Inputs (Dark #111618 background, rounded 8px, 1.5px Amber #FFB300 border) */}
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-4 max-w-md mx-auto w-full">
         {/* Artist Input */}
         <div>
@@ -77,7 +77,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
             value={artistName}
             onChange={(e) => setArtistName(e.target.value)}
             required
-            className="w-full bg-[#181818] border-2 border-[#ffb300]/70 focus:border-[#ffb300] rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 outline-none shadow-lg transition"
+            className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-4 py-3 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition"
           />
         </div>
 
@@ -88,7 +88,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
             placeholder="Date (DD/MM/YY)"
             value={dateStr}
             onChange={(e) => setDateStr(e.target.value)}
-            className="w-full bg-[#181818] border-2 border-[#ffb300]/70 focus:border-[#ffb300] rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 outline-none shadow-lg transition"
+            className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-4 py-3 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition"
           />
         </div>
 
@@ -100,25 +100,24 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved })
             value={venueName}
             onChange={(e) => setVenueName(e.target.value)}
             required
-            className="w-full bg-[#181818] border-2 border-[#ffb300]/70 focus:border-[#ffb300] rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 outline-none shadow-lg transition"
+            className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-4 py-3 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition"
           />
         </div>
 
-        {/* Setlist / Notes Textarea */}
-        <div className="flex-1 flex flex-col">
+        {/* Setlist / Notes Textarea (min 160dp height) */}
+        <div className="flex-1 flex flex-col min-h-[160px]">
           <textarea
             placeholder="Setlist / Notes"
             value={setlistText}
             onChange={(e) => setSetlistText(e.target.value)}
-            rows={8}
-            className="w-full flex-1 bg-[#181818] border-2 border-[#ffb300]/70 focus:border-[#ffb300] rounded-2xl p-4 text-slate-200 placeholder-slate-500 outline-none shadow-lg transition resize-none font-mono text-sm leading-relaxed"
+            className="w-full flex-1 min-h-[160px] bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg p-4 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition resize-none font-mono text-sm leading-relaxed"
           />
         </div>
 
-        {/* Glowing Mint Green CTA Button (Exact Match) */}
+        {/* Emerald Pill CTA Button */}
         <button
           type="submit"
-          className="w-full py-4 bg-gradient-to-r from-[#00E676] to-[#00C853] hover:from-[#00FFA3] hover:to-[#00E676] text-slate-950 font-black text-sm uppercase tracking-wider rounded-2xl shadow-[0_0_20px_rgba(0,230,118,0.4)] active:scale-[0.98] transition-transform my-2"
+          className="w-full py-4 bg-gradient-to-r from-[#00E676] to-[#00C853] hover:from-[#00FFA3] hover:to-[#00E676] text-slate-950 font-black text-sm uppercase tracking-wider rounded-full shadow-[0_0_20px_rgba(0,230,118,0.4)] active:scale-[0.98] transition-transform my-2"
         >
           + ADD TO DIARY
         </button>

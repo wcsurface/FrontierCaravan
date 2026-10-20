@@ -4,12 +4,12 @@
 
 :root {
   --foreground-rgb: 241, 245, 249;
-  --background-rgb: 7, 1, 18;
+  --background-rgb: 10, 13, 14;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-rgb));
+  background: #0A0D0E;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   overflow: hidden;
   user-select: none;
@@ -18,18 +18,26 @@ body {
   touch-action: manipulation;
 }
 
+/* Subtle Dark Grid Lines Background */
+.bg-grid-lines {
+  background-size: 32px 32px;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
 /* Custom Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0f091f;
+  background: #0A0D0E;
 }
 ::-webkit-scrollbar-thumb {
-  background: #301844;
+  background: #222B30;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #ff2a85;
+  background: #00E676;
 }
