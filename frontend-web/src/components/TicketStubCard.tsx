@@ -17,7 +17,7 @@ export const TicketStubCard: React.FC<TicketStubCardProps> = ({
   venue,
   onClick,
 }) => {
-  const { artists } = useEncoreStore();
+  const { artists, isPremium } = useEncoreStore();
 
   const formattedDate = new Date(concert.date)
     .toLocaleDateString('en-US', {
@@ -29,9 +29,9 @@ export const TicketStubCard: React.FC<TicketStubCardProps> = ({
 
   // Headliner always on top
   const headlinerObj = artist || artists.find(a => a.id === concert.headlineArtistId);
-  const headlinerName = headlinerObj?.name || 'THE CURE';
+  const headlinerName = headlinerObj?.name || 'AEROSMITH';
 
-  // Openers list (up to 4 openers = 5 bands total)
+  // Openers list
   let openersList: string[] = [];
   if (concert.openingArtistId) {
     const openerObj = artists.find(a => a.id === concert.openingArtistId);
@@ -42,7 +42,6 @@ export const TicketStubCard: React.FC<TicketStubCardProps> = ({
 
   const totalBands = 1 + openersList.length;
 
-  // Dynamic font scaling to guarantee perfect vertical centering and no clipping
   let headlinerSize = 'text-xl sm:text-2xl';
   let openerSize = 'text-xs sm:text-sm';
   let andSize = 'text-[10px] sm:text-xs';
@@ -58,7 +57,8 @@ export const TicketStubCard: React.FC<TicketStubCardProps> = ({
     openerSize = 'text-[10px] sm:text-[11px]';
   }
 
-  const venueName = venue?.name || 'Red Rocks';
+  const venueName = venue?.name || 'Deer Creek Music Center';
+  const featuredPhoto = (isPremium && concert.photoUris && concert.photoUris.length > 0) ? concert.photoUris[0] : null;
 
   return (
     <div
@@ -127,14 +127,33 @@ export const TicketStubCard: React.FC<TicketStubCardProps> = ({
           </div>
         </div>
 
-        {/* Right Section: Perforated Stub & Admission Details */}
-        <div className="w-[30%] h-full flex flex-col justify-between items-center pl-2 py-1 border-l-2 border-dotted border-[#423220]/40">
-          <div className="text-[10px] font-black tracking-widest text-[#1c1208] uppercase rotate-90 my-auto">
-            ADMIT ONE
-          </div>
-          <div className="text-[8px] font-mono font-bold text-[#423220] tracking-tighter">
-            GEN | SEC 7 | 3977
-          </div>
+        {/* Right Section: Perforated Stub & Admission / Premium Photo Stub Feature */}
+        <div className="w-[30%] h-full flex flex-col justify-between items-center pl-1 py-1 border-l-2 border-dotted border-[#423220]/40 overflow-hidden relative">
+          {featuredPhoto ? (
+            /* Premium Feature: Custom Photo Embedded Inside Ticket Stub ADMIT ONE Box */
+            <div className="w-full h-full rounded-lg overflow-hidden border border-[#423220]/60 relative group">
+              <img
+                src={featuredPhoto}
+                alt="Concert Photo Memory"
+                className="w-full h-full object-cover object-center"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end justify-center pb-0.5">
+                <span className="text-[7px] font-black text-amber-300 uppercase tracking-widest font-mono">
+                  VIP MEMORY
+                </span>
+              </div>
+            </div>
+          ) : (
+            /* Default ADMIT ONE Stub Details */
+            <>
+              <div className="text-[10px] font-black tracking-widest text-[#1c1208] uppercase rotate-90 my-auto">
+                ADMIT ONE
+              </div>
+              <div className="text-[8px] font-mono font-bold text-[#423220] tracking-tighter">
+                GEN | SEC 7 | 3977
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

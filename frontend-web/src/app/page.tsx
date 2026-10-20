@@ -8,6 +8,7 @@ import { LogShowScreen } from '../components/LogShowScreen';
 import { SetlistDetailView } from '../components/SetlistDetailView';
 import { StatsView } from '../components/StatsView';
 import { AuthScreen } from '../components/AuthScreen';
+import { ProfileView } from '../components/ProfileView';
 import { GlassNavBar } from '../components/GlassNavBar';
 import { Menu, User, CheckCircle2, Sparkles, ArrowDown, SlidersHorizontal } from 'lucide-react';
 
@@ -15,9 +16,7 @@ export default function HomeView() {
   const { user, token, checkMe } = useAuthStore();
   const { concerts, artists, venues } = useEncoreStore();
 
-  const [currentView, setCurrentView] = useState<'diary' | 'log' | 'setlist' | 'stats' | 'auth'>(
-    user ? 'diary' : 'auth'
-  );
+  const [currentView, setCurrentView] = useState<'diary' | 'log' | 'setlist' | 'stats' | 'auth'>('diary');
   const [selectedConcertId, setSelectedConcertId] = useState<string>('');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'band'>('newest');
 
@@ -174,14 +173,21 @@ export default function HomeView() {
         />
       )}
 
-      {/* SCREEN 5: AUTH VIEW */}
+      {/* SCREEN 5: PROFILE / AUTH VIEW */}
       {currentView === 'auth' && (
-        <AuthScreen
-          onBack={() => {
-            if (user) setCurrentView('diary');
-          }}
-          onSuccess={() => setCurrentView('diary')}
-        />
+        user ? (
+          <ProfileView
+            onBack={() => setCurrentView('diary')}
+            onNavigate={setCurrentView}
+          />
+        ) : (
+          <AuthScreen
+            onBack={() => {
+              if (user) setCurrentView('diary');
+            }}
+            onSuccess={() => setCurrentView('diary')}
+          />
+        )
       )}
     </main>
   );

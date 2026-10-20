@@ -5,7 +5,7 @@ import { useEncoreStore } from '../store/useEncoreStore';
 import { parseRawSetlist } from '../engine/setlistParser';
 import { searchVenues, PRESET_VENUES, VenueRecord } from '../engine/venueDataset';
 import { GlassNavBar } from './GlassNavBar';
-import { ArrowLeft, Plus, Trash2, MapPin } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, MapPin, Camera, Crown, Image as ImageIcon } from 'lucide-react';
 
 interface LogShowScreenProps {
   onBack: () => void;
@@ -14,7 +14,7 @@ interface LogShowScreenProps {
 }
 
 export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved, onNavigate }) => {
-  const { saveConcert } = useEncoreStore();
+  const { saveConcert, isPremium, setIsPremium } = useEncoreStore();
 
   const [headlineBand, setHeadlineBand] = useState('');
   const [openers, setOpeners] = useState<string[]>(['']);
@@ -24,6 +24,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved, o
   const [stateProvince, setStateProvince] = useState('');
   const [country, setCountry] = useState('');
   const [notesText, setNotesText] = useState('');
+  const [photoUris, setPhotoUris] = useState<string[]>([]);
 
   const [venueSuggestions, setVenueSuggestions] = useState<VenueRecord[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -37,6 +38,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved, o
     setStateProvince('');
     setCountry('');
     setNotesText('');
+    setPhotoUris([]);
     setVenueSuggestions([]);
     setIsDropdownOpen(false);
   };
@@ -57,6 +59,27 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved, o
     } else {
       setOpeners(['']);
     }
+  };
+
+  // Photo Upload Handler (Up to 3 Photos - Premium Feature)
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const files = Array.from(e.target.files);
+
+    files.forEach(file => {
+      if (photoUris.length >= 3) return;
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (reader.result) {
+          setPhotoUris(prev => (prev.length < 3 ? [...prev, reader.result as string] : prev));
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleRemovePhoto = (index: number) => {
+    setPhotoUris(photoUris.filter((_, i) => i !== index));
   };
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -136,6 +159,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved, o
       venueName: venueName.trim(),
       venueCity: city.trim() || 'Noblesville',
       venueCountry: country.trim() || 'USA',
+      photoUris,
       setlist: parsedTracks,
       notes: notesText.trim(),
       rating: 5.0,
@@ -311,6 +335,65 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved, o
               className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-3 py-2.5 text-xs text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)]"
             />
           </div>
+        </div>
+
+        {/* Concert Photo Attachment (Premium Feature: Up to 3 Photos) */}
+        <div className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-2">
+          <div className="flex items-center justify-between">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-[#FFB300] flex items-center gap-1.5">
+              <Camera size={14} /> Concert Photos ({photoUris.length}/3)
+            </label>
+            {!isPremium && (
+              <span className="text-[10px] font-black uppercase text-[#FFB300] bg-[#FFB300]/10 px-2 py-0.5 rounded border border-[#FFB300]/30 flex items-center gap-1">
+                <Crown size={10} /> VIP Pass ($3.99)
+              </span>
+            )}
+          </div>
+
+          {isPremium ? (
+            <div className="space-y-2">
+              <div className="flex flex-wrap gap-2">
+                {photoUris.map((uri, idx) => (
+                  <div key={idx} className="relative w-16 h-16 rounded-lg overflow-hidden border border-[#FFB300]/60 group">
+                    <img src={uri} alt="Concert Photo" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => handleRemovePhoto(idx)}
+                      className="absolute top-1 right-1 bg-black/80 text-rose-400 p-1 rounded-full opacity-90 hover:opacity-100 transition"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                ))}
+
+                {photoUris.length < 3 && (
+                  <label className="w-16 h-16 rounded-lg border-2 border-dashed border-[#FFB300]/60 bg-[#111618] hover:bg-[#1a2126] transition flex flex-col items-center justify-center cursor-pointer text-[#FFB300]">
+                    <Plus size={20} />
+                    <span className="text-[9px] font-bold uppercase mt-0.5">Photo</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoUpload}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="p-2.5 bg-[#111618] rounded-lg border border-[#222B30] text-center space-y-1.5">
+              <p className="text-xs text-slate-300 font-medium">
+                Unlock 3 Photo Attachments per show & Ad-Free experience!
+              </p>
+              <button
+                type="button"
+                onClick={() => onNavigate('auth')}
+                className="text-xs font-black text-[#FFB300] hover:underline uppercase tracking-wider flex items-center justify-center gap-1 mx-auto"
+              >
+                <Crown size={12} /> Upgrade for $3.99 One-Time
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Combined Notes / Setlist Field */}

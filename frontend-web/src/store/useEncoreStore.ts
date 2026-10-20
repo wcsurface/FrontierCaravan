@@ -18,7 +18,10 @@ interface EncoreState {
   venues: Venue[];
   setlistItems: SetlistItem[];
 
-  // User Preferences & Developer Settings
+  // Premium Status
+  isPremium: boolean;
+
+  // Settings
   setlistFmApiKey: string;
   isCloudSyncEnabled: boolean;
   cloudSyncStatus: 'synced' | 'syncing' | 'offline';
@@ -27,6 +30,7 @@ interface EncoreState {
   saveConcert: (input: CreateConcertInput) => string;
   deleteConcert: (concertId: string) => void;
   clearAllData: () => void;
+  setIsPremium: (status: boolean) => void;
   setSetlistFmApiKey: (key: string) => void;
   getConcertStats: () => ConcertStats;
   exportVaultJson: () => string;
@@ -40,15 +44,17 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'https://frontier
 export const useEncoreStore = create<EncoreState>()(
   persist(
     (set, get) => ({
-      // Clean Vault Tables for Real Data Entry
       concerts: [],
       artists: [],
       venues: [],
       setlistItems: [],
 
+      isPremium: false,
       setlistFmApiKey: '',
       isCloudSyncEnabled: true,
       cloudSyncStatus: 'synced',
+
+      setIsPremium: (status) => set({ isPremium: status }),
 
       saveConcert: (input) => {
         const { concerts, artists, venues, setlistItems } = get();
@@ -84,7 +90,7 @@ export const useEncoreStore = create<EncoreState>()(
           venue = {
             id: `v_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
             name: input.venueName,
-            city: input.venueCity || 'Local City',
+            city: input.venueCity || 'Noblesville',
             country: input.venueCountry || 'USA',
             createdAt: Date.now(),
           };
@@ -103,6 +109,7 @@ export const useEncoreStore = create<EncoreState>()(
           rating: input.rating || 5.0,
           ticketPrice: input.ticketPrice || 0,
           currency: 'USD',
+          photoUris: input.photoUris || [],
           generalNotes: input.notes || '',
           createdAt: Date.now(),
           updatedAt: Date.now(),
@@ -128,7 +135,6 @@ export const useEncoreStore = create<EncoreState>()(
           cloudSyncStatus: 'syncing',
         });
 
-        // Automatically push update to Railway PostgreSQL Cloud DB
         get().syncCloudPush();
 
         return concertId;

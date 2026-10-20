@@ -40,6 +40,7 @@ export interface Concert {
   ticketPrice?: number;
   currency: string;
   ticketImageUri?: string;
+  photoUris?: string[]; // Up to 3 concert photos (Premium feature)
   audioMemoUri?: string;
   generalNotes?: string;
   createdAt: number;
@@ -58,6 +59,7 @@ export interface CreateConcertInput {
   rating?: number;
   ticketPrice?: number;
   notes?: string;
+  photoUris?: string[];
   setlist: { songTitle: string; position: number; isEncore: boolean; originalArtist?: string }[];
 }
 
@@ -83,7 +85,6 @@ export class AnalyticsEngine {
     const totalShows = concerts.length;
     const totalSongsWitnessed = setlistItems.length;
 
-    // Unique Artists
     const artistIds = new Set<string>();
     concerts.forEach(c => {
       artistIds.add(c.headlineArtistId);
@@ -91,15 +92,12 @@ export class AnalyticsEngine {
     });
     const uniqueArtists = artistIds.size;
 
-    // Unique Venues
     const venueIds = new Set<string>();
     concerts.forEach(c => venueIds.add(c.venueId));
     const uniqueVenues = venueIds.size;
 
-    // Total Financial Investment
     const totalInvestment = concerts.reduce((acc, curr) => acc + (curr.ticketPrice || 0), 0);
 
-    // Top Artists (Headline + Opener) - Top 10 Ranked
     const artistCountMap = new Map<string, number>();
     concerts.forEach(c => {
       const currentHead = artistCountMap.get(c.headlineArtistId) || 0;
@@ -118,7 +116,6 @@ export class AnalyticsEngine {
       .sort((a, b) => b.timesSeen - a.timesSeen)
       .slice(0, 10);
 
-    // Top Venues - Top 10 Ranked
     const venueCountMap = new Map<string, number>();
     concerts.forEach(c => {
       const current = venueCountMap.get(c.venueId) || 0;
@@ -133,7 +130,6 @@ export class AnalyticsEngine {
       .sort((a, b) => b.visitCount - a.visitCount)
       .slice(0, 10);
 
-    // Top Years - Ranked by concert count
     const yearMap = new Map<number, number>();
     concerts.forEach(c => {
       const yr = new Date(c.date).getFullYear();
@@ -145,7 +141,6 @@ export class AnalyticsEngine {
       .sort((a, b) => b.count - a.count)
       .slice(0, 10);
 
-    // Top Days of Week
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const dayCounts = [0, 0, 0, 0, 0, 0, 0];
     concerts.forEach(c => {

@@ -5,7 +5,7 @@ import { useEncoreStore } from '../store/useEncoreStore';
 import { PRESET_VENUES } from '../engine/venueDataset';
 import { TicketStubCard } from './TicketStubCard';
 import { GlassNavBar } from './GlassNavBar';
-import { ArrowLeft, MapPin, Calendar, Users, FileText, Music, Edit3 } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Users, FileText, Music, Edit3, Trash2, Camera } from 'lucide-react';
 
 interface SetlistDetailViewProps {
   concertId: string;
@@ -15,7 +15,7 @@ interface SetlistDetailViewProps {
 }
 
 export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId, onBack, onEdit, onNavigate }) => {
-  const { concerts, artists, venues, setlistItems } = useEncoreStore();
+  const { concerts, artists, venues, setlistItems, deleteConcert, isPremium } = useEncoreStore();
 
   const concert = concerts.find((c) => c.id === concertId) || concerts[0];
   if (!concert) {
@@ -50,6 +50,13 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
 
   const mainTracks = items.filter((s) => !s.isEncore);
   const encoreTracks = items.filter((s) => s.isEncore);
+
+  const handleDelete = () => {
+    if (confirm('Are you sure you want to delete this show from your vault?')) {
+      deleteConcert(concert.id);
+      onBack();
+    }
+  };
 
   return (
     <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between">
@@ -130,6 +137,22 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
             </p>
           </div>
 
+          {/* Concert Photo Memories (VIP Feature) */}
+          {isPremium && concert.photoUris && concert.photoUris.length > 0 && (
+            <div className="border-t border-[#222B30] pt-3">
+              <span className="text-[10px] font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-2">
+                <Camera size={12} /> CONCERT PHOTO MEMORIES
+              </span>
+              <div className="grid grid-cols-3 gap-2">
+                {concert.photoUris.map((uri, idx) => (
+                  <div key={idx} className="aspect-square rounded-xl overflow-hidden border border-[#FFB300]/50 shadow-md">
+                    <img src={uri} alt="Concert Memory" className="w-full h-full object-cover" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Show Notes */}
           {concert.generalNotes && (
             <div className="border-t border-[#222B30] pt-3">
@@ -170,13 +193,21 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
             </div>
           )}
 
-          {/* Edit Show Button */}
-          <div className="pt-2">
+          {/* EDIT SHOW & DELETE SHOW Buttons */}
+          <div className="pt-2 space-y-3">
             <button
               onClick={() => onEdit(concert.id)}
               className="w-full py-3 bg-gradient-to-r from-[#FFB300] to-[#FFA000] hover:from-[#FFC107] hover:to-[#FFB300] text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-[0_0_15px_rgba(255,179,0,0.3)] active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
             >
               <Edit3 size={16} /> EDIT SHOW
+            </button>
+
+            {/* DELETE SHOW Button */}
+            <button
+              onClick={handleDelete}
+              className="w-full py-3 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 hover:text-white font-extrabold text-xs uppercase tracking-wider rounded-xl border border-rose-900/60 active:scale-[0.98] transition flex items-center justify-center gap-2"
+            >
+              <Trash2 size={16} /> DELETE SHOW
             </button>
           </div>
         </div>
