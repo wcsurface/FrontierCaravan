@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useGameStore, CargoInventory } from '../store/gameStore';
-import { Coins, Package, ShoppingCart, ArrowDownRight, ArrowUpRight } from 'lucide-react';
+import { Coins, Package, ShoppingCart, Fuel } from 'lucide-react';
 
 interface TradeGood {
   key: keyof CargoInventory;
@@ -20,7 +20,7 @@ const TRADE_GOODS: TradeGood[] = [
 ];
 
 export const TradeLedger: React.FC = () => {
-  const { scrap, cargo, currentNodeId, nodes, buyGood, sellGood } = useGameStore();
+  const { scrap, fuel, cargo, currentNodeId, nodes, buyGood, sellGood, refuelFromCargo } = useGameStore();
 
   const currentNode = nodes.find((n) => n.id === currentNodeId);
   const biome = currentNode?.biome || 'Safe Highway';
@@ -87,6 +87,15 @@ export const TradeLedger: React.FC = () => {
                 </span>
 
                 <div className="flex gap-2">
+                  {good.key === 'bioFuel' && (
+                    <button
+                      onClick={refuelFromCargo}
+                      disabled={owned <= 0 || fuel >= 100}
+                      className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 disabled:opacity-40 text-white font-bold text-xs px-2.5 py-1.5 rounded-lg transition"
+                    >
+                      <Fuel size={14} /> Refuel (+15)
+                    </button>
+                  )}
                   <button
                     onClick={() => buyGood(good.key, 1, price)}
                     disabled={scrap < price}

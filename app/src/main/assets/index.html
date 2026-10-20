@@ -20,7 +20,7 @@
     .tab-view.active { display: flex; flex-direction: column; }
 
     /* Bottom Navigation Bar */
-    #nav-bar { height: 56px; background: #1a202c; border-top: 2px solid #2d3748; display: flex; justify-content: space-around; align-items: center; }
+    #nav-bar { height: 56px; background: #1a202c; border-top: 2px solid #2d3748; display: flex; justify-around: align-items: center; }
     .nav-btn { background: none; border: none; color: #a0aec0; font-weight: bold; font-size: 13px; padding: 8px 16px; border-radius: 6px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
     .nav-btn.active { color: #ed8936; background: #2d3748; border-bottom: 2px solid #ed8936; }
 
@@ -381,6 +381,7 @@
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
             <span style="font-weight:bold; color:#ecc94b;">💰 ${item.price} Scrap</span>
+            ${item.key === 'bioFuel' ? `<button class="btn-primary" style="padding:6px 12px; font-size:11px; background:#38a169;" onclick="refuelTank()">Refuel (+15 Fuel)</button>` : ''}
             <button class="btn-primary" style="padding:6px 12px; font-size:11px;" onclick="buyItem('${item.key}', ${item.price})">Buy</button>
           </div>
         </div>
@@ -391,6 +392,24 @@
       if (gameState.scrap >= price) {
         gameState.scrap -= price;
         gameState.cargo[key] = (gameState.cargo[key] || 0) + 1;
+        // Direct fuel/food conversion on purchase for instant gameplay feel
+        if (key === 'bioFuel') {
+          gameState.fuel = Math.min(100, gameState.fuel + 15);
+        } else if (key === 'water') {
+          gameState.food = Math.min(100, gameState.food + 10);
+          gameState.morale = Math.min(100, gameState.morale + 2);
+        }
+        updateHUD();
+        renderMarket();
+        bridge.vibrate(40);
+        bridge.playAudioCue('buy');
+      }
+    }
+
+    function refuelTank() {
+      if (gameState.cargo.bioFuel > 0 && gameState.fuel < 100) {
+        gameState.cargo.bioFuel--;
+        gameState.fuel = Math.min(100, gameState.fuel + 15);
         updateHUD();
         renderMarket();
         bridge.vibrate(40);

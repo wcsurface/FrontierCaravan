@@ -68,6 +68,7 @@ export interface GameState {
   travelToNode: (targetNodeId: number) => void;
   buyGood: (key: keyof CargoInventory, amount: number, price: number) => void;
   sellGood: (key: keyof CargoInventory, amount: number, price: number) => void;
+  refuelFromCargo: () => void;
   resolveEventChoice: (choice: 'resolve_help' | 'resolve_fight' | 'resolve_bypass') => void;
   triggerAbility: (ability: 'nitro' | 'smoke' | 'repair') => void;
   healCrew: (crewId: string) => void;
@@ -258,13 +259,22 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   buyGood: (key, amount, price) => {
-    const { scrap, cargo } = get();
+    const { scrap, cargo, fuel, food, morale } = get();
     const totalPrice = price * amount;
     if (scrap >= totalPrice) {
       nativeBridge.vibrate(30);
       nativeBridge.playAudioCue('buy');
+
+      // Directly refill active fuel / food when purchased
+      const updatedFuel = key === 'bioFuel' ? Math.min(100, fuel + 15 * amount) : fuel;
+      const updatedFood = key === 'waterRations' ? Math.min(100, food + 10 * amount) : food;
+      const updatedMorale = key === 'waterRations' ? Math.min(100, morale + 2 * amount) : morale;
+
       set({
         scrap: scrap - totalPrice,
+        fuel: updatedFuel,
+        food: updatedFood,
+        morale: updatedMorale,
         cargo: { ...cargo, [key]: cargo[key] + amount },
       });
     }
@@ -278,6 +288,18 @@ export const useGameStore = create<GameState>((set, get) => ({
       set({
         scrap: scrap + price * amount,
         cargo: { ...cargo, [key]: cargo[key] - amount },
+      });
+    }
+  },
+
+  refuelFromCargo: () => {
+    const { cargo, fuel } = get();
+    if (cargo.bioFuel > 0 && fuel < 100) {
+      nativeBridge.vibrate(30);
+      nativeBridge.playAudioCue('buy');
+      set({
+        fuel: Math.min(100, fuel + 15),
+        cargo: { ...cargo, bioFuel: cargo.bioFuel - 1 },
       });
     }
   },
