@@ -271,7 +271,7 @@
       <div style="margin-top:12px; border-top:1px solid #222B30; padding-top:8px;">
         <div class="detail-label">VENUE & LOCATION</div>
         <div class="detail-val-text" id="detail-venue" style="margin-bottom:2px;">Deer Creek Music Center</div>
-        <div style="font-size:13px; font-weight:800; color:#00E676; margin-top:2px;" id="detail-location">Noblesville, Indiana, USA</div>
+        <div style="font-size:13px; font-weight:800; color:#00E676; margin-top:2px;" id="detail-location">Noblesville, IN, USA</div>
       </div>
 
       <div id="detail-notes-box" style="display:none; margin-top:12px; border-top:1px solid #222B30; padding-top:8px;">
@@ -408,38 +408,39 @@
   </div>
 
   <script>
+    // PRESET VENUES WITH OFFICIAL 2-LETTER U.S. STATE ABBREVIATIONS
     const VENUE_DB = [
-      { v: "Deer Creek Music Center", c: "Noblesville", s: "Indiana", co: "USA" },
-      { v: "Klipsch Music Center", c: "Noblesville", s: "Indiana", co: "USA" },
-      { v: "Ruoff Music Center", c: "Noblesville", s: "Indiana", co: "USA" },
-      { v: "Verizon Wireless Music Center (Noblesville)", c: "Noblesville", s: "Indiana", co: "USA" },
-      { v: "Market Square Arena", c: "Indianapolis", s: "Indiana", co: "USA" },
-      { v: "Red Rocks Amphitheatre", c: "Morrison", s: "Colorado", co: "USA" },
-      { v: "The Gorge Amphitheatre", c: "George", s: "Washington", co: "USA" },
-      { v: "Madison Square Garden", c: "New York", s: "New York", co: "USA" },
-      { v: "The Fillmore", c: "San Francisco", s: "California", co: "USA" },
-      { v: "Hollywood Bowl", c: "Los Angeles", s: "California", co: "USA" },
-      { v: "Ryman Auditorium", c: "Nashville", s: "Tennessee", co: "USA" },
-      { v: "First Avenue", c: "Minneapolis", s: "Minnesota", co: "USA" },
+      { v: "Deer Creek Music Center", c: "Noblesville", s: "IN", co: "USA" },
+      { v: "Klipsch Music Center", c: "Noblesville", s: "IN", co: "USA" },
+      { v: "Ruoff Music Center", c: "Noblesville", s: "IN", co: "USA" },
+      { v: "Verizon Wireless Music Center (Noblesville)", c: "Noblesville", s: "IN", co: "USA" },
+      { v: "Market Square Arena", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Red Rocks Amphitheatre", c: "Morrison", s: "CO", co: "USA" },
+      { v: "The Gorge Amphitheatre", c: "George", s: "WA", co: "USA" },
+      { v: "Madison Square Garden", c: "New York", s: "NY", co: "USA" },
+      { v: "The Fillmore", c: "San Francisco", s: "CA", co: "USA" },
+      { v: "Hollywood Bowl", c: "Los Angeles", s: "CA", co: "USA" },
+      { v: "Ryman Auditorium", c: "Nashville", s: "TN", co: "USA" },
+      { v: "First Avenue", c: "Minneapolis", s: "MN", co: "USA" },
       { v: "9:30 Club", c: "Washington", s: "DC", co: "USA" },
-      { v: "The Stone Pony", c: "Asbury Park", s: "New Jersey", co: "USA" },
-      { v: "The Forum (Kia Forum)", c: "Inglewood", s: "California", co: "USA" },
-      { v: "Dick's Sporting Goods Park", c: "Commerce City", s: "Colorado", co: "USA" },
-      { v: "Fiddler's Green Amphitheatre", c: "Greenwood Village", s: "Colorado", co: "USA" },
-      { v: "Boulder Theater", c: "Boulder", s: "Colorado", co: "USA" },
-      { v: "The Fillmore Auditorium", c: "Denver", s: "Colorado", co: "USA" },
-      { v: "Ogden Theatre", c: "Denver", s: "Colorado", co: "USA" },
-      { v: "Gothic Theatre", c: "Englewood", s: "Colorado", co: "USA" },
-      { v: "Bluebird Theater", c: "Denver", s: "Colorado", co: "USA" },
-      { v: "Hoosier Dome", c: "Indianapolis", s: "Indiana", co: "USA" },
-      { v: "Murat Theatre", c: "Indianapolis", s: "Indiana", co: "USA" },
-      { v: "Buckeye Lake Music Center", c: "Millersport", s: "Ohio", co: "USA" },
-      { v: "Richfield Coliseum", c: "Richfield", s: "Ohio", co: "USA" },
-      { v: "Blossom Music Center", c: "Cuyahoga Falls", s: "Ohio", co: "USA" },
-      { v: "Riverport Amphitheater", c: "St. Louis", s: "Missouri", co: "USA" },
-      { v: "Alpine Valley Music Theatre", c: "East Troy", s: "Wisconsin", co: "USA" },
-      { v: "Soldier Field", c: "Chicago", s: "Illinois", co: "USA" },
-      { v: "Rosemont Horizon", c: "Rosemont", s: "Illinois", co: "USA" },
+      { v: "The Stone Pony", c: "Asbury Park", s: "NJ", co: "USA" },
+      { v: "The Forum (Kia Forum)", c: "Inglewood", s: "CA", co: "USA" },
+      { v: "Dick's Sporting Goods Park", c: "Commerce City", s: "CO", co: "USA" },
+      { v: "Fiddler's Green Amphitheatre", c: "Greenwood Village", s: "CO", co: "USA" },
+      { v: "Boulder Theater", c: "Boulder", s: "CO", co: "USA" },
+      { v: "The Fillmore Auditorium", c: "Denver", s: "CO", co: "USA" },
+      { v: "Ogden Theatre", c: "Denver", s: "CO", co: "USA" },
+      { v: "Gothic Theatre", c: "Englewood", s: "CO", co: "USA" },
+      { v: "Bluebird Theater", c: "Denver", s: "CO", co: "USA" },
+      { v: "Hoosier Dome", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Murat Theatre", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Buckeye Lake Music Center", c: "Millersport", s: "OH", co: "USA" },
+      { v: "Richfield Coliseum", c: "Richfield", s: "OH", co: "USA" },
+      { v: "Blossom Music Center", c: "Cuyahoga Falls", s: "OH", co: "USA" },
+      { v: "Riverport Amphitheater", c: "St. Louis", s: "MO", co: "USA" },
+      { v: "Alpine Valley Music Theatre", c: "East Troy", s: "WI", co: "USA" },
+      { v: "Soldier Field", c: "Chicago", s: "IL", co: "USA" },
+      { v: "Rosemont Horizon", c: "Rosemont", s: "IL", co: "USA" },
     ];
 
     let authMode = 'login';
@@ -472,10 +473,8 @@
 
     function handleGoogleSignIn() {
       if (window.AndroidGoogleAuth && window.AndroidGoogleAuth.launchGoogleSignIn) {
-        // Launch Android System Native Account Chooser Sheet!
         window.AndroidGoogleAuth.launchGoogleSignIn();
       } else {
-        // Web Google OAuth 2.0 Authorization Window
         const googleClientId = '1084293847291-livelore.apps.googleusercontent.com';
         const redirectUri = encodeURIComponent(window.location.origin || 'https://frontier-caravan-9r14f56ys-surface7.vercel.app');
         const scope = encodeURIComponent('email profile');
@@ -488,7 +487,6 @@
       if (!googleEmail || !googleEmail.includes('@')) return;
       const cleanedEmail = googleEmail.toLowerCase().trim();
 
-      // Store Persistent Active Session in LocalStorage
       localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
 
       loadSavedShows();
@@ -507,7 +505,6 @@
           } catch(e) {}
         }
 
-        // Clear local storage keys
         localStorage.removeItem('livelore_local_shows');
         localStorage.removeItem('livelore_vault_v1');
         localStorage.removeItem('livelore_backup_shows');
@@ -516,7 +513,6 @@
           const userKey = `livelore_shows_${activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_')}`;
           localStorage.removeItem(userKey);
 
-          // Push 0 shows to Railway PostgreSQL Cloud DB
           fetch('/api/sync/push', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -605,7 +601,7 @@
 
       const preset = VENUE_DB.find(v => v.v.toLowerCase() === (show.venue || '').toLowerCase() || v.v.toLowerCase().startsWith((show.venue || '').toLowerCase()));
       const c = show.city || (preset ? preset.c : 'Noblesville');
-      const s = show.state || (preset ? preset.s : 'Indiana');
+      const s = show.state || (preset ? preset.s : 'IN');
       const co = show.country || (preset ? preset.co : 'USA');
 
       document.getElementById('detail-location').innerText = `${c}, ${s}, ${co}`;
@@ -664,7 +660,7 @@
       document.getElementById('input-headline').value = show.headline || '';
       document.getElementById('input-venue').value = show.venue || '';
       document.getElementById('input-city').value = show.city || 'Noblesville';
-      document.getElementById('input-state').value = show.state || 'Indiana';
+      document.getElementById('input-state').value = show.state || 'IN';
       document.getElementById('input-country').value = show.country || 'USA';
       document.getElementById('input-date').value = show.date || '';
       document.getElementById('input-notes').value = show.notes || '';
@@ -1130,7 +1126,7 @@
       const headline = document.getElementById('input-headline').value;
       const venue = document.getElementById('input-venue').value;
       const city = document.getElementById('input-city').value || 'Noblesville';
-      const state = document.getElementById('input-state').value || 'Indiana';
+      const state = document.getElementById('input-state').value || 'IN';
       const country = document.getElementById('input-country').value || 'USA';
       const date = document.getElementById('input-date').value || '08/02/88';
       const notes = document.getElementById('input-notes').value || '';
