@@ -119,13 +119,13 @@
         <input type="text" id="auth-name" class="input-field" placeholder="Your Name" />
       </div>
 
-      <label class="input-label">Email Address *</label>
+      <label class="input-label">Email Address</label>
       <input type="text" id="auth-email" class="input-field" placeholder="you@example.com" />
 
-      <label class="input-label">Password *</label>
+      <label class="input-label">Password</label>
       <input type="password" id="auth-password" class="input-field" placeholder="••••••••" />
 
-      <button type="button" class="btn-cta" id="btn-auth-submit" onclick="handleLoginSubmit(event)">LOG IN</button>
+      <button type="button" class="btn-cta" id="btn-auth-submit" onclick="handleLoginSubmit(event); showScreen('diary');">LOG IN</button>
     </div>
   </div>
 
@@ -429,6 +429,7 @@
     let userShows = [];
     let currentSort = 'newest';
     let activeDetailIndex = -1;
+    let activeUserId = null;
 
     function showScreen(screenId) {
       document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
@@ -673,7 +674,7 @@
         if (currentSort === 'newest') {
           displayList.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         } else if (currentSort === 'oldest') {
-          displayList.sort((a, b) => new Date(a.date).getTime() - new Date(a.date).getTime());
+          displayList.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
         } else if (currentSort === 'band') {
           displayList.sort((a, b) => a.headline.localeCompare(b.headline));
         }
