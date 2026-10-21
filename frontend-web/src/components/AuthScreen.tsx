@@ -32,8 +32,8 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
 
   return (
     <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none bg-grid-lines overflow-y-auto min-h-screen justify-between">
-      {/* Header with LiveLore Logo */}
-      <header className="relative flex items-center justify-between w-full pt-2 pb-6 my-1">
+      {/* Header with LiveLore Logo & Generous Bottom Padding */}
+      <header className="relative flex items-center justify-between w-full pt-4 pb-12 my-2">
         {user ? (
           <button
             onClick={onBack}
@@ -54,7 +54,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
         <div className="w-10 z-10" />
       </header>
 
-      <div className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full pb-8 pt-2">
+      <div className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full pb-8 pt-8 sm:pt-12">
         {/* If Active User is Logged In */}
         {user ? (
           <div className="bg-[#121619] p-6 rounded-2xl border border-[#222B30] text-center space-y-4 shadow-xl">
@@ -80,13 +80,13 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
             </div>
           </div>
         ) : (
-          /* Clean Authentication Form with Log In / Create Account Toggle */
-          <div className="space-y-6">
+          /* Clean Authentication Form with Generous Top Padding & Mode Switcher */
+          <div className="space-y-6 mt-4">
             {/* Mode Switcher Tabs */}
-            <div className="flex bg-[#121619] p-1 rounded-full border border-[#222B30]">
+            <div className="flex bg-[#121619] p-1 rounded-full border border-[#222B30] mb-2">
               <button
                 onClick={() => { setMode('login'); clearError(); }}
-                className={`flex-1 py-3 rounded-full text-xs font-black uppercase tracking-wider transition ${
+                className={`flex-1 py-3.5 rounded-full text-xs font-black uppercase tracking-wider transition ${
                   mode === 'login'
                     ? 'bg-[#FFB300] text-slate-950 shadow-md'
                     : 'text-slate-400 hover:text-white'
@@ -96,7 +96,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
               </button>
               <button
                 onClick={() => { setMode('register'); clearError(); }}
-                className={`flex-1 py-3 rounded-full text-xs font-black uppercase tracking-wider transition ${
+                className={`flex-1 py-3.5 rounded-full text-xs font-black uppercase tracking-wider transition ${
                   mode === 'register'
                     ? 'bg-[#FFB300] text-slate-950 shadow-md'
                     : 'text-slate-400 hover:text-white'

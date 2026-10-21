@@ -24,9 +24,9 @@
     .sort-control-bar { display: flex; justify-between; align-items: center; width: 100%; margin-bottom: 8px; padding: 0 4px; }
     .sort-dropdown { background: #121619; border: 1px solid #222B30; color: #f1f5f9; font-size: 11px; font-weight: 800; border-radius: 8px; padding: 6px 10px; outline: none; text-transform: uppercase; cursor: pointer; }
 
-    /* Auth Tab Switcher */
-    .auth-tab-box { display: flex; background: #121619; padding: 4px; border-radius: 9999px; border: 1px solid #222B30; margin-bottom: 20px; width: 100%; }
-    .auth-tab-btn { flex: 1; padding: 12px; border-radius: 9999px; border: none; background: none; color: #94a3b8; font-weight: 900; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
+    /* Auth Tab Switcher with Generous Top Padding */
+    .auth-tab-box { display: flex; background: #121619; padding: 4px; border-radius: 9999px; border: 1px solid #222B30; margin-top: 36px; margin-bottom: 24px; width: 100%; }
+    .auth-tab-btn { flex: 1; padding: 14px; border-radius: 9999px; border: none; background: none; color: #94a3b8; font-weight: 900; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
     .auth-tab-btn.active { background: #FFB300; color: #0a0a0a; box-shadow: 0 4px 10px rgba(255,179,0,0.3); }
 
     /* Ticket Container & Card */
@@ -101,13 +101,13 @@
 
   <!-- SCREEN 0: MANDATORY AUTH / LOG IN & REGISTER -->
   <div id="view-auth" class="screen-view active">
-    <div class="header">
+    <div class="header" style="margin-bottom:24px;">
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
       </div>
     </div>
 
-    <!-- Mode Switcher Tabs -->
+    <!-- Mode Switcher Tabs with Generous Top Margin -->
     <div class="auth-tab-box">
       <button class="auth-tab-btn active" id="tab-login" onclick="switchAuthMode('login')">Log In</button>
       <button class="auth-tab-btn" id="tab-register" onclick="switchAuthMode('register')">Create Account</button>
