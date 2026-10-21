@@ -108,7 +108,7 @@
     </div>
 
     <!-- Mode Switcher Tabs -->
-    <div class="auth-tab-box" style="margin-top:10px;">
+    <div class="auth-tab-box">
       <button class="auth-tab-btn active" id="tab-login" onclick="switchAuthMode('login')">Log In</button>
       <button class="auth-tab-btn" id="tab-register" onclick="switchAuthMode('register')">Create Account</button>
     </div>
@@ -119,11 +119,11 @@
         <input type="text" id="auth-name" class="input-field" placeholder="Your Name" />
       </div>
 
-      <label class="input-label">Email Address</label>
-      <input type="text" id="auth-email" class="input-field" placeholder="you@example.com" />
+      <label class="input-label">Email Address *</label>
+      <input type="text" id="auth-email" class="input-field" placeholder="you@example.com" required />
 
-      <label class="input-label">Password</label>
-      <input type="password" id="auth-password" class="input-field" placeholder="••••••••" />
+      <label class="input-label">Password *</label>
+      <input type="password" id="auth-password" class="input-field" placeholder="••••••••" required minlength="6" />
 
       <button type="button" class="btn-cta" id="btn-auth-submit" onclick="showScreen('diary')">LOG IN</button>
     </div>
@@ -280,22 +280,14 @@
       </div>
     </div>
 
-    <!-- Profile Account Info Card -->
-    <div class="detail-card" style="text-align:center;">
-      <div style="font-size:36px; margin-bottom:8px;">👤</div>
-      <div style="font-weight:900; font-size:18px; color:#ffffff; text-transform:uppercase;" id="profile-user-name">LiveLore Concert Fan</div>
-      <div style="font-size:12px; color:#94a3b8; margin-top:2px;" id="profile-user-email">fan@livelore.com</div>
-      <div style="font-size:11px; font-weight:800; color:#00E676; margin-top:8px;">✓ Railway Cloud Sync Active</div>
-    </div>
-
     <!-- Catchy $3.99 VIP Pass / Buy the App Banner -->
     <div class="detail-card" style="background: linear-gradient(135deg, rgba(255,179,0,0.2), #121619); border-color: #FFB300;">
       <div style="display:flex; justify-between; align-items:center; margin-bottom:8px;">
         <span style="font-size:11px; font-weight:900; color:#FFB300; text-transform:uppercase;">👑 LIVELORE VIP PASS</span>
         <span style="background:#FFB300; color:#0a0a0a; font-size:10px; font-weight:900; padding:2px 8px; border-radius:9999px;">$3.99 ONE-TIME</span>
       </div>
-      <div style="font-weight:900; font-size:16px; color:#ffffff; text-transform:uppercase; margin-bottom:6px;">Unlock Photo Stubs & 100% Ad-Free Vault! 🎟️</div>
-      <div style="font-size:12px; color:#cbd5e1; line-height:1.5; margin-bottom:12px;">Attach up to 3 concert photos per ticket stub. Your favorite show photo renders right inside your retro ticket stub!</div>
+      <div style="font-weight:900; font-size:16px; color:#ffffff; text-transform:uppercase; margin-bottom:6px;">Unlock Photo Feature & 100% AD-Free Experience!</div>
+      <div style="font-size:12px; color:#cbd5e1; line-height:1.5; margin-bottom:12px;">Attach and save photos from concerts. Remove all ads.</div>
       <button class="btn-edit" onclick="buyAppPremium()">⭐ GO PREMIUM FOR $3.99</button>
     </div>
 
@@ -434,7 +426,7 @@
     }
 
     function buyAppPremium() {
-      alert('🎉 Welcome to LiveLore VIP! You now have permanent ad-free access and 3-photo ticket stub memories!');
+      alert('🎉 Welcome to LiveLore VIP! You now have permanent ad-free access and photo features!');
     }
 
     function openShowDetails(showIndex) {

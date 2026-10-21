@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useEncoreStore } from '../store/useEncoreStore';
 import { GlassNavBar } from './GlassNavBar';
-import { ArrowLeft, User, CheckCircle2, Crown, LogOut, Sparkles, KeyRound, UserCheck } from 'lucide-react';
+import { ArrowLeft, Crown, LogOut, Sparkles, KeyRound } from 'lucide-react';
 
 interface ProfileViewProps {
   onBack: () => void;
@@ -21,7 +21,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate, on
 
   const handlePurchasePremium = () => {
     setIsPremium(true);
-    alert('🎉 Welcome to LiveLore VIP! Ad-Free experience and 3-Photo Ticket Stubs are now permanently unlocked!');
+    alert('🎉 Welcome to LiveLore VIP! Ad-Free experience and photo features are now permanently unlocked!');
   };
 
   const handlePasswordChange = (e: React.FormEvent) => {
@@ -55,21 +55,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate, on
 
       {/* Main Profile & Premium Offer */}
       <div className="flex-1 flex flex-col max-w-md mx-auto w-full space-y-5 pb-6">
-        {/* User Account Details Card */}
-        <div className="bg-[#121619] p-5 rounded-2xl border border-[#222B30] text-center space-y-3 shadow-xl">
-          <div className="w-16 h-16 bg-[#00E676]/10 text-[#00E676] rounded-full flex items-center justify-center mx-auto border border-[#00E676]/30">
-            <User size={32} />
-          </div>
-          <div>
-            <h2 className="text-xl font-black uppercase text-white tracking-wide font-sans">
-              {user?.displayName || 'LiveLore Concert Fan'}
+        {/* User Account Details Card (Renders only if user is logged in) */}
+        {user && (
+          <div className="bg-[#121619] p-4 rounded-2xl border border-[#222B30] text-center space-y-1 shadow-xl">
+            <h2 className="text-lg font-black uppercase text-white tracking-wide font-sans">
+              {user.displayName}
             </h2>
-            <p className="text-xs text-slate-400 font-mono mt-0.5">{user?.email || 'fan@livelore.com'}</p>
+            <p className="text-xs text-slate-400 font-mono">{user.email}</p>
           </div>
-          <div className="flex items-center justify-center gap-1.5 text-xs text-[#00E676] font-extrabold pt-1">
-            <CheckCircle2 size={16} /> Railway Cloud Sync Active
-          </div>
-        </div>
+        )}
 
         {/* CATCHY "BUY THE APP / GO PREMIUM ($3.99)" BANNER */}
         <div className={`p-5 rounded-2xl border transition shadow-xl space-y-3 relative overflow-hidden ${
@@ -79,7 +73,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate, on
         }`}>
           <div className="flex items-center justify-between">
             <span className="text-xs font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5">
-              <Crown size={16} className="text-[#FFB300]" /> {isPremium ? 'VIP BACKSTAGE PASS ACTIVE' : 'LIVELORE VIP PASS'}
+              <Crown size={16} className="text-[#FFB300]" /> {isPremium ? 'VIP PASS ACTIVE' : 'LIVELORE VIP PASS'}
             </span>
             <span className="bg-[#FFB300] text-slate-950 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">
               {isPremium ? 'UNLOCKED' : '$3.99 ONE-TIME'}
@@ -88,10 +82,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate, on
 
           <div>
             <h3 className="text-lg font-black text-white uppercase tracking-tight font-sans">
-              {isPremium ? 'Ad-Free Vault & Photo Stubs Unlocked! 🎟️' : 'Unlock Photo Stubs & 100% Ad-Free Vault! 🎟️'}
+              Unlock Photo Feature & 100% AD-Free Experience!
             </h3>
             <p className="text-xs text-slate-300 font-medium leading-relaxed mt-1">
-              Attach up to **3 high-res concert photos per ticket stub** from your camera or photo roll. Your favorite show photo displays right inside your retro ticket stub!
+              Attach and save photos from concerts. Remove all ads.
             </p>
           </div>
 
@@ -134,7 +128,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate, on
           </form>
         </div>
 
-        {/* Log Out / Switch Account Button */}
+        {/* Log Out Button */}
         <button
           onClick={() => {
             logout();
