@@ -411,10 +411,15 @@
     </div>
   </div>
 
-  <!-- SCREEN 6: SUB-STATS DETAIL (SHOWS COMPLETE LIST FOR SINGLE CATEGORY WITH ENLARGED TEXT) -->
+  <!-- SCREEN 6: SUB-STATS DETAIL (SHOWS COMPLETE LIST FOR SINGLE CATEGORY WITH ENLARGED TEXT & UNIVERSAL SVG BACK ARROW) -->
   <div id="view-substats" class="screen-view">
     <div class="header">
-      <button class="nav-btn-icon nav-btn-left" style="color:#ffffff;" onclick="showScreen('stats')">←</button>
+      <button type="button" onclick="showScreen('stats')" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:#FFB300; cursor:pointer; display:flex; align-items:center; justify-center; padding:8px; z-index:10;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFB300" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+      </button>
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
       </div>
