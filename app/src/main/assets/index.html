@@ -450,9 +450,29 @@
     }
 
     function handleGoogleSignIn() {
-      // Simulate/trigger One-Tap Google Sign In
-      const googleEmail = 'wcsurface@gmail.com';
-      localStorage.setItem('livelore_active_user', JSON.stringify({ email: googleEmail, provider: 'google' }));
+      const googleEmailPrompt = prompt("🌐 Google Sign-In Authorization:\n\nPlease enter your Google Account email address to authorize LiveLore:", "you@gmail.com");
+      if (!googleEmailPrompt || !googleEmailPrompt.includes('@')) {
+        showErrorBanner('⚠️ Google Sign-In authorization was canceled or invalid.');
+        return;
+      }
+
+      const cleanedEmail = googleEmailPrompt.toLowerCase().trim();
+
+      // Store Persistent Active Session in LocalStorage
+      localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
+
+      // Load user specific shows from localStorage if exists
+      const userKey = `livelore_shows_${cleanedEmail.replace(/[^a-z0-9]/g, '_')}`;
+      const storedShows = localStorage.getItem(userKey);
+      if (storedShows) {
+        try {
+          userShows = JSON.parse(storedShows);
+        } catch(err) {
+          userShows = [];
+        }
+      } else {
+        userShows = [];
+      }
 
       saveShowsToStorage();
       renderShowsFeed();
@@ -506,8 +526,19 @@
         return;
       }
 
-      // Store Persistent Active User Session in LocalStorage!
       localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'email' }));
+
+      const userKey = `livelore_shows_${cleanedEmail.replace(/[^a-z0-9]/g, '_')}`;
+      const storedShows = localStorage.getItem(userKey);
+      if (storedShows) {
+        try {
+          userShows = JSON.parse(storedShows);
+        } catch(err) {
+          userShows = [];
+        }
+      } else {
+        userShows = [];
+      }
 
       saveShowsToStorage();
       renderShowsFeed();
@@ -697,22 +728,42 @@
 
     function loadSavedShows() {
       try {
-        const raw = localStorage.getItem('livelore_local_shows');
-        if (raw) {
-          userShows = JSON.parse(raw);
-          if (!Array.isArray(userShows)) {
-            userShows = [];
-          } else {
-            userShows.forEach(s => {
-              if (!s.id) s.id = generateUniqueId();
-              if (s.venue && s.venue.toLowerCase().includes('deer creek')) {
-                s.venue = 'Deer Creek Music Center';
-                s.city = 'Noblesville';
-                s.state = 'Indiana';
-                s.country = 'USA';
-              }
-            });
+        const rawUser = localStorage.getItem('livelore_active_user');
+        let activeEmail = null;
+        if (rawUser) {
+          const uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email) {
+            activeEmail = uObj.email;
           }
+        }
+
+        if (activeEmail) {
+          const userKey = `livelore_shows_${activeEmail.replace(/[^a-z0-9]/g, '_')}`;
+          const storedShows = localStorage.getItem(userKey);
+          if (storedShows) {
+            userShows = JSON.parse(storedShows);
+          } else {
+            userShows = [];
+          }
+        } else {
+          const raw = localStorage.getItem('livelore_local_shows');
+          if (raw) {
+            userShows = JSON.parse(raw);
+          } else {
+            userShows = [];
+          }
+        }
+
+        if (Array.isArray(userShows)) {
+          userShows.forEach(s => {
+            if (!s.id) s.id = generateUniqueId();
+            if (s.venue && s.venue.toLowerCase().includes('deer creek')) {
+              s.venue = 'Deer Creek Music Center';
+              s.city = 'Noblesville';
+              s.state = 'Indiana';
+              s.country = 'USA';
+            }
+          });
         } else {
           userShows = [];
         }
@@ -722,7 +773,7 @@
       renderShowsFeed();
       updateStatsDisplay();
 
-      // Persistent Session Check: If logged in, open Concert Vault Home Screen directly!
+      // Persistent Session Check: If active user is stored, open Concert Vault directly!
       const activeUser = localStorage.getItem('livelore_active_user');
       if (activeUser) {
         showScreen('diary');
@@ -734,6 +785,14 @@
     function saveShowsToStorage() {
       try {
         localStorage.setItem('livelore_local_shows', JSON.stringify(userShows));
+        const rawUser = localStorage.getItem('livelore_active_user');
+        if (rawUser) {
+          const uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email) {
+            const userKey = `livelore_shows_${uObj.email.replace(/[^a-z0-9]/g, '_')}`;
+            localStorage.setItem(userKey, JSON.stringify(userShows));
+          }
+        }
       } catch (e) {}
     }
 
