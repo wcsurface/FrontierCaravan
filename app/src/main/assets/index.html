@@ -308,7 +308,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 5: STATS -->
+  <!-- SCREEN 5: STATS MAIN OVERVIEW PAGE (SHOWS ONLY TOP 10 PER CATEGORY) -->
   <div id="view-stats" class="screen-view">
     <div class="header">
       <div class="header-logo-box">
@@ -318,7 +318,7 @@
 
     <div style="text-align:center; font-weight:900; font-size:48px; color:#ffffff; margin: 8px 0;" id="stats-total-count">0 SHOWS</div>
 
-    <!-- TOP VENUES (FULL TOP 10) -->
+    <!-- TOP VENUES (TOP 10 ONLY) -->
     <div class="stats-card" onclick="showSubStats('venues')">
       <div class="stats-card-title" style="color:#00E676;">TOP VENUES (TOP 10) <span style="font-size:10px;">SEE ALL ➔</span></div>
       <div style="font-size:12px;" id="stats-venues-preview">
@@ -326,7 +326,7 @@
       </div>
     </div>
 
-    <!-- TOP ARTISTS (FULL TOP 10) -->
+    <!-- TOP ARTISTS (TOP 10 ONLY) -->
     <div class="stats-card" onclick="showSubStats('artists')">
       <div class="stats-card-title" style="color:#FFB300;">TOP ARTISTS (TOP 10) <span style="font-size:10px;">SEE ALL ➔</span></div>
       <div style="font-size:12px;" id="stats-artists-preview">
@@ -334,7 +334,7 @@
       </div>
     </div>
 
-    <!-- TOP YEARS (FULL TOP 10) -->
+    <!-- TOP YEARS (TOP 10 ONLY) -->
     <div class="stats-card" onclick="showSubStats('years')">
       <div class="stats-card-title" style="color:#00B0FF;">TOP YEARS (TOP 10) <span style="font-size:10px;">SEE ALL ➔</span></div>
       <div style="font-size:12px;" id="stats-years-preview">
@@ -359,9 +359,10 @@
     </div>
   </div>
 
-  <!-- SCREEN 6: SUB-STATS DETAIL -->
+  <!-- SCREEN 6: SUB-STATS DETAIL (SHOWS COMPLETE LIST FOR SINGLE CATEGORY) -->
   <div id="view-substats" class="screen-view">
     <div class="header">
+      <button class="nav-btn-icon nav-btn-left" style="color:#ffffff;" onclick="showScreen('stats')">←</button>
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
       </div>
@@ -562,7 +563,6 @@
         `).join('');
       }
 
-      // Change button text to SAVE EDITS
       const btnSave = document.getElementById('btn-save-show');
       if (btnSave) btnSave.innerText = '💾 SAVE EDITS';
 
@@ -813,10 +813,11 @@
           }
         });
 
-        const topV = Object.entries(venueCounts).sort((a,b) => b[1] - a[1]);
-        const topA = Object.entries(artistCounts).sort((a,b) => b[1] - a[1]);
-        const topY = Object.entries(yearCounts).sort((a,b) => b[0] - a[0]);
-        const topD = Object.entries(dayCounts).filter(d => d[1] > 0).sort((a,b) => b[1] - a[1]);
+        // Slice main overview lists to TOP 10 ONLY!
+        const topV = Object.entries(venueCounts).sort((a,b) => b[1] - a[1]).slice(0, 10);
+        const topA = Object.entries(artistCounts).sort((a,b) => b[1] - a[1]).slice(0, 10);
+        const topY = Object.entries(yearCounts).sort((a,b) => b[0] - a[0]).slice(0, 10);
+        const topD = Object.entries(dayCounts).filter(d => d[1] > 0).sort((a,b) => b[1] - a[1]).slice(0, 10);
 
         document.getElementById('stats-venues-preview').innerHTML = topV.map((item, i) => `
           <div style="margin-bottom:6px;">${i+1}. ${item[0]} - ${item[1]}</div>
@@ -850,9 +851,9 @@
         const topV = Object.entries(venueCounts).sort((a,b) => b[1] - a[1]);
 
         container.innerHTML = `
-          <div style="color:#00E676; font-size:14px; text-transform:uppercase; margin-bottom:10px;">ALL VENUES DATA</div>
+          <div style="color:#00E676; font-size:14px; text-transform:uppercase; margin-bottom:10px;">ALL VENUES (${topV.length})</div>
           ${topV.length > 0 ? topV.map((item, i) => `
-            <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">${i+1}. ${item[0]} - ${item[1]} Shows</div>
+            <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">${i+1}. ${item[0]} - ${item[1]} ${item[1] === 1 ? 'Show' : 'Shows'}</div>
           `).join('') : '<div style="color:#94a3b8;">No venues logged yet.</div>'}
         `;
       } else if (type === 'artists') {
@@ -883,9 +884,9 @@
         const topA = Object.entries(artistCounts).sort((a,b) => b[1] - a[1]);
 
         container.innerHTML = `
-          <div style="color:#FFB300; font-size:14px; text-transform:uppercase; margin-bottom:10px;">ALL ARTISTS DATA</div>
+          <div style="color:#FFB300; font-size:14px; text-transform:uppercase; margin-bottom:10px;">ALL ARTISTS (${topA.length})</div>
           ${topA.length > 0 ? topA.map((item, i) => `
-            <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">${i+1}. ${item[0]} - ${item[1]} Times</div>
+            <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">${i+1}. ${item[0]} - ${item[1]} ${item[1] === 1 ? 'Time' : 'Times'}</div>
           `).join('') : '<div style="color:#94a3b8;">No artists logged yet.</div>'}
         `;
       } else if (type === 'years') {
@@ -910,9 +911,9 @@
         const topY = Object.entries(yearCounts).sort((a,b) => b[0] - a[0]);
 
         container.innerHTML = `
-          <div style="color:#00B0FF; font-size:14px; text-transform:uppercase; margin-bottom:10px;">ALL YEARS DATA</div>
+          <div style="color:#00B0FF; font-size:14px; text-transform:uppercase; margin-bottom:10px;">ALL YEARS (${topY.length})</div>
           ${topY.length > 0 ? topY.map((item, i) => `
-            <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">Year ${item[0]} - ${item[1]} Shows</div>
+            <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">Year ${item[0]} - ${item[1]} ${item[1] === 1 ? 'Show' : 'Shows'}</div>
           `).join('') : '<div style="color:#94a3b8;">No years logged yet.</div>'}
         `;
       } else {
@@ -940,7 +941,7 @@
         container.innerHTML = `
           <div style="color:#E040FB; font-size:14px; text-transform:uppercase; margin-bottom:10px;">DAYS OF THE WEEK</div>
           ${topD.length > 0 ? topD.map((item, i) => `
-            <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">${item[0]} - ${item[1]} Shows (${Math.round((item[1]/userShows.length)*100)}%)</div>
+            <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">${item[0]} - ${item[1]} ${item[1] === 1 ? 'Show' : 'Shows'} (${Math.round((item[1]/userShows.length)*100)}%)</div>
           `).join('') : '<div style="color:#94a3b8;">No days logged yet.</div>'}
         `;
       }
@@ -974,10 +975,8 @@
         const updatedShowData = { headline, venue, city, state, country, date, openersList, notes };
 
         if (editingShowIndex >= 0 && editingShowIndex < userShows.length) {
-          // Update existing show in-place!
           userShows[editingShowIndex] = updatedShowData;
         } else {
-          // Create new show entry!
           userShows.unshift(updatedShowData);
         }
 

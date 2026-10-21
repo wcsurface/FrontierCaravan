@@ -50,20 +50,21 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
         <div className="w-10 z-10" />
       </header>
 
-      {/* 1. FULL DATA DETAIL SUB-VIEWS */}
+      {/* 1. FULL INDIVIDUAL STAT CATEGORY DETAIL VIEWS */}
       {activeSubView === 'venues' && (
         <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-4 overflow-y-auto">
-          <div className="text-center">
+          <div className="text-center mb-2">
             <h2 className="text-xl font-black uppercase text-[#00E676] font-sans flex items-center justify-center gap-2">
-              <MapPin size={22} /> ALL VENUES
+              <MapPin size={22} /> ALL VENUES ({venuesList.length})
             </h2>
+            <p className="text-xs text-slate-400 mt-1">Complete venue breakdown from your concert vault</p>
           </div>
           <div className="space-y-3">
             {venuesList.length > 0 ? venuesList.map((v, i) => (
               <div key={i} className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-1.5 shadow-sm">
                 <div className="flex justify-between items-center text-sm font-bold">
                   <span className="text-slate-100">{i + 1}. {v.name} {v.city ? `(${v.city})` : ''}</span>
-                  <span className="text-[#00E676] font-mono">{v.visitCount} Shows</span>
+                  <span className="text-[#00E676] font-mono">{v.visitCount} {v.visitCount === 1 ? 'Show' : 'Shows'}</span>
                 </div>
                 <div className="w-full h-2 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
                   <div className="h-full bg-[#00E676] rounded-full" style={{ width: `${(v.visitCount / maxVenueVisits) * 100}%` }} />
@@ -76,17 +77,18 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
 
       {activeSubView === 'artists' && (
         <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-4 overflow-y-auto">
-          <div className="text-center">
+          <div className="text-center mb-2">
             <h2 className="text-xl font-black uppercase text-[#FFB300] font-sans flex items-center justify-center gap-2">
-              <Music size={22} /> ALL ARTISTS
+              <Music size={22} /> ALL ARTISTS ({artistsList.length})
             </h2>
+            <p className="text-xs text-slate-400 mt-1">Complete artist breakdown including headliners and openers</p>
           </div>
           <div className="space-y-3">
             {artistsList.length > 0 ? artistsList.map((a, i) => (
               <div key={i} className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-1.5 shadow-sm">
                 <div className="flex justify-between items-center text-sm font-bold">
                   <span className="text-slate-100">{i + 1}. {a.name}</span>
-                  <span className="text-[#FFB300] font-mono">{a.timesSeen} Times</span>
+                  <span className="text-[#FFB300] font-mono">{a.timesSeen} {a.timesSeen === 1 ? 'Time' : 'Times'}</span>
                 </div>
                 <div className="w-full h-2 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
                   <div className="h-full bg-[#FFB300] rounded-full" style={{ width: `${(a.timesSeen / maxArtistSeen) * 100}%` }} />
@@ -99,17 +101,18 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
 
       {activeSubView === 'years' && (
         <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-4 overflow-y-auto">
-          <div className="text-center">
+          <div className="text-center mb-2">
             <h2 className="text-xl font-black uppercase text-[#00B0FF] font-sans flex items-center justify-center gap-2">
-              <Calendar size={22} /> ALL YEARS
+              <Calendar size={22} /> ALL YEARS ({yearsList.length})
             </h2>
+            <p className="text-xs text-slate-400 mt-1">Complete year-by-year concert activity</p>
           </div>
           <div className="space-y-3">
             {yearsList.length > 0 ? yearsList.map((y, i) => (
               <div key={i} className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-1.5 shadow-sm">
                 <div className="flex justify-between items-center text-sm font-bold">
                   <span className="text-slate-100">Year {y.year}</span>
-                  <span className="text-[#00B0FF] font-mono">{y.count} Concerts</span>
+                  <span className="text-[#00B0FF] font-mono">{y.count} {y.count === 1 ? 'Concert' : 'Concerts'}</span>
                 </div>
                 <div className="w-full h-2 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
                   <div className="h-full bg-[#00B0FF] rounded-full" style={{ width: `${(y.count / maxYearShows) * 100}%` }} />
@@ -122,17 +125,18 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
 
       {activeSubView === 'days' && (
         <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-4 overflow-y-auto">
-          <div className="text-center">
+          <div className="text-center mb-2">
             <h2 className="text-xl font-black uppercase text-[#E040FB] font-sans flex items-center justify-center gap-2">
               <Clock size={22} /> DAYS OF THE WEEK
             </h2>
+            <p className="text-xs text-slate-400 mt-1">Complete breakdown by day of week</p>
           </div>
           <div className="space-y-3">
             {daysList.length > 0 ? daysList.map((d, i) => (
               <div key={i} className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-1.5 shadow-sm">
                 <div className="flex justify-between items-center text-sm font-bold">
                   <span className="text-slate-100">{d.day}</span>
-                  <span className="text-[#E040FB] font-mono">{d.count} Shows ({d.percentage}%)</span>
+                  <span className="text-[#E040FB] font-mono">{d.count} {d.count === 1 ? 'Show' : 'Shows'} ({d.percentage}%)</span>
                 </div>
                 <div className="w-full h-2 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
                   <div className="h-full bg-[#E040FB] rounded-full" style={{ width: `${(d.count / maxDayShows) * 100}%` }} />
@@ -143,7 +147,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
         </div>
       )}
 
-      {/* 2. MAIN STATS OVERVIEW SCREEN */}
+      {/* 2. MAIN STATS OVERVIEW SCREEN (SHOWS ONLY TOP 10 PER CATEGORY) */}
       {activeSubView === 'main' && (
         <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-6 pb-4 overflow-y-auto">
           {/* Hero Readout */}
@@ -153,9 +157,9 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
             </h2>
           </div>
 
-          {/* Top 10 Ranked Sections */}
+          {/* Top 10 Ranked Category Cards */}
           <div className="space-y-6">
-            {/* Top Venues Card */}
+            {/* Top 10 Venues Card */}
             <div
               onClick={() => setActiveSubView('venues')}
               className="bg-[#121619] p-4.5 rounded-2xl border border-[#222B30] hover:border-[#00E676]/60 transition cursor-pointer shadow-lg group"
@@ -183,7 +187,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
               </div>
             </div>
 
-            {/* Top Artists Card */}
+            {/* Top 10 Artists Card */}
             <div
               onClick={() => setActiveSubView('artists')}
               className="bg-[#121619] p-4.5 rounded-2xl border border-[#222B30] hover:border-[#FFB300]/60 transition cursor-pointer shadow-lg group"
@@ -211,7 +215,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
               </div>
             </div>
 
-            {/* Top Years Card */}
+            {/* Top 10 Years Card */}
             <div
               onClick={() => setActiveSubView('years')}
               className="bg-[#121619] p-4.5 rounded-2xl border border-[#222B30] hover:border-[#00B0FF]/60 transition cursor-pointer shadow-lg group"
@@ -239,7 +243,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
               </div>
             </div>
 
-            {/* Days of Week Card */}
+            {/* Top Days of Week Card */}
             <div
               onClick={() => setActiveSubView('days')}
               className="bg-[#121619] p-4.5 rounded-2xl border border-[#222B30] hover:border-[#E040FB]/60 transition cursor-pointer shadow-lg group"
@@ -253,7 +257,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
                 </div>
               </div>
               <div className="space-y-2.5">
-                {daysList.length > 0 ? daysList.map((d, i) => (
+                {daysList.length > 0 ? daysList.slice(0, 10).map((d, i) => (
                   <div key={i} className="space-y-1">
                     <div className="flex justify-between text-xs font-semibold text-slate-200">
                       <span>{i + 1}. {d.day}</span>
