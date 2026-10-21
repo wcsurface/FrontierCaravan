@@ -441,6 +441,7 @@
       { v: "Alpine Valley Music Theatre", c: "East Troy", s: "WI", co: "USA" },
       { v: "Soldier Field", c: "Chicago", s: "IL", co: "USA" },
       { v: "Rosemont Horizon", c: "Rosemont", s: "IL", co: "USA" },
+      { v: "Chase Center", c: "San Francisco", s: "CA", co: "USA" },
     ];
 
     let authMode = 'login';
@@ -448,6 +449,23 @@
     let currentSort = 'newest';
     let activeDetailShowId = null;
     let editingShowId = null;
+
+    function toStateAbbr(stateStr) {
+      if (!stateStr) return 'IN';
+      const s = stateStr.trim();
+      if (s.length === 2) return s.toUpperCase();
+      const map = {
+        'california': 'CA', 'indiana': 'IN', 'colorado': 'CO', 'new york': 'NY',
+        'ohio': 'OH', 'illinois': 'IL', 'michigan': 'MI', 'wisconsin': 'WI',
+        'kentucky': 'KY', 'tennessee': 'TN', 'missouri': 'MO', 'texas': 'TX',
+        'nevada': 'NV', 'washington': 'WA', 'oregon': 'OR', 'pennsylvania': 'PA',
+        'new jersey': 'NJ', 'massachusetts': 'MA', 'connecticut': 'CT', 'rhode island': 'RI',
+        'maryland': 'MD', 'georgia': 'GA', 'north carolina': 'NC', 'florida': 'FL',
+        'arkansas': 'AR', 'kansas': 'KS', 'nebraska': 'NE', 'minnesota': 'MN',
+        'arizona': 'AZ', 'district of columbia': 'DC'
+      };
+      return map[s.toLowerCase()] || s;
+    }
 
     function generateUniqueId() {
       return 'show_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
@@ -505,6 +523,7 @@
           } catch(e) {}
         }
 
+        // Clear local storage keys
         localStorage.removeItem('livelore_local_shows');
         localStorage.removeItem('livelore_vault_v1');
         localStorage.removeItem('livelore_backup_shows');
@@ -513,6 +532,7 @@
           const userKey = `livelore_shows_${activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_')}`;
           localStorage.removeItem(userKey);
 
+          // Push 0 shows to Railway PostgreSQL Cloud DB
           fetch('/api/sync/push', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -601,7 +621,8 @@
 
       const preset = VENUE_DB.find(v => v.v.toLowerCase() === (show.venue || '').toLowerCase() || v.v.toLowerCase().startsWith((show.venue || '').toLowerCase()));
       const c = show.city || (preset ? preset.c : 'Noblesville');
-      const s = show.state || (preset ? preset.s : 'IN');
+      const rawState = show.state || (preset ? preset.s : 'IN');
+      const s = toStateAbbr(rawState);
       const co = show.country || (preset ? preset.co : 'USA');
 
       document.getElementById('detail-location').innerText = `${c}, ${s}, ${co}`;
@@ -660,7 +681,7 @@
       document.getElementById('input-headline').value = show.headline || '';
       document.getElementById('input-venue').value = show.venue || '';
       document.getElementById('input-city').value = show.city || 'Noblesville';
-      document.getElementById('input-state').value = show.state || 'IN';
+      document.getElementById('input-state').value = toStateAbbr(show.state || 'IN');
       document.getElementById('input-country').value = show.country || 'USA';
       document.getElementById('input-date').value = show.date || '';
       document.getElementById('input-notes').value = show.notes || '';
@@ -719,14 +740,14 @@
       if (matches.length > 0) {
         const best = matches[0];
         document.getElementById('input-city').value = best.c;
-        document.getElementById('input-state').value = best.s;
+        document.getElementById('input-state').value = toStateAbbr(best.s);
         document.getElementById('input-country').value = best.co;
 
         dropdown.style.display = 'block';
         dropdown.innerHTML = matches.map(item => `
-          <div style="padding:8px 12px; border-bottom:1px solid #222B30; cursor:pointer;" onclick="selectVenue('${item.v.replace(/'/g, "\\'")}', '${item.c.replace(/'/g, "\\'")}', '${item.s.replace(/'/g, "\\'")}', '${item.co.replace(/'/g, "\\'")}')">
+          <div style="padding:8px 12px; border-bottom:1px solid #222B30; cursor:pointer;" onclick="selectVenue('${item.v.replace(/'/g, "\\'")}', '${item.c.replace(/'/g, "\\'")}', '${toStateAbbr(item.s).replace(/'/g, "\\'")}', '${item.co.replace(/'/g, "\\'")}')">
             <div style="font-weight:bold; color:#fff;">${item.v}</div>
-            <div style="color:#94a3b8; font-size:10px;">${item.c}, ${item.s}, ${item.co}</div>
+            <div style="color:#94a3b8; font-size:10px;">${item.c}, ${toStateAbbr(item.s)}, ${item.co}</div>
           </div>
         `).join('');
       } else {
@@ -737,7 +758,7 @@
     function selectVenue(v, c, s, co) {
       document.getElementById('input-venue').value = v;
       document.getElementById('input-city').value = c;
-      document.getElementById('input-state').value = s;
+      document.getElementById('input-state').value = toStateAbbr(s);
       document.getElementById('input-country').value = co;
       document.getElementById('venue-dropdown').style.display = 'none';
     }
@@ -794,6 +815,7 @@
         if (Array.isArray(userShows)) {
           userShows.forEach(s => {
             if (!s.id) s.id = generateUniqueId();
+            if (s.state) s.state = toStateAbbr(s.state);
           });
         } else {
           userShows = [];
@@ -1126,7 +1148,7 @@
       const headline = document.getElementById('input-headline').value;
       const venue = document.getElementById('input-venue').value;
       const city = document.getElementById('input-city').value || 'Noblesville';
-      const state = document.getElementById('input-state').value || 'IN';
+      const state = toStateAbbr(document.getElementById('input-state').value || 'IN');
       const country = document.getElementById('input-country').value || 'USA';
       const date = document.getElementById('input-date').value || '08/02/88';
       const notes = document.getElementById('input-notes').value || '';
