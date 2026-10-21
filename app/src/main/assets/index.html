@@ -109,8 +109,8 @@
 
     <!-- Mode Switcher Tabs -->
     <div class="auth-tab-box">
-      <button class="auth-tab-btn active" id="tab-login" onclick="switchAuthMode('login')">Log In</button>
-      <button class="auth-tab-btn" id="tab-register" onclick="switchAuthMode('register')">Create Account</button>
+      <button type="button" class="auth-tab-btn active" id="tab-login" onclick="switchAuthMode('login')">Log In</button>
+      <button type="button" class="auth-tab-btn" id="tab-register" onclick="switchAuthMode('register')">Create Account</button>
     </div>
 
     <div style="flex:1; display:flex; flex-direction:column;">
@@ -119,13 +119,13 @@
         <input type="text" id="auth-name" class="input-field" placeholder="Your Name" />
       </div>
 
-      <label class="input-label">Email Address</label>
+      <label class="input-label">Email Address *</label>
       <input type="text" id="auth-email" class="input-field" placeholder="you@example.com" />
 
-      <label class="input-label">Password</label>
+      <label class="input-label">Password *</label>
       <input type="password" id="auth-password" class="input-field" placeholder="••••••••" />
 
-      <button type="button" class="btn-cta" id="btn-auth-submit" onclick="handleLoginSubmit(event); showScreen('diary');">LOG IN</button>
+      <button type="button" class="btn-cta" id="btn-auth-submit" onclick="showScreen('diary')">LOG IN</button>
     </div>
   </div>
 
@@ -429,7 +429,6 @@
     let userShows = [];
     let currentSort = 'newest';
     let activeDetailIndex = -1;
-    let activeUserId = null;
 
     function showScreen(screenId) {
       document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
