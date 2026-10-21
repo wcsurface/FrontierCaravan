@@ -17,7 +17,7 @@
     .header-logo-box { display: flex; align-items: center; justify-content: center; width: 100%; }
     .header-logo-img { height: 90px; width: auto; object-fit: contain; filter: drop-shadow(0 0 16px rgba(0,230,118,0.4)); }
 
-    /* Sort Control Bar - Moved Sort Filter to Right Edge & Doubled Shows Count Font Size */
+    /* Sort Control Bar (Shows Count Twice as Large & Filter at Right Edge) */
     .sort-control-bar { display: flex; justify-between; align-items: center; width: 100%; margin-bottom: 12px; padding: 0 2px; }
     .shows-count-title { font-size: 22px; font-weight: 900; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px; }
     .sort-dropdown { background: #121619; border: 1.5px solid #222B30; color: #f1f5f9; font-size: 11px; font-weight: 800; border-radius: 8px; padding: 7px 10px; outline: none; text-transform: uppercase; cursor: pointer; margin-left: auto; }
@@ -53,16 +53,17 @@
     .ticket-date { color: #d97706; text-transform: uppercase; }
     .ticket-stub { width: 28%; display: flex; flex-direction: column; justify-center; align-items: center; font-weight: 900; font-size: 10px; text-transform: uppercase; }
 
-    /* Inputs with Amber Borders (#FFB300) */
-    .input-label { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #FFB300; margin-bottom: 4px; display: block; }
-    .input-field { width: 100%; background: #111618; border: 1.5px solid #FFB300; border-radius: 8px; padding: 12px 14px; color: #f1f5f9; font-size: 14px; outline: none; margin-bottom: 8px; box-shadow: 0 0 10px rgba(255,179,0,0.15); }
-    textarea.input-field { min-height: 120px; resize: none; }
+    /* Inputs with Amber Borders (#FFB300) - Enlarged Field Titles, Helpers, and User Entered Text */
+    .input-label { font-size: 13px; font-weight: 900; text-transform: uppercase; color: #FFB300; margin-bottom: 6px; display: block; letter-spacing: 0.5px; }
+    .input-field { width: 100%; background: #111618; border: 1.5px solid #FFB300; border-radius: 8px; padding: 14px 14px; color: #f1f5f9; font-size: 16px; font-weight: 800; outline: none; margin-bottom: 8px; box-shadow: 0 0 10px rgba(255,179,0,0.15); }
+    .input-field::placeholder { color: #94a3b8; font-weight: 600; font-size: 15px; }
+    textarea.input-field { min-height: 120px; resize: none; line-height: 1.6; }
 
     /* Action CTA Buttons */
     .btn-cta { width: 100%; background: linear-gradient(90deg, #00E676, #00C853); color: #0a0a0a; font-weight: 900; font-size: 20px; padding: 16px; border-radius: 9999px; border: none; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; box-shadow: 0 0 22px rgba(0,230,118,0.5); margin-top: 12px; margin-bottom: 8px; }
     .btn-edit { width: 100%; background: linear-gradient(90deg, #FFB300, #FFA000); color: #0a0a0a; font-weight: 900; font-size: 14px; padding: 12px; border-radius: 9999px; border: none; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; box-shadow: 0 0 15px rgba(255,179,0,0.3); margin-top: 8px; margin-bottom: 6px; }
     .btn-delete { width: 100%; background: rgba(136, 19, 55, 0.4); color: #fecdd3; font-weight: 800; font-size: 13px; padding: 12px; border-radius: 9999px; border: 1px solid rgba(225, 29, 72, 0.6); text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-bottom: 8px; }
-    .btn-add-opener { background: none; border: none; color: #FFB300; font-weight: 800; font-size: 12px; cursor: pointer; margin-bottom: 12px; text-align: left; padding: 2px 0; }
+    .btn-add-opener { background: none; border: none; color: #FFB300; font-weight: 800; font-size: 13px; cursor: pointer; margin-bottom: 12px; text-align: left; padding: 2px 0; }
 
     /* FIXED FLOATING GLASSMORPHIC DARK UI 4-BUTTON NAVIGATION BAR CSS STYLES */
     .glass-nav-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 420px; display: flex; justify-between; align-items: center; gap: 6px; padding: 8px 12px 14px 12px; z-index: 100; background: rgba(10, 13, 14, 0.92); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-top: 1px solid rgba(34, 43, 48, 0.6); }

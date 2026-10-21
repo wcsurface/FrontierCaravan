@@ -45,7 +45,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
         }
         setVenueName(venueObj?.name || '');
         setCity(venueObj?.city || 'Noblesville');
-        setStateProvince(venueObj?.stateProvince || 'Indiana');
+        setStateProvince(venueObj?.stateProvince || 'IN');
         setCountry(venueObj?.country || 'USA');
         setNotesText(concert.generalNotes || '');
         setPhotoUris(concert.photoUris || []);
@@ -220,11 +220,11 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
         />
       </header>
 
-      {/* Form Inputs */}
+      {/* Form Inputs - Enlarged Titles, Placeholders, and User Entered Text for Optimal Readability */}
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-4 max-w-md mx-auto w-full pb-2 pt-2">
         {/* Headline Band */}
         <div>
-          <label className="block text-[11px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
+          <label className="block text-sm sm:text-base font-black uppercase tracking-wider text-[#FFB300] mb-1.5">
             Headline Band *
           </label>
           <input
@@ -233,13 +233,13 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
             value={headlineBand}
             onChange={(e) => setHeadlineBand(e.target.value)}
             required
-            className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-4 py-3 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition"
+            className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-4 py-3.5 text-base sm:text-lg font-extrabold text-slate-100 placeholder:text-slate-400 placeholder:font-semibold outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition"
           />
         </div>
 
         {/* Dynamic Opener Fields */}
         <div>
-          <label className="block text-[11px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
+          <label className="block text-sm sm:text-base font-black uppercase tracking-wider text-[#FFB300] mb-1.5">
             Opener
           </label>
           <div className="space-y-2">
@@ -250,7 +250,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
                   placeholder={idx === 0 ? "Opener" : `Opener ${idx + 1}`}
                   value={opener}
                   onChange={(e) => handleOpenerChange(idx, e.target.value)}
-                  className="flex-1 bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-4 py-3 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition"
+                  className="flex-1 bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-4 py-3.5 text-base sm:text-lg font-extrabold text-slate-100 placeholder:text-slate-400 placeholder:font-semibold outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition"
                 />
                 {openers.length > 1 && (
                   <button
@@ -258,7 +258,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
                     onClick={() => handleRemoveOpenerField(idx)}
                     className="p-3 text-slate-400 hover:text-rose-400 transition"
                   >
-                    <Trash2 size={18} />
+                    <Trash2 size={20} />
                   </button>
                 )}
               </div>
@@ -268,15 +268,15 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
           <button
             type="button"
             onClick={handleAddOpenerField}
-            className="mt-2 flex items-center gap-1.5 text-xs font-extrabold text-[#FFB300] hover:text-amber-300 transition py-1"
+            className="mt-2 flex items-center gap-1.5 text-sm font-extrabold text-[#FFB300] hover:text-amber-300 transition py-1"
           >
-            <Plus size={14} className="stroke-[3]" /> + Add Another Opener
+            <Plus size={16} className="stroke-[3]" /> + Add Another Opener
           </button>
         </div>
 
         {/* Date Input */}
         <div>
-          <label className="block text-[11px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
+          <label className="block text-sm sm:text-base font-black uppercase tracking-wider text-[#FFB300] mb-1.5">
             Date (MM/DD/YY)
           </label>
           <input
@@ -285,13 +285,13 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
             value={dateStr}
             onChange={handleDateChange}
             maxLength={10}
-            className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-4 py-3 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition font-mono"
+            className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-4 py-3.5 text-base sm:text-lg font-extrabold text-slate-100 placeholder:text-slate-400 placeholder:font-semibold outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition font-mono"
           />
         </div>
 
         {/* Venue Input */}
         <div className="relative">
-          <label className="block text-[11px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
+          <label className="block text-sm sm:text-base font-black uppercase tracking-wider text-[#FFB300] mb-1.5">
             Venue *
           </label>
           <input
@@ -301,7 +301,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
             onChange={(e) => handleVenueChange(e.target.value)}
             onFocus={() => venueName.trim().length > 0 && setIsDropdownOpen(true)}
             required
-            className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-4 py-3 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition"
+            className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-4 py-3.5 text-base sm:text-lg font-extrabold text-slate-100 placeholder:text-slate-400 placeholder:font-semibold outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition"
           />
 
           {isDropdownOpen && venueSuggestions.length > 0 && (
@@ -312,9 +312,9 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
                   onClick={() => handleSelectVenue(item)}
                   className="p-3 hover:bg-[#1C2328] cursor-pointer transition flex items-start gap-2.5"
                 >
-                  <MapPin size={16} className="text-[#FFB300] shrink-0 mt-0.5" />
+                  <MapPin size={18} className="text-[#FFB300] shrink-0 mt-0.5" />
                   <div>
-                    <div className="text-sm font-bold text-slate-100">{item.venue}</div>
+                    <div className="text-base font-bold text-slate-100">{item.venue}</div>
                     <div className="text-xs text-[#00E676] font-extrabold">
                       {item.city}, {item.stateProvince}, {item.country}
                     </div>
@@ -328,7 +328,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
         {/* Location Info Fields */}
         <div className="grid grid-cols-3 gap-2">
           <div>
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
+            <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-[#FFB300] mb-1">
               City
             </label>
             <input
@@ -336,25 +336,25 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
               placeholder="City"
               value={city}
               onChange={(e) => setCity(e.target.value)}
-              className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-3 py-2.5 text-xs text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)]"
+              className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-3 py-3 text-sm sm:text-base font-extrabold text-slate-100 placeholder:text-slate-400 placeholder:font-semibold outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)]"
             />
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#FFB300] mb-1 truncate">
-              State / Province
+            <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-[#FFB300] mb-1 truncate">
+              State
             </label>
             <input
               type="text"
               placeholder="State"
               value={stateProvince}
               onChange={(e) => setStateProvince(e.target.value)}
-              className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-3 py-2.5 text-xs text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)]"
+              className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-3 py-3 text-sm sm:text-base font-extrabold text-slate-100 placeholder:text-slate-400 placeholder:font-semibold outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)]"
             />
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
+            <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-[#FFB300] mb-1">
               Country
             </label>
             <input
@@ -362,7 +362,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
               placeholder="Country"
               value={country}
               onChange={(e) => setCountry(e.target.value)}
-              className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-3 py-2.5 text-xs text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)]"
+              className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg px-3 py-3 text-sm sm:text-base font-extrabold text-slate-100 placeholder:text-slate-400 placeholder:font-semibold outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)]"
             />
           </div>
         </div>
@@ -370,8 +370,8 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
         {/* Concert Photo Attachment (Premium Feature) */}
         <div className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-2">
           <div className="flex items-center justify-between">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[#FFB300] flex items-center gap-1.5">
-              <Camera size={14} /> Concert Photos ({photoUris.length}/3)
+            <label className="text-xs sm:text-sm font-black uppercase tracking-wider text-[#FFB300] flex items-center gap-1.5">
+              <Camera size={16} /> Concert Photos ({photoUris.length}/3)
             </label>
             {!isPremium && (
               <span className="text-[10px] font-black uppercase text-[#FFB300] bg-[#FFB300]/10 px-2 py-0.5 rounded border border-[#FFB300]/30 flex items-center gap-1">
@@ -428,7 +428,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
 
         {/* Combined Notes / Setlist Field */}
         <div className="flex-1 flex flex-col min-h-[140px]">
-          <label className="block text-[11px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
+          <label className="block text-sm sm:text-base font-black uppercase tracking-wider text-[#FFB300] mb-1.5">
             Notes
           </label>
           <textarea
@@ -436,11 +436,11 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
             value={notesText}
             onChange={(e) => setNotesText(e.target.value)}
             rows={4}
-            className="w-full flex-1 bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg p-4 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition resize-none text-sm leading-relaxed"
+            className="w-full flex-1 bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg p-4 text-base sm:text-lg font-extrabold text-slate-100 placeholder:text-slate-400 placeholder:font-semibold outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition resize-none leading-relaxed"
           />
         </div>
 
-        {/* Submit Button: Changes dynamically between "+ ADD" and "💾 SAVE EDITS" */}
+        {/* Submit Button: Unchanged Green + ADD CTA */}
         <div className="my-2">
           <button
             type="submit"
