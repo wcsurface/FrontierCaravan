@@ -9,7 +9,7 @@ interface GlassNavBarProps {
 
 export const GlassNavBar: React.FC<GlassNavBarProps> = ({ currentView, onNavigate }) => {
   return (
-    <div className="w-full max-w-md mx-auto pt-2 pb-4 px-1 flex items-center justify-between gap-1.5 z-30 select-none shrink-0">
+    <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-3 z-50 bg-[#0A0D0E]/90 backdrop-blur-lg border-t border-[#222B30]/60 flex items-center justify-between gap-1.5 select-none">
       {/* 1. HOME BUTTON */}
       <div className="relative group flex-1">
         <div className="absolute -inset-0.5 rounded-xl bg-gradient-to-r from-amber-500/40 via-purple-600/30 to-amber-600/30 blur-md opacity-90 group-hover:opacity-100 transition"></div>
@@ -42,7 +42,7 @@ export const GlassNavBar: React.FC<GlassNavBarProps> = ({ currentView, onNavigat
         </button>
       </div>
 
-      {/* 3. LOG IN BUTTON */}
+      {/* 3. PROFILE BUTTON */}
       <div className="relative group flex-1">
         <div className="absolute -inset-0.5 rounded-xl bg-gradient-to-b from-[#FF7A00]/50 via-[#FFA73B]/30 to-[#8E2B5F]/40 blur-md opacity-90 group-hover:opacity-100 transition"></div>
         <button
@@ -53,7 +53,7 @@ export const GlassNavBar: React.FC<GlassNavBarProps> = ({ currentView, onNavigat
           }`}
         >
           <span className="text-[#F6B756] font-extrabold text-xs sm:text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] uppercase tracking-wider block truncate">
-            Log In
+            Profile
           </span>
         </button>
       </div>

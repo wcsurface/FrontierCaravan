@@ -57,7 +57,7 @@ export default function HomeView() {
     <main className="flex flex-col items-center justify-between min-h-screen bg-[#0A0D0E] text-slate-100 select-none font-sans overflow-hidden bg-grid-lines">
       {/* SCREEN 1: DIARY VIEW */}
       {currentView === 'diary' && (
-        <div className="flex flex-col w-full max-w-md h-screen p-4 overflow-y-auto justify-between">
+        <div className="flex flex-col w-full max-w-md h-screen p-4 overflow-y-auto justify-between pb-28">
           {/* Header with LiveLore Logo */}
           <header className="relative flex items-center justify-between w-full pt-3 pb-6 my-1">
             <button
@@ -107,7 +107,7 @@ export default function HomeView() {
           )}
 
           {/* Ticket Stubs Feed OR Clean Empty State */}
-          <div className="flex-1 overflow-y-auto pr-1 flex flex-col">
+          <div className="flex-1 overflow-y-auto pr-1 flex flex-col pb-6">
             {sortedConcerts.length === 0 ? (
               <div className="flex flex-col items-center justify-center text-center my-auto py-8 px-4 space-y-6">
                 <div className="w-16 h-16 bg-[#FFB300]/10 text-[#FFB300] rounded-full flex items-center justify-center border border-[#FFB300]/30 shadow-[0_0_20px_rgba(255,179,0,0.2)] mb-1">
@@ -141,7 +141,7 @@ export default function HomeView() {
             )}
           </div>
 
-          {/* Glassmorphic 4-Button Navigation Bar */}
+          {/* Fixed Floating Glassmorphic 4-Button Navigation Bar */}
           <GlassNavBar currentView={currentView} onNavigate={setCurrentView} />
         </div>
       )}
