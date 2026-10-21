@@ -21,7 +21,7 @@ interface AuthState {
   checkMe: () => Promise<void>;
 }
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'https://frontiercaravan-production.up.railway.app';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'https://frontier-caravan-9r14f56ys-surface7.vercel.app';
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -42,10 +42,10 @@ export const useAuthStore = create<AuthState>()(
 
           const data = await res.json();
 
-          if (res.ok && data.token && data.user) {
+          if (res.ok && data.user) {
             set({ user: data.user, token: data.token, isLoading: false, error: null });
 
-            // Immediately pull user's saved concerts vault from Railway PostgreSQL DB
+            // Immediately pull user's saved concerts vault from Cloud DB
             useEncoreStore.getState().syncCloudPull(data.user.id);
             return true;
           } else {
@@ -69,10 +69,10 @@ export const useAuthStore = create<AuthState>()(
 
           const data = await res.json();
 
-          if (res.ok && data.token && data.user) {
+          if (res.ok && data.user) {
             set({ user: data.user, token: data.token, isLoading: false, error: null });
 
-            // Immediately pull / initialize user's concerts vault in Railway PostgreSQL
+            // Immediately pull / initialize user's concerts vault in Cloud DB
             useEncoreStore.getState().syncCloudPull(data.user.id);
             return true;
           } else {
@@ -105,11 +105,8 @@ export const useAuthStore = create<AuthState>()(
             const data = await res.json();
             if (data.user) {
               set({ user: data.user });
-              // Pull user's latest vault from Railway PostgreSQL DB
               useEncoreStore.getState().syncCloudPull(data.user.id);
             }
-          } else {
-            set({ user: null, token: null });
           }
         } catch (e) {
           // Offline mode
