@@ -16,7 +16,7 @@ export default function HomeView() {
   const { user, token, checkMe } = useAuthStore();
   const { concerts, artists, venues } = useEncoreStore();
 
-  const [currentView, setCurrentView] = useState<'diary' | 'log' | 'setlist' | 'stats' | 'auth'>('diary');
+  const [currentView, setCurrentView] = useState<'diary' | 'log' | 'setlist' | 'stats' | 'auth' | 'profile'>('diary');
   const [selectedConcertId, setSelectedConcertId] = useState<string>('');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'band'>('newest');
 
@@ -74,7 +74,7 @@ export default function HomeView() {
               />
             </div>
             <button
-              onClick={() => setCurrentView('auth')}
+              onClick={() => setCurrentView('profile')}
               className="p-2 text-[#00E676] hover:text-white transition rounded-full z-10 flex items-center gap-1"
             >
               {user ? (
@@ -142,7 +142,7 @@ export default function HomeView() {
           </div>
 
           {/* Fixed Floating Glassmorphic 4-Button Navigation Bar */}
-          <GlassNavBar currentView={currentView} onNavigate={setCurrentView} />
+          <GlassNavBar currentView="diary" onNavigate={(view) => setCurrentView(view === 'auth' ? 'profile' : view)} />
         </div>
       )}
 
@@ -151,7 +151,7 @@ export default function HomeView() {
         <LogShowScreen
           onBack={() => setCurrentView('diary')}
           onSaved={() => setCurrentView('diary')}
-          onNavigate={setCurrentView}
+          onNavigate={(view) => setCurrentView(view === 'auth' ? 'profile' : view)}
         />
       )}
 
@@ -161,7 +161,7 @@ export default function HomeView() {
           concertId={selectedConcertId}
           onBack={() => setCurrentView('diary')}
           onEdit={(concertId) => handleEditConcert(concertId)}
-          onNavigate={setCurrentView}
+          onNavigate={(view) => setCurrentView(view === 'auth' ? 'profile' : view)}
         />
       )}
 
@@ -169,25 +169,25 @@ export default function HomeView() {
       {currentView === 'stats' && (
         <StatsView
           onBack={() => setCurrentView('diary')}
-          onNavigate={setCurrentView}
+          onNavigate={(view) => setCurrentView(view === 'auth' ? 'profile' : view)}
         />
       )}
 
-      {/* SCREEN 5: PROFILE / AUTH VIEW */}
+      {/* SCREEN 5: PROFILE VIEW */}
+      {currentView === 'profile' && (
+        <ProfileView
+          onBack={() => setCurrentView('diary')}
+          onNavigate={(view) => setCurrentView(view === 'auth' ? 'profile' : view)}
+          onSwitchAccount={() => setCurrentView('auth')}
+        />
+      )}
+
+      {/* SCREEN 6: AUTH / LOG IN SCREEN */}
       {currentView === 'auth' && (
-        user ? (
-          <ProfileView
-            onBack={() => setCurrentView('diary')}
-            onNavigate={setCurrentView}
-          />
-        ) : (
-          <AuthScreen
-            onBack={() => {
-              if (user) setCurrentView('diary');
-            }}
-            onSuccess={() => setCurrentView('diary')}
-          />
-        )
+        <AuthScreen
+          onBack={() => setCurrentView('diary')}
+          onSuccess={() => setCurrentView('diary')}
+        />
       )}
     </main>
   );

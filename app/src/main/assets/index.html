@@ -53,9 +53,7 @@
     .btn-delete { width: 100%; background: rgba(136, 19, 55, 0.4); color: #fecdd3; font-weight: 800; font-size: 13px; padding: 12px; border-radius: 9999px; border: 1px solid rgba(225, 29, 72, 0.6); text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-bottom: 8px; }
     .btn-add-opener { background: none; border: none; color: #FFB300; font-weight: 800; font-size: 12px; cursor: pointer; margin-bottom: 12px; text-align: left; padding: 2px 0; }
 
-    /* ========================================================================== */
     /* FIXED FLOATING GLASSMORPHIC DARK UI 4-BUTTON NAVIGATION BAR CSS STYLES */
-    /* ========================================================================== */
     .glass-nav-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 420px; display: flex; justify-between; align-items: center; gap: 6px; padding: 8px 12px 14px 12px; z-index: 100; background: rgba(10, 13, 14, 0.92); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-top: 1px solid rgba(34, 43, 48, 0.6); }
     .glass-btn-wrapper { position: relative; flex: 1; }
 
@@ -101,7 +99,7 @@
 </head>
 <body>
 
-  <!-- SCREEN 0: MANDATORY AUTH / AUTH PAGE -->
+  <!-- SCREEN 0: MANDATORY AUTH / LOG IN & REGISTER -->
   <div id="view-auth" class="screen-view active">
     <div class="header">
       <div class="header-logo-box">
@@ -120,20 +118,20 @@
       <button class="auth-tab-btn" id="tab-register" onclick="switchAuthMode('register')">Create Account</button>
     </div>
 
-    <div style="flex:1; display:flex; flex-direction:column;">
+    <form style="flex:1; display:flex; flex-direction:column;" onsubmit="handleLoginSubmit(event)">
       <div id="field-name-box" style="display:none;">
         <label class="input-label">Display Name</label>
         <input type="text" id="auth-name" class="input-field" placeholder="Your Name" />
       </div>
 
-      <label class="input-label">Email Address</label>
-      <input type="text" id="auth-email" class="input-field" placeholder="you@example.com" />
+      <label class="input-label">Email Address *</label>
+      <input type="text" id="auth-email" class="input-field" placeholder="you@example.com" required />
 
-      <label class="input-label">Password</label>
-      <input type="password" id="auth-password" class="input-field" placeholder="••••••••" />
+      <label class="input-label">Password *</label>
+      <input type="password" id="auth-password" class="input-field" placeholder="••••••••" required minlength="6" />
 
-      <button type="button" class="btn-cta" id="btn-auth-submit" onclick="showScreen('diary')">LOG IN</button>
-    </div>
+      <button type="submit" class="btn-cta" id="btn-auth-submit">LOG IN</button>
+    </form>
   </div>
 
   <!-- SCREEN 1: DIARY (HOME PAGE) -->
@@ -143,7 +141,7 @@
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
       </div>
-      <button class="nav-btn-icon nav-btn-right" onclick="showScreen('auth')">★</button>
+      <button class="nav-btn-icon nav-btn-right" onclick="showScreen('profile')">★</button>
     </div>
 
     <!-- Sort Control Bar -->
@@ -164,7 +162,7 @@
     <div class="glass-nav-bar">
       <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
       <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('auth')"><span class="glass-btn-text">Profile</span></button></div>
+      <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
       <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
     </div>
   </div>
@@ -221,7 +219,7 @@
     <div class="glass-nav-bar">
       <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="cancelShowLog()"><span class="glass-btn-text">Home</span></button></div>
       <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('auth')"><span class="glass-btn-text">Profile</span></button></div>
+      <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
       <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
     </div>
   </div>
@@ -273,12 +271,59 @@
     <div class="glass-nav-bar">
       <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
       <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('auth')"><span class="glass-btn-text">Profile</span></button></div>
+      <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
       <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
     </div>
   </div>
 
-  <!-- SCREEN 4: STATS -->
+  <!-- SCREEN 4: PROFILE DASHBOARD PAGE -->
+  <div id="view-profile" class="screen-view">
+    <div class="header">
+      <button class="nav-btn-icon nav-btn-left" style="color:#ffffff;" onclick="showScreen('diary')">←</button>
+      <div class="header-logo-box">
+        <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
+    </div>
+
+    <!-- Profile Account Info Card -->
+    <div class="detail-card" style="text-align:center;">
+      <div style="font-size:36px; margin-bottom:8px;">👤</div>
+      <div style="font-weight:900; font-size:18px; color:#ffffff; text-transform:uppercase;" id="profile-user-name">LiveLore Concert Fan</div>
+      <div style="font-size:12px; color:#94a3b8; margin-top:2px;" id="profile-user-email">fan@livelore.com</div>
+      <div style="font-size:11px; font-weight:800; color:#00E676; margin-top:8px;">✓ Railway Cloud Sync Active</div>
+    </div>
+
+    <!-- Catchy $3.99 VIP Pass / Buy the App Banner -->
+    <div class="detail-card" style="background: linear-gradient(135deg, rgba(255,179,0,0.2), #121619); border-color: #FFB300;">
+      <div style="display:flex; justify-between; align-items:center; margin-bottom:8px;">
+        <span style="font-size:11px; font-weight:900; color:#FFB300; text-transform:uppercase;">👑 LIVELORE VIP PASS</span>
+        <span style="background:#FFB300; color:#0a0a0a; font-size:10px; font-weight:900; padding:2px 8px; border-radius:9999px;">$3.99 ONE-TIME</span>
+      </div>
+      <div style="font-weight:900; font-size:16px; color:#ffffff; text-transform:uppercase; margin-bottom:6px;">Unlock Photo Stubs & 100% Ad-Free Vault! 🎟️</div>
+      <div style="font-size:12px; color:#cbd5e1; line-height:1.5; margin-bottom:12px;">Attach up to 3 concert photos per ticket stub. Your favorite show photo renders right inside your retro ticket stub!</div>
+      <button class="btn-edit" onclick="buyAppPremium()">⭐ GO PREMIUM FOR $3.99</button>
+    </div>
+
+    <!-- Change Password Card -->
+    <div class="detail-card">
+      <div class="detail-label">🔑 CHANGE PASSWORD</div>
+      <input type="password" id="profile-new-pass" class="input-field" placeholder="New Password (min 6 chars)" style="margin-top:8px; margin-bottom:10px;" />
+      <button type="button" class="btn-cancel" style="margin-bottom:0;" onclick="alert('✓ Password updated successfully!')">Update Password</button>
+    </div>
+
+    <!-- Log Out Button -->
+    <button class="btn-delete" onclick="showScreen('auth')">LOG OUT</button>
+
+    <!-- Fixed Floating Glassmorphic 4-Button Navigation Bar -->
+    <div class="glass-nav-bar">
+      <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+      <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
+      <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+      <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
+    </div>
+  </div>
+
+  <!-- SCREEN 5: STATS -->
   <div id="view-stats" class="screen-view">
     <div class="header">
       <button class="nav-btn-icon nav-btn-left" style="color:#ffffff;" onclick="showScreen('diary')">←</button>
@@ -325,12 +370,12 @@
     <div class="glass-nav-bar">
       <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
       <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('auth')"><span class="glass-btn-text">Profile</span></button></div>
+      <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
       <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
     </div>
   </div>
 
-  <!-- SCREEN 5: SUB-STATS DETAIL -->
+  <!-- SCREEN 6: SUB-STATS DETAIL -->
   <div id="view-substats" class="screen-view">
     <div class="header">
       <button class="nav-btn-icon nav-btn-left" style="color:#ffffff;" onclick="showScreen('stats')">←</button>
@@ -345,7 +390,7 @@
     <div class="glass-nav-bar">
       <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
       <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('auth')"><span class="glass-btn-text">Profile</span></button></div>
+      <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
       <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
     </div>
   </div>
@@ -391,6 +436,10 @@
     function handleLoginSubmit(e) {
       if (e) e.preventDefault();
       showScreen('diary');
+    }
+
+    function buyAppPremium() {
+      alert('🎉 Welcome to LiveLore VIP! You now have permanent ad-free access and 3-photo ticket stub memories!');
     }
 
     function openShowDetails(showIndex) {

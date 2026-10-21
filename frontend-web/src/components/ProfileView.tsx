@@ -4,14 +4,15 @@ import React, { useState } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useEncoreStore } from '../store/useEncoreStore';
 import { GlassNavBar } from './GlassNavBar';
-import { ArrowLeft, User, CheckCircle2, Crown, Lock, LogOut, Sparkles, KeyRound } from 'lucide-react';
+import { ArrowLeft, User, CheckCircle2, Crown, LogOut, Sparkles, KeyRound, UserCheck } from 'lucide-react';
 
 interface ProfileViewProps {
   onBack: () => void;
   onNavigate: (view: 'diary' | 'log' | 'stats' | 'auth') => void;
+  onSwitchAccount?: () => void;
 }
 
-export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate }) => {
+export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate, onSwitchAccount }) => {
   const { user, logout } = useAuthStore();
   const { isPremium, setIsPremium } = useEncoreStore();
 
@@ -33,7 +34,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate }) 
   };
 
   return (
-    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between min-h-screen">
+    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between min-h-screen pb-28">
       {/* Header with LiveLore Logo */}
       <header className="relative flex items-center justify-between w-full pt-2 pb-6 my-1 shrink-0">
         <button
@@ -133,16 +134,19 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate }) 
           </form>
         </div>
 
-        {/* Log Out Button */}
+        {/* Log Out / Switch Account Button */}
         <button
-          onClick={logout}
+          onClick={() => {
+            logout();
+            if (onSwitchAccount) onSwitchAccount();
+          }}
           className="w-full py-3.5 bg-[#121619] hover:bg-rose-950/40 text-rose-400 font-extrabold text-sm uppercase tracking-wider rounded-full border border-rose-900/50 transition flex items-center justify-center gap-2"
         >
           <LogOut size={18} /> LOG OUT
         </button>
       </div>
 
-      {/* Glassmorphic 4-Button Navigation Bar */}
+      {/* Fixed Floating Glassmorphic 4-Button Navigation Bar */}
       <GlassNavBar currentView="auth" onNavigate={onNavigate} />
     </div>
   );
