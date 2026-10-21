@@ -10,7 +10,7 @@ import { StatsView } from '../components/StatsView';
 import { AuthScreen } from '../components/AuthScreen';
 import { ProfileView } from '../components/ProfileView';
 import { GlassNavBar } from '../components/GlassNavBar';
-import { Sparkles, ArrowDown, SlidersHorizontal } from 'lucide-react';
+import { Sparkles, ArrowUp, SlidersHorizontal } from 'lucide-react';
 
 export default function HomeView() {
   const { user, token, checkMe } = useAuthStore();
@@ -99,7 +99,7 @@ export default function HomeView() {
             </div>
           )}
 
-          {/* Ticket Stubs Feed OR Clean Empty State */}
+          {/* Ticket Stubs Feed OR Clean Empty State Pointing UPWARD to Top Navigation Bar */}
           <div className="flex-1 overflow-y-auto pr-1 flex flex-col pb-6">
             {sortedConcerts.length === 0 ? (
               <div className="flex flex-col items-center justify-center text-center my-auto py-8 px-4 space-y-6">
@@ -110,11 +110,11 @@ export default function HomeView() {
                   Your Concert Vault Is Empty! 🎸
                 </h2>
 
-                <div className="pt-4 flex flex-col items-center gap-3 text-[#00E676] animate-bounce">
+                <div className="pt-2 flex flex-col items-center gap-3 text-[#00E676] animate-bounce">
+                  <ArrowUp size={44} className="stroke-[3.5] text-[#00E676] drop-shadow-[0_0_15px_rgba(0,230,118,0.8)]" />
                   <span className="text-base sm:text-lg font-black uppercase tracking-widest text-[#FFB300]">
-                    Start adding your concerts below!
+                    Start adding your concerts above!
                   </span>
-                  <ArrowDown size={44} className="stroke-[3.5] text-[#00E676] drop-shadow-[0_0_15px_rgba(0,230,118,0.8)]" />
                 </div>
               </div>
             ) : (

@@ -17,7 +17,7 @@
     .header-logo-box { display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 6px; }
     .header-logo-img { height: 80px; width: auto; object-fit: contain; filter: drop-shadow(0 0 16px rgba(0,230,118,0.4)); }
 
-    /* Sort Control Bar */
+    /* Sort Control Bar (Shows Count Twice as Large & Filter at Right Edge) */
     .sort-control-bar { display: flex; justify-between; align-items: center; width: 100%; margin-bottom: 12px; padding: 0 2px; }
     .shows-count-title { font-size: 22px; font-weight: 900; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px; }
     .sort-dropdown { background: #121619; border: 1.5px solid #222B30; color: #f1f5f9; font-size: 11px; font-weight: 800; border-radius: 8px; padding: 7px 10px; outline: none; text-transform: uppercase; cursor: pointer; margin-left: auto; }
@@ -92,12 +92,12 @@
 
     .glass-btn-text { font-weight: 900; font-size: 13px; text-transform: uppercase; letter-spacing: 0.8px; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* Empty State Pointer Animation */
-    @keyframes bounceDown {
+    /* Empty State Pointer Animation Pointing UPWARD to Top Navigation Bar */
+    @keyframes bounceUp {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(10px); }
+      50% { transform: translateY(-10px); }
     }
-    .bounce-pointer { animation: bounceDown 1.5s infinite; }
+    .bounce-pointer { animation: bounceUp 1.5s infinite; }
 
     /* Detail Card Box - Enlarged Labels & Values */
     .detail-card { background: #121619; border: 1px solid #222B30; border-radius: 16px; padding: 20px; margin-bottom: 12px; width: 100%; }
@@ -299,7 +299,7 @@
     <button class="btn-delete" id="btn-delete-show" style="font-size:15px; padding:14px;" onclick="triggerDeleteShow()">🗑 DELETE SHOW</button>
   </div>
 
-  <!-- SCREEN 4: PROFILE DASHBOARD PAGE (TICKET THEME TOGGLE AT TOP + GLASS NAVBAR UNDER LOGO) -->
+  <!-- SCREEN 4: PROFILE DASHBOARD PAGE ($4.99 PRICE & 6 SPECIFIC REFINEMENTS) -->
   <div id="view-profile" class="screen-view">
     <div class="header">
       <div class="header-logo-box">
@@ -961,9 +961,9 @@
           <div id="empty-state-box" style="text-align:center; padding: 30px 16px; margin: auto 0;">
             <div style="font-size:36px; margin-bottom:12px;">🎸</div>
             <div style="font-weight:900; font-size:24px; color:#ffffff; text-transform:uppercase; margin-bottom:16px;">YOUR CONCERT VAULT IS EMPTY!</div>
-            <div class="bounce-pointer" style="color:#FFB300; font-weight:900; font-size:16px; text-transform:uppercase; letter-spacing:1px; margin-top:20px;">
-              START ADDING YOUR CONCERTS BELOW!
-              <div style="font-size:42px; color:#00E676; margin-top:8px; font-weight:900;">↓</div>
+            <div class="bounce-pointer" style="color:#FFB300; font-weight:900; font-size:16px; text-transform:uppercase; letter-spacing:1px; margin-top:12px;">
+              <div style="font-size:42px; color:#00E676; margin-bottom:8px; font-weight:900;">↑</div>
+              START ADDING YOUR CONCERTS ABOVE!
             </div>
           </div>
         `;
