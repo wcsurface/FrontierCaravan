@@ -6,9 +6,8 @@ export interface VenueRecord {
 }
 
 export const PRESET_VENUES: VenueRecord[] = [
-  // Historic & Current Names for Deer Creek / Noblesville, IN
+  // Historic & Current Names for Noblesville, IN
   { venue: "Deer Creek Music Center", city: "Noblesville", stateProvince: "Indiana", country: "USA" },
-  { venue: "Deer Creek", city: "Noblesville", stateProvince: "Indiana", country: "USA" },
   { venue: "Klipsch Music Center", city: "Noblesville", stateProvince: "Indiana", country: "USA" },
   { venue: "Ruoff Music Center", city: "Noblesville", stateProvince: "Indiana", country: "USA" },
   { venue: "Ruoff Home Mortgage Music Center", city: "Noblesville", stateProvince: "Indiana", country: "USA" },
