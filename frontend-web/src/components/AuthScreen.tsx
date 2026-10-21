@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { ArrowLeft, Lock, Mail, User, CheckCircle2, AlertCircle } from 'lucide-react';
 
@@ -16,6 +16,22 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
   const [password, setPassword] = useState('');
 
   const { login, register, isLoading, error, clearError, user, logout } = useAuthStore();
+
+  useEffect(() => {
+    // Clear inputs when entering auth screen
+    setEmail('');
+    setPassword('');
+    setDisplayName('');
+    clearError();
+  }, [clearError]);
+
+  const handleSwitchTab = (newMode: 'login' | 'register') => {
+    setMode(newMode);
+    setEmail('');
+    setPassword('');
+    setDisplayName('');
+    clearError();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,7 +101,8 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
             {/* Mode Switcher Tabs */}
             <div className="flex bg-[#121619] p-1 rounded-full border border-[#222B30] mb-2">
               <button
-                onClick={() => { setMode('login'); clearError(); }}
+                type="button"
+                onClick={() => handleSwitchTab('login')}
                 className={`flex-1 py-3.5 rounded-full text-xs font-black uppercase tracking-wider transition ${
                   mode === 'login'
                     ? 'bg-[#FFB300] text-slate-950 shadow-md'
@@ -95,7 +112,8 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
                 Log In
               </button>
               <button
-                onClick={() => { setMode('register'); clearError(); }}
+                type="button"
+                onClick={() => handleSwitchTab('register')}
                 className={`flex-1 py-3.5 rounded-full text-xs font-black uppercase tracking-wider transition ${
                   mode === 'register'
                     ? 'bg-[#FFB300] text-slate-950 shadow-md'
@@ -114,7 +132,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
               {/* Display Name (Register Mode) */}
               {mode === 'register' && (
                 <div>
@@ -129,6 +147,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
                       required
+                      autoComplete="off"
                       className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg pl-10 pr-4 py-3 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition"
                     />
                   </div>
@@ -148,6 +167,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    autoComplete="off"
                     className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg pl-10 pr-4 py-3 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition"
                   />
                 </div>
@@ -167,6 +187,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     minLength={6}
+                    autoComplete="new-password"
                     className="w-full bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg pl-10 pr-4 py-3 text-slate-200 placeholder-slate-500 outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition"
                   />
                 </div>

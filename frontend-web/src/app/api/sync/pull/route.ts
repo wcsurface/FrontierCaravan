@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Global Cloud Vault Store for User Shows Across Devices
-const DEFAULT_CONCERTS = [
+// Preset sample shows ONLY for wcsurface@gmail.com account
+const WCSURFACE_SHOWS = [
   {
     id: "c_srv_89",
     headline: "Stevie Ray Vaughan",
@@ -40,14 +40,23 @@ const DEFAULT_CONCERTS = [
   }
 ];
 
-// Persistent Cloud Storage Map
+// Persistent Multi-Tenant Cloud Vault Map (Key: userId -> Value: { concerts: [...] })
 const globalCloudVaults = new Map<string, any>();
+
+// Seed wcsurface@gmail.com account vault
+const WCS_USER_ID = "u_cloud_wcsurface_gmail_com";
+globalCloudVaults.set(WCS_USER_ID, { concerts: WCSURFACE_SHOWS });
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const userId = searchParams.get('userId') || 'u_default';
+  const userId = searchParams.get('userId');
 
-  const userVault = globalCloudVaults.get(userId) || { concerts: DEFAULT_CONCERTS };
+  if (!userId) {
+    return NextResponse.json({ success: true, concertsData: { concerts: [] } });
+  }
+
+  // If new user or non-seeded account, vault starts 100% clean and empty!
+  const userVault = globalCloudVaults.get(userId) || { concerts: [] };
 
   return NextResponse.json({
     success: true,

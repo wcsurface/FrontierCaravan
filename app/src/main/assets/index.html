@@ -24,9 +24,9 @@
     .sort-control-bar { display: flex; justify-between; align-items: center; width: 100%; margin-bottom: 8px; padding: 0 4px; }
     .sort-dropdown { background: #121619; border: 1px solid #222B30; color: #f1f5f9; font-size: 11px; font-weight: 800; border-radius: 8px; padding: 6px 10px; outline: none; text-transform: uppercase; cursor: pointer; }
 
-    /* Auth Tab Switcher */
-    .auth-tab-box { display: flex; background: #121619; padding: 4px; border-radius: 9999px; border: 1px solid #222B30; margin-bottom: 20px; width: 100%; }
-    .auth-tab-btn { flex: 1; padding: 12px; border-radius: 9999px; border: none; background: none; color: #94a3b8; font-weight: 900; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
+    /* Auth Tab Switcher with Generous Top Padding */
+    .auth-tab-box { display: flex; background: #121619; padding: 4px; border-radius: 9999px; border: 1px solid #222B30; margin-top: 36px; margin-bottom: 24px; width: 100%; }
+    .auth-tab-btn { flex: 1; padding: 14px; border-radius: 9999px; border: none; background: none; color: #94a3b8; font-weight: 900; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
     .auth-tab-btn.active { background: #FFB300; color: #0a0a0a; box-shadow: 0 4px 10px rgba(255,179,0,0.3); }
 
     /* Ticket Container & Card */
@@ -107,26 +107,26 @@
       </div>
     </div>
 
-    <!-- Mode Switcher Tabs -->
+    <!-- Mode Switcher Tabs with Generous Top Margin -->
     <div class="auth-tab-box">
       <button type="button" class="auth-tab-btn active" id="tab-login" onclick="switchAuthMode('login')">Log In</button>
       <button type="button" class="auth-tab-btn" id="tab-register" onclick="switchAuthMode('register')">Create Account</button>
     </div>
 
-    <div style="flex:1; display:flex; flex-direction:column;">
+    <form style="flex:1; display:flex; flex-direction:column;" onsubmit="handleLoginSubmit(event)" autocomplete="off">
       <div id="field-name-box" style="display:none;">
         <label class="input-label">Display Name</label>
-        <input type="text" id="auth-name" class="input-field" placeholder="Your Name" />
+        <input type="text" id="auth-name" class="input-field" placeholder="Your Name" autocomplete="off" />
       </div>
 
       <label class="input-label">Email Address *</label>
-      <input type="text" id="auth-email" class="input-field" placeholder="you@example.com" />
+      <input type="text" id="auth-email" class="input-field" placeholder="you@example.com" autocomplete="off" />
 
       <label class="input-label">Password *</label>
-      <input type="password" id="auth-password" class="input-field" placeholder="••••••••" />
+      <input type="password" id="auth-password" class="input-field" placeholder="••••••••" autocomplete="new-password" />
 
-      <button type="button" class="btn-cta" id="btn-auth-submit" onclick="showScreen('diary');">LOG IN</button>
-    </div>
+      <button type="submit" class="btn-cta" id="btn-auth-submit">LOG IN</button>
+    </form>
   </div>
 
   <!-- SCREEN 1: DIARY (HOME PAGE) -->
@@ -299,7 +299,7 @@
     </div>
 
     <!-- Log Out Button -->
-    <button class="btn-delete" onclick="showScreen('auth')">LOG OUT</button>
+    <button class="btn-delete" onclick="handleLogout()">LOG OUT</button>
 
     <!-- Fixed Floating Glassmorphic 4-Button Navigation Bar -->
     <div class="glass-nav-bar">
@@ -402,7 +402,7 @@
       { v: "The Forum (Kia Forum)", c: "Inglewood", s: "California", co: "USA" },
     ];
 
-    const DEFAULT_PRESET_SHOWS = [
+    const WCSURFACE_PRESET_SHOWS = [
       {
         headline: "Stevie Ray Vaughan",
         venue: "Deer Creek Music Center",
@@ -429,6 +429,8 @@
     let userShows = [];
     let currentSort = 'newest';
     let activeDetailIndex = -1;
+    let activeUserId = null;
+    let activeUserEmail = null;
 
     function showScreen(screenId) {
       document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
@@ -441,10 +443,56 @@
       document.getElementById('tab-register').classList.toggle('active', mode === 'register');
       document.getElementById('field-name-box').style.display = mode === 'register' ? 'block' : 'none';
       document.getElementById('btn-auth-submit').innerText = mode === 'login' ? 'LOG IN' : 'CREATE ACCOUNT';
+
+      // Clear inputs when switching auth modes
+      document.getElementById('auth-email').value = '';
+      document.getElementById('auth-password').value = '';
+      document.getElementById('auth-name').value = '';
     }
 
-    function handleLoginSubmit(e) {
+    function handleLogout() {
+      activeUserId = null;
+      activeUserEmail = null;
+      localStorage.removeItem('livelore_active_user');
+      localStorage.removeItem('livelore_local_shows');
+      userShows = [];
+      renderShowsFeed();
+      updateStatsDisplay();
+
+      document.getElementById('auth-email').value = '';
+      document.getElementById('auth-password').value = '';
+      document.getElementById('auth-name').value = '';
+      showScreen('auth');
+    }
+
+    async function handleLoginSubmit(e) {
       if (e) e.preventDefault();
+      const emailInput = document.getElementById('auth-email').value || '';
+      const passInput = document.getElementById('auth-password').value || '';
+
+      const cleanedEmail = emailInput.toLowerCase().trim();
+      activeUserEmail = cleanedEmail;
+      activeUserId = `u_cloud_${cleanedEmail.replace(/[^a-z0-9]/g, '_')}`;
+
+      localStorage.setItem('livelore_active_user', JSON.stringify({ id: activeUserId, email: cleanedEmail }));
+
+      // Strictly scope sample shows ONLY for wcsurface@gmail.com!
+      if (cleanedEmail === 'wcsurface@gmail.com') {
+        userShows = [...WCSURFACE_PRESET_SHOWS];
+      } else {
+        // ALL new accounts start with a 100% clean, empty vault!
+        userShows = [];
+      }
+
+      saveShowsToStorage();
+      renderShowsFeed();
+      updateStatsDisplay();
+
+      // Clear input fields
+      document.getElementById('auth-email').value = '';
+      document.getElementById('auth-password').value = '';
+      document.getElementById('auth-name').value = '';
+
       showScreen('diary');
     }
 
@@ -612,26 +660,27 @@
 
     function loadSavedShows() {
       try {
+        const rawUser = localStorage.getItem('livelore_active_user');
+        if (rawUser) {
+          const uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email) {
+            activeUserEmail = uObj.email;
+            activeUserId = uObj.id;
+          }
+        }
+
         const raw = localStorage.getItem('livelore_local_shows');
         if (raw) {
           userShows = JSON.parse(raw);
-          if (!Array.isArray(userShows) || userShows.length === 0) {
-            userShows = [...DEFAULT_PRESET_SHOWS];
-          } else {
-            userShows.forEach(s => {
-              if (s.venue && s.venue.toLowerCase().includes('deer creek')) {
-                s.city = 'Noblesville';
-                s.state = 'Indiana';
-                s.country = 'USA';
-              }
-            });
-          }
         } else {
-          userShows = [...DEFAULT_PRESET_SHOWS];
+          if (activeUserEmail === 'wcsurface@gmail.com') {
+            userShows = [...WCSURFACE_PRESET_SHOWS];
+          } else {
+            userShows = [];
+          }
         }
-        saveShowsToStorage();
       } catch (e) {
-        userShows = [...DEFAULT_PRESET_SHOWS];
+        userShows = [];
       }
       renderShowsFeed();
       updateStatsDisplay();
