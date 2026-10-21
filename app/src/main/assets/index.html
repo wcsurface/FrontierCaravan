@@ -99,11 +99,11 @@
     }
     .bounce-pointer { animation: bounceDown 1.5s infinite; }
 
-    /* Detail Card Box */
-    .detail-card { background: #121619; border: 1px solid #222B30; border-radius: 16px; padding: 18px; margin-bottom: 8px; width: 100%; }
+    /* Detail Card Box - Enlarged Labels & Values */
+    .detail-card { background: #121619; border: 1px solid #222B30; border-radius: 16px; padding: 20px; margin-bottom: 12px; width: 100%; }
     .detail-label { font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #FFB300; margin-bottom: 6px; }
-    .detail-val-headline { font-size: 22px; font-weight: 900; text-transform: uppercase; font-family: serif; color: #ffffff; margin-bottom: 12px; }
-    .detail-val-text { font-size: 14px; font-weight: 700; color: #e2e8f0; margin-bottom: 12px; }
+    .detail-val-headline { font-size: 26px; font-weight: 900; text-transform: uppercase; font-family: serif; color: #ffffff; margin-bottom: 12px; }
+    .detail-val-text { font-size: 17px; font-weight: 800; color: #f1f5f9; margin-bottom: 12px; }
 
     /* Stats Card Box - Enlarged Titles & Content Text */
     .stats-card { background: #121619; border: 1px solid #222B30; border-radius: 16px; padding: 18px; margin-bottom: 16px; cursor: pointer; }
@@ -246,7 +246,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 3: SHOW DETAILS & SETLIST -->
+  <!-- SCREEN 3: SHOW DETAILS & SETLIST (Title updated to HEADLINE ARTIST & Enlarged Readability) -->
   <div id="view-setlist" class="screen-view">
     <div class="header">
       <div class="header-logo-box">
@@ -259,34 +259,34 @@
 
     <!-- Detailed Show Info Card -->
     <div class="detail-card">
-      <div class="detail-label">HEADLINE BAND</div>
+      <div class="detail-label">HEADLINE ARTIST</div>
       <div class="detail-val-headline" id="detail-headline">STEVIE RAY VAUGHAN</div>
 
-      <div id="detail-openers-box" style="display:none; margin-top:12px; border-top:1px solid #222B30; padding-top:8px;">
+      <div id="detail-openers-box" style="display:none; margin-top:14px; border-top:1px solid #222B30; padding-top:10px;">
         <div class="detail-label">OPENER(S)</div>
         <div class="detail-val-text" id="detail-openers">The Stray Cats, Duke Tumatoe</div>
       </div>
 
-      <div style="margin-top:12px; border-top:1px solid #222B30; padding-top:8px;">
+      <div style="margin-top:14px; border-top:1px solid #222B30; padding-top:10px;">
         <div class="detail-label">DATE</div>
         <div class="detail-val-text" id="detail-date">07/22/89</div>
       </div>
 
-      <div style="margin-top:12px; border-top:1px solid #222B30; padding-top:8px;">
+      <div style="margin-top:14px; border-top:1px solid #222B30; padding-top:10px;">
         <div class="detail-label">VENUE & LOCATION</div>
-        <div class="detail-val-text" id="detail-venue" style="margin-bottom:2px;">Deer Creek Music Center</div>
-        <div style="font-size:13px; font-weight:800; color:#00E676; margin-top:2px;" id="detail-location">Noblesville, IN, USA</div>
+        <div class="detail-val-text" id="detail-venue" style="margin-bottom:4px;">Deer Creek Music Center</div>
+        <div style="font-size:15px; font-weight:800; color:#00E676; margin-top:2px;" id="detail-location">Noblesville, IN, USA</div>
       </div>
 
-      <div id="detail-notes-box" style="display:none; margin-top:12px; border-top:1px solid #222B30; padding-top:8px;">
+      <div id="detail-notes-box" style="display:none; margin-top:14px; border-top:1px solid #222B30; padding-top:10px;">
         <div class="detail-label">NOTES & MEMORIES</div>
-        <div style="font-size:13px; color:#f1f5f9; background:#0A0D0E; padding:12px; border-radius:8px; border:1px solid #222B30; line-height:1.6; white-space:pre-wrap;" id="detail-notes">My first concert.</div>
+        <div style="font-size:15px; font-weight:600; color:#f1f5f9; background:#0A0D0E; padding:14px; border-radius:10px; border:1px solid #222B30; line-height:1.6; white-space:pre-wrap;" id="detail-notes">My first concert.</div>
       </div>
     </div>
 
     <!-- Action Buttons: EDIT SHOW & DELETE SHOW -->
-    <button class="btn-edit" id="btn-edit-show" onclick="triggerEditShow()">✏ EDIT SHOW</button>
-    <button class="btn-delete" id="btn-delete-show" onclick="triggerDeleteShow()">🗑 DELETE SHOW</button>
+    <button class="btn-edit" id="btn-edit-show" style="font-size:16px; padding:14px;" onclick="triggerEditShow()">✏ EDIT SHOW</button>
+    <button class="btn-delete" id="btn-delete-show" style="font-size:15px; padding:14px;" onclick="triggerDeleteShow()">🗑 DELETE SHOW</button>
 
     <!-- Fixed Floating Glassmorphic 4-Button Navigation Bar -->
     <div class="glass-nav-bar">

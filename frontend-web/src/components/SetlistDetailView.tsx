@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useEncoreStore } from '../store/useEncoreStore';
-import { PRESET_VENUES } from '../engine/venueDataset';
+import { PRESET_VENUES, toStateAbbr } from '../engine/venueDataset';
 import { TicketStubCard } from './TicketStubCard';
 import { GlassNavBar } from './GlassNavBar';
 import { MapPin, Calendar, Users, FileText, Music, Edit3, Trash2, Camera } from 'lucide-react';
@@ -42,9 +42,10 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
     v => v.venue.toLowerCase() === (venue?.name || '').toLowerCase()
   );
 
-  const city = venue?.city || presetVenue?.city || 'Noblesville';
-  const state = venue?.stateProvince || presetVenue?.stateProvince || 'Indiana';
-  const country = venue?.country || presetVenue?.country || 'USA';
+  const city = (venue?.city || presetVenue?.city || 'Noblesville').trim();
+  const rawState = venue?.stateProvince || presetVenue?.stateProvince || 'IN';
+  const state = toStateAbbr(rawState);
+  const country = (venue?.country || presetVenue?.country || 'USA').trim();
 
   const locationString = `${city}, ${state}, ${country}`;
 
@@ -59,7 +60,7 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
   };
 
   return (
-    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between pb-28">
+    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between pb-28 min-h-screen">
       {/* Header with LiveLore Logo & Generous Top Padding */}
       <header className="relative flex items-center justify-center w-full pt-10 sm:pt-14 pb-6 my-1">
         <img
@@ -70,64 +71,64 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
       </header>
 
       {/* Main Content Area */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto max-w-md mx-auto w-full">
         {/* Featured Ticket Stub Graphic */}
-        <div className="max-w-md mx-auto w-full my-2">
+        <div className="w-full my-2">
           <TicketStubCard concert={concert} artist={headliner} venue={venue} />
         </div>
 
-        {/* Show Details Card */}
-        <div className="max-w-md mx-auto w-full bg-[#121619] p-5 rounded-2xl border border-[#222B30] shadow-xl space-y-4 my-3">
-          {/* Headline Band */}
+        {/* Show Details Card - Enlarged Readability Across All Fields */}
+        <div className="w-full bg-[#121619] p-6 rounded-2xl border border-[#222B30] shadow-xl space-y-4 my-3">
+          {/* Headline Artist (Title changed from HEADLINE BAND to HEADLINE ARTIST) */}
           <div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#FFB300] block mb-1">
-              HEADLINE BAND
+            <span className="text-xs sm:text-sm font-black uppercase tracking-widest text-[#FFB300] block mb-1.5">
+              HEADLINE ARTIST
             </span>
-            <h2 className="text-2xl font-black text-white uppercase tracking-tight font-serif">
+            <h2 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight font-serif">
               {headliner?.name || 'STEVIE RAY VAUGHAN'}
             </h2>
           </div>
 
           {/* Opener(s) */}
           {opener?.name && (
-            <div className="border-t border-[#222B30] pt-3">
-              <span className="text-[10px] font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-1">
-                <Users size={12} /> OPENER(S)
+            <div className="border-t border-[#222B30] pt-3.5">
+              <span className="text-xs sm:text-sm font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-1.5">
+                <Users size={16} /> OPENER(S)
               </span>
-              <p className="text-sm font-bold text-slate-200 font-serif">
+              <p className="text-base sm:text-lg font-extrabold text-slate-100 font-serif">
                 {opener.name}
               </p>
             </div>
           )}
 
           {/* Date & Day of Week */}
-          <div className="border-t border-[#222B30] pt-3">
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-1">
-              <Calendar size={12} /> DATE
+          <div className="border-t border-[#222B30] pt-3.5">
+            <span className="text-xs sm:text-sm font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-1.5">
+              <Calendar size={16} /> DATE
             </span>
-            <p className="text-sm font-extrabold text-slate-200">
+            <p className="text-base sm:text-lg font-extrabold text-slate-100">
               {formattedDate}
             </p>
           </div>
 
           {/* Venue & Location */}
-          <div className="border-t border-[#222B30] pt-3">
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-1">
-              <MapPin size={12} /> VENUE & LOCATION
+          <div className="border-t border-[#222B30] pt-3.5">
+            <span className="text-xs sm:text-sm font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-1.5">
+              <MapPin size={16} /> VENUE & LOCATION
             </span>
-            <p className="text-base font-black text-white uppercase font-sans">
+            <p className="text-base sm:text-lg font-extrabold text-white uppercase font-sans">
               {venue?.name || 'Deer Creek Music Center'}
             </p>
-            <p className="text-xs sm:text-sm font-extrabold text-[#00E676] tracking-wide mt-1">
+            <p className="text-sm sm:text-base font-extrabold text-[#00E676] tracking-wide mt-1">
               {locationString}
             </p>
           </div>
 
           {/* Concert Photo Memories (VIP Feature) */}
           {isPremium && concert.photoUris && concert.photoUris.length > 0 && (
-            <div className="border-t border-[#222B30] pt-3">
-              <span className="text-[10px] font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-2">
-                <Camera size={12} /> CONCERT PHOTO MEMORIES
+            <div className="border-t border-[#222B30] pt-3.5">
+              <span className="text-xs sm:text-sm font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-2">
+                <Camera size={16} /> CONCERT PHOTO MEMORIES
               </span>
               <div className="grid grid-cols-3 gap-2">
                 {concert.photoUris.map((uri, idx) => (
@@ -141,11 +142,11 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
 
           {/* Show Notes */}
           {concert.generalNotes && (
-            <div className="border-t border-[#222B30] pt-3">
-              <span className="text-[10px] font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-1">
-                <FileText size={12} /> NOTES & MEMORIES
+            <div className="border-t border-[#222B30] pt-3.5">
+              <span className="text-xs sm:text-sm font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-1.5">
+                <FileText size={16} /> NOTES & MEMORIES
               </span>
-              <p className="text-sm text-slate-200 leading-relaxed font-sans bg-[#0A0D0E] p-3 rounded-xl border border-[#222B30] whitespace-pre-wrap">
+              <p className="text-sm sm:text-base text-slate-100 leading-relaxed font-sans bg-[#0A0D0E] p-4 rounded-xl border border-[#222B30] whitespace-pre-wrap font-semibold">
                 {concert.generalNotes}
               </p>
             </div>
@@ -153,11 +154,11 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
 
           {/* Parsed Setlist Tracks if present */}
           {items.length > 0 && (
-            <div className="border-t border-[#222B30] pt-3">
-              <span className="text-[10px] font-black uppercase tracking-widest text-[#00E676] flex items-center gap-1.5 mb-2">
-                <Music size={12} /> PARSED SETLIST TRACKS
+            <div className="border-t border-[#222B30] pt-3.5">
+              <span className="text-xs sm:text-sm font-black uppercase tracking-widest text-[#00E676] flex items-center gap-1.5 mb-2">
+                <Music size={16} /> PARSED SETLIST TRACKS
               </span>
-              <div className="space-y-1.5 font-mono text-xs text-slate-300 bg-[#0A0D0E] p-3 rounded-xl border border-[#222B30]">
+              <div className="space-y-2 font-mono text-sm sm:text-base font-bold text-slate-200 bg-[#0A0D0E] p-4 rounded-xl border border-[#222B30]">
                 {mainTracks.map((t) => (
                   <div key={t.id} className="flex gap-2">
                     <span className="text-slate-500">{t.position}.</span>
@@ -166,7 +167,7 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
                 ))}
                 {encoreTracks.length > 0 && (
                   <>
-                    <div className="text-[10px] font-black text-[#00E676] uppercase pt-2">ENCORE</div>
+                    <div className="text-xs sm:text-sm font-black text-[#00E676] uppercase pt-2">ENCORE</div>
                     {encoreTracks.map((t) => (
                       <div key={t.id} className="flex gap-2">
                         <span className="text-slate-500">{t.position}.</span>
@@ -180,20 +181,20 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
           )}
 
           {/* EDIT SHOW & DELETE SHOW Buttons */}
-          <div className="pt-2 space-y-3">
+          <div className="pt-3 space-y-3">
             <button
               onClick={() => onEdit(concert.id)}
-              className="w-full py-3 bg-gradient-to-r from-[#FFB300] to-[#FFA000] hover:from-[#FFC107] hover:to-[#FFB300] text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-[0_0_15px_rgba(255,179,0,0.3)] active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+              className="w-full py-3.5 bg-gradient-to-r from-[#FFB300] to-[#FFA000] hover:from-[#FFC107] hover:to-[#FFB300] text-slate-950 font-black text-sm sm:text-base uppercase tracking-wider rounded-xl shadow-[0_0_15px_rgba(255,179,0,0.3)] active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
             >
-              <Edit3 size={16} /> EDIT SHOW
+              <Edit3 size={18} /> EDIT SHOW
             </button>
 
             {/* DELETE SHOW Button */}
             <button
               onClick={handleDelete}
-              className="w-full py-3 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 hover:text-white font-extrabold text-xs uppercase tracking-wider rounded-xl border border-rose-900/60 active:scale-[0.98] transition flex items-center justify-center gap-2"
+              className="w-full py-3.5 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 hover:text-white font-black text-sm sm:text-base uppercase tracking-wider rounded-xl border border-rose-900/60 active:scale-[0.98] transition flex items-center justify-center gap-2"
             >
-              <Trash2 size={16} /> DELETE SHOW
+              <Trash2 size={18} /> DELETE SHOW
             </button>
           </div>
         </div>
