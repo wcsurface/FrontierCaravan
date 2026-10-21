@@ -56,7 +56,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate, on
           </div>
         )}
 
-        {/* 2. CATCHY VIP PASS AREA WITH ENLARGED EASY-TO-READ TEXT */}
+        {/* 2. CATCHY VIP PASS AREA WITH ENLARGED EASY-TO-READ TEXT ($4.99 PRICE) */}
         <div className={`p-6 rounded-2xl border transition shadow-xl space-y-4 relative overflow-hidden ${
           isPremium
             ? 'bg-gradient-to-br from-[#00E676]/20 via-[#121619] to-[#00C853]/10 border-[#00E676]'
@@ -67,7 +67,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate, on
               <Crown size={18} className="text-[#FFB300]" /> {isPremium ? 'VIP PASS ACTIVE' : 'LIVELORE VIP PASS'}
             </span>
             <span className="bg-[#FFB300] text-slate-950 text-xs font-black px-3 py-1 rounded-full uppercase">
-              {isPremium ? 'UNLOCKED' : '$3.99 ONE-TIME'}
+              {isPremium ? 'UNLOCKED' : '$4.99 ONE-TIME'}
             </span>
           </div>
 
@@ -85,7 +85,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate, on
               onClick={handlePurchasePremium}
               className="w-full py-4 bg-gradient-to-r from-[#FFB300] to-[#FFA000] hover:from-[#FFC107] hover:to-[#FFB300] text-slate-950 font-black text-base uppercase tracking-wider rounded-full shadow-[0_0_20px_rgba(255,179,0,0.4)] active:scale-[0.98] transition-transform flex items-center justify-center gap-2 mt-2"
             >
-              <Sparkles size={20} /> ⭐ GO PREMIUM FOR $3.99
+              <Sparkles size={20} /> ⭐ GO PREMIUM FOR $4.99
             </button>
           )}
         </div>

@@ -4,6 +4,24 @@ import React from 'react';
 import { Concert, Artist, Venue } from '../engine/concertService';
 import { useEncoreStore } from '../store/useEncoreStore';
 
+export const TICKET_COLOR_PALETTE = [
+  '#F7C252', // Warm Gold
+  '#F7A993', // Vintage Peach
+  '#CAE6AB', // Retro Lime Mint
+  '#D6EBCA', // Pale Sage
+  '#F7E5B3', // Classic Cream
+];
+
+export function getTicketColor(id?: string): string {
+  if (!id) return TICKET_COLOR_PALETTE[0];
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = (hash << 5) - hash + id.charCodeAt(i);
+    hash |= 0;
+  }
+  return TICKET_COLOR_PALETTE[Math.abs(hash) % TICKET_COLOR_PALETTE.length];
+}
+
 interface TicketStubCardProps {
   concert: Concert;
   artist?: Artist;
@@ -60,32 +78,39 @@ export const TicketStubCard: React.FC<TicketStubCardProps> = ({
   const venueName = venue?.name || 'Deer Creek Music Center';
   const featuredPhoto = (isPremium && concert.photoUris && concert.photoUris.length > 0) ? concert.photoUris[0] : null;
 
+  // Persistent Vintage Color from Palette based on Concert ID
+  const ticketBgColor = getTicketColor(concert.id);
+
   return (
     <div
       onClick={onClick}
       className="relative w-full aspect-[2.85/1] max-w-md mx-auto my-3 cursor-pointer select-none transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-2xl rounded-xl overflow-hidden"
+      style={{ backgroundColor: ticketBgColor }}
     >
-      {/* Real Authentic Vintage Ticket Stub Background Asset */}
+      {/* Real Authentic Vintage Ticket Stub Background Asset Overlay */}
       <img
         src="/assets/vintage_ticket_stub.png"
         alt="Vintage Ticket Stub"
-        className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
+        className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none mix-blend-multiply opacity-80"
         onError={(e) => {
           (e.currentTarget as HTMLImageElement).style.display = 'none';
         }}
       />
 
-      {/* Styled Authentic Paper Fallback Background */}
-      <div className="absolute inset-0 bg-[#f4e4bc] border-2 border-[#d6c294] rounded-xl z-[-1]" />
+      {/* Styled Authentic Color Paper Fallback Background */}
+      <div
+        className="absolute inset-0 rounded-xl z-[-1] border-2 border-[#1c1208]/30"
+        style={{ backgroundColor: ticketBgColor }}
+      />
 
       {/* Text Overlay Positioned Perfectly Inside Ticket Boxes */}
-      <div className="relative z-10 w-full h-full flex px-3 py-2 text-[#322312]">
+      <div className="relative z-10 w-full h-full flex px-3 py-2 text-[#221508]">
         {/* Left Side: Barcode Margin */}
         <div className="w-[12%] h-full flex flex-col justify-between items-center py-1 opacity-70">
-          <span className="text-[9px] font-bold font-mono rotate-90 origin-center text-[#423220]">
+          <span className="text-[9px] font-bold font-mono rotate-90 origin-center text-[#221508]">
             95
           </span>
-          <span className="text-[8px] font-bold font-mono tracking-widest text-[#423220] -rotate-90">
+          <span className="text-[8px] font-bold font-mono tracking-widest text-[#221508] -rotate-90">
             ADVANCE
           </span>
         </div>
@@ -95,19 +120,19 @@ export const TicketStubCard: React.FC<TicketStubCardProps> = ({
           {/* Top Main Box: DYNAMICALLY CENTERED BANDS (Headliner on top) */}
           <div className="flex-1 flex flex-col items-center justify-center text-center px-1 my-0.5 overflow-hidden">
             {/* Always Headliner on Top */}
-            <h3 className={`${headlinerSize} font-black uppercase tracking-tight text-[#1c1208] leading-none font-serif drop-shadow-sm`}>
+            <h3 className={`${headlinerSize} font-black uppercase tracking-tight text-[#140b03] leading-none font-serif drop-shadow-sm`}>
               {headlinerName}
             </h3>
 
             {/* If there are openers - Larger Font Size */}
             {openersList.length > 0 && (
               <div className="flex flex-col items-center justify-center mt-0.5">
-                <span className={`${andSize} font-serif italic font-bold text-[#423220]/80 my-0.5`}>
+                <span className={`${andSize} font-serif italic font-bold text-[#221508]/80 my-0.5`}>
                   and
                 </span>
                 <div className="flex flex-wrap items-center justify-center gap-x-1.5 leading-tight">
                   {openersList.slice(0, 4).map((opener, i) => (
-                    <span key={i} className={`${openerSize} font-black text-[#2b1c0e] font-serif`}>
+                    <span key={i} className={`${openerSize} font-black text-[#1c0f04] font-serif`}>
                       {opener}{i < Math.min(openersList.length, 4) - 1 ? ',' : ''}
                     </span>
                   ))}
@@ -117,21 +142,21 @@ export const TicketStubCard: React.FC<TicketStubCardProps> = ({
           </div>
 
           {/* Bottom Box: VENUE & HIGHLIGHTED CONCERT DATE BADGE (1-2 Points Larger) */}
-          <div className="h-[28%] flex border-t-2 border-[#423220]/50 pt-0.5 items-center justify-between px-1">
-            <span className="text-xs sm:text-sm font-black uppercase text-[#2b1c0e] truncate max-w-[55%]">
+          <div className="h-[28%] flex border-t-2 border-[#221508]/40 pt-0.5 items-center justify-between px-1">
+            <span className="text-xs sm:text-sm font-black uppercase text-[#1c0f04] truncate max-w-[55%]">
               {venueName}
             </span>
-            <span className="text-xs sm:text-sm font-black uppercase text-[#d97706] tracking-wider">
+            <span className="text-xs sm:text-sm font-black uppercase text-[#b45309] tracking-wider">
               {formattedDate}
             </span>
           </div>
         </div>
 
         {/* Right Section: Perforated Stub & Admission / Premium Photo Stub Feature */}
-        <div className="w-[30%] h-full flex flex-col justify-between items-center pl-1 py-1 border-l-2 border-dotted border-[#423220]/40 overflow-hidden relative">
+        <div className="w-[30%] h-full flex flex-col justify-between items-center pl-1 py-1 border-l-2 border-dotted border-[#221508]/40 overflow-hidden relative">
           {featuredPhoto ? (
             /* Premium Feature: Custom Photo Embedded Inside Ticket Stub ADMIT ONE Box */
-            <div className="w-full h-full rounded-lg overflow-hidden border border-[#423220]/60 relative group">
+            <div className="w-full h-full rounded-lg overflow-hidden border border-[#221508]/60 relative group">
               <img
                 src={featuredPhoto}
                 alt="Concert Photo Memory"
@@ -146,10 +171,10 @@ export const TicketStubCard: React.FC<TicketStubCardProps> = ({
           ) : (
             /* Default ADMIT ONE Stub Details */
             <>
-              <div className="text-[10px] font-black tracking-widest text-[#1c1208] uppercase rotate-90 my-auto">
+              <div className="text-[10px] font-black tracking-widest text-[#140b03] uppercase rotate-90 my-auto">
                 ADMIT ONE
               </div>
-              <div className="text-[8px] font-mono font-bold text-[#423220] tracking-tighter">
+              <div className="text-[8px] font-mono font-bold text-[#221508] tracking-tighter">
                 GEN | SEC 7 | 3977
               </div>
             </>

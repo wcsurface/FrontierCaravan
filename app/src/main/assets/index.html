@@ -40,17 +40,17 @@
     /* Error Notification Banner */
     .error-banner { display: none; background: rgba(136, 19, 55, 0.5); border: 1px solid rgba(225, 29, 72, 0.8); color: #fecdd3; padding: 12px 14px; border-radius: 12px; font-size: 12px; font-weight: 700; margin-bottom: 14px; width: 100%; text-align: center; }
 
-    /* Ticket Container & Card - Larger Opener & Footer Font Sizes */
+    /* Ticket Container & Card - Multi-Color Vintage Assortment Palette */
     #ticket-list { width: 100%; flex: 1; max-height: calc(100vh - 180px); overflow-y: auto; margin-bottom: 8px; }
-    .ticket-card { position: relative; width: 100%; aspect-ratio: 2.85 / 1; background: #f4e4bc; color: #2b1c0e; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; display: flex; justify-between; box-shadow: 0 10px 25px rgba(0,0,0,0.6); border: 2px solid #d6c294; cursor: pointer; }
-    .ticket-left { width: 70%; display: flex; flex-direction: column; justify-between; border-right: 2px dashed #423220; padding-right: 8px; }
+    .ticket-card { position: relative; width: 100%; aspect-ratio: 2.85 / 1; color: #221508; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; display: flex; justify-between; box-shadow: 0 10px 25px rgba(0,0,0,0.6); border: 2px solid rgba(34,21,8,0.25); cursor: pointer; }
+    .ticket-left { width: 70%; display: flex; flex-direction: column; justify-between; border-right: 2px dashed rgba(34,21,8,0.4); padding-right: 8px; }
     .ticket-artist-box { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; margin: auto 0; }
-    .ticket-artist-head { font-weight: 900; font-size: 19px; text-transform: uppercase; font-family: serif; color: #1c1208; line-height: 1.1; }
-    .ticket-artist-and { font-family: serif; font-style: italic; font-weight: bold; font-size: 12px; color: rgba(66,50,32,0.8); margin: 2px 0; }
-    .ticket-artist-openers { font-weight: 900; font-size: 14px; font-family: serif; color: #2b1c0e; }
-    .ticket-footer { display: flex; justify-between; border-top: 2px solid rgba(66,50,32,0.5); padding-top: 4px; font-weight: 900; font-size: 13px; }
-    .ticket-venue { color: #2b1c0e; text-transform: uppercase; }
-    .ticket-date { color: #d97706; text-transform: uppercase; }
+    .ticket-artist-head { font-weight: 900; font-size: 19px; text-transform: uppercase; font-family: serif; color: #140b03; line-height: 1.1; }
+    .ticket-artist-and { font-family: serif; font-style: italic; font-weight: bold; font-size: 12px; color: rgba(34,21,8,0.8); margin: 2px 0; }
+    .ticket-artist-openers { font-weight: 900; font-size: 14px; font-family: serif; color: #1c0f04; }
+    .ticket-footer { display: flex; justify-between; border-top: 2px solid rgba(34,21,8,0.4); padding-top: 4px; font-weight: 900; font-size: 13px; }
+    .ticket-venue { color: #1c0f04; text-transform: uppercase; }
+    .ticket-date { color: #b45309; text-transform: uppercase; }
     .ticket-stub { width: 28%; display: flex; flex-direction: column; justify-center; align-items: center; font-weight: 900; font-size: 10px; text-transform: uppercase; }
 
     /* Inputs with Amber Borders (#FFB300) - Enlarged Field Titles, Helpers, and User Entered Text */
@@ -297,7 +297,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 4: PROFILE DASHBOARD PAGE (6 SPECIFIC REFINEMENTS) -->
+  <!-- SCREEN 4: PROFILE DASHBOARD PAGE ($4.99 PRICE & 6 SPECIFIC REFINEMENTS) -->
   <div id="view-profile" class="screen-view">
     <!-- 1. Generous Top Clearance Below Logo -->
     <div class="header" style="margin-bottom:32px; padding-bottom:16px;">
@@ -306,15 +306,15 @@
       </div>
     </div>
 
-    <!-- 2. Enlarged VIP Pass Area with Highly Legible Typography -->
+    <!-- 2. Enlarged VIP Pass Area with $4.99 PRICE & Highly Legible Typography -->
     <div class="detail-card" style="background: linear-gradient(135deg, rgba(255,179,0,0.22), #121619); border-color: #FFB300; padding: 22px; margin-bottom: 24px;">
       <div style="display:flex; justify-between; align-items:center; margin-bottom:12px;">
         <span style="font-size:13px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px;">👑 LIVELORE VIP PASS</span>
-        <span style="background:#FFB300; color:#0a0a0a; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">$3.99 ONE-TIME</span>
+        <span style="background:#FFB300; color:#0a0a0a; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">$4.99 ONE-TIME</span>
       </div>
       <div style="font-weight:900; font-size:19px; color:#ffffff; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">Unlock Photo Feature & 100% AD-Free Experience!</div>
       <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.5; margin-bottom:16px;">Attach and save photos from concerts. Remove all ads.</div>
-      <button class="btn-edit" style="font-size:16px; padding:14px;" onclick="buyAppPremium()">⭐ GO PREMIUM FOR $3.99</button>
+      <button class="btn-edit" style="font-size:16px; padding:14px;" onclick="buyAppPremium()">⭐ GO PREMIUM FOR $4.99</button>
     </div>
 
     <!-- 3 & 4. Account Details Card with Generous Clearance & Enlarged Text -->
@@ -432,6 +432,25 @@
   </div>
 
   <script>
+    // 5-COLOR RANDOM ASSORTMENT VINTAGE PALETTE
+    const TICKET_COLOR_PALETTE = [
+      '#F7C252', // Warm Gold
+      '#F7A993', // Vintage Peach
+      '#CAE6AB', // Retro Lime Mint
+      '#D6EBCA', // Pale Sage
+      '#F7E5B3', // Classic Cream
+    ];
+
+    function getTicketColor(id) {
+      if (!id) return TICKET_COLOR_PALETTE[0];
+      let hash = 0;
+      for (let i = 0; i < id.length; i++) {
+        hash = (hash << 5) - hash + id.charCodeAt(i);
+        hash |= 0;
+      }
+      return TICKET_COLOR_PALETTE[Math.abs(hash) % TICKET_COLOR_PALETTE.length];
+    }
+
     // PRESET VENUES WITH OFFICIAL 2-LETTER U.S. STATE ABBREVIATIONS
     const VENUE_DB = [
       { v: "Deer Creek Music Center", c: "Noblesville", s: "IN", co: "USA" },
@@ -663,7 +682,8 @@
         notesBox.style.display = 'none';
       }
 
-      // Ticket preview
+      // Ticket preview with Persistent Color Continuity!
+      const ticketColor = getTicketColor(show.id);
       let bandStackHtml = `<div class="ticket-artist-head">${show.headline.toUpperCase()}</div>`;
       if (show.openersList && show.openersList.length > 0) {
         bandStackHtml += `
@@ -673,7 +693,7 @@
       }
 
       document.getElementById('detail-ticket-preview').innerHTML = `
-        <div class="ticket-card" style="margin-bottom:0;">
+        <div class="ticket-card" style="margin-bottom:0; background-color:${ticketColor};">
           <div class="ticket-left">
             <div class="ticket-artist-box">${bandStackHtml}</div>
             <div class="ticket-footer">
@@ -927,7 +947,10 @@
         displayList.forEach((show) => {
           if (!show.id) show.id = generateUniqueId();
           const card = document.createElement('div');
+          const ticketColor = getTicketColor(show.id);
+
           card.className = 'ticket-card';
+          card.style.backgroundColor = ticketColor;
           card.onclick = () => openShowDetails(show.id);
 
           let bandStackHtml = `<div class="ticket-artist-head">${(show.headline || '').trim().toUpperCase()}</div>`;
@@ -951,7 +974,7 @@
             </div>
             <div class="ticket-stub">
               <div>ADMIT ONE</div>
-              <div style="font-size:8px; color:#64748b; margin-top:4px;">SEC 7</div>
+              <div style="font-size:8px; color:#221508; margin-top:4px;">SEC 7</div>
             </div>
           `;
           list.appendChild(card);

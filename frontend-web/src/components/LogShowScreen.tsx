@@ -367,7 +367,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
           </div>
         </div>
 
-        {/* Concert Photo Attachment (Premium Feature) */}
+        {/* Concert Photo Attachment (Premium Feature - $4.99 Price) */}
         <div className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-2">
           <div className="flex items-center justify-between">
             <label className="text-xs sm:text-sm font-black uppercase tracking-wider text-[#FFB300] flex items-center gap-1.5">
@@ -375,7 +375,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
             </label>
             {!isPremium && (
               <span className="text-[10px] font-black uppercase text-[#FFB300] bg-[#FFB300]/10 px-2 py-0.5 rounded border border-[#FFB300]/30 flex items-center gap-1">
-                <Crown size={10} /> VIP Pass ($3.99)
+                <Crown size={10} /> VIP Pass ($4.99)
               </span>
             )}
           </div>
@@ -420,7 +420,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
                 onClick={() => onNavigate('auth')}
                 className="text-xs font-black text-[#FFB300] hover:underline uppercase tracking-wider flex items-center justify-center gap-1 mx-auto"
               >
-                <Crown size={12} /> Upgrade for $3.99 One-Time
+                <Crown size={12} /> Upgrade for $4.99 One-Time
               </button>
             </div>
           )}
