@@ -71,8 +71,27 @@ export interface ConcertStats {
   totalInvestment: number;
   topArtists: { name: string; timesSeen: number }[];
   topVenues: { name: string; city: string; visitCount: number }[];
+  topCities: { city: string; state: string; visitCount: number }[];
+  topStates: { state: string; visitCount: number }[];
   topYears: { year: number; count: number }[];
   topDaysOfWeek: { day: string; count: number; percentage: number }[];
+}
+
+export function toStateAbbr(stateStr: string): string {
+  if (!stateStr) return 'IN';
+  const s = stateStr.trim();
+  if (s.length === 2) return s.toUpperCase();
+  const map: Record<string, string> = {
+    'california': 'CA', 'indiana': 'IN', 'colorado': 'CO', 'new york': 'NY',
+    'ohio': 'OH', 'illinois': 'IL', 'michigan': 'MI', 'wisconsin': 'WI',
+    'kentucky': 'KY', 'tennessee': 'TN', 'missouri': 'MO', 'texas': 'TX',
+    'nevada': 'NV', 'washington': 'WA', 'oregon': 'OR', 'pennsylvania': 'PA',
+    'new jersey': 'NJ', 'massachusetts': 'MA', 'connecticut': 'CT', 'rhode island': 'RI',
+    'maryland': 'MD', 'georgia': 'GA', 'north carolina': 'NC', 'florida': 'FL',
+    'arkansas': 'AR', 'kansas': 'KS', 'nebraska': 'NE', 'minnesota': 'MN',
+    'arizona': 'AZ', 'district of columbia': 'DC'
+  };
+  return map[s.toLowerCase()] || s;
 }
 
 // Robust Helper to parse any date format (milliseconds or "MM/DD/YY" strings)
@@ -120,7 +139,7 @@ export class AnalyticsEngine {
 
     const totalInvestment = concerts.reduce((acc, curr) => acc + (curr.ticketPrice || 0), 0);
 
-    // CASE-INSENSITIVE & TRIMMED ARTIST AGGREGATION
+    // 1. TOP ARTISTS (Case-Insensitive & Trimmed)
     const artistNormalizedCountMap = new Map<string, number>();
     const artistDisplayNameMap = new Map<string, string>();
 
@@ -136,26 +155,20 @@ export class AnalyticsEngine {
     };
 
     concerts.forEach(c => {
-      // 1. Headliner
       const headlinerObj = artists.find(a => a.id === c.headlineArtistId);
-      if (headlinerObj && headlinerObj.name) {
-        recordArtistName(headlinerObj.name);
-      }
+      if (headlinerObj && headlinerObj.name) recordArtistName(headlinerObj.name);
 
-      // 2. Opening Acts (Handles comma-separated openers)
       const openerObj = artists.find(a => a.id === c.openingArtistId);
       if (openerObj && openerObj.name) {
-        const openerBands = openerObj.name.split(',').map(b => b.trim()).filter(Boolean);
-        openerBands.forEach(bName => recordArtistName(bName));
+        openerObj.name.split(',').map(b => b.trim()).filter(Boolean).forEach(bName => recordArtistName(bName));
       }
     });
 
     const topArtists = Array.from(artistNormalizedCountMap.entries())
       .map(([normKey, count]) => ({ name: artistDisplayNameMap.get(normKey) || normKey, timesSeen: count }))
-      .sort((a, b) => b.timesSeen - a.timesSeen)
-      .slice(0, 10);
+      .sort((a, b) => b.timesSeen - a.timesSeen);
 
-    // CASE-INSENSITIVE & TRIMMED VENUE AGGREGATION
+    // 2. TOP VENUES (Case-Insensitive & Trimmed)
     const venueNormalizedCountMap = new Map<string, number>();
     const venueDisplayNameMap = new Map<string, { name: string; city: string }>();
 
@@ -176,10 +189,48 @@ export class AnalyticsEngine {
         const info = venueDisplayNameMap.get(normKey) || { name: normKey, city: '' };
         return { name: info.name, city: info.city, visitCount: count };
       })
-      .sort((a, b) => b.visitCount - a.visitCount)
-      .slice(0, 10);
+      .sort((a, b) => b.visitCount - a.visitCount);
 
-    // Compute Top Years SORTED BY MOST CONCERTS ATTENDED DESCENDING!
+    // 3. TOP CITIES (Case-Insensitive & Trimmed)
+    const cityNormalizedCountMap = new Map<string, number>();
+    const cityDisplayNameMap = new Map<string, { city: string; state: string }>();
+
+    concerts.forEach(c => {
+      const vObj = venues.find(v => v.id === c.venueId);
+      const rawCity = vObj?.city || 'Unknown City';
+      const cleanCity = rawCity.trim();
+      const cleanState = toStateAbbr(vObj?.stateProvince || '');
+      const normKey = `${cleanCity.toLowerCase()}_${cleanState.toLowerCase()}`;
+
+      cityNormalizedCountMap.set(normKey, (cityNormalizedCountMap.get(normKey) || 0) + 1);
+      if (!cityDisplayNameMap.has(normKey)) {
+        cityDisplayNameMap.set(normKey, { city: cleanCity, state: cleanState });
+      }
+    });
+
+    const topCities = Array.from(cityNormalizedCountMap.entries())
+      .map(([normKey, count]) => {
+        const info = cityDisplayNameMap.get(normKey) || { city: normKey, state: '' };
+        return { city: info.city, state: info.state, visitCount: count };
+      })
+      .sort((a, b) => b.visitCount - a.visitCount);
+
+    // 4. TOP STATES (Case-Insensitive & 2-Letter Abbreviation)
+    const stateNormalizedCountMap = new Map<string, number>();
+
+    concerts.forEach(c => {
+      const vObj = venues.find(v => v.id === c.venueId);
+      const rawState = vObj?.stateProvince || 'IN';
+      const cleanState = toStateAbbr(rawState);
+
+      stateNormalizedCountMap.set(cleanState, (stateNormalizedCountMap.get(cleanState) || 0) + 1);
+    });
+
+    const topStates = Array.from(stateNormalizedCountMap.entries())
+      .map(([state, count]) => ({ state, visitCount: count }))
+      .sort((a, b) => b.visitCount - a.visitCount);
+
+    // 5. TOP YEARS SORTED BY MOST CONCERTS ATTENDED DESCENDING!
     const yearMap = new Map<number, number>();
     concerts.forEach(c => {
       const dObj = parseConcertDate(c.date);
@@ -193,7 +244,7 @@ export class AnalyticsEngine {
       .map(([year, count]) => ({ year, count }))
       .sort((a, b) => b.count - a.count || b.year - a.year);
 
-    // Compute Days of Week cleanly
+    // 6. DAYS OF WEEK
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const dayCounts = [0, 0, 0, 0, 0, 0, 0];
     concerts.forEach(c => {
@@ -221,6 +272,8 @@ export class AnalyticsEngine {
       totalInvestment,
       topArtists,
       topVenues,
+      topCities,
+      topStates,
       topYears,
       topDaysOfWeek,
     };

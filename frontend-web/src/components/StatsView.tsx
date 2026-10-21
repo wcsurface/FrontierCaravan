@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useEncoreStore } from '../store/useEncoreStore';
 import { GlassNavBar } from './GlassNavBar';
-import { ArrowLeft, ChevronRight, MapPin, Music, Calendar, Clock } from 'lucide-react';
+import { ArrowLeft, ChevronRight, MapPin, Music, Calendar, Clock, Building2, Flag } from 'lucide-react';
 
 interface StatsViewProps {
   onBack: () => void;
@@ -14,21 +14,25 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
   const { getConcertStats, concerts } = useEncoreStore();
   const stats = getConcertStats();
 
-  const [activeSubView, setActiveSubView] = useState<'main' | 'venues' | 'artists' | 'years' | 'days'>('main');
+  const [activeSubView, setActiveSubView] = useState<'main' | 'artists' | 'venues' | 'cities' | 'states' | 'years' | 'days'>('main');
 
-  const venuesList = stats.topVenues;
-  const artistsList = stats.topArtists;
-  const yearsList = stats.topYears;
-  const daysList = stats.topDaysOfWeek;
+  const artistsList = stats.topArtists || [];
+  const venuesList = stats.topVenues || [];
+  const citiesList = stats.topCities || [];
+  const statesList = stats.topStates || [];
+  const yearsList = stats.topYears || [];
+  const daysList = stats.topDaysOfWeek || [];
 
-  const maxVenueVisits = Math.max(...venuesList.map(v => v.visitCount), 1);
   const maxArtistSeen = Math.max(...artistsList.map(a => a.timesSeen), 1);
+  const maxVenueVisits = Math.max(...venuesList.map(v => v.visitCount), 1);
+  const maxCityVisits = Math.max(...citiesList.map(c => c.visitCount), 1);
+  const maxStateVisits = Math.max(...statesList.map(s => s.visitCount), 1);
   const maxYearShows = Math.max(...yearsList.map(y => y.count), 1);
   const maxDayShows = Math.max(...daysList.map(d => d.count), 1);
 
   return (
-    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between pb-28">
-      {/* Header with LiveLore Logo & Generous Top Padding */}
+    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between pb-28 min-h-screen">
+      {/* Header with LiveLore Logo */}
       <header className="relative flex items-center justify-between w-full pt-10 sm:pt-14 pb-6 my-1 shrink-0">
         {activeSubView !== 'main' ? (
           <button
@@ -50,31 +54,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
         <div className="w-10 z-10" />
       </header>
 
-      {/* 1. FULL INDIVIDUAL STAT CATEGORY DETAIL VIEWS */}
-      {activeSubView === 'venues' && (
-        <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-4 overflow-y-auto">
-          <div className="text-center mb-2">
-            <h2 className="text-xl font-black uppercase text-[#00E676] font-sans flex items-center justify-center gap-2">
-              <MapPin size={22} /> ALL VENUES ({venuesList.length})
-            </h2>
-            <p className="text-xs text-slate-400 mt-1">Complete venue breakdown from your concert vault</p>
-          </div>
-          <div className="space-y-3">
-            {venuesList.length > 0 ? venuesList.map((v, i) => (
-              <div key={i} className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-1.5 shadow-sm">
-                <div className="flex justify-between items-center text-sm font-bold">
-                  <span className="text-slate-100">{i + 1}. {v.name} {v.city ? `(${v.city})` : ''}</span>
-                  <span className="text-[#00E676] font-mono">{v.visitCount} {v.visitCount === 1 ? 'Show' : 'Shows'}</span>
-                </div>
-                <div className="w-full h-2 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
-                  <div className="h-full bg-[#00E676] rounded-full" style={{ width: `${(v.visitCount / maxVenueVisits) * 100}%` }} />
-                </div>
-              </div>
-            )) : <p className="text-xs text-center text-slate-500 py-4">No venues logged yet.</p>}
-          </div>
-        </div>
-      )}
-
+      {/* FULL INDIVIDUAL CATEGORY SUB-PAGES */}
       {activeSubView === 'artists' && (
         <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-4 overflow-y-auto">
           <div className="text-center mb-2">
@@ -99,10 +79,82 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
         </div>
       )}
 
-      {activeSubView === 'years' && (
+      {activeSubView === 'venues' && (
+        <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-4 overflow-y-auto">
+          <div className="text-center mb-2">
+            <h2 className="text-xl font-black uppercase text-[#00E676] font-sans flex items-center justify-center gap-2">
+              <MapPin size={22} /> ALL VENUES ({venuesList.length})
+            </h2>
+            <p className="text-xs text-slate-400 mt-1">Complete venue breakdown from your concert vault</p>
+          </div>
+          <div className="space-y-3">
+            {venuesList.length > 0 ? venuesList.map((v, i) => (
+              <div key={i} className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-1.5 shadow-sm">
+                <div className="flex justify-between items-center text-sm font-bold">
+                  <span className="text-slate-100">{i + 1}. {v.name} {v.city ? `(${v.city})` : ''}</span>
+                  <span className="text-[#00E676] font-mono">{v.visitCount} {v.visitCount === 1 ? 'Show' : 'Shows'}</span>
+                </div>
+                <div className="w-full h-2 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
+                  <div className="h-full bg-[#00E676] rounded-full" style={{ width: `${(v.visitCount / maxVenueVisits) * 100}%` }} />
+                </div>
+              </div>
+            )) : <p className="text-xs text-center text-slate-500 py-4">No venues logged yet.</p>}
+          </div>
+        </div>
+      )}
+
+      {activeSubView === 'cities' && (
         <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-4 overflow-y-auto">
           <div className="text-center mb-2">
             <h2 className="text-xl font-black uppercase text-[#00B0FF] font-sans flex items-center justify-center gap-2">
+              <Building2 size={22} /> ALL CITIES ({citiesList.length})
+            </h2>
+            <p className="text-xs text-slate-400 mt-1">Complete city breakdown of concerts attended</p>
+          </div>
+          <div className="space-y-3">
+            {citiesList.length > 0 ? citiesList.map((c, i) => (
+              <div key={i} className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-1.5 shadow-sm">
+                <div className="flex justify-between items-center text-sm font-bold">
+                  <span className="text-slate-100">{i + 1}. {c.city} {c.state ? `(${c.state})` : ''}</span>
+                  <span className="text-[#00B0FF] font-mono">{c.visitCount} {c.visitCount === 1 ? 'Show' : 'Shows'}</span>
+                </div>
+                <div className="w-full h-2 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
+                  <div className="h-full bg-[#00B0FF] rounded-full" style={{ width: `${(c.visitCount / maxCityVisits) * 100}%` }} />
+                </div>
+              </div>
+            )) : <p className="text-xs text-center text-slate-500 py-4">No cities logged yet.</p>}
+          </div>
+        </div>
+      )}
+
+      {activeSubView === 'states' && (
+        <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-4 overflow-y-auto">
+          <div className="text-center mb-2">
+            <h2 className="text-xl font-black uppercase text-[#E040FB] font-sans flex items-center justify-center gap-2">
+              <Flag size={22} /> ALL STATES ({statesList.length})
+            </h2>
+            <p className="text-xs text-slate-400 mt-1">Complete state breakdown using 2-letter state abbreviations</p>
+          </div>
+          <div className="space-y-3">
+            {statesList.length > 0 ? statesList.map((s, i) => (
+              <div key={i} className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-1.5 shadow-sm">
+                <div className="flex justify-between items-center text-sm font-bold">
+                  <span className="text-slate-100">{i + 1}. {s.state}</span>
+                  <span className="text-[#E040FB] font-mono">{s.visitCount} {s.visitCount === 1 ? 'Show' : 'Shows'}</span>
+                </div>
+                <div className="w-full h-2 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
+                  <div className="h-full bg-[#E040FB] rounded-full" style={{ width: `${(s.visitCount / maxStateVisits) * 100}%` }} />
+                </div>
+              </div>
+            )) : <p className="text-xs text-center text-slate-500 py-4">No states logged yet.</p>}
+          </div>
+        </div>
+      )}
+
+      {activeSubView === 'years' && (
+        <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-4 overflow-y-auto">
+          <div className="text-center mb-2">
+            <h2 className="text-xl font-black uppercase text-[#FF7A00] font-sans flex items-center justify-center gap-2">
               <Calendar size={22} /> ALL YEARS ({yearsList.length})
             </h2>
             <p className="text-xs text-slate-400 mt-1">Complete year-by-year concert activity</p>
@@ -111,11 +163,11 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
             {yearsList.length > 0 ? yearsList.map((y, i) => (
               <div key={i} className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-1.5 shadow-sm">
                 <div className="flex justify-between items-center text-sm font-bold">
-                  <span className="text-slate-100">Year {y.year}</span>
-                  <span className="text-[#00B0FF] font-mono">{y.count} {y.count === 1 ? 'Concert' : 'Concerts'}</span>
+                  <span className="text-slate-100">{i + 1}. Year {y.year}</span>
+                  <span className="text-[#FF7A00] font-mono">{y.count} {y.count === 1 ? 'Concert' : 'Concerts'}</span>
                 </div>
                 <div className="w-full h-2 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
-                  <div className="h-full bg-[#00B0FF] rounded-full" style={{ width: `${(y.count / maxYearShows) * 100}%` }} />
+                  <div className="h-full bg-[#FF7A00] rounded-full" style={{ width: `${(y.count / maxYearShows) * 100}%` }} />
                 </div>
               </div>
             )) : <p className="text-xs text-center text-slate-500 py-4">No years logged yet.</p>}
@@ -126,7 +178,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
       {activeSubView === 'days' && (
         <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-4 overflow-y-auto">
           <div className="text-center mb-2">
-            <h2 className="text-xl font-black uppercase text-[#E040FB] font-sans flex items-center justify-center gap-2">
+            <h2 className="text-xl font-black uppercase text-[#FF4081] font-sans flex items-center justify-center gap-2">
               <Clock size={22} /> DAYS OF THE WEEK
             </h2>
             <p className="text-xs text-slate-400 mt-1">Complete breakdown by day of week</p>
@@ -136,10 +188,10 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
               <div key={i} className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-1.5 shadow-sm">
                 <div className="flex justify-between items-center text-sm font-bold">
                   <span className="text-slate-100">{d.day}</span>
-                  <span className="text-[#E040FB] font-mono">{d.count} {d.count === 1 ? 'Show' : 'Shows'} ({d.percentage}%)</span>
+                  <span className="text-[#FF4081] font-mono">{d.count} {d.count === 1 ? 'Show' : 'Shows'} ({d.percentage}%)</span>
                 </div>
                 <div className="w-full h-2 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
-                  <div className="h-full bg-[#E040FB] rounded-full" style={{ width: `${(d.count / maxDayShows) * 100}%` }} />
+                  <div className="h-full bg-[#FF4081] rounded-full" style={{ width: `${(d.count / maxDayShows) * 100}%` }} />
                 </div>
               </div>
             )) : <p className="text-xs text-center text-slate-500 py-4">No days logged yet.</p>}
@@ -147,47 +199,18 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
         </div>
       )}
 
-      {/* 2. MAIN STATS OVERVIEW SCREEN (SHOWS ONLY TOP 10 PER CATEGORY) */}
+      {/* MAIN OVERVIEW SCREEN (EXACT REQUESTED ORDER) */}
       {activeSubView === 'main' && (
         <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-6 pb-4 overflow-y-auto">
-          {/* Hero Readout */}
+          {/* Total Shows Hero Readout */}
           <div className="text-center my-2">
             <h2 className="text-5xl sm:text-6xl font-black tracking-tight text-white uppercase font-sans">
               {concerts.length} {concerts.length === 1 ? 'SHOW' : 'SHOWS'}
             </h2>
           </div>
 
-          {/* Top 10 Ranked Category Cards */}
           <div className="space-y-6">
-            {/* Top 10 Venues Card */}
-            <div
-              onClick={() => setActiveSubView('venues')}
-              className="bg-[#121619] p-4.5 rounded-2xl border border-[#222B30] hover:border-[#00E676]/60 transition cursor-pointer shadow-lg group"
-            >
-              <div className="flex justify-between items-center mb-3.5 pb-2 border-b border-[#222B30]">
-                <h3 className="text-xs sm:text-sm font-black text-[#00E676] uppercase tracking-widest flex items-center gap-1.5">
-                  <MapPin size={16} /> TOP VENUES (TOP 10)
-                </h3>
-                <div className="flex items-center gap-1 text-[11px] font-extrabold text-slate-400 group-hover:text-[#00E676] transition">
-                  SEE ALL <ChevronRight size={16} />
-                </div>
-              </div>
-              <div className="space-y-2.5">
-                {venuesList.length > 0 ? venuesList.slice(0, 10).map((v, i) => (
-                  <div key={i} className="space-y-1">
-                    <div className="flex justify-between text-xs font-semibold text-slate-200">
-                      <span>{i + 1}. {v.name}</span>
-                      <span className="text-[#00E676] font-mono font-extrabold">{v.visitCount}</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
-                      <div className="h-full bg-[#00E676] rounded-full" style={{ width: `${(v.visitCount / maxVenueVisits) * 100}%` }} />
-                    </div>
-                  </div>
-                )) : <p className="text-xs text-slate-500 font-medium italic">Log shows to view your top venues!</p>}
-              </div>
-            </div>
-
-            {/* Top 10 Artists Card */}
+            {/* 1. TOP ARTISTS (TOP 10) */}
             <div
               onClick={() => setActiveSubView('artists')}
               className="bg-[#121619] p-4.5 rounded-2xl border border-[#222B30] hover:border-[#FFB300]/60 transition cursor-pointer shadow-lg group"
@@ -215,16 +238,100 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
               </div>
             </div>
 
-            {/* Top 10 Years Card */}
+            {/* 2. TOP VENUES (TOP 10) */}
             <div
-              onClick={() => setActiveSubView('years')}
+              onClick={() => setActiveSubView('venues')}
+              className="bg-[#121619] p-4.5 rounded-2xl border border-[#222B30] hover:border-[#00E676]/60 transition cursor-pointer shadow-lg group"
+            >
+              <div className="flex justify-between items-center mb-3.5 pb-2 border-b border-[#222B30]">
+                <h3 className="text-xs sm:text-sm font-black text-[#00E676] uppercase tracking-widest flex items-center gap-1.5">
+                  <MapPin size={16} /> TOP VENUES (TOP 10)
+                </h3>
+                <div className="flex items-center gap-1 text-[11px] font-extrabold text-slate-400 group-hover:text-[#00E676] transition">
+                  SEE ALL <ChevronRight size={16} />
+                </div>
+              </div>
+              <div className="space-y-2.5">
+                {venuesList.length > 0 ? venuesList.slice(0, 10).map((v, i) => (
+                  <div key={i} className="space-y-1">
+                    <div className="flex justify-between text-xs font-semibold text-slate-200">
+                      <span>{i + 1}. {v.name}</span>
+                      <span className="text-[#00E676] font-mono font-extrabold">{v.visitCount}</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
+                      <div className="h-full bg-[#00E676] rounded-full" style={{ width: `${(v.visitCount / maxVenueVisits) * 100}%` }} />
+                    </div>
+                  </div>
+                )) : <p className="text-xs text-slate-500 font-medium italic">Log shows to view your top venues!</p>}
+              </div>
+            </div>
+
+            {/* 3. TOP CITIES (TOP 10) */}
+            <div
+              onClick={() => setActiveSubView('cities')}
               className="bg-[#121619] p-4.5 rounded-2xl border border-[#222B30] hover:border-[#00B0FF]/60 transition cursor-pointer shadow-lg group"
             >
               <div className="flex justify-between items-center mb-3.5 pb-2 border-b border-[#222B30]">
                 <h3 className="text-xs sm:text-sm font-black text-[#00B0FF] uppercase tracking-widest flex items-center gap-1.5">
-                  <Calendar size={16} /> TOP YEARS (TOP 10)
+                  <Building2 size={16} /> TOP CITIES (TOP 10)
                 </h3>
                 <div className="flex items-center gap-1 text-[11px] font-extrabold text-slate-400 group-hover:text-[#00B0FF] transition">
+                  SEE ALL <ChevronRight size={16} />
+                </div>
+              </div>
+              <div className="space-y-2.5">
+                {citiesList.length > 0 ? citiesList.slice(0, 10).map((c, i) => (
+                  <div key={i} className="space-y-1">
+                    <div className="flex justify-between text-xs font-semibold text-slate-200">
+                      <span>{i + 1}. {c.city} {c.state ? `(${c.state})` : ''}</span>
+                      <span className="text-[#00B0FF] font-mono font-extrabold">{c.visitCount}</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
+                      <div className="h-full bg-[#00B0FF] rounded-full" style={{ width: `${(c.visitCount / maxCityVisits) * 100}%` }} />
+                    </div>
+                  </div>
+                )) : <p className="text-xs text-slate-500 font-medium italic">Log shows to view your top cities!</p>}
+              </div>
+            </div>
+
+            {/* 4. TOP STATES (TOP 10) */}
+            <div
+              onClick={() => setActiveSubView('states')}
+              className="bg-[#121619] p-4.5 rounded-2xl border border-[#222B30] hover:border-[#E040FB]/60 transition cursor-pointer shadow-lg group"
+            >
+              <div className="flex justify-between items-center mb-3.5 pb-2 border-b border-[#222B30]">
+                <h3 className="text-xs sm:text-sm font-black text-[#E040FB] uppercase tracking-widest flex items-center gap-1.5">
+                  <Flag size={16} /> TOP STATES (TOP 10)
+                </h3>
+                <div className="flex items-center gap-1 text-[11px] font-extrabold text-slate-400 group-hover:text-[#E040FB] transition">
+                  SEE ALL <ChevronRight size={16} />
+                </div>
+              </div>
+              <div className="space-y-2.5">
+                {statesList.length > 0 ? statesList.slice(0, 10).map((s, i) => (
+                  <div key={i} className="space-y-1">
+                    <div className="flex justify-between text-xs font-semibold text-slate-200">
+                      <span>{i + 1}. {s.state}</span>
+                      <span className="text-[#E040FB] font-mono font-extrabold">{s.visitCount}</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
+                      <div className="h-full bg-[#E040FB] rounded-full" style={{ width: `${(s.visitCount / maxStateVisits) * 100}%` }} />
+                    </div>
+                  </div>
+                )) : <p className="text-xs text-slate-500 font-medium italic">Log shows to view your top states!</p>}
+              </div>
+            </div>
+
+            {/* 5. TOP YEARS (TOP 10) */}
+            <div
+              onClick={() => setActiveSubView('years')}
+              className="bg-[#121619] p-4.5 rounded-2xl border border-[#222B30] hover:border-[#FF7A00]/60 transition cursor-pointer shadow-lg group"
+            >
+              <div className="flex justify-between items-center mb-3.5 pb-2 border-b border-[#222B30]">
+                <h3 className="text-xs sm:text-sm font-black text-[#FF7A00] uppercase tracking-widest flex items-center gap-1.5">
+                  <Calendar size={16} /> TOP YEARS (TOP 10)
+                </h3>
+                <div className="flex items-center gap-1 text-[11px] font-extrabold text-slate-400 group-hover:text-[#FF7A00] transition">
                   SEE ALL <ChevronRight size={16} />
                 </div>
               </div>
@@ -233,26 +340,26 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
                   <div key={i} className="space-y-1">
                     <div className="flex justify-between text-xs font-semibold text-slate-200">
                       <span>{i + 1}. Year {y.year}</span>
-                      <span className="text-[#00B0FF] font-mono font-extrabold">{y.count} shows</span>
+                      <span className="text-[#FF7A00] font-mono font-extrabold">{y.count} shows</span>
                     </div>
                     <div className="w-full h-1.5 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
-                      <div className="h-full bg-[#00B0FF] rounded-full" style={{ width: `${(y.count / maxYearShows) * 100}%` }} />
+                      <div className="h-full bg-[#FF7A00] rounded-full" style={{ width: `${(y.count / maxYearShows) * 100}%` }} />
                     </div>
                   </div>
                 )) : <p className="text-xs text-slate-500 font-medium italic">Log shows to view your top years!</p>}
               </div>
             </div>
 
-            {/* Top Days of Week Card */}
+            {/* 6. DAYS OF THE WEEK */}
             <div
               onClick={() => setActiveSubView('days')}
-              className="bg-[#121619] p-4.5 rounded-2xl border border-[#222B30] hover:border-[#E040FB]/60 transition cursor-pointer shadow-lg group"
+              className="bg-[#121619] p-4.5 rounded-2xl border border-[#222B30] hover:border-[#FF4081]/60 transition cursor-pointer shadow-lg group"
             >
               <div className="flex justify-between items-center mb-3.5 pb-2 border-b border-[#222B30]">
-                <h3 className="text-xs sm:text-sm font-black text-[#E040FB] uppercase tracking-widest flex items-center gap-1.5">
+                <h3 className="text-xs sm:text-sm font-black text-[#FF4081] uppercase tracking-widest flex items-center gap-1.5">
                   <Clock size={16} /> DAYS OF THE WEEK
                 </h3>
-                <div className="flex items-center gap-1 text-[11px] font-extrabold text-slate-400 group-hover:text-[#E040FB] transition">
+                <div className="flex items-center gap-1 text-[11px] font-extrabold text-slate-400 group-hover:text-[#FF4081] transition">
                   SEE ALL <ChevronRight size={16} />
                 </div>
               </div>
@@ -261,10 +368,10 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
                   <div key={i} className="space-y-1">
                     <div className="flex justify-between text-xs font-semibold text-slate-200">
                       <span>{i + 1}. {d.day}</span>
-                      <span className="text-[#E040FB] font-mono font-extrabold">{d.count} ({d.percentage}%)</span>
+                      <span className="text-[#FF4081] font-mono font-extrabold">{d.count} ({d.percentage}%)</span>
                     </div>
                     <div className="w-full h-1.5 bg-[#0A0D0E] rounded-full overflow-hidden border border-[#222B30]">
-                      <div className="h-full bg-[#E040FB] rounded-full" style={{ width: `${(d.count / maxDayShows) * 100}%` }} />
+                      <div className="h-full bg-[#FF4081] rounded-full" style={{ width: `${(d.count / maxDayShows) * 100}%` }} />
                     </div>
                   </div>
                 )) : <p className="text-xs text-slate-500 font-medium italic">Log shows to view days of week breakdown!</p>}
