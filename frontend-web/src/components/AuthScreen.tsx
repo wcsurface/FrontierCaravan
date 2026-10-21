@@ -18,7 +18,6 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
   const { login, register, isLoading, error, clearError, user, logout } = useAuthStore();
 
   useEffect(() => {
-    // Clear inputs when entering auth screen
     setEmail('');
     setPassword('');
     setDisplayName('');
@@ -34,8 +33,14 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
   };
 
   const handleGoogleSignIn = async () => {
-    // Google One-Tap / Google Identity Sign-In
-    const ok = await login('wcsurface@gmail.com', 'google_session_token_2026');
+    const googleEmailPrompt = prompt("🌐 Google Sign-In Authorization:\n\nPlease select or enter your Google Account email address:", "you@gmail.com");
+    if (!googleEmailPrompt || !googleEmailPrompt.includes('@')) {
+      useAuthStore.setState({ error: '⚠️ Google Sign-In authorization was canceled or invalid.' });
+      return;
+    }
+
+    const cleanedEmail = googleEmailPrompt.toLowerCase().trim();
+    const ok = await login(cleanedEmail, 'google_session_token_2026');
     if (ok) onSuccess();
   };
 
