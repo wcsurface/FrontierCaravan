@@ -396,6 +396,7 @@
     let userShows = [];
     let currentSort = 'newest';
     let activeDetailIndex = -1;
+    let activeUserEmail = null;
 
     function showScreen(screenId) {
       document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
@@ -415,7 +416,12 @@
     }
 
     function handleLogout() {
-      // Clear inputs but PRESERVE userShows in localStorage!
+      activeUserEmail = null;
+      localStorage.removeItem('livelore_active_user');
+      userShows = [];
+      renderShowsFeed();
+      updateStatsDisplay();
+
       document.getElementById('auth-email').value = '';
       document.getElementById('auth-password').value = '';
       document.getElementById('auth-name').value = '';
@@ -424,7 +430,25 @@
 
     function handleLoginSubmit(e) {
       if (e) e.preventDefault();
-      // Keep existing userShows in localStorage intact!
+      const emailInput = document.getElementById('auth-email').value || '';
+      const cleanedEmail = emailInput.toLowerCase().trim();
+
+      activeUserEmail = cleanedEmail;
+      localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail }));
+
+      // Load user specific shows from localStorage if exists; new accounts start with []
+      const userKey = `livelore_shows_${cleanedEmail.replace(/[^a-z0-9]/g, '_')}`;
+      const storedShows = localStorage.getItem(userKey);
+      if (storedShows) {
+        try {
+          userShows = JSON.parse(storedShows);
+        } catch(err) {
+          userShows = [];
+        }
+      } else {
+        userShows = [];
+      }
+
       saveShowsToStorage();
       renderShowsFeed();
       updateStatsDisplay();
@@ -600,19 +624,21 @@
 
     function loadSavedShows() {
       try {
-        const raw = localStorage.getItem('livelore_local_shows');
-        if (raw) {
-          userShows = JSON.parse(raw);
-          if (!Array.isArray(userShows)) {
-            userShows = [];
+        const rawUser = localStorage.getItem('livelore_active_user');
+        if (rawUser) {
+          const uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email) {
+            activeUserEmail = uObj.email;
+          }
+        }
+
+        if (activeUserEmail) {
+          const userKey = `livelore_shows_${activeUserEmail.replace(/[^a-z0-9]/g, '_')}`;
+          const storedShows = localStorage.getItem(userKey);
+          if (storedShows) {
+            userShows = JSON.parse(storedShows);
           } else {
-            userShows.forEach(s => {
-              if (s.venue && s.venue.toLowerCase().includes('deer creek')) {
-                s.city = 'Noblesville';
-                s.state = 'Indiana';
-                s.country = 'USA';
-              }
-            });
+            userShows = [];
           }
         } else {
           userShows = [];
@@ -626,7 +652,12 @@
 
     function saveShowsToStorage() {
       try {
-        localStorage.setItem('livelore_local_shows', JSON.stringify(userShows));
+        if (activeUserEmail) {
+          const userKey = `livelore_shows_${activeUserEmail.replace(/[^a-z0-9]/g, '_')}`;
+          localStorage.setItem(userKey, JSON.stringify(userShows));
+        } else {
+          localStorage.setItem('livelore_local_shows', JSON.stringify(userShows));
+        }
       } catch (e) {}
     }
 
@@ -712,10 +743,8 @@
         const daysArr = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
         userShows.forEach(s => {
-          // 1. Venue Count
           venueCounts[s.venue] = (venueCounts[s.venue] || 0) + 1;
 
-          // 2. Tabulate BOTH Headliner and ALL Opening Acts into Top Artists!
           if (s.headline && s.headline.trim()) {
             const hName = s.headline.trim();
             artistCounts[hName] = (artistCounts[hName] || 0) + 1;
@@ -740,7 +769,6 @@
             artistCounts[opName] = (artistCounts[opName] || 0) + 1;
           });
 
-          // 3. Year & Day of Week
           let dObj = new Date(s.date);
           if (isNaN(dObj.getTime()) && typeof s.date === 'string') {
             const parts = s.date.split(/[\/\.-]/);
