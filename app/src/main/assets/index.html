@@ -517,6 +517,14 @@
     function showScreen(screenId) {
       document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
       document.getElementById('view-' + screenId).classList.add('active');
+
+      if (window.AndroidAdMob) {
+        if (screenId === 'auth') {
+          window.AndroidAdMob.hideBannerAd();
+        } else {
+          window.AndroidAdMob.showBannerAd();
+        }
+      }
     }
 
     function switchAuthMode(mode) {
@@ -703,7 +711,7 @@
           </div>
           <div class="ticket-stub">
             <div>ADMIT ONE</div>
-            <div style="font-size:8px; color:#64748b; margin-top:4px;">SEC 7</div>
+            <div style="font-size:8px; color:#221508; margin-top:4px;">SEC 7</div>
           </div>
         </div>
       `;

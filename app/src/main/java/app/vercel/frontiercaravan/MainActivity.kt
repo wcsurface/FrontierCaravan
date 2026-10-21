@@ -4,23 +4,37 @@ import android.accounts.AccountManager
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import androidx.activity.ComponentActivity
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 
 class MainActivity : ComponentActivity() {
 
     private lateinit var webView: WebView
+    private lateinit var adView: AdView
+    private lateinit var adContainerLayout: LinearLayout
     private val REQUEST_CODE_PICK_ACCOUNT = 1002
+
+    // Official Google AdMob Test Banner Unit ID
+    private val ADMOB_BANNER_TEST_UNIT_ID = "ca-app-pub-3940256099942544/6300978111"
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,8 +42,27 @@ class MainActivity : ComponentActivity() {
 
         hideSystemUI()
 
-        webView = WebView(this)
-        setContentView(webView)
+        // 1. Initialize Google Mobile Ads SDK
+        MobileAds.initialize(this) {}
+
+        // 2. Main Root Layout (Vertical Linear Layout)
+        val rootLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            setBackgroundColor(Color.parseColor("#0A0D0E"))
+        }
+
+        // 3. Main WebView
+        webView = WebView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                0,
+                1.0f
+            )
+        }
 
         val settings: WebSettings = webView.settings
         settings.javaScriptEnabled = true
@@ -49,9 +82,38 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        // Expose Native Haptics & Google Auth Interfaces
+        // 4. AdMob Banner Container Anchored securely at Bottom
+        adContainerLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            setBackgroundColor(Color.parseColor("#0A0D0E"))
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            visibility = View.VISIBLE
+        }
+
+        adView = AdView(this).apply {
+            setAdSize(AdSize.BANNER)
+            adUnitId = ADMOB_BANNER_TEST_UNIT_ID
+        }
+
+        adContainerLayout.addView(adView)
+
+        // Load Official AdMob Test Banner Ad
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
+
+        // Assemble Layout
+        rootLayout.addView(webView)
+        rootLayout.addView(adContainerLayout)
+        setContentView(rootLayout)
+
+        // Expose Native Interfaces to JavaScript
         webView.addJavascriptInterface(AndroidHapticsInterface(this), "AndroidHaptics")
         webView.addJavascriptInterface(AndroidGoogleAuthInterface(this), "AndroidGoogleAuth")
+        webView.addJavascriptInterface(AndroidAdMobInterface(), "AndroidAdMob")
 
         val targetUrl = "file:///android_asset/index.html"
         webView.loadUrl(targetUrl)
@@ -86,6 +148,23 @@ class MainActivity : ComponentActivity() {
                 webView.post {
                     webView.evaluateJavascript("onNativeGoogleAuthSuccess('$safeEmail')", null)
                 }
+            }
+        }
+    }
+
+    // Native AdMob Interface to show/hide banner on specific screens
+    inner class AndroidAdMobInterface {
+        @JavascriptInterface
+        fun showBannerAd() {
+            runOnUiThread {
+                adContainerLayout.visibility = View.VISIBLE
+            }
+        }
+
+        @JavascriptInterface
+        fun hideBannerAd() {
+            runOnUiThread {
+                adContainerLayout.visibility = View.GONE
             }
         }
     }
