@@ -107,18 +107,13 @@
       </div>
     </div>
 
-    <div style="text-align:center; margin-bottom:16px;">
-      <div style="font-size:12px; font-weight:800; text-transform:uppercase; color:#FFB300;">CONCERT DIARY & SETLIST VAULT</div>
-      <div style="font-size:13px; color:#94a3b8; margin-top:4px;">Log in or create an account to save & sync your live show diary across all devices.</div>
-    </div>
-
     <!-- Mode Switcher Tabs -->
-    <div class="auth-tab-box">
+    <div class="auth-tab-box" style="margin-top:10px;">
       <button class="auth-tab-btn active" id="tab-login" onclick="switchAuthMode('login')">Log In</button>
       <button class="auth-tab-btn" id="tab-register" onclick="switchAuthMode('register')">Create Account</button>
     </div>
 
-    <form style="flex:1; display:flex; flex-direction:column;" onsubmit="handleLoginSubmit(event)">
+    <div style="flex:1; display:flex; flex-direction:column;">
       <div id="field-name-box" style="display:none;">
         <label class="input-label">Display Name</label>
         <input type="text" id="auth-name" class="input-field" placeholder="Your Name" />
@@ -131,7 +126,7 @@
       <input type="password" id="auth-password" class="input-field" placeholder="••••••••" />
 
       <button type="button" class="btn-cta" id="btn-auth-submit" onclick="showScreen('diary')">LOG IN</button>
-    </form>
+    </div>
   </div>
 
   <!-- SCREEN 1: DIARY (HOME PAGE) -->

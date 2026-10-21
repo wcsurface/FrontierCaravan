@@ -55,16 +55,6 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
       </header>
 
       <div className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full pb-8 pt-2">
-        {/* App Subheading */}
-        <div className="text-center mb-6">
-          <p className="text-xs font-bold uppercase tracking-widest text-[#FFB300]">
-            Concert Diary & Setlist Vault
-          </p>
-          <p className="text-sm text-slate-400 font-medium mt-1">
-            Log in or create an account to save & sync your live show diary across all devices.
-          </p>
-        </div>
-
         {/* If Active User is Logged In */}
         {user ? (
           <div className="bg-[#121619] p-6 rounded-2xl border border-[#222B30] text-center space-y-4 shadow-xl">
@@ -90,7 +80,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
             </div>
           </div>
         ) : (
-          /* Original Clean Authentication Form with Log In / Create Account Toggle */
+          /* Clean Authentication Form with Log In / Create Account Toggle */
           <div className="space-y-6">
             {/* Mode Switcher Tabs */}
             <div className="flex bg-[#121619] p-1 rounded-full border border-[#222B30]">
