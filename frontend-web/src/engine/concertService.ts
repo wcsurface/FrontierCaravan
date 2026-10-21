@@ -31,7 +31,7 @@ export interface SetlistItem {
 
 export interface Concert {
   id: string;
-  date: number; // Unix Milliseconds
+  date: number | string; // Unix Milliseconds or Date String
   venueId: string;
   headlineArtistId: string;
   openingArtistId?: string;
@@ -40,7 +40,7 @@ export interface Concert {
   ticketPrice?: number;
   currency: string;
   ticketImageUri?: string;
-  photoUris?: string[]; // Up to 3 concert photos (Premium feature)
+  photoUris?: string[];
   audioMemoUri?: string;
   generalNotes?: string;
   createdAt: number;
@@ -49,7 +49,7 @@ export interface Concert {
 }
 
 export interface CreateConcertInput {
-  date: number;
+  date: number | string;
   headlineArtistName: string;
   openingArtistName?: string;
   venueName: string;
@@ -73,6 +73,28 @@ export interface ConcertStats {
   topVenues: { name: string; city: string; visitCount: number }[];
   topYears: { year: number; count: number }[];
   topDaysOfWeek: { day: string; count: number; percentage: number }[];
+}
+
+// Robust Helper to parse any date format (milliseconds or "MM/DD/YY" strings)
+export function parseConcertDate(dateVal: number | string): Date {
+  if (!dateVal) return new Date();
+  if (typeof dateVal === 'number') return new Date(dateVal);
+  if (typeof dateVal === 'string') {
+    const parts = dateVal.split(/[\/\.-]/);
+    if (parts.length === 3) {
+      let m = parseInt(parts[0], 10) - 1;
+      let d = parseInt(parts[1], 10);
+      let y = parseInt(parts[2], 10);
+      if (y < 100) {
+        y = y > 30 ? 1900 + y : 2000 + y;
+      }
+      const parsed = new Date(y, m, d);
+      if (!isNaN(parsed.getTime())) return parsed;
+    }
+    const directDate = new Date(dateVal);
+    if (!isNaN(directDate.getTime())) return directDate;
+  }
+  return new Date();
 }
 
 export class AnalyticsEngine {
@@ -130,10 +152,14 @@ export class AnalyticsEngine {
       .sort((a, b) => b.visitCount - a.visitCount)
       .slice(0, 10);
 
+    // Compute Top Years cleanly
     const yearMap = new Map<number, number>();
     concerts.forEach(c => {
-      const yr = new Date(c.date).getFullYear();
-      yearMap.set(yr, (yearMap.get(yr) || 0) + 1);
+      const dObj = parseConcertDate(c.date);
+      const yr = dObj.getFullYear();
+      if (!isNaN(yr)) {
+        yearMap.set(yr, (yearMap.get(yr) || 0) + 1);
+      }
     });
 
     const topYears = Array.from(yearMap.entries())
@@ -141,11 +167,15 @@ export class AnalyticsEngine {
       .sort((a, b) => b.count - a.count)
       .slice(0, 10);
 
+    // Compute Days of Week cleanly
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const dayCounts = [0, 0, 0, 0, 0, 0, 0];
     concerts.forEach(c => {
-      const dayIndex = new Date(c.date).getDay();
-      dayCounts[dayIndex]++;
+      const dObj = parseConcertDate(c.date);
+      const dayIndex = dObj.getDay();
+      if (!isNaN(dayIndex)) {
+        dayCounts[dayIndex]++;
+      }
     });
 
     const topDaysOfWeek = days
@@ -154,6 +184,7 @@ export class AnalyticsEngine {
         count: dayCounts[idx],
         percentage: totalShows > 0 ? Math.round((dayCounts[idx] / totalShows) * 100) : 0,
       }))
+      .filter(d => d.count > 0)
       .sort((a, b) => b.count - a.count);
 
     return {

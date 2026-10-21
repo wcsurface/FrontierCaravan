@@ -12,17 +12,20 @@
     .screen-view { display: none; width: 100%; max-width: 420px; height: 100%; flex-direction: column; justify-between; overflow-y: auto; padding-bottom: 90px; }
     .screen-view.active { display: flex; }
 
-    /* Centered Header with Generous Top Padding Clearing Camera Area */
-    .header { position: relative; width: 100%; display: flex; justify-content: center; align-items: center; padding: 36px 0 20px 0; min-height: 100px; }
-    .header-logo-box { display: flex; align-items: center; justify-content: center; width: 100%; }
-    .header-logo-img { height: 90px; width: auto; object-fit: contain; filter: drop-shadow(0 0 16px rgba(0,230,118,0.4)); }
+    /* Centered Header with 2X Larger LiveLore Logo */
+    .header { position: relative; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 0 24px 0; min-height: 100px; }
+    .header-logo-box { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+    .header-logo-img { height: 100px; width: auto; object-fit: contain; filter: drop-shadow(0 0 16px rgba(0,230,118,0.4)); }
+    .nav-btn-icon { position: absolute; z-index: 10; background: none; border: none; padding: 8px 12px; cursor: pointer; color: #00E676; font-size: 28px; font-weight: bold; }
+    .nav-btn-left { left: 0; }
+    .nav-btn-right { right: 0; }
 
     /* Sort Control Bar */
     .sort-control-bar { display: flex; justify-between; align-items: center; width: 100%; margin-bottom: 8px; padding: 0 4px; }
     .sort-dropdown { background: #121619; border: 1px solid #222B30; color: #f1f5f9; font-size: 11px; font-weight: 800; border-radius: 8px; padding: 6px 10px; outline: none; text-transform: uppercase; cursor: pointer; }
 
     /* Auth Tab Switcher */
-    .auth-tab-box { display: flex; background: #121619; padding: 4px; border-radius: 9999px; border: 1px solid #222B30; margin-top: 24px; margin-bottom: 20px; width: 100%; }
+    .auth-tab-box { display: flex; background: #121619; padding: 4px; border-radius: 9999px; border: 1px solid #222B30; margin-bottom: 20px; width: 100%; }
     .auth-tab-btn { flex: 1; padding: 12px; border-radius: 9999px; border: none; background: none; color: #94a3b8; font-weight: 900; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
     .auth-tab-btn.active { background: #FFB300; color: #0a0a0a; box-shadow: 0 4px 10px rgba(255,179,0,0.3); }
 
@@ -98,7 +101,7 @@
 
   <!-- SCREEN 0: MANDATORY AUTH / LOG IN & REGISTER -->
   <div id="view-auth" class="screen-view active">
-    <div class="header">
+    <div class="header" style="margin-bottom:24px;">
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
       </div>
@@ -110,20 +113,20 @@
       <button type="button" class="auth-tab-btn" id="tab-register" onclick="switchAuthMode('register')">Create Account</button>
     </div>
 
-    <form style="flex:1; display:flex; flex-direction:column;" onsubmit="handleLoginSubmit(event)" autocomplete="off">
+    <div style="flex:1; display:flex; flex-direction:column;">
       <div id="field-name-box" style="display:none;">
         <label class="input-label">Display Name</label>
-        <input type="text" id="auth-name" class="input-field" placeholder="Your Name" autocomplete="off" />
+        <input type="text" id="auth-name" class="input-field" placeholder="Your Name" />
       </div>
 
       <label class="input-label">Email Address *</label>
-      <input type="text" id="auth-email" class="input-field" placeholder="you@example.com" autocomplete="off" />
+      <input type="text" id="auth-email" class="input-field" placeholder="you@example.com" />
 
       <label class="input-label">Password *</label>
-      <input type="password" id="auth-password" class="input-field" placeholder="••••••••" autocomplete="new-password" />
+      <input type="password" id="auth-password" class="input-field" placeholder="••••••••" />
 
-      <button type="submit" class="btn-cta" id="btn-auth-submit">LOG IN</button>
-    </form>
+      <button type="button" class="btn-cta" id="btn-auth-submit" onclick="showScreen('diary');">LOG IN</button>
+    </div>
   </div>
 
   <!-- SCREEN 1: DIARY (HOME PAGE) -->
@@ -724,7 +727,7 @@
         if (currentSort === 'newest') {
           displayList.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         } else if (currentSort === 'oldest') {
-          displayList.sort((a, b) => new Date(a.date).getTime() - new Date(a.date).getTime());
+          displayList.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
         } else if (currentSort === 'band') {
           displayList.sort((a, b) => a.headline.localeCompare(b.headline));
         }
@@ -771,13 +774,39 @@
       if (count > 0) {
         const venueCounts = {};
         const artistCounts = {};
+        const yearCounts = {};
+        const dayCounts = { 'Sunday':0, 'Monday':0, 'Tuesday':0, 'Wednesday':0, 'Thursday':0, 'Friday':0, 'Saturday':0 };
+        const daysArr = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
         userShows.forEach(s => {
           venueCounts[s.venue] = (venueCounts[s.venue] || 0) + 1;
           artistCounts[s.headline] = (artistCounts[s.headline] || 0) + 1;
+
+          let dObj = new Date(s.date);
+          if (isNaN(dObj.getTime()) && typeof s.date === 'string') {
+            const parts = s.date.split(/[\/\.-]/);
+            if (parts.length === 3) {
+              let m = parseInt(parts[0], 10) - 1;
+              let d = parseInt(parts[1], 10);
+              let y = parseInt(parts[2], 10);
+              if (y < 100) y = y > 30 ? 1900 + y : 2000 + y;
+              dObj = new Date(y, m, d);
+            }
+          }
+
+          if (!isNaN(dObj.getTime())) {
+            const yr = dObj.getFullYear();
+            yearCounts[yr] = (yearCounts[yr] || 0) + 1;
+
+            const dayName = daysArr[dObj.getDay()];
+            if (dayName) dayCounts[dayName] = (dayCounts[dayName] || 0) + 1;
+          }
         });
 
         const topV = Object.entries(venueCounts).sort((a,b) => b[1] - a[1]);
         const topA = Object.entries(artistCounts).sort((a,b) => b[1] - a[1]);
+        const topY = Object.entries(yearCounts).sort((a,b) => b[0] - a[0]);
+        const topD = Object.entries(dayCounts).filter(d => d[1] > 0).sort((a,b) => b[1] - a[1]);
 
         document.getElementById('stats-venues-preview').innerHTML = topV.map((item, i) => `
           <div style="margin-bottom:6px;">${i+1}. ${item[0]} - ${item[1]}</div>
@@ -786,6 +815,19 @@
         document.getElementById('stats-artists-preview').innerHTML = topA.map((item, i) => `
           <div style="margin-bottom:6px;">${i+1}. ${item[0]} - ${item[1]}</div>
         `).join('');
+
+        document.getElementById('stats-years-preview').innerHTML = topY.map((item, i) => `
+          <div style="margin-bottom:6px;">${i+1}. Year ${item[0]} - ${item[1]} shows</div>
+        `).join('');
+
+        document.getElementById('stats-days-preview').innerHTML = topD.map((item, i) => `
+          <div style="margin-bottom:6px;">${i+1}. ${item[0]} - ${item[1]} shows (${Math.round((item[1]/count)*100)}%)</div>
+        `).join('');
+      } else {
+        document.getElementById('stats-venues-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic;">Log shows to view your top venues!</div>';
+        document.getElementById('stats-artists-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic;">Log shows to view your top artists!</div>';
+        document.getElementById('stats-years-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic;">Log shows to view your top years!</div>';
+        document.getElementById('stats-days-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic;">Log shows to view days of week breakdown!</div>';
       }
     }
 
@@ -815,14 +857,59 @@
           `).join('') : '<div style="color:#94a3b8;">No artists logged yet.</div>'}
         `;
       } else if (type === 'years') {
+        const yearCounts = {};
+        userShows.forEach(s => {
+          let dObj = new Date(s.date);
+          if (isNaN(dObj.getTime()) && typeof s.date === 'string') {
+            const parts = s.date.split(/[\/\.-]/);
+            if (parts.length === 3) {
+              let m = parseInt(parts[0], 10) - 1;
+              let d = parseInt(parts[1], 10);
+              let y = parseInt(parts[2], 10);
+              if (y < 100) y = y > 30 ? 1900 + y : 2000 + y;
+              dObj = new Date(y, m, d);
+            }
+          }
+          if (!isNaN(dObj.getTime())) {
+            const yr = dObj.getFullYear();
+            yearCounts[yr] = (yearCounts[yr] || 0) + 1;
+          }
+        });
+        const topY = Object.entries(yearCounts).sort((a,b) => b[0] - a[0]);
+
         container.innerHTML = `
           <div style="color:#00B0FF; font-size:14px; text-transform:uppercase; margin-bottom:10px;">ALL YEARS DATA</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">Total Concerts: ${userShows.length}</div>
+          ${topY.length > 0 ? topY.map((item, i) => `
+            <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">Year ${item[0]} - ${item[1]} Shows</div>
+          `).join('') : '<div style="color:#94a3b8;">No years logged yet.</div>'}
         `;
       } else {
+        const dayCounts = { 'Sunday':0, 'Monday':0, 'Tuesday':0, 'Wednesday':0, 'Thursday':0, 'Friday':0, 'Saturday':0 };
+        const daysArr = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        userShows.forEach(s => {
+          let dObj = new Date(s.date);
+          if (isNaN(dObj.getTime()) && typeof s.date === 'string') {
+            const parts = s.date.split(/[\/\.-]/);
+            if (parts.length === 3) {
+              let m = parseInt(parts[0], 10) - 1;
+              let d = parseInt(parts[1], 10);
+              let y = parseInt(parts[2], 10);
+              if (y < 100) y = y > 30 ? 1900 + y : 2000 + y;
+              dObj = new Date(y, m, d);
+            }
+          }
+          if (!isNaN(dObj.getTime())) {
+            const dayName = daysArr[dObj.getDay()];
+            if (dayName) dayCounts[dayName] = (dayCounts[dayName] || 0) + 1;
+          }
+        });
+        const topD = Object.entries(dayCounts).filter(d => d[1] > 0).sort((a,b) => b[1] - a[1]);
+
         container.innerHTML = `
           <div style="color:#E040FB; font-size:14px; text-transform:uppercase; margin-bottom:10px;">DAYS OF THE WEEK</div>
-          <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">Total Concerts: ${userShows.length}</div>
+          ${topD.length > 0 ? topD.map((item, i) => `
+            <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">${item[0]} - ${item[1]} Shows (${Math.round((item[1]/userShows.length)*100)}%)</div>
+          `).join('') : '<div style="color:#94a3b8;">No days logged yet.</div>'}
         `;
       }
       showScreen('substats');

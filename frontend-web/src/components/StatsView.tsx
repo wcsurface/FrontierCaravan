@@ -11,55 +11,15 @@ interface StatsViewProps {
 }
 
 export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
-  const { getConcertStats } = useEncoreStore();
+  const { getConcertStats, concerts } = useEncoreStore();
   const stats = getConcertStats();
 
   const [activeSubView, setActiveSubView] = useState<'main' | 'venues' | 'artists' | 'years' | 'days'>('main');
 
-  const venuesList = stats.topVenues.length > 0 ? stats.topVenues : [
-    { name: 'Red Rocks Amphitheatre', city: 'Morrison', visitCount: 12 },
-    { name: 'The Fillmore', city: 'San Francisco', visitCount: 8 },
-    { name: 'The Paramount Theatre', city: 'Seattle', visitCount: 5 },
-    { name: 'Madison Square Garden', city: 'New York', visitCount: 4 },
-    { name: 'Ryman Auditorium', city: 'Nashville', visitCount: 3 },
-    { name: 'First Avenue', city: 'Minneapolis', visitCount: 3 },
-    { name: 'The Wiltern', city: 'Los Angeles', visitCount: 2 },
-    { name: '9:30 Club', city: 'Washington DC', visitCount: 2 },
-    { name: 'Stubbs BBQ', city: 'Austin', visitCount: 2 },
-    { name: 'Metro', city: 'Chicago', visitCount: 1 },
-  ];
-
-  const artistsList = stats.topArtists.length > 0 ? stats.topArtists : [
-    { name: 'The Cure', timesSeen: 6 },
-    { name: 'Radiohead', timesSeen: 4 },
-    { name: 'Pixies', timesSeen: 4 },
-    { name: 'Depeche Mode', timesSeen: 3 },
-    { name: 'Nirvana', timesSeen: 3 },
-    { name: 'The Smashing Pumpkins', timesSeen: 2 },
-    { name: 'LCD Soundsystem', timesSeen: 2 },
-    { name: 'Nine Inch Nails', timesSeen: 2 },
-    { name: 'Interpol', timesSeen: 2 },
-    { name: 'Arcade Fire', timesSeen: 1 },
-  ];
-
-  const yearsList = stats.topYears.length > 0 ? stats.topYears : [
-    { year: 2026, count: 18 },
-    { year: 2025, count: 22 },
-    { year: 2024, count: 15 },
-    { year: 2023, count: 11 },
-    { year: 2022, count: 8 },
-    { year: 2021, count: 4 },
-    { year: 2019, count: 3 },
-    { year: 2018, count: 2 },
-  ];
-
-  const daysList = stats.topDaysOfWeek.length > 0 ? stats.topDaysOfWeek : [
-    { day: 'Thursday', count: 32, percentage: 42 },
-    { day: 'Friday', count: 20, percentage: 26 },
-    { day: 'Saturday', count: 14, percentage: 18 },
-    { day: 'Wednesday', count: 8, percentage: 10 },
-    { day: 'Tuesday', count: 4, percentage: 4 },
-  ];
+  const venuesList = stats.topVenues;
+  const artistsList = stats.topArtists;
+  const yearsList = stats.topYears;
+  const daysList = stats.topDaysOfWeek;
 
   const maxVenueVisits = Math.max(...venuesList.map(v => v.visitCount), 1);
   const maxArtistSeen = Math.max(...artistsList.map(a => a.timesSeen), 1);
@@ -99,7 +59,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
             </h2>
           </div>
           <div className="space-y-3">
-            {venuesList.map((v, i) => (
+            {venuesList.length > 0 ? venuesList.map((v, i) => (
               <div key={i} className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-1.5 shadow-sm">
                 <div className="flex justify-between items-center text-sm font-bold">
                   <span className="text-slate-100">{i + 1}. {v.name} {v.city ? `(${v.city})` : ''}</span>
@@ -109,7 +69,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
                   <div className="h-full bg-[#00E676] rounded-full" style={{ width: `${(v.visitCount / maxVenueVisits) * 100}%` }} />
                 </div>
               </div>
-            ))}
+            )) : <p className="text-xs text-center text-slate-500 py-4">No venues logged yet.</p>}
           </div>
         </div>
       )}
@@ -122,7 +82,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
             </h2>
           </div>
           <div className="space-y-3">
-            {artistsList.map((a, i) => (
+            {artistsList.length > 0 ? artistsList.map((a, i) => (
               <div key={i} className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-1.5 shadow-sm">
                 <div className="flex justify-between items-center text-sm font-bold">
                   <span className="text-slate-100">{i + 1}. {a.name}</span>
@@ -132,7 +92,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
                   <div className="h-full bg-[#FFB300] rounded-full" style={{ width: `${(a.timesSeen / maxArtistSeen) * 100}%` }} />
                 </div>
               </div>
-            ))}
+            )) : <p className="text-xs text-center text-slate-500 py-4">No artists logged yet.</p>}
           </div>
         </div>
       )}
@@ -145,7 +105,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
             </h2>
           </div>
           <div className="space-y-3">
-            {yearsList.map((y, i) => (
+            {yearsList.length > 0 ? yearsList.map((y, i) => (
               <div key={i} className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-1.5 shadow-sm">
                 <div className="flex justify-between items-center text-sm font-bold">
                   <span className="text-slate-100">Year {y.year}</span>
@@ -155,7 +115,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
                   <div className="h-full bg-[#00B0FF] rounded-full" style={{ width: `${(y.count / maxYearShows) * 100}%` }} />
                 </div>
               </div>
-            ))}
+            )) : <p className="text-xs text-center text-slate-500 py-4">No years logged yet.</p>}
           </div>
         </div>
       )}
@@ -168,7 +128,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
             </h2>
           </div>
           <div className="space-y-3">
-            {daysList.map((d, i) => (
+            {daysList.length > 0 ? daysList.map((d, i) => (
               <div key={i} className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-1.5 shadow-sm">
                 <div className="flex justify-between items-center text-sm font-bold">
                   <span className="text-slate-100">{d.day}</span>
@@ -178,7 +138,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
                   <div className="h-full bg-[#E040FB] rounded-full" style={{ width: `${(d.count / maxDayShows) * 100}%` }} />
                 </div>
               </div>
-            ))}
+            )) : <p className="text-xs text-center text-slate-500 py-4">No days logged yet.</p>}
           </div>
         </div>
       )}
@@ -189,7 +149,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
           {/* Hero Readout */}
           <div className="text-center my-2">
             <h2 className="text-5xl sm:text-6xl font-black tracking-tight text-white uppercase font-sans">
-              {stats.totalShows || 78} SHOWS
+              {concerts.length} {concerts.length === 1 ? 'SHOW' : 'SHOWS'}
             </h2>
           </div>
 
@@ -209,7 +169,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
                 </div>
               </div>
               <div className="space-y-2.5">
-                {venuesList.slice(0, 10).map((v, i) => (
+                {venuesList.length > 0 ? venuesList.slice(0, 10).map((v, i) => (
                   <div key={i} className="space-y-1">
                     <div className="flex justify-between text-xs font-semibold text-slate-200">
                       <span>{i + 1}. {v.name}</span>
@@ -219,7 +179,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
                       <div className="h-full bg-[#00E676] rounded-full" style={{ width: `${(v.visitCount / maxVenueVisits) * 100}%` }} />
                     </div>
                   </div>
-                ))}
+                )) : <p className="text-xs text-slate-500 font-medium italic">Log shows to view your top venues!</p>}
               </div>
             </div>
 
@@ -237,7 +197,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
                 </div>
               </div>
               <div className="space-y-2.5">
-                {artistsList.slice(0, 10).map((a, i) => (
+                {artistsList.length > 0 ? artistsList.slice(0, 10).map((a, i) => (
                   <div key={i} className="space-y-1">
                     <div className="flex justify-between text-xs font-semibold text-slate-200">
                       <span>{i + 1}. {a.name}</span>
@@ -247,7 +207,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
                       <div className="h-full bg-[#FFB300] rounded-full" style={{ width: `${(a.timesSeen / maxArtistSeen) * 100}%` }} />
                     </div>
                   </div>
-                ))}
+                )) : <p className="text-xs text-slate-500 font-medium italic">Log shows to view your top artists!</p>}
               </div>
             </div>
 
@@ -265,7 +225,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
                 </div>
               </div>
               <div className="space-y-2.5">
-                {yearsList.slice(0, 10).map((y, i) => (
+                {yearsList.length > 0 ? yearsList.slice(0, 10).map((y, i) => (
                   <div key={i} className="space-y-1">
                     <div className="flex justify-between text-xs font-semibold text-slate-200">
                       <span>{i + 1}. Year {y.year}</span>
@@ -275,7 +235,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
                       <div className="h-full bg-[#00B0FF] rounded-full" style={{ width: `${(y.count / maxYearShows) * 100}%` }} />
                     </div>
                   </div>
-                ))}
+                )) : <p className="text-xs text-slate-500 font-medium italic">Log shows to view your top years!</p>}
               </div>
             </div>
 
@@ -293,7 +253,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
                 </div>
               </div>
               <div className="space-y-2.5">
-                {daysList.map((d, i) => (
+                {daysList.length > 0 ? daysList.map((d, i) => (
                   <div key={i} className="space-y-1">
                     <div className="flex justify-between text-xs font-semibold text-slate-200">
                       <span>{i + 1}. {d.day}</span>
@@ -303,7 +263,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
                       <div className="h-full bg-[#E040FB] rounded-full" style={{ width: `${(d.count / maxDayShows) * 100}%` }} />
                     </div>
                   </div>
-                ))}
+                )) : <p className="text-xs text-slate-500 font-medium italic">Log shows to view days of week breakdown!</p>}
               </div>
             </div>
           </div>
