@@ -17,9 +17,10 @@
     .header-logo-box { display: flex; align-items: center; justify-content: center; width: 100%; }
     .header-logo-img { height: 90px; width: auto; object-fit: contain; filter: drop-shadow(0 0 16px rgba(0,230,118,0.4)); }
 
-    /* Sort Control Bar */
-    .sort-control-bar { display: flex; justify-between; align-items: center; width: 100%; margin-bottom: 8px; padding: 0 4px; }
-    .sort-dropdown { background: #121619; border: 1px solid #222B30; color: #f1f5f9; font-size: 11px; font-weight: 800; border-radius: 8px; padding: 6px 10px; outline: none; text-transform: uppercase; cursor: pointer; }
+    /* Sort Control Bar - Moved Sort Filter to Right Edge & Doubled Shows Count Font Size */
+    .sort-control-bar { display: flex; justify-between; align-items: center; width: 100%; margin-bottom: 12px; padding: 0 2px; }
+    .shows-count-title { font-size: 22px; font-weight: 900; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px; }
+    .sort-dropdown { background: #121619; border: 1.5px solid #222B30; color: #f1f5f9; font-size: 11px; font-weight: 800; border-radius: 8px; padding: 7px 10px; outline: none; text-transform: uppercase; cursor: pointer; margin-left: auto; }
 
     /* Auth Tab Switcher */
     .auth-tab-box { display: flex; background: #121619; padding: 4px; border-radius: 9999px; border: 1px solid #222B30; margin-bottom: 16px; width: 100%; }
@@ -39,15 +40,15 @@
     /* Error Notification Banner */
     .error-banner { display: none; background: rgba(136, 19, 55, 0.5); border: 1px solid rgba(225, 29, 72, 0.8); color: #fecdd3; padding: 12px 14px; border-radius: 12px; font-size: 12px; font-weight: 700; margin-bottom: 14px; width: 100%; text-align: center; }
 
-    /* Ticket Container & Card */
+    /* Ticket Container & Card - Larger Opener & Footer Font Sizes */
     #ticket-list { width: 100%; flex: 1; max-height: calc(100vh - 180px); overflow-y: auto; margin-bottom: 8px; }
     .ticket-card { position: relative; width: 100%; aspect-ratio: 2.85 / 1; background: #f4e4bc; color: #2b1c0e; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; display: flex; justify-between; box-shadow: 0 10px 25px rgba(0,0,0,0.6); border: 2px solid #d6c294; cursor: pointer; }
     .ticket-left { width: 70%; display: flex; flex-direction: column; justify-between; border-right: 2px dashed #423220; padding-right: 8px; }
     .ticket-artist-box { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; margin: auto 0; }
     .ticket-artist-head { font-weight: 900; font-size: 19px; text-transform: uppercase; font-family: serif; color: #1c1208; line-height: 1.1; }
-    .ticket-artist-and { font-family: serif; font-style: italic; font-weight: bold; font-size: 11px; color: rgba(66,50,32,0.8); margin: 2px 0; }
-    .ticket-artist-openers { font-weight: 800; font-size: 12px; font-family: serif; color: #2b1c0e; }
-    .ticket-footer { display: flex; justify-between; border-top: 2px solid rgba(66,50,32,0.5); padding-top: 4px; font-weight: 900; font-size: 11px; }
+    .ticket-artist-and { font-family: serif; font-style: italic; font-weight: bold; font-size: 12px; color: rgba(66,50,32,0.8); margin: 2px 0; }
+    .ticket-artist-openers { font-weight: 900; font-size: 14px; font-family: serif; color: #2b1c0e; }
+    .ticket-footer { display: flex; justify-between; border-top: 2px solid rgba(66,50,32,0.5); padding-top: 4px; font-weight: 900; font-size: 13px; }
     .ticket-venue { color: #2b1c0e; text-transform: uppercase; }
     .ticket-date { color: #d97706; text-transform: uppercase; }
     .ticket-stub { width: 28%; display: flex; flex-direction: column; justify-center; align-items: center; font-weight: 900; font-size: 10px; text-transform: uppercase; }
@@ -163,9 +164,9 @@
       </div>
     </div>
 
-    <!-- Sort Control Bar -->
+    <!-- Sort Control Bar (Shows Count Twice as Large & Filter at Right Edge) -->
     <div class="sort-control-bar" id="sort-control-bar" style="display:none;">
-      <div style="font-size:11px; font-weight:800; color:#94a3b8; text-transform:uppercase;" id="shows-count-label">0 SHOWS</div>
+      <div class="shows-count-title" id="shows-count-label">0 SHOWS LOGGED</div>
       <select class="sort-dropdown" id="sort-dropdown-select" onchange="handleSortChange(this.value)">
         <option value="newest">Newest First</option>
         <option value="oldest">Oldest First</option>
@@ -713,12 +714,14 @@
       const indexToDelete = userShows.findIndex(s => s.id === activeDetailShowId);
       if (indexToDelete < 0) return;
 
-      userShows.splice(indexToDelete, 1);
-      activeDetailShowId = null;
-      saveShowsToStorage();
-      renderShowsFeed();
-      updateStatsDisplay();
-      showScreen('diary');
+      if (confirm('Are you sure you want to delete this show from your vault?')) {
+        userShows.splice(indexToDelete, 1);
+        activeDetailShowId = null;
+        saveShowsToStorage();
+        renderShowsFeed();
+        updateStatsDisplay();
+        showScreen('diary');
+      }
     }
 
     function formatDateOnInput(elem) {

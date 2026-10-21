@@ -43,18 +43,18 @@ export const TicketStubCard: React.FC<TicketStubCardProps> = ({
   const totalBands = 1 + openersList.length;
 
   let headlinerSize = 'text-xl sm:text-2xl';
-  let openerSize = 'text-xs sm:text-sm';
-  let andSize = 'text-[10px] sm:text-xs';
+  let openerSize = 'text-sm sm:text-base';
+  let andSize = 'text-xs sm:text-sm';
 
   if (totalBands === 2) {
     headlinerSize = 'text-lg sm:text-xl';
-    openerSize = 'text-xs sm:text-sm';
+    openerSize = 'text-sm sm:text-base';
   } else if (totalBands === 3) {
     headlinerSize = 'text-base sm:text-lg';
-    openerSize = 'text-[11px] sm:text-xs';
+    openerSize = 'text-xs sm:text-sm';
   } else if (totalBands >= 4) {
     headlinerSize = 'text-sm sm:text-base';
-    openerSize = 'text-[10px] sm:text-[11px]';
+    openerSize = 'text-xs sm:text-sm';
   }
 
   const venueName = venue?.name || 'Deer Creek Music Center';
@@ -99,7 +99,7 @@ export const TicketStubCard: React.FC<TicketStubCardProps> = ({
               {headlinerName}
             </h3>
 
-            {/* If there are openers */}
+            {/* If there are openers - Larger Font Size */}
             {openersList.length > 0 && (
               <div className="flex flex-col items-center justify-center mt-0.5">
                 <span className={`${andSize} font-serif italic font-bold text-[#423220]/80 my-0.5`}>
@@ -107,7 +107,7 @@ export const TicketStubCard: React.FC<TicketStubCardProps> = ({
                 </span>
                 <div className="flex flex-wrap items-center justify-center gap-x-1.5 leading-tight">
                   {openersList.slice(0, 4).map((opener, i) => (
-                    <span key={i} className={`${openerSize} font-extrabold text-[#2b1c0e] font-serif`}>
+                    <span key={i} className={`${openerSize} font-black text-[#2b1c0e] font-serif`}>
                       {opener}{i < Math.min(openersList.length, 4) - 1 ? ',' : ''}
                     </span>
                   ))}
@@ -116,12 +116,12 @@ export const TicketStubCard: React.FC<TicketStubCardProps> = ({
             )}
           </div>
 
-          {/* Bottom Box: VENUE & HIGHLIGHTED CONCERT DATE BADGE */}
+          {/* Bottom Box: VENUE & HIGHLIGHTED CONCERT DATE BADGE (1-2 Points Larger) */}
           <div className="h-[28%] flex border-t-2 border-[#423220]/50 pt-0.5 items-center justify-between px-1">
-            <span className="text-[10px] sm:text-xs font-black uppercase text-[#2b1c0e] truncate max-w-[55%]">
+            <span className="text-xs sm:text-sm font-black uppercase text-[#2b1c0e] truncate max-w-[55%]">
               {venueName}
             </span>
-            <span className="text-[10px] sm:text-xs font-black uppercase text-[#d97706] tracking-wider">
+            <span className="text-xs sm:text-sm font-black uppercase text-[#d97706] tracking-wider">
               {formattedDate}
             </span>
           </div>
