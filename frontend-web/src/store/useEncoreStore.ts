@@ -21,6 +21,9 @@ interface EncoreState {
   // Premium Status
   isPremium: boolean;
 
+  // Ticket Stub Theme ('multicolor' | 'classic')
+  ticketTheme: 'multicolor' | 'classic';
+
   // Settings
   setlistFmApiKey: string;
   isCloudSyncEnabled: boolean;
@@ -32,6 +35,7 @@ interface EncoreState {
   deleteConcert: (concertId: string) => void;
   clearAllData: () => void;
   setIsPremium: (status: boolean) => void;
+  setTicketTheme: (theme: 'multicolor' | 'classic') => void;
   setSetlistFmApiKey: (key: string) => void;
   getConcertStats: () => ConcertStats;
   exportVaultJson: () => string;
@@ -51,11 +55,13 @@ export const useEncoreStore = create<EncoreState>()(
       setlistItems: [],
 
       isPremium: false,
+      ticketTheme: 'multicolor',
       setlistFmApiKey: '',
       isCloudSyncEnabled: true,
       cloudSyncStatus: 'synced',
 
       setIsPremium: (status) => set({ isPremium: status }),
+      setTicketTheme: (theme) => set({ ticketTheme: theme }),
 
       saveConcert: (input) => {
         const { concerts, artists, venues, setlistItems } = get();

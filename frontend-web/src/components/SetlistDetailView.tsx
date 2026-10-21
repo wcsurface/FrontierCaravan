@@ -60,18 +60,19 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
   };
 
   return (
-    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between pb-28 min-h-screen">
-      {/* Header with LiveLore Logo & Generous Top Padding */}
-      <header className="relative flex items-center justify-center w-full pt-10 sm:pt-14 pb-6 my-1">
+    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between min-h-screen">
+      {/* Header with LiveLore Logo & Glass Navbar Positioned Directly Under Logo */}
+      <header className="relative flex flex-col items-center justify-center w-full pt-6 sm:pt-10 pb-4 shrink-0">
         <img
           src="/assets/livelore_logo.png"
           alt="LiveLore"
-          className="h-24 sm:h-28 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.4)] filter contrast-105"
+          className="h-20 sm:h-24 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.4)] filter contrast-105"
         />
+        <GlassNavBar currentView="setlist" onNavigate={onNavigate} />
       </header>
 
       {/* Main Content Area */}
-      <div className="flex-1 overflow-y-auto max-w-md mx-auto w-full">
+      <div className="flex-1 overflow-y-auto max-w-md mx-auto w-full pb-6">
         {/* Featured Ticket Stub Graphic */}
         <div className="w-full my-2">
           <TicketStubCard concert={concert} artist={headliner} venue={venue} />
@@ -79,7 +80,7 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
 
         {/* Show Details Card - Enlarged Readability Across All Fields */}
         <div className="w-full bg-[#121619] p-6 rounded-2xl border border-[#222B30] shadow-xl space-y-4 my-3">
-          {/* Headline Artist (Title changed from HEADLINE BAND to HEADLINE ARTIST) */}
+          {/* Headline Artist */}
           <div>
             <span className="text-xs sm:text-sm font-black uppercase tracking-widest text-[#FFB300] block mb-1.5">
               HEADLINE ARTIST
@@ -199,9 +200,6 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
           </div>
         </div>
       </div>
-
-      {/* Glassmorphic 4-Button Navigation Bar */}
-      <GlassNavBar currentView="setlist" onNavigate={onNavigate} />
     </div>
   );
 };

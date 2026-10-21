@@ -9,15 +9,15 @@
     body { background-color: #0A0D0E; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; align-items: center; justify-between; padding: 8px; }
 
     /* Screen Views */
-    .screen-view { display: none; width: 100%; max-width: 420px; height: 100%; flex-direction: column; justify-between; overflow-y: auto; padding-bottom: 90px; }
+    .screen-view { display: none; width: 100%; max-width: 420px; height: 100%; flex-direction: column; justify-between; overflow-y: auto; padding-bottom: 20px; }
     .screen-view.active { display: flex; }
 
-    /* Centered Header with 2X Larger LiveLore Logo & Generous Vertical Spacing */
-    .header { position: relative; width: 100%; display: flex; justify-content: center; align-items: center; padding: 42px 0 24px 0; min-height: 100px; }
-    .header-logo-box { display: flex; align-items: center; justify-content: center; width: 100%; }
-    .header-logo-img { height: 90px; width: auto; object-fit: contain; filter: drop-shadow(0 0 16px rgba(0,230,118,0.4)); }
+    /* Centered Header with LiveLore Logo & Glass Navbar Directly Under Logo */
+    .header { position: relative; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 24px 0 12px 0; min-height: 120px; }
+    .header-logo-box { display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 6px; }
+    .header-logo-img { height: 80px; width: auto; object-fit: contain; filter: drop-shadow(0 0 16px rgba(0,230,118,0.4)); }
 
-    /* Sort Control Bar (Shows Count Twice as Large & Filter at Right Edge) */
+    /* Sort Control Bar */
     .sort-control-bar { display: flex; justify-between; align-items: center; width: 100%; margin-bottom: 12px; padding: 0 2px; }
     .shows-count-title { font-size: 22px; font-weight: 900; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px; }
     .sort-dropdown { background: #121619; border: 1.5px solid #222B30; color: #f1f5f9; font-size: 11px; font-weight: 800; border-radius: 8px; padding: 7px 10px; outline: none; text-transform: uppercase; cursor: pointer; margin-left: auto; }
@@ -41,7 +41,7 @@
     .error-banner { display: none; background: rgba(136, 19, 55, 0.5); border: 1px solid rgba(225, 29, 72, 0.8); color: #fecdd3; padding: 12px 14px; border-radius: 12px; font-size: 12px; font-weight: 700; margin-bottom: 14px; width: 100%; text-align: center; }
 
     /* Ticket Container & Card - Multi-Color Vintage Assortment Palette */
-    #ticket-list { width: 100%; flex: 1; max-height: calc(100vh - 180px); overflow-y: auto; margin-bottom: 8px; }
+    #ticket-list { width: 100%; flex: 1; overflow-y: auto; margin-bottom: 8px; }
     .ticket-card { position: relative; width: 100%; aspect-ratio: 2.85 / 1; color: #221508; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; display: flex; justify-between; box-shadow: 0 10px 25px rgba(0,0,0,0.6); border: 2px solid rgba(34,21,8,0.25); cursor: pointer; }
     .ticket-left { width: 70%; display: flex; flex-direction: column; justify-between; border-right: 2px dashed rgba(34,21,8,0.4); padding-right: 8px; }
     .ticket-artist-box { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; margin: auto 0; }
@@ -66,8 +66,8 @@
     .btn-update-pass { width: 100%; background: linear-gradient(90deg, #1C2128, #222B30); color: #FFB300; font-weight: 900; font-size: 14px; padding: 12px; border-radius: 9999px; border: 1.5px solid #FFB300; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); margin-top: 8px; }
     .btn-add-opener { background: none; border: none; color: #FFB300; font-weight: 800; font-size: 13px; cursor: pointer; margin-bottom: 12px; text-align: left; padding: 2px 0; }
 
-    /* FIXED FLOATING GLASSMORPHIC DARK UI 4-BUTTON NAVIGATION BAR CSS STYLES */
-    .glass-nav-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 420px; display: flex; justify-between; align-items: center; gap: 6px; padding: 8px 12px 14px 12px; z-index: 100; background: rgba(10, 13, 14, 0.92); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-top: 1px solid rgba(34, 43, 48, 0.6); }
+    /* GLASSMORPHIC DARK UI 4-BUTTON NAVIGATION BAR (POSITIONED DIRECTLY UNDER LOGO AT TOP) */
+    .glass-nav-bar { width: 100%; max-width: 420px; display: flex; justify-between; align-items: center; gap: 6px; padding: 8px 10px; z-index: 40; background: rgba(10, 13, 14, 0.92); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border: 1px solid rgba(34, 43, 48, 0.8); border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin-top: 6px; }
     .glass-btn-wrapper { position: relative; flex: 1; }
 
     .glow-home { position: absolute; inset: -2px; border-radius: 14px; background: linear-gradient(135deg, rgba(255, 140, 0, 0.45), rgba(176, 66, 137, 0.35)); filter: blur(8px); opacity: 0.85; }
@@ -75,7 +75,7 @@
     .glow-profile { position: absolute; inset: -2px; border-radius: 14px; background: linear-gradient(180deg, rgba(255, 122, 0, 0.50), rgba(142, 43, 95, 0.35)); filter: blur(8px); opacity: 0.85; }
     .glow-stats { position: absolute; inset: -2px; border-radius: 14px; background: linear-gradient(180deg, rgba(0, 180, 100, 0.40), rgba(0, 206, 209, 0.25)); filter: blur(8px); opacity: 0.85; }
 
-    .glass-btn { position: relative; width: 100%; padding: 12px 4px; border-radius: 12px; background: rgba(28, 33, 40, 0.80); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.5); cursor: pointer; text-align: center; border: 1.5px solid transparent; transition: transform 0.15s ease; }
+    .glass-btn { position: relative; width: 100%; padding: 10px 4px; border-radius: 12px; background: rgba(28, 33, 40, 0.80); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.5); cursor: pointer; text-align: center; border: 1.5px solid transparent; transition: transform 0.15s ease; }
     .glass-btn:active { transform: scale(0.95); }
 
     .glass-btn-home { border-color: rgba(230, 160, 75, 0.70); }
@@ -90,7 +90,7 @@
     .glass-btn-stats { border-color: rgba(50, 236, 160, 0.85); }
     .glass-btn-stats span { color: #2DE38E; }
 
-    .glass-btn-text { font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 0.8px; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .glass-btn-text { font-weight: 900; font-size: 13px; text-transform: uppercase; letter-spacing: 0.8px; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* Empty State Pointer Animation */
     @keyframes bounceDown {
@@ -109,6 +109,11 @@
     .stats-card { background: #121619; border: 1px solid #222B30; border-radius: 16px; padding: 18px; margin-bottom: 16px; cursor: pointer; }
     .stats-card-title { font-weight: 900; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #222B30; display: flex; justify-between; align-items: center; }
     .stats-item-text { font-size: 15px; font-weight: 800; color: #f1f5f9; }
+
+    /* Theme Toggle Switch */
+    .theme-toggle-box { display: flex; background: #111618; padding: 4px; border-radius: 12px; border: 1px solid #222B30; margin-top: 8px; width: 100%; }
+    .theme-toggle-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; background: none; color: #94a3b8; font-weight: 900; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; }
+    .theme-toggle-btn.active { background: #FFB300; color: #0a0a0a; box-shadow: 0 4px 10px rgba(255,179,0,0.3); }
   </style>
 </head>
 <body>
@@ -165,6 +170,13 @@
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
       </div>
+      <!-- Glass Navigation Bar Directly Under Logo -->
+      <div class="glass-nav-bar">
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
+      </div>
     </div>
 
     <!-- Sort Control Bar (Shows Count Twice as Large & Filter at Right Edge) -->
@@ -180,14 +192,6 @@
     <div id="ticket-list">
       <!-- Dynamic persisted tickets container -->
     </div>
-
-    <!-- Fixed Floating Glassmorphic 4-Button Navigation Bar -->
-    <div class="glass-nav-bar">
-      <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
-    </div>
   </div>
 
   <!-- SCREEN 2: LOG SHOW -->
@@ -195,6 +199,13 @@
     <div class="header">
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
+      <!-- Glass Navigation Bar Directly Under Logo -->
+      <div class="glass-nav-bar">
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
 
@@ -236,21 +247,20 @@
       <!-- Action Button: Changes dynamically between "+ ADD" and "💾 SAVE EDITS" -->
       <button type="submit" class="btn-cta" id="btn-save-show">+ ADD</button>
     </form>
-
-    <!-- Fixed Floating Glassmorphic 4-Button Navigation Bar -->
-    <div class="glass-nav-bar">
-      <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="cancelShowLog()"><span class="glass-btn-text">Home</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
-    </div>
   </div>
 
-  <!-- SCREEN 3: SHOW DETAILS & SETLIST (Title updated to HEADLINE ARTIST & Enlarged Readability) -->
+  <!-- SCREEN 3: SHOW DETAILS & SETLIST -->
   <div id="view-setlist" class="screen-view">
     <div class="header">
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
+      <!-- Glass Navigation Bar Directly Under Logo -->
+      <div class="glass-nav-bar">
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
 
@@ -287,27 +297,34 @@
     <!-- Action Buttons: EDIT SHOW & DELETE SHOW -->
     <button class="btn-edit" id="btn-edit-show" style="font-size:16px; padding:14px;" onclick="triggerEditShow()">✏ EDIT SHOW</button>
     <button class="btn-delete" id="btn-delete-show" style="font-size:15px; padding:14px;" onclick="triggerDeleteShow()">🗑 DELETE SHOW</button>
-
-    <!-- Fixed Floating Glassmorphic 4-Button Navigation Bar -->
-    <div class="glass-nav-bar">
-      <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
-    </div>
   </div>
 
-  <!-- SCREEN 4: PROFILE DASHBOARD PAGE ($4.99 PRICE & 6 SPECIFIC REFINEMENTS) -->
+  <!-- SCREEN 4: PROFILE DASHBOARD PAGE (TICKET THEME TOGGLE AT TOP + GLASS NAVBAR UNDER LOGO) -->
   <div id="view-profile" class="screen-view">
-    <!-- 1. Generous Top Clearance Below Logo -->
-    <div class="header" style="margin-bottom:32px; padding-bottom:16px;">
+    <div class="header">
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
       </div>
+      <!-- Glass Navigation Bar Directly Under Logo -->
+      <div class="glass-nav-bar">
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
+      </div>
     </div>
 
-    <!-- 2. Enlarged VIP Pass Area with $4.99 PRICE & Highly Legible Typography -->
-    <div class="detail-card" style="background: linear-gradient(135deg, rgba(255,179,0,0.22), #121619); border-color: #FFB300; padding: 22px; margin-bottom: 24px;">
+    <!-- 1. TICKET STUB COLOR THEME TOGGLE (FIRST THING ON PROFILE PAGE ABOVE VIP BOX) -->
+    <div class="detail-card" style="padding: 20px; margin-bottom: 20px;">
+      <div class="detail-label" style="font-size:13px; margin-bottom:8px;">🎨 TICKET STUB COLOR THEME</div>
+      <div class="theme-toggle-box">
+        <button type="button" class="theme-toggle-btn active" id="theme-btn-multicolor" onclick="switchTicketTheme('multicolor')">🎨 Multi-Colored</button>
+        <button type="button" class="theme-toggle-btn" id="theme-btn-classic" onclick="switchTicketTheme('classic')">📜 Classic Beige</button>
+      </div>
+    </div>
+
+    <!-- 2. Enlarged VIP Pass Area with $4.99 PRICE -->
+    <div class="detail-card" style="background: linear-gradient(135deg, rgba(255,179,0,0.22), #121619); border-color: #FFB300; padding: 22px; margin-bottom: 20px;">
       <div style="display:flex; justify-between; align-items:center; margin-bottom:12px;">
         <span style="font-size:13px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px;">👑 LIVELORE VIP PASS</span>
         <span style="background:#FFB300; color:#0a0a0a; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">$4.99 ONE-TIME</span>
@@ -317,38 +334,36 @@
       <button class="btn-edit" style="font-size:16px; padding:14px;" onclick="buyAppPremium()">⭐ GO PREMIUM FOR $4.99</button>
     </div>
 
-    <!-- 3 & 4. Account Details Card with Generous Clearance & Enlarged Text -->
-    <div class="detail-card" style="padding: 22px; margin-bottom: 24px;">
+    <!-- 3. Account Details Card -->
+    <div class="detail-card" style="padding: 22px; margin-bottom: 20px;">
       <div class="detail-label" style="font-size:13px; margin-bottom:6px;">👤 ACCOUNT EMAIL</div>
       <div style="font-size:18px; font-weight:900; color:#ffffff; margin-bottom:20px;" id="profile-email-display">you@example.com</div>
 
       <div style="border-top: 1px solid #222B30; padding-top: 16px;">
         <div class="detail-label" style="font-size:13px; margin-bottom:8px;">🔑 CHANGE PASSWORD</div>
         <input type="password" id="profile-new-pass" class="input-field" placeholder="New Password (min 6 chars)" style="margin-top:6px; margin-bottom:12px;" />
-        <!-- 6. Sleek, Pill-Shaped Glassmorphic Update Password Button -->
         <button type="button" class="btn-update-pass" onclick="alert('✓ Password updated successfully!')">Update Password</button>
       </div>
     </div>
 
-    <!-- 5. Log Out Button with Extra Top Margin -->
-    <div style="margin-top:20px; width:100%;">
+    <!-- Log Out Button -->
+    <div style="margin-top:12px; width:100%;">
       <button class="btn-delete" style="font-size:16px; padding:16px;" onclick="handleLogout()">LOG OUT</button>
-    </div>
-
-    <!-- Fixed Floating Glassmorphic 4-Button Navigation Bar -->
-    <div class="glass-nav-bar">
-      <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
     </div>
   </div>
 
-  <!-- SCREEN 5: STATS MAIN OVERVIEW PAGE (EXACT REQUESTED ORDER WITH ENLARGED HIGH-READABILITY TEXT) -->
+  <!-- SCREEN 5: STATS MAIN OVERVIEW PAGE -->
   <div id="view-stats" class="screen-view">
     <div class="header">
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
+      <!-- Glass Navigation Bar Directly Under Logo -->
+      <div class="glass-nav-bar">
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
 
@@ -401,20 +416,12 @@
         <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log shows to view days of week breakdown!</div>
       </div>
     </div>
-
-    <!-- Fixed Floating Glassmorphic 4-Button Navigation Bar -->
-    <div class="glass-nav-bar">
-      <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
-    </div>
   </div>
 
-  <!-- SCREEN 6: SUB-STATS DETAIL (SHOWS COMPLETE LIST FOR SINGLE CATEGORY WITH ENLARGED TEXT & UNIVERSAL SVG BACK ARROW) -->
+  <!-- SCREEN 6: SUB-STATS DETAIL -->
   <div id="view-substats" class="screen-view">
     <div class="header">
-      <button type="button" onclick="showScreen('stats')" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:#FFB300; cursor:pointer; display:flex; align-items:center; justify-center; padding:8px; z-index:10;">
+      <button type="button" onclick="showScreen('stats')" style="position:absolute; left:12px; top:36px; background:none; border:none; color:#FFB300; cursor:pointer; display:flex; align-items:center; justify-center; padding:8px; z-index:10;">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFB300" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
           <line x1="19" y1="12" x2="5" y2="12"></line>
           <polyline points="12 19 5 12 12 5"></polyline>
@@ -423,17 +430,16 @@
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
       </div>
+      <!-- Glass Navigation Bar Directly Under Logo -->
+      <div class="glass-nav-bar">
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
+      </div>
     </div>
 
     <div id="substats-container" style="flex:1; font-size:16px; font-weight:800; padding-bottom:20px; margin-top:10px;"></div>
-
-    <!-- Fixed Floating Glassmorphic 4-Button Navigation Bar -->
-    <div class="glass-nav-bar">
-      <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
-      <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
-    </div>
   </div>
 
   <script>
@@ -446,7 +452,22 @@
       '#F7E5B3', // Classic Cream
     ];
 
+    let currentTicketTheme = localStorage.getItem('livelore_ticket_theme') || 'multicolor';
+
+    function switchTicketTheme(theme) {
+      currentTicketTheme = theme;
+      localStorage.setItem('livelore_ticket_theme', theme);
+
+      const btnMulti = document.getElementById('theme-btn-multicolor');
+      const btnClassic = document.getElementById('theme-btn-classic');
+      if (btnMulti) btnMulti.classList.toggle('active', theme === 'multicolor');
+      if (btnClassic) btnClassic.classList.toggle('active', theme === 'classic');
+
+      renderShowsFeed();
+    }
+
     function getTicketColor(id) {
+      if (currentTicketTheme === 'classic') return '#f4e4bc';
       if (!id) return TICKET_COLOR_PALETTE[0];
       let hash = 0;
       for (let i = 0; i < id.length; i++) {
@@ -878,6 +899,10 @@
       } catch (e) {
         userShows = [];
       }
+
+      // Initialize theme toggle state
+      switchTicketTheme(currentTicketTheme);
+
       saveShowsToStorage();
       renderShowsFeed();
       updateStatsDisplay();

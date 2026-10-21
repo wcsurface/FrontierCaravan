@@ -9,18 +9,18 @@ interface GlassNavBarProps {
 
 export const GlassNavBar: React.FC<GlassNavBarProps> = ({ currentView, onNavigate }) => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-3 z-50 bg-[#0A0D0E]/90 backdrop-blur-lg border-t border-[#222B30]/60 flex items-center justify-between gap-1.5 select-none">
+    <div className="w-full max-w-md mx-auto my-2 p-2 rounded-2xl bg-[#0A0D0E]/90 backdrop-blur-lg border border-[#222B30]/80 shadow-2xl flex items-center justify-between gap-1.5 select-none shrink-0 z-40">
       {/* 1. HOME BUTTON */}
       <div className="relative group flex-1">
         <div className="absolute -inset-0.5 rounded-xl bg-gradient-to-r from-amber-500/40 via-purple-600/30 to-amber-600/30 blur-md opacity-90 group-hover:opacity-100 transition"></div>
         <button
           type="button"
           onClick={() => onNavigate('diary')}
-          className={`relative w-full py-3 px-1.5 rounded-xl bg-[#1C2128]/80 backdrop-blur-md border border-[#E6A04B]/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),inset_0_-1px_2px_rgba(0,0,0,0.5)] active:scale-95 transition-all text-center ${
-            currentView === 'diary' ? 'ring-1 ring-[#F6B756]' : ''
+          className={`relative w-full py-2.5 px-1.5 rounded-xl bg-[#1C2128]/80 backdrop-blur-md border border-[#E6A04B]/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),inset_0_-1px_2px_rgba(0,0,0,0.5)] active:scale-95 transition-all text-center ${
+            currentView === 'diary' ? 'ring-2 ring-[#F6B756]' : ''
           }`}
         >
-          <span className="text-[#F6B756] font-extrabold text-xs sm:text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] uppercase tracking-wider block truncate">
+          <span className="text-[#F6B756] font-black text-xs sm:text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] uppercase tracking-wider block truncate">
             Home
           </span>
         </button>
@@ -32,11 +32,11 @@ export const GlassNavBar: React.FC<GlassNavBarProps> = ({ currentView, onNavigat
         <button
           type="button"
           onClick={() => onNavigate('log')}
-          className={`relative w-full py-3 px-1.5 rounded-xl bg-[#1C2128]/80 backdrop-blur-md border border-[#2DE38E]/85 shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),inset_0_-1px_2px_rgba(0,0,0,0.5)] active:scale-95 transition-all text-center ${
-            currentView === 'log' ? 'ring-1 ring-[#2DE38E]' : ''
+          className={`relative w-full py-2.5 px-1.5 rounded-xl bg-[#1C2128]/80 backdrop-blur-md border border-[#2DE38E]/85 shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),inset_0_-1px_2px_rgba(0,0,0,0.5)] active:scale-95 transition-all text-center ${
+            currentView === 'log' ? 'ring-2 ring-[#2DE38E]' : ''
           }`}
         >
-          <span className="text-[#2DE38E] font-extrabold text-xs sm:text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] uppercase tracking-wider block truncate">
+          <span className="text-[#2DE38E] font-black text-xs sm:text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] uppercase tracking-wider block truncate">
             Add Show
           </span>
         </button>
@@ -48,11 +48,11 @@ export const GlassNavBar: React.FC<GlassNavBarProps> = ({ currentView, onNavigat
         <button
           type="button"
           onClick={() => onNavigate('auth')}
-          className={`relative w-full py-3 px-1.5 rounded-xl bg-[#1C2128]/80 backdrop-blur-md border border-[#FFA73B]/85 shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),inset_0_-1px_2px_rgba(0,0,0,0.5)] active:scale-95 transition-all text-center ${
-            currentView === 'auth' ? 'ring-1 ring-[#F6B756]' : ''
+          className={`relative w-full py-2.5 px-1.5 rounded-xl bg-[#1C2128]/80 backdrop-blur-md border border-[#FFA73B]/85 shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),inset_0_-1px_2px_rgba(0,0,0,0.5)] active:scale-95 transition-all text-center ${
+            currentView === 'auth' ? 'ring-2 ring-[#F6B756]' : ''
           }`}
         >
-          <span className="text-[#F6B756] font-extrabold text-xs sm:text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] uppercase tracking-wider block truncate">
+          <span className="text-[#F6B756] font-black text-xs sm:text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] uppercase tracking-wider block truncate">
             Profile
           </span>
         </button>
@@ -64,11 +64,11 @@ export const GlassNavBar: React.FC<GlassNavBarProps> = ({ currentView, onNavigat
         <button
           type="button"
           onClick={() => onNavigate('stats')}
-          className={`relative w-full py-3 px-1.5 rounded-xl bg-[#1C2128]/80 backdrop-blur-md border border-[#2DE38E]/85 shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),inset_0_-1px_2px_rgba(0,0,0,0.5)] active:scale-95 transition-all text-center ${
-            currentView === 'stats' ? 'ring-1 ring-[#2DE38E]' : ''
+          className={`relative w-full py-2.5 px-1.5 rounded-xl bg-[#1C2128]/80 backdrop-blur-md border border-[#2DE38E]/85 shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),inset_0_-1px_2px_rgba(0,0,0,0.5)] active:scale-95 transition-all text-center ${
+            currentView === 'stats' ? 'ring-2 ring-[#2DE38E]' : ''
           }`}
         >
-          <span className="text-[#2DE38E] font-extrabold text-xs sm:text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] uppercase tracking-wider block truncate">
+          <span className="text-[#2DE38E] font-black text-xs sm:text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] uppercase tracking-wider block truncate">
             Stats
           </span>
         </button>

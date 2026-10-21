@@ -60,20 +60,28 @@ export default function HomeView() {
     <main className="flex flex-col items-center justify-between min-h-screen bg-[#0A0D0E] text-slate-100 select-none font-sans overflow-hidden bg-grid-lines">
       {/* SCREEN 1: DIARY VIEW */}
       {currentView === 'diary' && (
-        <div className="flex flex-col w-full max-w-md h-screen p-4 overflow-y-auto justify-between pb-28">
-          {/* Centered LiveLore Header with Generous Top Padding Clearing Camera Notch */}
-          <header className="relative flex items-center justify-center w-full pt-10 sm:pt-14 pb-6 my-1">
+        <div className="flex flex-col w-full max-w-md h-screen p-4 overflow-y-auto justify-between">
+          {/* Centered LiveLore Header with Glass Navbar Positioned Directly Under Logo */}
+          <header className="relative flex flex-col items-center justify-center w-full pt-6 sm:pt-10 pb-4 shrink-0">
             <img
               src="/assets/livelore_logo.png"
               alt="LiveLore"
-              className="h-24 sm:h-28 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.4)] filter contrast-105"
+              className="h-20 sm:h-24 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.4)] filter contrast-105"
+            />
+            {/* Glass Navigation Bar Rendered Under Logo */}
+            <GlassNavBar
+              currentView={currentView}
+              onNavigate={(view) => {
+                if (view === 'log') setEditingConcertId(undefined);
+                setCurrentView(view === 'auth' ? 'profile' : view);
+              }}
             />
           </header>
 
           {/* Sort Dropdown & Show Count Bar */}
           {concerts.length > 0 && (
-            <div className="flex items-center justify-between px-1 mb-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            <div className="flex items-center justify-between px-1 my-2">
+              <span className="text-xl font-black uppercase text-slate-100 font-sans">
                 {concerts.length} {concerts.length === 1 ? 'Show' : 'Shows'} Logged
               </span>
               <div className="flex items-center gap-1.5 bg-[#121619] border border-[#222B30] rounded-lg px-2.5 py-1.5 shadow-sm">
@@ -125,15 +133,6 @@ export default function HomeView() {
               })
             )}
           </div>
-
-          {/* Fixed Floating Glassmorphic 4-Button Navigation Bar */}
-          <GlassNavBar
-            currentView={currentView}
-            onNavigate={(view) => {
-              if (view === 'log') setEditingConcertId(undefined);
-              setCurrentView(view === 'auth' ? 'profile' : view);
-            }}
-          />
         </div>
       )}
 

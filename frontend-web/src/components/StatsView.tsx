@@ -31,32 +31,28 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
   const maxDayShows = Math.max(...daysList.map(d => d.count), 1);
 
   return (
-    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between pb-28 min-h-screen">
-      {/* Header with LiveLore Logo */}
-      <header className="relative flex items-center justify-center w-full pt-10 sm:pt-14 pb-6 my-1 shrink-0">
-        {activeSubView !== 'main' ? (
+    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between min-h-screen">
+      {/* Header with LiveLore Logo & Glass Navbar Positioned Directly Under Logo */}
+      <header className="relative flex flex-col items-center justify-center w-full pt-6 sm:pt-10 pb-4 shrink-0">
+        {activeSubView !== 'main' && (
           <button
             onClick={() => setActiveSubView('main')}
-            className="p-2 text-slate-200 hover:text-white transition rounded-full z-10"
+            className="absolute left-2 top-8 p-2 text-slate-200 hover:text-white transition rounded-full z-10"
           >
             <ArrowLeft size={28} />
           </button>
-        ) : (
-          <div className="w-10 z-10" />
         )}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-10">
-          <img
-            src="/assets/livelore_logo.png"
-            alt="LiveLore"
-            className="h-24 sm:h-28 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.4)] filter contrast-105"
-          />
-        </div>
-        <div className="w-10 z-10" />
+        <img
+          src="/assets/livelore_logo.png"
+          alt="LiveLore"
+          className="h-20 sm:h-24 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.4)] filter contrast-105"
+        />
+        <GlassNavBar currentView="stats" onNavigate={onNavigate} />
       </header>
 
       {/* FULL INDIVIDUAL CATEGORY SUB-PAGES - LARGER, EASY-TO-READ TYPOGRAPHY */}
       {activeSubView === 'artists' && (
-        <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-4 overflow-y-auto">
+        <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-6 overflow-y-auto">
           <div className="text-center mb-2">
             <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#FFB300] font-sans flex items-center justify-center gap-2">
               <Music size={26} /> ALL ARTISTS ({artistsList.length})
@@ -80,7 +76,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
       )}
 
       {activeSubView === 'venues' && (
-        <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-4 overflow-y-auto">
+        <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-6 overflow-y-auto">
           <div className="text-center mb-2">
             <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#00E676] font-sans flex items-center justify-center gap-2">
               <MapPin size={26} /> ALL VENUES ({venuesList.length})
@@ -104,7 +100,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
       )}
 
       {activeSubView === 'cities' && (
-        <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-4 overflow-y-auto">
+        <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-6 overflow-y-auto">
           <div className="text-center mb-2">
             <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#00B0FF] font-sans flex items-center justify-center gap-2">
               <Building2 size={26} /> ALL CITIES ({citiesList.length})
@@ -128,7 +124,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
       )}
 
       {activeSubView === 'states' && (
-        <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-4 overflow-y-auto">
+        <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-6 overflow-y-auto">
           <div className="text-center mb-2">
             <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#E040FB] font-sans flex items-center justify-center gap-2">
               <Flag size={26} /> ALL STATES ({statesList.length})
@@ -152,7 +148,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
       )}
 
       {activeSubView === 'years' && (
-        <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-4 overflow-y-auto">
+        <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-6 overflow-y-auto">
           <div className="text-center mb-2">
             <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#FF7A00] font-sans flex items-center justify-center gap-2">
               <Calendar size={26} /> ALL YEARS ({yearsList.length})
@@ -176,7 +172,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
       )}
 
       {activeSubView === 'days' && (
-        <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-4 overflow-y-auto">
+        <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-4 pb-6 overflow-y-auto">
           <div className="text-center mb-2">
             <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#FF4081] font-sans flex items-center justify-center gap-2">
               <Clock size={26} /> DAYS OF THE WEEK
@@ -199,9 +195,9 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
         </div>
       )}
 
-      {/* MAIN OVERVIEW SCREEN - ENLARGED, HIGHLY READABLE TYPOGRAPHY */}
+      {/* MAIN OVERVIEW SCREEN */}
       {activeSubView === 'main' && (
-        <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-6 pb-4 overflow-y-auto">
+        <div className="flex-1 flex flex-col w-full max-w-md mx-auto space-y-6 pb-6 overflow-y-auto">
           {/* Total Shows Hero Readout */}
           <div className="text-center my-2">
             <h2 className="text-5xl sm:text-6xl font-black tracking-tight text-white uppercase font-sans">
@@ -380,9 +376,6 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
           </div>
         </div>
       )}
-
-      {/* Glassmorphic 4-Button Navigation Bar */}
-      <GlassNavBar currentView="stats" onNavigate={onNavigate} />
     </div>
   );
 };

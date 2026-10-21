@@ -12,7 +12,8 @@ export const TICKET_COLOR_PALETTE = [
   '#F7E5B3', // Classic Cream
 ];
 
-export function getTicketColor(id?: string): string {
+export function getTicketColor(id?: string, theme: 'multicolor' | 'classic' = 'multicolor'): string {
+  if (theme === 'classic') return '#f4e4bc';
   if (!id) return TICKET_COLOR_PALETTE[0];
   let hash = 0;
   for (let i = 0; i < id.length; i++) {
@@ -35,7 +36,7 @@ export const TicketStubCard: React.FC<TicketStubCardProps> = ({
   venue,
   onClick,
 }) => {
-  const { artists, isPremium } = useEncoreStore();
+  const { artists, isPremium, ticketTheme } = useEncoreStore();
 
   const formattedDate = new Date(concert.date)
     .toLocaleDateString('en-US', {
@@ -78,8 +79,8 @@ export const TicketStubCard: React.FC<TicketStubCardProps> = ({
   const venueName = venue?.name || 'Deer Creek Music Center';
   const featuredPhoto = (isPremium && concert.photoUris && concert.photoUris.length > 0) ? concert.photoUris[0] : null;
 
-  // Persistent Vintage Color from Palette based on Concert ID
-  const ticketBgColor = getTicketColor(concert.id);
+  // Persistent Vintage Color from Palette based on Concert ID & ticketTheme
+  const ticketBgColor = getTicketColor(concert.id, ticketTheme);
 
   return (
     <div

@@ -210,18 +210,19 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
   };
 
   return (
-    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none bg-grid-lines overflow-y-auto justify-between pb-28">
-      {/* Header with LiveLore Logo & Generous Top Padding */}
-      <header className="relative flex items-center justify-center w-full pt-10 sm:pt-14 pb-6 my-1">
+    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none bg-grid-lines overflow-y-auto justify-between">
+      {/* Header with LiveLore Logo & Glass Navbar Positioned Directly Under Logo */}
+      <header className="relative flex flex-col items-center justify-center w-full pt-6 sm:pt-10 pb-4 shrink-0">
         <img
           src="/assets/livelore_logo.png"
           alt="LiveLore"
-          className="h-24 sm:h-28 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.4)] filter contrast-105"
+          className="h-20 sm:h-24 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.4)] filter contrast-105"
         />
+        <GlassNavBar currentView="log" onNavigate={onNavigate} />
       </header>
 
-      {/* Form Inputs - Enlarged Titles, Placeholders, and User Entered Text for Optimal Readability */}
-      <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-4 max-w-md mx-auto w-full pb-2 pt-2">
+      {/* Form Inputs */}
+      <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-4 max-w-md mx-auto w-full pb-6 pt-2">
         {/* Headline Band */}
         <div>
           <label className="block text-sm sm:text-base font-black uppercase tracking-wider text-[#FFB300] mb-1.5">
@@ -440,7 +441,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
           />
         </div>
 
-        {/* Submit Button: Unchanged Green + ADD CTA */}
+        {/* Submit Button */}
         <div className="my-2">
           <button
             type="submit"
@@ -450,9 +451,6 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
           </button>
         </div>
       </form>
-
-      {/* Glassmorphic 4-Button Navigation Bar */}
-      <GlassNavBar currentView="log" onNavigate={onNavigate} />
     </div>
   );
 };
