@@ -321,6 +321,9 @@
       <button type="button" class="btn-cancel" style="margin-bottom:0;" onclick="alert('✓ Password updated successfully!')">Update Password</button>
     </div>
 
+    <!-- Clear Vault Button -->
+    <button class="btn-delete" style="background: rgba(225, 29, 72, 0.2); border-color: rgba(225, 29, 72, 0.5);" onclick="handleClearUserVault()">🗑 CLEAR ALL CONCERTS IN VAULT</button>
+
     <!-- Log Out Button -->
     <button class="btn-delete" onclick="handleLogout()">LOG OUT</button>
 
@@ -439,136 +442,6 @@
       { v: "Rosemont Horizon", c: "Rosemont", s: "Illinois", co: "USA" },
     ];
 
-    // FULL 110+ CONCERTS LIST FOR WCSURFACE@GMAIL.COM VAULT
-    const WCSURFACE_FULL_VAULT = [
-      { headline: "Aerosmith", openersList: ["Guns N Roses"], date: "08/02/88", venue: "Market Square Arena", city: "Indianapolis", state: "Indiana", country: "USA", notes: "My first concert." },
-      { headline: "Stevie Ray Vaughan", openersList: ["The Stray Cats", "Duke Tumatoe"], date: "07/22/89", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "Mom took Matt VonBuechler and me" },
-      { headline: "The Rolling Stones", openersList: ["Living Colour"], date: "12/06/89", venue: "Hoosier Dome", city: "Indianapolis", state: "Indiana", country: "USA", notes: "" },
-      { headline: "The Rolling Stones", openersList: ["Living Colour"], date: "12/07/89", venue: "Hoosier Dome", city: "Indianapolis", state: "Indiana", country: "USA", notes: "" },
-      { headline: "The Guess Who", openersList: [], date: "04/06/90", venue: "Star Plaza Theatre", city: "Merrillville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Aerosmith", openersList: ["Joan Jett and the Blackhearts"], date: "05/28/90", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Rush", openersList: ["Mr. Big"], date: "06/14/90", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Mötley Crüe", openersList: ["Warrant"], date: "07/14/90", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Robert Plant", openersList: ["Alannah Myles"], date: "07/26/90", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Damn Yankees", openersList: ["Bad Company"], date: "08/03/90", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Guns N' Roses", openersList: ["Skid Row"], date: "05/28/91", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Guns N' Roses", openersList: ["Skid Row"], date: "05/29/91", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Grateful Dead", openersList: [], date: "06/07/91", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Don Henley", openersList: ["Susanna Hoffs"], date: "06/16/91", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Rush", openersList: ["Eric Johnson"], date: "10/31/91", venue: "Market Square Arena", city: "Indianapolis", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Grateful Dead", openersList: [], date: "06/28/92", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "The Guess Who", openersList: [], date: "06/30/92", venue: "Hilton U. Brown Theatre", city: "Indianapolis", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Grateful Dead", openersList: [], date: "03/14/93", venue: "Richfield Coliseum", city: "Richfield", state: "Ohio", country: "USA", notes: "" },
-      { headline: "Grateful Dead", openersList: ["Sting"], date: "06/11/93", venue: "Buckeye Lake Music Center", city: "Millersport", state: "Ohio", country: "USA", notes: "" },
-      { headline: "Grateful Dead", openersList: [], date: "06/21/93", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Grateful Dead", openersList: [], date: "06/22/93", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Grateful Dead", openersList: [], date: "06/23/93", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Grateful Dead", openersList: [], date: "03/16/94", venue: "Rosemont Horizon", city: "Rosemont", state: "Illinois", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "06/24/94", venue: "Murat Theatre", city: "Indianapolis", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Grateful Dead", openersList: [], date: "07/19/94", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Grateful Dead", openersList: [], date: "07/20/94", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Grateful Dead", openersList: [], date: "07/21/94", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Grateful Dead", openersList: ["Traffic"], date: "07/23/94", venue: "Soldier Field", city: "Chicago", state: "Illinois", country: "USA", notes: "" },
-      { headline: "Grateful Dead", openersList: ["Traffic"], date: "07/24/94", venue: "Soldier Field", city: "Chicago", state: "Illinois", country: "USA", notes: "" },
-      { headline: "Grateful Dead", openersList: [], date: "07/26/94", venue: "Riverport Amphitheater", city: "St. Louis", state: "Missouri", country: "USA", notes: "" },
-      { headline: "Grateful Dead", openersList: [], date: "07/27/94", venue: "Riverport Amphitheater", city: "St. Louis", state: "Missouri", country: "USA", notes: "" },
-      { headline: "Grateful Dead", openersList: ["Traffic"], date: "07/29/94", venue: "Buckeye Lake Music Center", city: "Millersport", state: "Ohio", country: "USA", notes: "" },
-      { headline: "Grateful Dead", openersList: [], date: "07/31/94", venue: "The Palace of Auburn Hills", city: "Auburn Hills", state: "Michigan", country: "USA", notes: "" },
-      { headline: "Grateful Dead", openersList: [], date: "08/01/94", venue: "The Palace of Auburn Hills", city: "Auburn Hills", state: "Michigan", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "10/10/94", venue: "Palace Theatre", city: "Louisville", state: "Kentucky", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "11/17/94", venue: "Hara Arena", city: "Dayton", state: "Ohio", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "06/14/95", venue: "Mud Island Amphitheater", city: "Memphis", state: "Tennessee", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "06/19/95", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "06/20/95", venue: "Blossom Music Center", city: "Cuyahoga Falls", state: "Ohio", country: "USA", notes: "" },
-      { headline: "Grateful Dead", openersList: [], date: "07/02/95", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "The Allman Brothers Band", openersList: ["Rusted Root"], date: "09/04/95", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "10/22/95", venue: "Assembly Hall", city: "Champaign", state: "Illinois", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "10/31/95", venue: "Rosemont Horizon", city: "Rosemont", state: "Illinois", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "11/30/95", venue: "Nutter Center", city: "Dayton", state: "Ohio", country: "USA", notes: "" },
-      { headline: "Parliament-Funkadelic", openersList: [], date: "04/15/96", venue: "World Mardi Gras", city: "Indianapolis", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Merl Saunders", openersList: [], date: "05/06/96", venue: "The Vogue", city: "Indianapolis", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Furthur Festival", openersList: ["Hot Tuna", "John Wesley Harding", "Los Lobos", "Bruce Hornsby", "Mickey Hart's Mystery Box", "RatDog"], date: "06/28/96", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "08/10/96", venue: "Alpine Valley Music Theatre", city: "East Troy", state: "Wisconsin", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "08/12/96", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "08/13/96", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Cypress Hill", openersList: ["The Roots", "Erykah Badu", "Foxy Brown", "George Clinton & P-Funk All Stars"], date: "08/14/97", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Bob Dylan", openersList: ["Ani DiFranco"], date: "08/27/97", venue: "Deer Creek Music Center", city: "Noblesville", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Jerry Garcia Band", openersList: [], date: "03/15/98", venue: "Bluebird Nightclub", city: "Bloomington", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Mike Keneally & Beer for Dolphins", openersList: ["The Groove Parlour"], date: "07/15/98", venue: "A Field in Northern Indiana", city: "Northern Indiana", state: "Indiana", country: "USA", notes: "My Band, The Groove Parlour, were the openers." },
-      { headline: "Mike Keneally & Beer for Dolphins", openersList: [], date: "10/15/98", venue: "Headliners", city: "Muncie", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Parliament-Funkadelic", openersList: [], date: "04/02/98", venue: "Worthen Arena (Ball State)", city: "Muncie", state: "Indiana", country: "USA", notes: "" },
-      { headline: "\"Weird Al\" Yankovic", openersList: [], date: "02/10/00", venue: "Emens Auditorium", city: "Muncie", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Indy Jazz Fest", openersList: ["Al Green", "Dave Brubeck"], date: "06/15/00", venue: "Military Park", city: "Indianapolis", state: "Indiana", country: "USA", notes: "" },
-      { headline: "Willie Nelson", openersList: ["Los Lonely Boys"], date: "10/20/07", venue: "Concrete Street Amphitheater", city: "Corpus Christi", state: "Texas", country: "USA", notes: "" },
-      { headline: "Parliament-Funkadelic", openersList: [], date: "01/10/09", venue: "The Fillmore Auditorium", city: "Denver", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Parliament-Funkadelic", openersList: [], date: "07/12/09", venue: "Mishawaka Amphitheatre", city: "Bellvue", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Reggae on the Rocks", openersList: ["Steel Pulse", "Rebelution", "Ky-Mani Marley", "Israel Vibration"], date: "08/28/10", venue: "Red Rocks Amphitheatre", city: "Morrison", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Return To Forever", openersList: ["Zappa Plays Zappa"], date: "08/27/11", venue: "Paramount Theatre", city: "Denver", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Mickey Hart Band", openersList: [], date: "12/10/11", venue: "Oriental Theater", city: "Denver", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Mickey Hart Band", openersList: [], date: "05/17/12", venue: "Ogden Theatre", city: "Denver", state: "Colorado", country: "USA", notes: "" },
-      { headline: "The Grandmothers of Invention", openersList: [], date: "07/31/12", venue: "Bluebird Theater", city: "Denver", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Maceo Parker", openersList: [], date: "02/09/13", venue: "Cervantes' Masterpiece Ballroom", city: "Denver", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "09/01/13", venue: "Dick's Sporting Goods Park", city: "Commerce City", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Ani DiFranco", openersList: [], date: "10/13/13", venue: "Boulder Theater", city: "Boulder", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Zappa Plays Zappa", openersList: [], date: "02/14/14", venue: "Ogden Theatre", city: "Denver", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Chromeo", openersList: ["Cut Copy", "Flume"], date: "08/05/14", venue: "Red Rocks Amphitheatre", city: "Morrison", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Ani DiFranco", openersList: [], date: "08/15/14", venue: "Planet Bluegrass (Folks Festival)", city: "Lyons", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Ziggy Marley", openersList: [], date: "08/19/14", venue: "Ogden Theatre", city: "Denver", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Parliament-Funkadelic", openersList: [], date: "09/12/14", venue: "Gothic Theatre", city: "Englewood", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Crosby, Stills & Nash", openersList: [], date: "09/23/14", venue: "Red Rocks Amphitheatre", city: "Morrison", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Maceo Parker", openersList: [], date: "10/19/14", venue: "Cervantes' Masterpiece Ballroom", city: "Denver", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Pink Talking Fish", openersList: [], date: "01/17/15", venue: "Quixote's True Blue", city: "Denver", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Robert Randolph & The Family Band", openersList: [], date: "03/07/15", venue: "Gothic Theatre", city: "Englewood", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Steve Miller Band", openersList: [], date: "08/15/15", venue: "Bohemian Nights Festival", city: "Fort Collins", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Rodrigo y Gabriela", openersList: [], date: "08/16/15", venue: "Bohemian Nights Festival", city: "Fort Collins", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "09/04/15", venue: "Dick's Sporting Goods Park", city: "Commerce City", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Morris Day & The Time", openersList: [], date: "09/05/15", venue: "Civic Center Park", city: "Denver", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Bruce Hornsby", openersList: [], date: "09/07/15", venue: "Civic Center Park", city: "Denver", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Duran Duran", openersList: ["Chic"], date: "09/20/15", venue: "Red Rocks Amphitheatre", city: "Morrison", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Israel Vibration", openersList: [], date: "10/22/15", venue: "Ogden Theatre", city: "Denver", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Trey Anastasio Band", openersList: [], date: "11/13/15", venue: "The Fillmore Auditorium", city: "Denver", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Ween", openersList: [], date: "02/12/16", venue: "1stBank Center", city: "Broomfield", state: "Colorado", country: "USA", notes: "" },
-      { headline: "The Purple Experience", openersList: [], date: "06/04/16", venue: "Elitch Gardens Arena", city: "Denver", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "09/02/16", venue: "Dick's Sporting Goods Park", city: "Commerce City", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "10/31/16", venue: "MGM Grand Garden Arena", city: "Las Vegas", state: "Nevada", country: "USA", notes: "" },
-      { headline: "Trey Anastasio Band", openersList: ["Vulfpeck"], date: "05/21/17", venue: "Red Rocks Amphitheatre", city: "Morrison", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Ween", openersList: [], date: "07/12/17", venue: "Red Rocks Amphitheatre", city: "Morrison", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Jack Johnson", openersList: ["Jamtown"], date: "07/14/17", venue: "Fiddler's Green Amphitheatre", city: "Greenwood Village", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Jerry Garcia 75th Birthday Bash", openersList: ["JGB Acoustic", "JGB", "Bob Weir & Campfire Band"], date: "08/04/17", venue: "Red Rocks Amphitheatre", city: "Morrison", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Joe Russo's Almost Dead", openersList: [], date: "08/31/17", venue: "Red Rocks Amphitheatre", city: "Morrison", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "09/01/17", venue: "Dick's Sporting Goods Park", city: "Commerce City", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "09/02/17", venue: "Dick's Sporting Goods Park", city: "Commerce City", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "09/03/17", venue: "Dick's Sporting Goods Park", city: "Commerce City", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Parliament-Funkadelic", openersList: ["G. Love & Special Sauce"], date: "10/07/17", venue: "Denver Oktoberfest", city: "Denver", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Mike Gordon", openersList: [], date: "10/14/17", venue: "Twist & Shout (Mini Concert)", city: "Denver", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Mike Gordon", openersList: [], date: "10/14/17", venue: "Boulder Theater", city: "Boulder", state: "Colorado", country: "USA", notes: "" },
-      { headline: "They Might Be Giants", openersList: [], date: "03/28/18", venue: "Gothic Theatre", city: "Englewood", state: "Colorado", country: "USA", notes: "" },
-      { headline: "James Taylor", openersList: [], date: "06/27/18", venue: "Fiddler's Green Amphitheatre", city: "Greenwood Village", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "08/31/18", venue: "Dick's Sporting Goods Park", city: "Commerce City", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "09/01/18", venue: "Dick's Sporting Goods Park", city: "Commerce City", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "09/02/18", venue: "Dick's Sporting Goods Park", city: "Commerce City", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Primus", openersList: [], date: "10/07/18", venue: "Ogden Theatre", city: "Denver", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Trey Anastasio", openersList: [], date: "12/15/18", venue: "Macky Auditorium", city: "Boulder", state: "Colorado", country: "USA", notes: "Solo Acoustic" },
-      { headline: "Parliament-Funkadelic", openersList: [], date: "01/11/19", venue: "Boulder Theater", city: "Boulder", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Zappa Plays Zappa", openersList: [], date: "02/02/20", venue: "Gothic Theatre", city: "Englewood", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "09/03/21", venue: "Dick's Sporting Goods Park", city: "Commerce City", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "09/05/21", venue: "Dick's Sporting Goods Park", city: "Commerce City", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "10/31/21", venue: "MGM Grand Garden Arena", city: "Las Vegas", state: "Nevada", country: "USA", notes: "" },
-      { headline: "South Park 25th Anniversary", openersList: ["Primus", "Ween"], date: "08/09/21", venue: "Red Rocks Amphitheatre", city: "Morrison", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Jack Johnson", openersList: ["Ziggy Marley"], date: "08/31/22", venue: "Fiddler's Green Amphitheatre", city: "Greenwood Village", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "09/01/22", venue: "Dick's Sporting Goods Park", city: "Commerce City", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "09/03/22", venue: "Dick's Sporting Goods Park", city: "Commerce City", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "08/31/23", venue: "Dick's Sporting Goods Park", city: "Commerce City", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "09/02/23", venue: "Dick's Sporting Goods Park", city: "Commerce City", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Esperanza Spalding", openersList: [], date: "08/02/24", venue: "Fox Theater", city: "Oakland", state: "California", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "08/29/24", venue: "Dick's Sporting Goods Park", city: "Commerce City", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Buena Vista Social Orchestra", openersList: [], date: "09/06/24", venue: "Golden State Theatre", city: "Monterey", state: "California", country: "USA", notes: "" },
-      { headline: "Michael Kiwanuka", openersList: [], date: "10/17/24", venue: "Greek Theatre (UC Berkeley)", city: "Berkeley", state: "California", country: "USA", notes: "" },
-      { headline: "Cyndi Lauper", openersList: [], date: "11/26/24", venue: "Chase Center", city: "San Francisco", state: "California", country: "USA", notes: "" },
-      { headline: "\"Weird Al\" Yankovic", openersList: [], date: "06/24/25", venue: "Red Rocks Amphitheatre", city: "Morrison", state: "Colorado", country: "USA", notes: "" },
-      { headline: "Phish", openersList: [], date: "09/04/26", venue: "Dick's Sporting Goods Park", city: "Commerce City", state: "Colorado", country: "USA", notes: "" }
-    ];
-
     let authMode = 'login';
     let userShows = [];
     let currentSort = 'newest';
@@ -609,10 +482,48 @@
       // Store Persistent Active Session in LocalStorage
       localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
 
-      // Load & Merge All User Shows from Railway Cloud DB & LocalStorage
       loadSavedShows();
 
       showScreen('diary');
+    }
+
+    function handleClearUserVault() {
+      if (confirm('⚠️ Are you sure you want to clear all concerts from your account vault? This will reset your concert list so you can re-enter your shows.')) {
+        userShows = [];
+
+        const rawUser = localStorage.getItem('livelore_active_user');
+        let activeEmail = null;
+        if (rawUser) {
+          try {
+            activeEmail = JSON.parse(rawUser).email;
+          } catch(e) {}
+        }
+
+        // Clear local storage keys
+        localStorage.removeItem('livelore_local_shows');
+        localStorage.removeItem('livelore_vault_v1');
+        localStorage.removeItem('livelore_backup_shows');
+
+        if (activeEmail) {
+          const userKey = `livelore_shows_${activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_')}`;
+          localStorage.removeItem(userKey);
+
+          // Push 0 shows to Railway PostgreSQL Cloud DB
+          fetch('/api/sync/push', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: `u_cloud_${activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_')}`,
+              concertsData: { concerts: [] }
+            })
+          }).catch(function(err) {});
+        }
+
+        renderShowsFeed();
+        updateStatsDisplay();
+        alert('✓ All concert data cleared from vault. You can now re-enter your shows cleanly!');
+        showScreen('diary');
+      }
     }
 
     function showErrorBanner(msg) {
@@ -846,7 +757,6 @@
       renderShowsFeed();
     }
 
-    // AUTOMATIC UNIFIED ACCOUNT DATA MERGER & CLOUD DB PERSISTENCE
     function loadSavedShows() {
       try {
         const rawUser = localStorage.getItem('livelore_active_user');
@@ -860,78 +770,29 @@
           }
         }
 
-        const mergedShowsMap = new Map();
-
-        function mergeCandidateArray(arr) {
-          if (!Array.isArray(arr)) return;
-          arr.forEach(c => {
-            if (!c) return;
-            const headline = c.headlineArtistName || c.headline || 'Headline Band';
-            const venue = c.venueName || c.venue || 'Venue';
-            const city = c.venueCity || c.city || 'Noblesville';
-            const state = c.venueState || c.state || 'Indiana';
-            const country = c.venueCountry || c.country || 'USA';
-            const notes = c.generalNotes || c.notes || '';
-            const dateStr = c.date ? (typeof c.date === 'number' ? new Date(c.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' }) : c.date) : '';
-            const openersList = c.openingArtistName ? [c.openingArtistName] : (Array.isArray(c.openersList) ? c.openersList : []);
-            const id = c.id || generateUniqueId();
-
-            const key = id || `${dateStr}_${headline.toLowerCase()}`;
-            if (!mergedShowsMap.has(key)) {
-              mergedShowsMap.set(key, { id, headline, venue, city, state, country, date: dateStr, notes, openersList });
-            }
-          });
-        }
-
-        const keysToScan = [
-          'livelore_local_shows',
-          'livelore_vault_v1',
-          'livelore_backup_shows'
-        ];
-
         if (activeEmail) {
           const userKey = `livelore_shows_${activeEmail.replace(/[^a-z0-9]/g, '_')}`;
-          keysToScan.unshift(userKey);
-        }
-
-        for (const key of keysToScan) {
-          const raw = localStorage.getItem(key);
+          const raw = localStorage.getItem(userKey);
           if (raw) {
-            try {
-              const parsed = JSON.parse(raw);
-              if (Array.isArray(parsed)) {
-                mergeCandidateArray(parsed);
-              } else if (parsed && Array.isArray(parsed.concerts)) {
-                mergeCandidateArray(parsed.concerts);
-              } else if (parsed && parsed.state && Array.isArray(parsed.state.concerts)) {
-                mergeCandidateArray(parsed.state.concerts);
-              }
-            } catch(e) {}
+            userShows = JSON.parse(raw);
+          } else {
+            userShows = [];
+          }
+        } else {
+          const raw = localStorage.getItem('livelore_local_shows');
+          if (raw) {
+            userShows = JSON.parse(raw);
+          } else {
+            userShows = [];
           }
         }
 
-        // If wcsurface@gmail.com account, initialize with the full 110+ concerts vault!
-        if (activeEmail === 'wcsurface@gmail.com' && mergedShowsMap.size < 50) {
-          WCSURFACE_FULL_VAULT.forEach(item => {
-            const id = generateUniqueId();
-            const key = `${item.date}_${item.headline.toLowerCase()}`;
-            if (!mergedShowsMap.has(key)) {
-              mergedShowsMap.set(key, { ...item, id });
-            }
-          });
-        }
-
-        userShows = Array.from(mergedShowsMap.values());
-
-        if (userShows.length > 0) {
+        if (Array.isArray(userShows)) {
           userShows.forEach(s => {
-            if (s.venue && s.venue.toLowerCase().includes('deer creek')) {
-              s.venue = 'Deer Creek Music Center';
-              s.city = 'Noblesville';
-              s.state = 'Indiana';
-              s.country = 'USA';
-            }
+            if (!s.id) s.id = generateUniqueId();
           });
+        } else {
+          userShows = [];
         }
       } catch (e) {
         userShows = [];
@@ -951,30 +812,28 @@
 
     function saveShowsToStorage() {
       try {
-        if (userShows && userShows.length > 0) {
-          const serialized = JSON.stringify(userShows);
-          localStorage.setItem('livelore_local_shows', serialized);
-          localStorage.setItem('livelore_vault_v1', serialized);
-          localStorage.setItem('livelore_backup_shows', serialized);
+        const serialized = JSON.stringify(userShows);
+        localStorage.setItem('livelore_local_shows', serialized);
+        localStorage.setItem('livelore_vault_v1', serialized);
+        localStorage.setItem('livelore_backup_shows', serialized);
 
-          const rawUser = localStorage.getItem('livelore_active_user');
-          if (rawUser) {
-            const uObj = JSON.parse(rawUser);
-            if (uObj && uObj.email) {
-              const userEmail = uObj.email.toLowerCase().trim();
-              const userKey = `livelore_shows_${userEmail.replace(/[^a-z0-9]/g, '_')}`;
-              localStorage.setItem(userKey, serialized);
+        const rawUser = localStorage.getItem('livelore_active_user');
+        if (rawUser) {
+          const uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email) {
+            const userEmail = uObj.email.toLowerCase().trim();
+            const userKey = `livelore_shows_${userEmail.replace(/[^a-z0-9]/g, '_')}`;
+            localStorage.setItem(userKey, serialized);
 
-              // Push directly to Railway Cloud Database API attached to this user's email!
-              fetch('/api/sync/push', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  userId: `u_cloud_${userEmail.replace(/[^a-z0-9]/g, '_')}`,
-                  concertsData: { concerts: userShows }
-                })
-              }).catch(function(err) {});
-            }
+            // Push directly to Railway Cloud Database API attached to this user's email!
+            fetch('/api/sync/push', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                userId: `u_cloud_${userEmail.replace(/[^a-z0-9]/g, '_')}`,
+                concertsData: { concerts: userShows }
+              })
+            }).catch(function(err) {});
           }
         }
       } catch (e) {}
