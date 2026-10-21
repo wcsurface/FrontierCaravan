@@ -59,10 +59,11 @@
     .input-field::placeholder { color: #94a3b8; font-weight: 600; font-size: 15px; }
     textarea.input-field { min-height: 120px; resize: none; line-height: 1.6; }
 
-    /* Action CTA Buttons */
+    /* Action CTA Buttons & Styled Update Password Button */
     .btn-cta { width: 100%; background: linear-gradient(90deg, #00E676, #00C853); color: #0a0a0a; font-weight: 900; font-size: 20px; padding: 16px; border-radius: 9999px; border: none; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; box-shadow: 0 0 22px rgba(0,230,118,0.5); margin-top: 12px; margin-bottom: 8px; }
-    .btn-edit { width: 100%; background: linear-gradient(90deg, #FFB300, #FFA000); color: #0a0a0a; font-weight: 900; font-size: 14px; padding: 12px; border-radius: 9999px; border: none; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; box-shadow: 0 0 15px rgba(255,179,0,0.3); margin-top: 8px; margin-bottom: 6px; }
-    .btn-delete { width: 100%; background: rgba(136, 19, 55, 0.4); color: #fecdd3; font-weight: 800; font-size: 13px; padding: 12px; border-radius: 9999px; border: 1px solid rgba(225, 29, 72, 0.6); text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-bottom: 8px; }
+    .btn-edit { width: 100%; background: linear-gradient(90deg, #FFB300, #FFA000); color: #0a0a0a; font-weight: 900; font-size: 16px; padding: 14px; border-radius: 9999px; border: none; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; box-shadow: 0 0 15px rgba(255,179,0,0.3); margin-top: 8px; margin-bottom: 6px; }
+    .btn-delete { width: 100%; background: rgba(136, 19, 55, 0.4); color: #fecdd3; font-weight: 900; font-size: 15px; padding: 14px; border-radius: 9999px; border: 1px solid rgba(225, 29, 72, 0.6); text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-bottom: 8px; }
+    .btn-update-pass { width: 100%; background: linear-gradient(90deg, #1C2128, #222B30); color: #FFB300; font-weight: 900; font-size: 14px; padding: 12px; border-radius: 9999px; border: 1.5px solid #FFB300; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); margin-top: 8px; }
     .btn-add-opener { background: none; border: none; color: #FFB300; font-weight: 800; font-size: 13px; cursor: pointer; margin-bottom: 12px; text-align: left; padding: 2px 0; }
 
     /* FIXED FLOATING GLASSMORPHIC DARK UI 4-BUTTON NAVIGATION BAR CSS STYLES */
@@ -100,7 +101,7 @@
 
     /* Detail Card Box */
     .detail-card { background: #121619; border: 1px solid #222B30; border-radius: 16px; padding: 18px; margin-bottom: 8px; width: 100%; }
-    .detail-label { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; color: #FFB300; margin-bottom: 4px; }
+    .detail-label { font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #FFB300; margin-bottom: 6px; }
     .detail-val-headline { font-size: 22px; font-weight: 900; text-transform: uppercase; font-family: serif; color: #ffffff; margin-bottom: 12px; }
     .detail-val-text { font-size: 14px; font-weight: 700; color: #e2e8f0; margin-bottom: 12px; }
 
@@ -296,36 +297,43 @@
     </div>
   </div>
 
-  <!-- SCREEN 4: PROFILE DASHBOARD PAGE -->
+  <!-- SCREEN 4: PROFILE DASHBOARD PAGE (6 SPECIFIC REFINEMENTS) -->
   <div id="view-profile" class="screen-view">
-    <div class="header">
+    <!-- 1. Generous Top Clearance Below Logo -->
+    <div class="header" style="margin-bottom:32px; padding-bottom:16px;">
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
       </div>
     </div>
 
-    <!-- Catchy $3.99 VIP Pass / Buy the App Banner -->
-    <div class="detail-card" style="background: linear-gradient(135deg, rgba(255,179,0,0.2), #121619); border-color: #FFB300;">
-      <div style="display:flex; justify-between; align-items:center; margin-bottom:8px;">
-        <span style="font-size:11px; font-weight:900; color:#FFB300; text-transform:uppercase;">👑 LIVELORE VIP PASS</span>
-        <span style="background:#FFB300; color:#0a0a0a; font-size:10px; font-weight:900; padding:2px 8px; border-radius:9999px;">$3.99 ONE-TIME</span>
+    <!-- 2. Enlarged VIP Pass Area with Highly Legible Typography -->
+    <div class="detail-card" style="background: linear-gradient(135deg, rgba(255,179,0,0.22), #121619); border-color: #FFB300; padding: 22px; margin-bottom: 24px;">
+      <div style="display:flex; justify-between; align-items:center; margin-bottom:12px;">
+        <span style="font-size:13px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px;">👑 LIVELORE VIP PASS</span>
+        <span style="background:#FFB300; color:#0a0a0a; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">$3.99 ONE-TIME</span>
       </div>
-      <div style="font-weight:900; font-size:16px; color:#ffffff; text-transform:uppercase; margin-bottom:6px;">Unlock Photo Feature & 100% AD-Free Experience!</div>
-      <div style="font-size:12px; color:#cbd5e1; line-height:1.5; margin-bottom:12px;">Attach and save photos from concerts. Remove all ads.</div>
-      <button class="btn-edit" onclick="buyAppPremium()">⭐ GO PREMIUM FOR $3.99</button>
+      <div style="font-weight:900; font-size:19px; color:#ffffff; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">Unlock Photo Feature & 100% AD-Free Experience!</div>
+      <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.5; margin-bottom:16px;">Attach and save photos from concerts. Remove all ads.</div>
+      <button class="btn-edit" style="font-size:16px; padding:14px;" onclick="buyAppPremium()">⭐ GO PREMIUM FOR $3.99</button>
     </div>
 
-    <!-- Account Details Card -->
-    <div class="detail-card">
-      <div class="detail-label">👤 ACCOUNT EMAIL</div>
-      <div style="font-size:14px; font-weight:800; color:#ffffff; margin-top:4px; margin-bottom:12px;" id="profile-email-display">you@example.com</div>
-      <div class="detail-label">🔑 CHANGE PASSWORD</div>
-      <input type="password" id="profile-new-pass" class="input-field" placeholder="New Password (min 6 chars)" style="margin-top:8px; margin-bottom:10px;" />
-      <button type="button" class="btn-cancel" style="margin-bottom:0;" onclick="alert('✓ Password updated successfully!')">Update Password</button>
+    <!-- 3 & 4. Account Details Card with Generous Clearance & Enlarged Text -->
+    <div class="detail-card" style="padding: 22px; margin-bottom: 24px;">
+      <div class="detail-label" style="font-size:13px; margin-bottom:6px;">👤 ACCOUNT EMAIL</div>
+      <div style="font-size:18px; font-weight:900; color:#ffffff; margin-bottom:20px;" id="profile-email-display">you@example.com</div>
+
+      <div style="border-top: 1px solid #222B30; padding-top: 16px;">
+        <div class="detail-label" style="font-size:13px; margin-bottom:8px;">🔑 CHANGE PASSWORD</div>
+        <input type="password" id="profile-new-pass" class="input-field" placeholder="New Password (min 6 chars)" style="margin-top:6px; margin-bottom:12px;" />
+        <!-- 6. Sleek, Pill-Shaped Glassmorphic Update Password Button -->
+        <button type="button" class="btn-update-pass" onclick="alert('✓ Password updated successfully!')">Update Password</button>
+      </div>
     </div>
 
-    <!-- Log Out Button -->
-    <button class="btn-delete" onclick="handleLogout()">LOG OUT</button>
+    <!-- 5. Log Out Button with Extra Top Margin -->
+    <div style="margin-top:20px; width:100%;">
+      <button class="btn-delete" style="font-size:16px; padding:16px;" onclick="handleLogout()">LOG OUT</button>
+    </div>
 
     <!-- Fixed Floating Glassmorphic 4-Button Navigation Bar -->
     <div class="glass-nav-bar">
