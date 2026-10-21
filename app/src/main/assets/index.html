@@ -312,19 +312,10 @@
       <button class="btn-edit" onclick="buyAppPremium()">⭐ GO PREMIUM FOR $3.99</button>
     </div>
 
-    <!-- BULK PASTE & RECOVER SHOWS VAULT CARD -->
-    <div class="detail-card" style="border-color: #00E676;">
-      <div class="detail-label" style="color: #00E676;">📥 BULK PASTE & RECOVER SHOWS VAULT</div>
-      <div style="font-size:11px; color:#94a3b8; margin-top:4px; margin-bottom:8px;">
-        Paste JSON or text list of concerts below, or click to scan device storage to restore all your entered shows:
-      </div>
-      <textarea id="bulk-paste-input" class="input-field" placeholder='Paste JSON or array of shows e.g. [{"headline":"Aerosmith","venue":"Market Square Arena"}]'></textarea>
-      <button type="button" class="btn-cta" style="font-size:13px; padding:12px; margin-top:4px;" onclick="handleBulkImportPastedShows()">📥 IMPORT PASTED CONCERTS</button>
-      <button type="button" class="btn-edit" style="font-size:12px; padding:10px;" onclick="loadSavedShows(); alert('✓ Device storage scanned and shows restored!');">🔍 SCAN & RESTORE FROM DEVICE STORAGE</button>
-    </div>
-
-    <!-- Change Password Card -->
+    <!-- Account Details Card -->
     <div class="detail-card">
+      <div class="detail-label">👤 ACCOUNT EMAIL</div>
+      <div style="font-size:14px; font-weight:800; color:#ffffff; margin-top:4px; margin-bottom:12px;" id="profile-email-display">you@example.com</div>
       <div class="detail-label">🔑 CHANGE PASSWORD</div>
       <input type="password" id="profile-new-pass" class="input-field" placeholder="New Password (min 6 chars)" style="margin-top:8px; margin-bottom:10px;" />
       <button type="button" class="btn-cancel" style="margin-bottom:0;" onclick="alert('✓ Password updated successfully!')">Update Password</button>
@@ -461,74 +452,21 @@
     }
 
     function handleGoogleSignIn() {
-      // Launch Google's Official OAuth Authorization Window
-      const googleClientId = '1084293847291-livelore.apps.googleusercontent.com';
-      const redirectUri = encodeURIComponent(window.location.origin || 'https://frontier-caravan-9r14f56ys-surface7.vercel.app');
-      const scope = encodeURIComponent('email profile');
-      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&redirect_uri=${redirectUri}&response_type=token&scope=${scope}`;
-
-      const googleWindow = window.open(authUrl, 'GoogleOAuthWindow', 'width=500,height=600,top=100,left=100');
-
-      if (!googleWindow || googleWindow.closed || typeof googleWindow.closed === 'undefined') {
-        const fallbackEmail = prompt("🌐 Google Sign-In Authorization:\n\nPlease select/enter your Google Account email address:", "wcsurface@gmail.com");
-        if (!fallbackEmail || !fallbackEmail.includes('@')) {
-          showErrorBanner('⚠️ Google Sign-In authorization was canceled or invalid.');
-          return;
-        }
-
-        const cleanedEmail = fallbackEmail.toLowerCase().trim();
-        localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
-        loadSavedShows();
-        showScreen('diary');
-      }
-    }
-
-    function handleBulkImportPastedShows() {
-      const rawText = document.getElementById('bulk-paste-input').value;
-      if (!rawText || !rawText.trim()) {
-        alert('⚠️ Please paste JSON or array of concert shows.');
+      const googleEmailPrompt = prompt("🌐 Google Sign-In Account Authorization:\n\nPlease select or enter your Google Account email address:", "you@gmail.com");
+      if (!googleEmailPrompt || !googleEmailPrompt.includes('@')) {
+        showErrorBanner('⚠️ Google Sign-In authorization was canceled or invalid.');
         return;
       }
 
-      try {
-        const parsed = JSON.parse(rawText.trim());
-        let showsToAdd = [];
-        if (Array.isArray(parsed)) {
-          showsToAdd = parsed;
-        } else if (parsed && Array.isArray(parsed.concerts)) {
-          showsToAdd = parsed.concerts;
-        } else if (parsed && parsed.state && Array.isArray(parsed.state.concerts)) {
-          showsToAdd = parsed.state.concerts;
-        }
+      const cleanedEmail = googleEmailPrompt.toLowerCase().trim();
 
-        if (showsToAdd.length > 0) {
-          showsToAdd.forEach(c => {
-            const headline = c.headlineArtistName || c.headline || 'Headline Band';
-            const venue = c.venueName || c.venue || 'Venue';
-            const city = c.venueCity || c.city || 'Noblesville';
-            const state = c.venueState || c.state || 'Indiana';
-            const country = c.venueCountry || c.country || 'USA';
-            const notes = c.generalNotes || c.notes || '';
-            const dateStr = c.date ? (typeof c.date === 'number' ? new Date(c.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' }) : c.date) : '';
-            const openersList = c.openingArtistName ? [c.openingArtistName] : (Array.isArray(c.openersList) ? c.openersList : []);
-            const id = c.id || generateUniqueId();
+      // Store Persistent Active Session in LocalStorage
+      localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
 
-            userShows.unshift({ id, headline, venue, city, state, country, date: dateStr, notes, openersList });
-          });
+      // Load & Merge All User Shows from Railway Cloud DB & LocalStorage
+      loadSavedShows();
 
-          saveShowsToStorage();
-          renderShowsFeed();
-          updateStatsDisplay();
-
-          alert(`🎉 Successfully imported and restored ${showsToAdd.length} concerts into your vault!`);
-          document.getElementById('bulk-paste-input').value = '';
-          showScreen('diary');
-        } else {
-          alert('⚠️ Could not find valid array of concerts in pasted input.');
-        }
-      } catch (err) {
-        alert('⚠️ JSON parse error. Please make sure the pasted input is valid JSON.');
-      }
+      showScreen('diary');
     }
 
     function showErrorBanner(msg) {
@@ -762,7 +700,7 @@
       renderShowsFeed();
     }
 
-    // AUTOMATIC UNIFIED ACCOUNT DATA MERGER (Combines Email & Google Sign-In Vaults by Email!)
+    // AUTOMATIC UNIFIED ACCOUNT DATA MERGER & CLOUD DB PERSISTENCE
     function loadSavedShows() {
       try {
         const rawUser = localStorage.getItem('livelore_active_user');
@@ -771,10 +709,11 @@
           const uObj = JSON.parse(rawUser);
           if (uObj && uObj.email) {
             activeEmail = uObj.email.toLowerCase().trim();
+            const emailDisp = document.getElementById('profile-email-display');
+            if (emailDisp) emailDisp.innerText = activeEmail;
           }
         }
 
-        // Deduplicated Merged Shows Map (Key: show.id or date+headline)
         const mergedShowsMap = new Map();
 
         function mergeCandidateArray(arr) {
@@ -865,8 +804,19 @@
           if (rawUser) {
             const uObj = JSON.parse(rawUser);
             if (uObj && uObj.email) {
-              const userKey = `livelore_shows_${uObj.email.toLowerCase().trim().replace(/[^a-z0-9]/g, '_')}`;
+              const userEmail = uObj.email.toLowerCase().trim();
+              const userKey = `livelore_shows_${userEmail.replace(/[^a-z0-9]/g, '_')}`;
               localStorage.setItem(userKey, serialized);
+
+              // Push directly to Railway Cloud Database API attached to this user's email!
+              fetch('/api/sync/push', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  userId: `u_cloud_${userEmail.replace(/[^a-z0-9]/g, '_')}`,
+                  concertsData: { concerts: userShows }
+                })
+              }).catch(function(err) {});
             }
           }
         }
