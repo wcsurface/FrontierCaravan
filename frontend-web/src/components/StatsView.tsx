@@ -67,15 +67,19 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
   const maxDayShows = Math.max(...daysList.map(d => d.count), 1);
 
   return (
-    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between">
-      {/* Header with LiveLore Logo */}
-      <header className="relative flex items-center justify-between w-full pt-2 pb-6 my-1 shrink-0">
-        <button
-          onClick={activeSubView === 'main' ? onBack : () => setActiveSubView('main')}
-          className="p-2 text-slate-200 hover:text-white transition rounded-full z-10"
-        >
-          <ArrowLeft size={26} />
-        </button>
+    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between pb-28">
+      {/* Header with LiveLore Logo & Generous Top Padding */}
+      <header className="relative flex items-center justify-between w-full pt-10 sm:pt-14 pb-6 my-1 shrink-0">
+        {activeSubView !== 'main' ? (
+          <button
+            onClick={() => setActiveSubView('main')}
+            className="p-2 text-slate-200 hover:text-white transition rounded-full z-10"
+          >
+            <ArrowLeft size={26} />
+          </button>
+        ) : (
+          <div className="w-10 z-10" />
+        )}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-10">
           <img
             src="/assets/livelore_logo.png"

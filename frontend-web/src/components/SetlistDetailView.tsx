@@ -5,7 +5,7 @@ import { useEncoreStore } from '../store/useEncoreStore';
 import { PRESET_VENUES } from '../engine/venueDataset';
 import { TicketStubCard } from './TicketStubCard';
 import { GlassNavBar } from './GlassNavBar';
-import { ArrowLeft, MapPin, Calendar, Users, FileText, Music, Edit3, Trash2, Camera } from 'lucide-react';
+import { MapPin, Calendar, Users, FileText, Music, Edit3, Trash2, Camera } from 'lucide-react';
 
 interface SetlistDetailViewProps {
   concertId: string;
@@ -59,28 +59,14 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
   };
 
   return (
-    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between">
-      {/* Header with LiveLore Logo */}
-      <header className="relative flex items-center justify-between w-full pt-2 pb-6 my-1">
-        <button
-          onClick={onBack}
-          className="p-2 text-slate-200 hover:text-white transition rounded-full z-10"
-        >
-          <ArrowLeft size={26} />
-        </button>
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-10">
-          <img
-            src="/assets/livelore_logo.png"
-            alt="LiveLore"
-            className="h-24 sm:h-28 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.4)] filter contrast-105"
-          />
-        </div>
-        <button
-          onClick={() => onEdit(concert.id)}
-          className="p-2 text-[#FFB300] hover:text-amber-300 transition rounded-full z-10 flex items-center gap-1 font-bold text-xs"
-        >
-          <Edit3 size={22} />
-        </button>
+    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between pb-28">
+      {/* Header with LiveLore Logo & Generous Top Padding */}
+      <header className="relative flex items-center justify-center w-full pt-10 sm:pt-14 pb-6 my-1">
+        <img
+          src="/assets/livelore_logo.png"
+          alt="LiveLore"
+          className="h-24 sm:h-28 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.4)] filter contrast-105"
+        />
       </header>
 
       {/* Main Content Area */}

@@ -12,21 +12,18 @@
     .screen-view { display: none; width: 100%; max-width: 420px; height: 100%; flex-direction: column; justify-between; overflow-y: auto; padding-bottom: 90px; }
     .screen-view.active { display: flex; }
 
-    /* Centered Header with 2X Larger LiveLore Logo */
-    .header { position: relative; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 0 24px 0; min-height: 100px; }
-    .header-logo-box { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-    .header-logo-img { height: 100px; width: auto; object-fit: contain; filter: drop-shadow(0 0 16px rgba(0,230,118,0.4)); }
-    .nav-btn-icon { position: absolute; z-index: 10; background: none; border: none; padding: 8px 12px; cursor: pointer; color: #00E676; font-size: 28px; font-weight: bold; }
-    .nav-btn-left { left: 0; }
-    .nav-btn-right { right: 0; }
+    /* Centered Header with Generous Top Padding Clearing Camera Area */
+    .header { position: relative; width: 100%; display: flex; justify-content: center; align-items: center; padding: 36px 0 20px 0; min-height: 100px; }
+    .header-logo-box { display: flex; align-items: center; justify-content: center; width: 100%; }
+    .header-logo-img { height: 90px; width: auto; object-fit: contain; filter: drop-shadow(0 0 16px rgba(0,230,118,0.4)); }
 
     /* Sort Control Bar */
     .sort-control-bar { display: flex; justify-between; align-items: center; width: 100%; margin-bottom: 8px; padding: 0 4px; }
     .sort-dropdown { background: #121619; border: 1px solid #222B30; color: #f1f5f9; font-size: 11px; font-weight: 800; border-radius: 8px; padding: 6px 10px; outline: none; text-transform: uppercase; cursor: pointer; }
 
-    /* Auth Tab Switcher with Generous Top Padding */
-    .auth-tab-box { display: flex; background: #121619; padding: 4px; border-radius: 9999px; border: 1px solid #222B30; margin-top: 36px; margin-bottom: 24px; width: 100%; }
-    .auth-tab-btn { flex: 1; padding: 14px; border-radius: 9999px; border: none; background: none; color: #94a3b8; font-weight: 900; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
+    /* Auth Tab Switcher */
+    .auth-tab-box { display: flex; background: #121619; padding: 4px; border-radius: 9999px; border: 1px solid #222B30; margin-top: 24px; margin-bottom: 20px; width: 100%; }
+    .auth-tab-btn { flex: 1; padding: 12px; border-radius: 9999px; border: none; background: none; color: #94a3b8; font-weight: 900; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
     .auth-tab-btn.active { background: #FFB300; color: #0a0a0a; box-shadow: 0 4px 10px rgba(255,179,0,0.3); }
 
     /* Ticket Container & Card */
@@ -101,13 +98,13 @@
 
   <!-- SCREEN 0: MANDATORY AUTH / LOG IN & REGISTER -->
   <div id="view-auth" class="screen-view active">
-    <div class="header" style="margin-bottom:24px;">
+    <div class="header">
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
       </div>
     </div>
 
-    <!-- Mode Switcher Tabs with Generous Top Margin -->
+    <!-- Mode Switcher Tabs -->
     <div class="auth-tab-box">
       <button type="button" class="auth-tab-btn active" id="tab-login" onclick="switchAuthMode('login')">Log In</button>
       <button type="button" class="auth-tab-btn" id="tab-register" onclick="switchAuthMode('register')">Create Account</button>
@@ -132,11 +129,9 @@
   <!-- SCREEN 1: DIARY (HOME PAGE) -->
   <div id="view-diary" class="screen-view">
     <div class="header">
-      <button class="nav-btn-icon nav-btn-left" onclick="showScreen('stats')">☰</button>
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
       </div>
-      <button class="nav-btn-icon nav-btn-right" onclick="showScreen('profile')">★</button>
     </div>
 
     <!-- Sort Control Bar -->
@@ -165,7 +160,6 @@
   <!-- SCREEN 2: LOG SHOW -->
   <div id="view-log" class="screen-view">
     <div class="header">
-      <button class="nav-btn-icon nav-btn-left" style="color:#ffffff;" onclick="showScreen('diary')">←</button>
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
       </div>
@@ -222,7 +216,6 @@
   <!-- SCREEN 3: SHOW DETAILS & SETLIST -->
   <div id="view-setlist" class="screen-view">
     <div class="header">
-      <button class="nav-btn-icon nav-btn-left" style="color:#ffffff;" onclick="showScreen('diary')">←</button>
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
       </div>
@@ -274,7 +267,6 @@
   <!-- SCREEN 4: PROFILE DASHBOARD PAGE -->
   <div id="view-profile" class="screen-view">
     <div class="header">
-      <button class="nav-btn-icon nav-btn-left" style="color:#ffffff;" onclick="showScreen('diary')">←</button>
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
       </div>
@@ -313,7 +305,6 @@
   <!-- SCREEN 5: STATS -->
   <div id="view-stats" class="screen-view">
     <div class="header">
-      <button class="nav-btn-icon nav-btn-left" style="color:#ffffff;" onclick="showScreen('diary')">←</button>
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
       </div>
@@ -365,7 +356,6 @@
   <!-- SCREEN 6: SUB-STATS DETAIL -->
   <div id="view-substats" class="screen-view">
     <div class="header">
-      <button class="nav-btn-icon nav-btn-left" style="color:#ffffff;" onclick="showScreen('stats')">←</button>
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
       </div>
@@ -444,7 +434,6 @@
       document.getElementById('field-name-box').style.display = mode === 'register' ? 'block' : 'none';
       document.getElementById('btn-auth-submit').innerText = mode === 'login' ? 'LOG IN' : 'CREATE ACCOUNT';
 
-      // Clear inputs when switching auth modes
       document.getElementById('auth-email').value = '';
       document.getElementById('auth-password').value = '';
       document.getElementById('auth-name').value = '';
@@ -465,7 +454,7 @@
       showScreen('auth');
     }
 
-    async function handleLoginSubmit(e) {
+    function handleLoginSubmit(e) {
       if (e) e.preventDefault();
       const emailInput = document.getElementById('auth-email').value || '';
       const passInput = document.getElementById('auth-password').value || '';
@@ -476,11 +465,9 @@
 
       localStorage.setItem('livelore_active_user', JSON.stringify({ id: activeUserId, email: cleanedEmail }));
 
-      // Strictly scope sample shows ONLY for wcsurface@gmail.com!
       if (cleanedEmail === 'wcsurface@gmail.com') {
         userShows = [...WCSURFACE_PRESET_SHOWS];
       } else {
-        // ALL new accounts start with a 100% clean, empty vault!
         userShows = [];
       }
 
@@ -488,7 +475,6 @@
       renderShowsFeed();
       updateStatsDisplay();
 
-      // Clear input fields
       document.getElementById('auth-email').value = '';
       document.getElementById('auth-password').value = '';
       document.getElementById('auth-name').value = '';
@@ -672,6 +658,21 @@
         const raw = localStorage.getItem('livelore_local_shows');
         if (raw) {
           userShows = JSON.parse(raw);
+          if (!Array.isArray(userShows) || userShows.length === 0) {
+            if (activeUserEmail === 'wcsurface@gmail.com') {
+              userShows = [...WCSURFACE_PRESET_SHOWS];
+            } else {
+              userShows = [];
+            }
+          } else {
+            userShows.forEach(s => {
+              if (s.venue && s.venue.toLowerCase().includes('deer creek')) {
+                s.city = 'Noblesville';
+                s.state = 'Indiana';
+                s.country = 'USA';
+              }
+            });
+          }
         } else {
           if (activeUserEmail === 'wcsurface@gmail.com') {
             userShows = [...WCSURFACE_PRESET_SHOWS];
@@ -679,6 +680,7 @@
             userShows = [];
           }
         }
+        saveShowsToStorage();
       } catch (e) {
         userShows = [];
       }
@@ -722,7 +724,7 @@
         if (currentSort === 'newest') {
           displayList.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         } else if (currentSort === 'oldest') {
-          displayList.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          displayList.sort((a, b) => new Date(a.date).getTime() - new Date(a.date).getTime());
         } else if (currentSort === 'band') {
           displayList.sort((a, b) => a.headline.localeCompare(b.headline));
         }

@@ -10,7 +10,7 @@ import { StatsView } from '../components/StatsView';
 import { AuthScreen } from '../components/AuthScreen';
 import { ProfileView } from '../components/ProfileView';
 import { GlassNavBar } from '../components/GlassNavBar';
-import { Menu, User, CheckCircle2, Sparkles, ArrowDown, SlidersHorizontal } from 'lucide-react';
+import { Sparkles, ArrowDown, SlidersHorizontal } from 'lucide-react';
 
 export default function HomeView() {
   const { user, token, checkMe } = useAuthStore();
@@ -58,31 +58,13 @@ export default function HomeView() {
       {/* SCREEN 1: DIARY VIEW */}
       {currentView === 'diary' && (
         <div className="flex flex-col w-full max-w-md h-screen p-4 overflow-y-auto justify-between pb-28">
-          {/* Header with LiveLore Logo */}
-          <header className="relative flex items-center justify-between w-full pt-3 pb-6 my-1">
-            <button
-              onClick={() => setCurrentView('stats')}
-              className="p-2 text-slate-200 hover:text-white transition rounded-full z-10"
-            >
-              <Menu size={26} />
-            </button>
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-10">
-              <img
-                src="/assets/livelore_logo.png"
-                alt="LiveLore"
-                className="h-24 sm:h-28 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.4)] filter contrast-105"
-              />
-            </div>
-            <button
-              onClick={() => setCurrentView('profile')}
-              className="p-2 text-[#00E676] hover:text-white transition rounded-full z-10 flex items-center gap-1"
-            >
-              {user ? (
-                <CheckCircle2 size={24} className="text-[#00E676]" />
-              ) : (
-                <User size={26} className="text-[#FFB300]" />
-              )}
-            </button>
+          {/* Centered LiveLore Header with Generous Top Padding Clearing Camera Notch */}
+          <header className="relative flex items-center justify-center w-full pt-10 sm:pt-14 pb-6 my-1">
+            <img
+              src="/assets/livelore_logo.png"
+              alt="LiveLore"
+              className="h-24 sm:h-28 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.4)] filter contrast-105"
+            />
           </header>
 
           {/* Sort Dropdown & Show Count Bar */}
@@ -142,7 +124,7 @@ export default function HomeView() {
           </div>
 
           {/* Fixed Floating Glassmorphic 4-Button Navigation Bar */}
-          <GlassNavBar currentView="diary" onNavigate={(view) => setCurrentView(view === 'auth' ? 'profile' : view)} />
+          <GlassNavBar currentView={currentView} onNavigate={(view) => setCurrentView(view === 'auth' ? 'profile' : view)} />
         </div>
       )}
 

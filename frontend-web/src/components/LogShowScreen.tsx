@@ -5,7 +5,7 @@ import { useEncoreStore } from '../store/useEncoreStore';
 import { parseRawSetlist } from '../engine/setlistParser';
 import { searchVenues, PRESET_VENUES, VenueRecord } from '../engine/venueDataset';
 import { GlassNavBar } from './GlassNavBar';
-import { ArrowLeft, Plus, Trash2, MapPin, Camera, Crown, Image as ImageIcon } from 'lucide-react';
+import { Plus, Trash2, MapPin, Camera, Crown } from 'lucide-react';
 
 interface LogShowScreenProps {
   onBack: () => void;
@@ -14,7 +14,7 @@ interface LogShowScreenProps {
 }
 
 export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved, onNavigate }) => {
-  const { saveConcert, isPremium, setIsPremium } = useEncoreStore();
+  const { saveConcert, isPremium } = useEncoreStore();
 
   const [headlineBand, setHeadlineBand] = useState('');
   const [openers, setOpeners] = useState<string[]>(['']);
@@ -61,7 +61,6 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved, o
     }
   };
 
-  // Photo Upload Handler (Up to 3 Photos - Premium Feature)
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const files = Array.from(e.target.files);
@@ -171,23 +170,14 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved, o
   };
 
   return (
-    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none bg-grid-lines overflow-y-auto justify-between">
-      {/* Header with LiveLore Logo */}
-      <header className="relative flex items-center justify-between w-full pt-3 pb-6 my-1">
-        <button
-          onClick={() => { resetForm(); onBack(); }}
-          className="p-2 text-slate-200 hover:text-white transition rounded-full z-10"
-        >
-          <ArrowLeft size={26} />
-        </button>
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-10">
-          <img
-            src="/assets/livelore_logo.png"
-            alt="LiveLore"
-            className="h-24 sm:h-28 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.4)] filter contrast-105"
-          />
-        </div>
-        <div className="w-10 z-10" />
+    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none bg-grid-lines overflow-y-auto justify-between pb-28">
+      {/* Header with LiveLore Logo & Generous Top Padding */}
+      <header className="relative flex items-center justify-center w-full pt-10 sm:pt-14 pb-6 my-1">
+        <img
+          src="/assets/livelore_logo.png"
+          alt="LiveLore"
+          className="h-24 sm:h-28 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.4)] filter contrast-105"
+        />
       </header>
 
       {/* Form Inputs */}
@@ -337,7 +327,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved, o
           </div>
         </div>
 
-        {/* Concert Photo Attachment (Premium Feature: Up to 3 Photos) */}
+        {/* Concert Photo Attachment (Premium Feature) */}
         <div className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-2">
           <div className="flex items-center justify-between">
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#FFB300] flex items-center gap-1.5">
@@ -383,7 +373,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved, o
           ) : (
             <div className="p-2.5 bg-[#111618] rounded-lg border border-[#222B30] text-center space-y-1.5">
               <p className="text-xs text-slate-300 font-medium">
-                Unlock 3 Photo Attachments per show & Ad-Free experience!
+                Unlock Photo Feature & 100% AD-Free Experience!
               </p>
               <button
                 type="button"
