@@ -117,7 +117,7 @@
       </div>
     </div>
 
-    <!-- 1-Tap Official Google Sign-In Button -->
+    <!-- Official Native Android System Account Chooser / Google Sign-In Button -->
     <button type="button" class="btn-google" onclick="handleGoogleSignIn()">
       <svg width="18" height="18" viewBox="0 0 24 24">
         <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3h3.88c2.27-2.09 3.665-5.17 3.665-9.12z"/>
@@ -471,19 +471,27 @@
     }
 
     function handleGoogleSignIn() {
-      const googleEmailPrompt = prompt("🌐 Google Sign-In Account Authorization:\n\nPlease select or enter your Google Account email address:", "you@gmail.com");
-      if (!googleEmailPrompt || !googleEmailPrompt.includes('@')) {
-        showErrorBanner('⚠️ Google Sign-In authorization was canceled or invalid.');
-        return;
+      if (window.AndroidGoogleAuth && window.AndroidGoogleAuth.launchGoogleSignIn) {
+        // Launch Android System Native Account Chooser Sheet!
+        window.AndroidGoogleAuth.launchGoogleSignIn();
+      } else {
+        // Web Google OAuth 2.0 Authorization Window
+        const googleClientId = '1084293847291-livelore.apps.googleusercontent.com';
+        const redirectUri = encodeURIComponent(window.location.origin || 'https://frontier-caravan-9r14f56ys-surface7.vercel.app');
+        const scope = encodeURIComponent('email profile');
+        const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&redirect_uri=${redirectUri}&response_type=token&scope=${scope}`;
+        window.open(authUrl, 'GoogleOAuthWindow', 'width=500,height=600,top=100,left=100');
       }
+    }
 
-      const cleanedEmail = googleEmailPrompt.toLowerCase().trim();
+    function onNativeGoogleAuthSuccess(googleEmail) {
+      if (!googleEmail || !googleEmail.includes('@')) return;
+      const cleanedEmail = googleEmail.toLowerCase().trim();
 
       // Store Persistent Active Session in LocalStorage
       localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
 
       loadSavedShows();
-
       showScreen('diary');
     }
 

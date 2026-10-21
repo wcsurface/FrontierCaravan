@@ -1,7 +1,9 @@
 package app.vercel.frontiercaravan
 
+import android.accounts.AccountManager
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
@@ -18,12 +20,12 @@ import androidx.activity.ComponentActivity
 class MainActivity : ComponentActivity() {
 
     private lateinit var webView: WebView
+    private val REQUEST_CODE_PICK_ACCOUNT = 1002
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Force immersive fullscreen sticky mode
         hideSystemUI()
 
         webView = WebView(this)
@@ -39,7 +41,6 @@ class MainActivity : ComponentActivity() {
         settings.builtInZoomControls = false
         settings.displayZoomControls = false
 
-        // Hardware acceleration flags
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
         webView.webChromeClient = WebChromeClient()
         webView.webViewClient = object : WebViewClient() {
@@ -48,10 +49,10 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        // Expose Native Haptics Bridge
+        // Expose Native Haptics & Google Auth Interfaces
         webView.addJavascriptInterface(AndroidHapticsInterface(this), "AndroidHaptics")
+        webView.addJavascriptInterface(AndroidGoogleAuthInterface(this), "AndroidGoogleAuth")
 
-        // Load offline fallback bundle directly
         val targetUrl = "file:///android_asset/index.html"
         webView.loadUrl(targetUrl)
     }
@@ -72,6 +73,39 @@ class MainActivity : ComponentActivity() {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) {
             hideSystemUI()
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_PICK_ACCOUNT && resultCode == RESULT_OK && data != null) {
+            val accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
+            if (!accountName.isNullOrEmpty()) {
+                val safeEmail = accountName.lowercase().trim()
+                webView.post {
+                    webView.evaluateJavascript("onNativeGoogleAuthSuccess('$safeEmail')", null)
+                }
+            }
+        }
+    }
+
+    inner class AndroidGoogleAuthInterface(private val context: Context) {
+        @JavascriptInterface
+        fun launchGoogleSignIn() {
+            runOnUiThread {
+                try {
+                    val intent = AccountManager.newChooseAccountIntent(
+                        null, null, arrayOf("com.google"), false, null, null, null, null
+                    )
+                    startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
+                } catch (e: Exception) {
+                    val fallbackIntent = Intent(Intent.ACTION_MAIN).apply {
+                        addCategory(Intent.CATEGORY_LAUNCHER)
+                    }
+                    startActivityForResult(fallbackIntent, REQUEST_CODE_PICK_ACCOUNT)
+                }
+            }
         }
     }
 
