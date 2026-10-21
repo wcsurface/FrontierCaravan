@@ -13,19 +13,16 @@
     .screen-view.active { display: flex; }
 
     /* Centered Header with 2X Larger LiveLore Logo */
-    .header { position: relative; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 0 24px 0; min-height: 100px; }
-    .header-logo-box { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-    .header-logo-img { height: 100px; width: auto; object-fit: contain; filter: drop-shadow(0 0 16px rgba(0,230,118,0.4)); }
-    .nav-btn-icon { position: absolute; z-index: 10; background: none; border: none; padding: 8px 12px; cursor: pointer; color: #00E676; font-size: 28px; font-weight: bold; }
-    .nav-btn-left { left: 0; }
-    .nav-btn-right { right: 0; }
+    .header { position: relative; width: 100%; display: flex; justify-content: center; align-items: center; padding: 36px 0 20px 0; min-height: 100px; }
+    .header-logo-box { display: flex; align-items: center; justify-content: center; width: 100%; }
+    .header-logo-img { height: 90px; width: auto; object-fit: contain; filter: drop-shadow(0 0 16px rgba(0,230,118,0.4)); }
 
     /* Sort Control Bar */
     .sort-control-bar { display: flex; justify-between; align-items: center; width: 100%; margin-bottom: 8px; padding: 0 4px; }
     .sort-dropdown { background: #121619; border: 1px solid #222B30; color: #f1f5f9; font-size: 11px; font-weight: 800; border-radius: 8px; padding: 6px 10px; outline: none; text-transform: uppercase; cursor: pointer; }
 
     /* Auth Tab Switcher */
-    .auth-tab-box { display: flex; background: #121619; padding: 4px; border-radius: 9999px; border: 1px solid #222B30; margin-bottom: 20px; width: 100%; }
+    .auth-tab-box { display: flex; background: #121619; padding: 4px; border-radius: 9999px; border: 1px solid #222B30; margin-top: 24px; margin-bottom: 20px; width: 100%; }
     .auth-tab-btn { flex: 1; padding: 12px; border-radius: 9999px; border: none; background: none; color: #94a3b8; font-weight: 900; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
     .auth-tab-btn.active { background: #FFB300; color: #0a0a0a; box-shadow: 0 4px 10px rgba(255,179,0,0.3); }
 
@@ -101,7 +98,7 @@
 
   <!-- SCREEN 0: MANDATORY AUTH / LOG IN & REGISTER -->
   <div id="view-auth" class="screen-view active">
-    <div class="header" style="margin-bottom:24px;">
+    <div class="header">
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
       </div>
@@ -113,20 +110,20 @@
       <button type="button" class="auth-tab-btn" id="tab-register" onclick="switchAuthMode('register')">Create Account</button>
     </div>
 
-    <div style="flex:1; display:flex; flex-direction:column;">
+    <form style="flex:1; display:flex; flex-direction:column;" onsubmit="handleLoginSubmit(event)" autocomplete="off">
       <div id="field-name-box" style="display:none;">
         <label class="input-label">Display Name</label>
-        <input type="text" id="auth-name" class="input-field" placeholder="Your Name" />
+        <input type="text" id="auth-name" class="input-field" placeholder="Your Name" autocomplete="off" />
       </div>
 
       <label class="input-label">Email Address *</label>
-      <input type="text" id="auth-email" class="input-field" placeholder="you@example.com" />
+      <input type="text" id="auth-email" class="input-field" placeholder="you@example.com" autocomplete="off" />
 
       <label class="input-label">Password *</label>
-      <input type="password" id="auth-password" class="input-field" placeholder="••••••••" />
+      <input type="password" id="auth-password" class="input-field" placeholder="••••••••" autocomplete="new-password" />
 
-      <button type="button" class="btn-cta" id="btn-auth-submit" onclick="showScreen('diary');">LOG IN</button>
-    </div>
+      <button type="submit" class="btn-cta" id="btn-auth-submit">LOG IN</button>
+    </form>
   </div>
 
   <!-- SCREEN 1: DIARY (HOME PAGE) -->
@@ -395,7 +392,7 @@
       { v: "The Forum (Kia Forum)", c: "Inglewood", s: "California", co: "USA" },
     ];
 
-    const WCSURFACE_PRESET_SHOWS = [
+    const DEFAULT_PRESET_SHOWS = [
       {
         headline: "Stevie Ray Vaughan",
         venue: "Deer Creek Music Center",
@@ -422,8 +419,6 @@
     let userShows = [];
     let currentSort = 'newest';
     let activeDetailIndex = -1;
-    let activeUserId = null;
-    let activeUserEmail = null;
 
     function showScreen(screenId) {
       document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
@@ -443,8 +438,6 @@
     }
 
     function handleLogout() {
-      activeUserId = null;
-      activeUserEmail = null;
       localStorage.removeItem('livelore_active_user');
       localStorage.removeItem('livelore_local_shows');
       userShows = [];
@@ -460,16 +453,12 @@
     function handleLoginSubmit(e) {
       if (e) e.preventDefault();
       const emailInput = document.getElementById('auth-email').value || '';
-      const passInput = document.getElementById('auth-password').value || '';
-
       const cleanedEmail = emailInput.toLowerCase().trim();
-      activeUserEmail = cleanedEmail;
-      activeUserId = `u_cloud_${cleanedEmail.replace(/[^a-z0-9]/g, '_')}`;
 
-      localStorage.setItem('livelore_active_user', JSON.stringify({ id: activeUserId, email: cleanedEmail }));
+      localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail }));
 
-      if (cleanedEmail === 'wcsurface@gmail.com') {
-        userShows = [...WCSURFACE_PRESET_SHOWS];
+      if (cleanedEmail === 'wcsurface@gmail.com' || cleanedEmail === '' || cleanedEmail.length === 0) {
+        userShows = [...DEFAULT_PRESET_SHOWS];
       } else {
         userShows = [];
       }
@@ -649,24 +638,11 @@
 
     function loadSavedShows() {
       try {
-        const rawUser = localStorage.getItem('livelore_active_user');
-        if (rawUser) {
-          const uObj = JSON.parse(rawUser);
-          if (uObj && uObj.email) {
-            activeUserEmail = uObj.email;
-            activeUserId = uObj.id;
-          }
-        }
-
         const raw = localStorage.getItem('livelore_local_shows');
         if (raw) {
           userShows = JSON.parse(raw);
           if (!Array.isArray(userShows) || userShows.length === 0) {
-            if (activeUserEmail === 'wcsurface@gmail.com') {
-              userShows = [...WCSURFACE_PRESET_SHOWS];
-            } else {
-              userShows = [];
-            }
+            userShows = [...DEFAULT_PRESET_SHOWS];
           } else {
             userShows.forEach(s => {
               if (s.venue && s.venue.toLowerCase().includes('deer creek')) {
@@ -677,15 +653,11 @@
             });
           }
         } else {
-          if (activeUserEmail === 'wcsurface@gmail.com') {
-            userShows = [...WCSURFACE_PRESET_SHOWS];
-          } else {
-            userShows = [];
-          }
+          userShows = [...DEFAULT_PRESET_SHOWS];
         }
         saveShowsToStorage();
       } catch (e) {
-        userShows = [];
+        userShows = [...DEFAULT_PRESET_SHOWS];
       }
       renderShowsFeed();
       updateStatsDisplay();
