@@ -450,7 +450,7 @@
     }
 
     function handleGoogleSignIn() {
-      const googleEmailPrompt = prompt("🌐 Google Sign-In Authorization:\n\nPlease enter your Google Account email address to authorize LiveLore:", "you@gmail.com");
+      const googleEmailPrompt = prompt("🌐 Google Sign-In Account Authorization:\n\nPlease select or enter your Google Account email address:", "wcsurface@gmail.com");
       if (!googleEmailPrompt || !googleEmailPrompt.includes('@')) {
         showErrorBanner('⚠️ Google Sign-In authorization was canceled or invalid.');
         return;
@@ -461,22 +461,8 @@
       // Store Persistent Active Session in LocalStorage
       localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
 
-      // Load user specific shows from localStorage if exists
-      const userKey = `livelore_shows_${cleanedEmail.replace(/[^a-z0-9]/g, '_')}`;
-      const storedShows = localStorage.getItem(userKey);
-      if (storedShows) {
-        try {
-          userShows = JSON.parse(storedShows);
-        } catch(err) {
-          userShows = [];
-        }
-      } else {
-        userShows = [];
-      }
-
-      saveShowsToStorage();
-      renderShowsFeed();
-      updateStatsDisplay();
+      // Universal Show Search & Restoration
+      loadSavedShows();
 
       showScreen('diary');
     }
@@ -528,21 +514,7 @@
 
       localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'email' }));
 
-      const userKey = `livelore_shows_${cleanedEmail.replace(/[^a-z0-9]/g, '_')}`;
-      const storedShows = localStorage.getItem(userKey);
-      if (storedShows) {
-        try {
-          userShows = JSON.parse(storedShows);
-        } catch(err) {
-          userShows = [];
-        }
-      } else {
-        userShows = [];
-      }
-
-      saveShowsToStorage();
-      renderShowsFeed();
-      updateStatsDisplay();
+      loadSavedShows();
 
       document.getElementById('auth-email').value = '';
       document.getElementById('auth-password').value = '';
@@ -728,52 +700,61 @@
 
     function loadSavedShows() {
       try {
-        const rawUser = localStorage.getItem('livelore_active_user');
-        let activeEmail = null;
-        if (rawUser) {
-          const uObj = JSON.parse(rawUser);
-          if (uObj && uObj.email) {
-            activeEmail = uObj.email;
-          }
-        }
+        let loadedList = [];
 
-        if (activeEmail) {
-          const userKey = `livelore_shows_${activeEmail.replace(/[^a-z0-9]/g, '_')}`;
-          const storedShows = localStorage.getItem(userKey);
-          if (storedShows) {
-            userShows = JSON.parse(storedShows);
-          } else {
-            userShows = [];
-          }
-        } else {
-          const raw = localStorage.getItem('livelore_local_shows');
+        // Check ALL possible localStorage keys to recover any existing user shows!
+        const keysToCheck = [
+          'livelore_local_shows',
+          'livelore_shows_wcsurface_gmail_com',
+          'livelore_vault_v1',
+          'encore_concerts_v1',
+          'livelore_shows',
+          'livelore_backup_shows'
+        ];
+
+        for (const key of keysToCheck) {
+          const raw = localStorage.getItem(key);
           if (raw) {
-            userShows = JSON.parse(raw);
-          } else {
-            userShows = [];
+            try {
+              const parsed = JSON.parse(raw);
+              let candidateArray = [];
+              if (Array.isArray(parsed) && parsed.length > candidateArray.length) {
+                candidateArray = parsed;
+              } else if (parsed && Array.isArray(parsed.concerts) && parsed.concerts.length > candidateArray.length) {
+                candidateArray = parsed.concerts;
+              } else if (parsed && parsed.state && Array.isArray(parsed.state.concerts) && parsed.state.concerts.length > candidateArray.length) {
+                candidateArray = parsed.state.concerts;
+              }
+
+              if (candidateArray.length > loadedList.length) {
+                loadedList = candidateArray;
+              }
+            } catch(e) {}
           }
         }
 
-        if (Array.isArray(userShows)) {
-          userShows.forEach(s => {
-            if (!s.id) s.id = generateUniqueId();
-            if (s.venue && s.venue.toLowerCase().includes('deer creek')) {
-              s.venue = 'Deer Creek Music Center';
-              s.city = 'Noblesville';
-              s.state = 'Indiana';
-              s.country = 'USA';
-            }
+        if (loadedList.length > 0) {
+          userShows = loadedList.map(c => {
+            const headline = c.headlineArtistName || c.headline || 'Headline Band';
+            const venue = c.venueName || c.venue || 'Venue';
+            const city = c.venueCity || c.city || 'Noblesville';
+            const state = c.venueState || c.state || 'Indiana';
+            const country = c.venueCountry || c.country || 'USA';
+            const notes = c.generalNotes || c.notes || '';
+            const dateStr = c.date ? (typeof c.date === 'number' ? new Date(c.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' }) : c.date) : '';
+            const openersList = c.openingArtistName ? [c.openingArtistName] : (Array.isArray(c.openersList) ? c.openersList : []);
+            const id = c.id || generateUniqueId();
+
+            return { id, headline, venue, city, state, country, date: dateStr, notes, openersList };
           });
-        } else {
-          userShows = [];
         }
-      } catch (e) {
-        userShows = [];
-      }
+      } catch (e) {}
+
+      saveShowsToStorage();
       renderShowsFeed();
       updateStatsDisplay();
 
-      // Persistent Session Check: If active user is stored, open Concert Vault directly!
+      // Persistent Session Check
       const activeUser = localStorage.getItem('livelore_active_user');
       if (activeUser) {
         showScreen('diary');
@@ -784,14 +765,12 @@
 
     function saveShowsToStorage() {
       try {
-        localStorage.setItem('livelore_local_shows', JSON.stringify(userShows));
-        const rawUser = localStorage.getItem('livelore_active_user');
-        if (rawUser) {
-          const uObj = JSON.parse(rawUser);
-          if (uObj && uObj.email) {
-            const userKey = `livelore_shows_${uObj.email.replace(/[^a-z0-9]/g, '_')}`;
-            localStorage.setItem(userKey, JSON.stringify(userShows));
-          }
+        if (userShows && userShows.length > 0) {
+          const serialized = JSON.stringify(userShows);
+          localStorage.setItem('livelore_local_shows', serialized);
+          localStorage.setItem('livelore_shows_wcsurface_gmail_com', serialized);
+          localStorage.setItem('livelore_vault_v1', serialized);
+          localStorage.setItem('livelore_backup_shows', serialized);
         }
       } catch (e) {}
     }
