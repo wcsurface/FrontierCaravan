@@ -109,7 +109,7 @@ export class AnalyticsEngine {
 
     const artistIds = new Set<string>();
     concerts.forEach(c => {
-      artistIds.add(c.headlineArtistId);
+      if (c.headlineArtistId) artistIds.add(c.headlineArtistId);
       if (c.openingArtistId) artistIds.add(c.openingArtistId);
     });
     const uniqueArtists = artistIds.size;
@@ -120,21 +120,29 @@ export class AnalyticsEngine {
 
     const totalInvestment = concerts.reduce((acc, curr) => acc + (curr.ticketPrice || 0), 0);
 
-    const artistCountMap = new Map<string, number>();
+    // Tabulate Both Headliners and ALL Opening Acts into Top Artists!
+    const artistNameCountMap = new Map<string, number>();
+
     concerts.forEach(c => {
-      const currentHead = artistCountMap.get(c.headlineArtistId) || 0;
-      artistCountMap.set(c.headlineArtistId, currentHead + 1);
-      if (c.openingArtistId) {
-        const currentOpener = artistCountMap.get(c.openingArtistId) || 0;
-        artistCountMap.set(c.openingArtistId, currentOpener + 1);
+      // 1. Headliner
+      const headlinerObj = artists.find(a => a.id === c.headlineArtistId);
+      if (headlinerObj && headlinerObj.name) {
+        const hName = headlinerObj.name.trim();
+        artistNameCountMap.set(hName, (artistNameCountMap.get(hName) || 0) + 1);
+      }
+
+      // 2. Opening Acts (Handles comma-separated openers like "The Stray Cats, Duke Tumatoe")
+      const openerObj = artists.find(a => a.id === c.openingArtistId);
+      if (openerObj && openerObj.name) {
+        const openerBands = openerObj.name.split(',').map(b => b.trim()).filter(Boolean);
+        openerBands.forEach(bName => {
+          artistNameCountMap.set(bName, (artistNameCountMap.get(bName) || 0) + 1);
+        });
       }
     });
 
-    const topArtists = Array.from(artistCountMap.entries())
-      .map(([aId, count]) => {
-        const artistObj = artists.find(a => a.id === aId);
-        return { name: artistObj?.name || 'Unknown Artist', timesSeen: count };
-      })
+    const topArtists = Array.from(artistNameCountMap.entries())
+      .map(([name, count]) => ({ name, timesSeen: count }))
       .sort((a, b) => b.timesSeen - a.timesSeen)
       .slice(0, 10);
 
