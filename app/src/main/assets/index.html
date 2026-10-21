@@ -458,10 +458,10 @@
 
       const cleanedEmail = googleEmailPrompt.toLowerCase().trim();
 
-      // Store Persistent Active Session in LocalStorage
+      // Unified Account Storage Key for BOTH Email and Google Sign-In!
       localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
 
-      // Universal Show Search & Restoration
+      // Load & Merge All User Shows from LocalStorage
       loadSavedShows();
 
       showScreen('diary');
@@ -512,8 +512,10 @@
         return;
       }
 
+      // Unified Account Storage Key for BOTH Email and Google Sign-In!
       localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'email' }));
 
+      // Load & Merge All User Shows from LocalStorage
       loadSavedShows();
 
       document.getElementById('auth-email').value = '';
@@ -698,43 +700,26 @@
       renderShowsFeed();
     }
 
+    // AUTOMATIC UNIFIED ACCOUNT DATA MERGER (Combines Email & Google Sign-In Vaults by Email!)
     function loadSavedShows() {
       try {
-        let loadedList = [];
-
-        // Check ALL possible localStorage keys to recover any existing user shows!
-        const keysToCheck = [
-          'livelore_local_shows',
-          'livelore_shows_wcsurface_gmail_com',
-          'livelore_vault_v1',
-          'encore_concerts_v1',
-          'livelore_shows',
-          'livelore_backup_shows'
-        ];
-
-        for (const key of keysToCheck) {
-          const raw = localStorage.getItem(key);
-          if (raw) {
-            try {
-              const parsed = JSON.parse(raw);
-              let candidateArray = [];
-              if (Array.isArray(parsed) && parsed.length > candidateArray.length) {
-                candidateArray = parsed;
-              } else if (parsed && Array.isArray(parsed.concerts) && parsed.concerts.length > candidateArray.length) {
-                candidateArray = parsed.concerts;
-              } else if (parsed && parsed.state && Array.isArray(parsed.state.concerts) && parsed.state.concerts.length > candidateArray.length) {
-                candidateArray = parsed.state.concerts;
-              }
-
-              if (candidateArray.length > loadedList.length) {
-                loadedList = candidateArray;
-              }
-            } catch(e) {}
+        const rawUser = localStorage.getItem('livelore_active_user');
+        let activeEmail = null;
+        if (rawUser) {
+          const uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email) {
+            activeEmail = uObj.email.toLowerCase().trim();
           }
         }
 
-        if (loadedList.length > 0) {
-          userShows = loadedList.map(c => {
+        // Deduplicated Merged Shows Map (Key: show.id or date+headline)
+        const mergedShowsMap = new Map();
+
+        // Helper to add/merge shows array safely
+        function mergeCandidateArray(arr) {
+          if (!Array.isArray(arr)) return;
+          arr.forEach(c => {
+            if (!c) return;
             const headline = c.headlineArtistName || c.headline || 'Headline Band';
             const venue = c.venueName || c.venue || 'Venue';
             const city = c.venueCity || c.city || 'Noblesville';
@@ -745,11 +730,56 @@
             const openersList = c.openingArtistName ? [c.openingArtistName] : (Array.isArray(c.openersList) ? c.openersList : []);
             const id = c.id || generateUniqueId();
 
-            return { id, headline, venue, city, state, country, date: dateStr, notes, openersList };
+            const key = id || `${dateStr}_${headline.toLowerCase()}`;
+            if (!mergedShowsMap.has(key)) {
+              mergedShowsMap.set(key, { id, headline, venue, city, state, country, date: dateStr, notes, openersList });
+            }
           });
         }
-      } catch (e) {}
 
+        // Keys to scan and merge for this account
+        const keysToScan = [
+          'livelore_local_shows',
+          'livelore_vault_v1',
+          'livelore_backup_shows'
+        ];
+
+        if (activeEmail) {
+          const userKey = `livelore_shows_${activeEmail.replace(/[^a-z0-9]/g, '_')}`;
+          keysToScan.unshift(userKey);
+        }
+
+        for (const key of keysToScan) {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            try {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed)) {
+                mergeCandidateArray(parsed);
+              } else if (parsed && Array.isArray(parsed.concerts)) {
+                mergeCandidateArray(parsed.concerts);
+              } else if (parsed && parsed.state && Array.isArray(parsed.state.concerts)) {
+                mergeCandidateArray(parsed.state.concerts);
+              }
+            } catch(e) {}
+          }
+        }
+
+        userShows = Array.from(mergedShowsMap.values());
+
+        if (userShows.length > 0) {
+          userShows.forEach(s => {
+            if (s.venue && s.venue.toLowerCase().includes('deer creek')) {
+              s.venue = 'Deer Creek Music Center';
+              s.city = 'Noblesville';
+              s.state = 'Indiana';
+              s.country = 'USA';
+            }
+          });
+        }
+      } catch (e) {
+        userShows = [];
+      }
       saveShowsToStorage();
       renderShowsFeed();
       updateStatsDisplay();
@@ -768,9 +798,17 @@
         if (userShows && userShows.length > 0) {
           const serialized = JSON.stringify(userShows);
           localStorage.setItem('livelore_local_shows', serialized);
-          localStorage.setItem('livelore_shows_wcsurface_gmail_com', serialized);
           localStorage.setItem('livelore_vault_v1', serialized);
           localStorage.setItem('livelore_backup_shows', serialized);
+
+          const rawUser = localStorage.getItem('livelore_active_user');
+          if (rawUser) {
+            const uObj = JSON.parse(rawUser);
+            if (uObj && uObj.email) {
+              const userKey = `livelore_shows_${uObj.email.toLowerCase().trim().replace(/[^a-z0-9]/g, '_')}`;
+              localStorage.setItem(userKey, serialized);
+            }
+          }
         }
       } catch (e) {}
     }
