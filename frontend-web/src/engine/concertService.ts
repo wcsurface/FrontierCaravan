@@ -160,7 +160,7 @@ export class AnalyticsEngine {
       .sort((a, b) => b.visitCount - a.visitCount)
       .slice(0, 10);
 
-    // Compute Top Years cleanly
+    // Compute Top Years SORTED BY MOST CONCERTS ATTENDED DESCENDING!
     const yearMap = new Map<number, number>();
     concerts.forEach(c => {
       const dObj = parseConcertDate(c.date);
@@ -172,8 +172,7 @@ export class AnalyticsEngine {
 
     const topYears = Array.from(yearMap.entries())
       .map(([year, count]) => ({ year, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 10);
+      .sort((a, b) => b.count - a.count || b.year - a.year);
 
     // Compute Days of Week cleanly
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];

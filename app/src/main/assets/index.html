@@ -334,7 +334,7 @@
       </div>
     </div>
 
-    <!-- TOP YEARS (TOP 10 ONLY) -->
+    <!-- TOP YEARS (TOP 10 ONLY - SORTED BY MOST CONCERTS ATTENDED) -->
     <div class="stats-card" onclick="showSubStats('years')">
       <div class="stats-card-title" style="color:#00B0FF;">TOP YEARS (TOP 10) <span style="font-size:10px;">SEE ALL ➔</span></div>
       <div style="font-size:12px;" id="stats-years-preview">
@@ -731,7 +731,7 @@
           if (!show.id) show.id = generateUniqueId();
           const card = document.createElement('div');
           card.className = 'ticket-card';
-          card.onclick = () => openShowDetails(show.id); // ALWAYS LOOK UP BY UNIQUE SHOW.ID!
+          card.onclick = () => openShowDetails(show.id);
 
           let bandStackHtml = `<div class="ticket-artist-head">${show.headline.toUpperCase()}</div>`;
           if (show.openersList && show.openersList.length > 0) {
@@ -823,10 +823,10 @@
           }
         });
 
-        // Slice main overview lists to TOP 10 ONLY!
+        // Top Years sorted strictly by MOST CONCERTS ATTENDED descending!
         const topV = Object.entries(venueCounts).sort((a,b) => b[1] - a[1]).slice(0, 10);
         const topA = Object.entries(artistCounts).sort((a,b) => b[1] - a[1]).slice(0, 10);
-        const topY = Object.entries(yearCounts).sort((a,b) => b[0] - a[0]).slice(0, 10);
+        const topY = Object.entries(yearCounts).sort((a,b) => b[1] - a[1] || b[0] - a[0]).slice(0, 10);
         const topD = Object.entries(dayCounts).filter(d => d[1] > 0).sort((a,b) => b[1] - a[1]).slice(0, 10);
 
         document.getElementById('stats-venues-preview').innerHTML = topV.map((item, i) => `
@@ -838,7 +838,7 @@
         `).join('');
 
         document.getElementById('stats-years-preview').innerHTML = topY.map((item, i) => `
-          <div style="margin-bottom:6px;">${i+1}. Year ${item[0]} - ${item[1]} shows</div>
+          <div style="margin-bottom:6px;">${i+1}. Year ${item[0]} - ${item[1]} ${item[1] === 1 ? 'show' : 'shows'}</div>
         `).join('');
 
         document.getElementById('stats-days-preview').innerHTML = topD.map((item, i) => `
@@ -918,12 +918,13 @@
             yearCounts[yr] = (yearCounts[yr] || 0) + 1;
           }
         });
-        const topY = Object.entries(yearCounts).sort((a,b) => b[0] - a[0]);
+        // ALL YEARS PAGE SORTED BY MOST CONCERTS ATTENDED DESCENDING!
+        const topY = Object.entries(yearCounts).sort((a,b) => b[1] - a[1] || b[0] - a[0]);
 
         container.innerHTML = `
           <div style="color:#00B0FF; font-size:14px; text-transform:uppercase; margin-bottom:10px;">ALL YEARS (${topY.length})</div>
           ${topY.length > 0 ? topY.map((item, i) => `
-            <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">Year ${item[0]} - ${item[1]} ${item[1] === 1 ? 'Show' : 'Shows'}</div>
+            <div style="margin-bottom:8px; padding:12px; background:#121619; border-radius:8px;">${i+1}. Year ${item[0]} - ${item[1]} ${item[1] === 1 ? 'Show' : 'Shows'}</div>
           `).join('') : '<div style="color:#94a3b8;">No years logged yet.</div>'}
         `;
       } else {
