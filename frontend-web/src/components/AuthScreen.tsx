@@ -33,28 +33,38 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
   return (
     <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none bg-grid-lines overflow-y-auto min-h-screen justify-between">
       {/* Header with LiveLore Logo */}
-      <header className="relative flex items-center justify-between w-full pt-2 pb-4 mb-2">
+      <header className="relative flex items-center justify-between w-full pt-2 pb-6 my-1">
         {user ? (
           <button
             onClick={onBack}
             className="p-2 text-slate-200 hover:text-white transition rounded-full z-10"
           >
-            <ArrowLeft size={24} />
+            <ArrowLeft size={26} />
           </button>
         ) : (
           <div className="w-10 z-10" />
         )}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-12">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-10">
           <img
             src="/assets/livelore_logo.png"
             alt="LiveLore"
-            className="h-14 sm:h-16 w-auto object-contain drop-shadow-[0_0_15px_rgba(0,230,118,0.3)] filter contrast-105"
+            className="h-24 sm:h-28 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.4)] filter contrast-105"
           />
         </div>
         <div className="w-10 z-10" />
       </header>
 
-      <div className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full pb-8 pt-4">
+      <div className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full pb-8 pt-2">
+        {/* App Subheading */}
+        <div className="text-center mb-6">
+          <p className="text-xs font-bold uppercase tracking-widest text-[#FFB300]">
+            Concert Diary & Setlist Vault
+          </p>
+          <p className="text-sm text-slate-400 font-medium mt-1">
+            Log in or create an account to save & sync your live show diary across all devices.
+          </p>
+        </div>
+
         {/* If Active User is Logged In */}
         {user ? (
           <div className="bg-[#121619] p-6 rounded-2xl border border-[#222B30] text-center space-y-4 shadow-xl">
@@ -80,7 +90,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
             </div>
           </div>
         ) : (
-          /* Authentication Form */
+          /* Original Clean Authentication Form with Log In / Create Account Toggle */
           <div className="space-y-6">
             {/* Mode Switcher Tabs */}
             <div className="flex bg-[#121619] p-1 rounded-full border border-[#222B30]">
