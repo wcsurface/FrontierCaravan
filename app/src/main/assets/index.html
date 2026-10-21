@@ -22,7 +22,7 @@
     .sort-dropdown { background: #121619; border: 1px solid #222B30; color: #f1f5f9; font-size: 11px; font-weight: 800; border-radius: 8px; padding: 6px 10px; outline: none; text-transform: uppercase; cursor: pointer; }
 
     /* Auth Tab Switcher */
-    .auth-tab-box { display: flex; background: #121619; padding: 4px; border-radius: 9999px; border: 1px solid #222B30; margin-top: 24px; margin-bottom: 20px; width: 100%; }
+    .auth-tab-box { display: flex; background: #121619; padding: 4px; border-radius: 9999px; border: 1px solid #222B30; margin-bottom: 20px; width: 100%; }
     .auth-tab-btn { flex: 1; padding: 12px; border-radius: 9999px; border: none; background: none; color: #94a3b8; font-weight: 900; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
     .auth-tab-btn.active { background: #FFB300; color: #0a0a0a; box-shadow: 0 4px 10px rgba(255,179,0,0.3); }
 
@@ -392,29 +392,6 @@
       { v: "The Forum (Kia Forum)", c: "Inglewood", s: "California", co: "USA" },
     ];
 
-    const DEFAULT_PRESET_SHOWS = [
-      {
-        headline: "Stevie Ray Vaughan",
-        venue: "Deer Creek Music Center",
-        city: "Noblesville",
-        state: "Indiana",
-        country: "USA",
-        date: "07/22/89",
-        openersList: ["The Stray Cats", "Duke Tumatoe"],
-        notes: "Mom took Matt VonBuechler and me"
-      },
-      {
-        headline: "Aerosmith",
-        venue: "Market Square Arena",
-        city: "Indianapolis",
-        state: "Indiana",
-        country: "USA",
-        date: "08/02/88",
-        openersList: ["Guns N Roses"],
-        notes: "My first concert."
-      }
-    ];
-
     let authMode = 'login';
     let userShows = [];
     let currentSort = 'newest';
@@ -438,12 +415,7 @@
     }
 
     function handleLogout() {
-      localStorage.removeItem('livelore_active_user');
-      localStorage.removeItem('livelore_local_shows');
-      userShows = [];
-      renderShowsFeed();
-      updateStatsDisplay();
-
+      // Clear inputs but PRESERVE userShows in localStorage!
       document.getElementById('auth-email').value = '';
       document.getElementById('auth-password').value = '';
       document.getElementById('auth-name').value = '';
@@ -452,17 +424,7 @@
 
     function handleLoginSubmit(e) {
       if (e) e.preventDefault();
-      const emailInput = document.getElementById('auth-email').value || '';
-      const cleanedEmail = emailInput.toLowerCase().trim();
-
-      localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail }));
-
-      if (cleanedEmail === 'wcsurface@gmail.com' || cleanedEmail === '' || cleanedEmail.length === 0) {
-        userShows = [...DEFAULT_PRESET_SHOWS];
-      } else {
-        userShows = [];
-      }
-
+      // Keep existing userShows in localStorage intact!
       saveShowsToStorage();
       renderShowsFeed();
       updateStatsDisplay();
@@ -641,8 +603,8 @@
         const raw = localStorage.getItem('livelore_local_shows');
         if (raw) {
           userShows = JSON.parse(raw);
-          if (!Array.isArray(userShows) || userShows.length === 0) {
-            userShows = [...DEFAULT_PRESET_SHOWS];
+          if (!Array.isArray(userShows)) {
+            userShows = [];
           } else {
             userShows.forEach(s => {
               if (s.venue && s.venue.toLowerCase().includes('deer creek')) {
@@ -653,11 +615,10 @@
             });
           }
         } else {
-          userShows = [...DEFAULT_PRESET_SHOWS];
+          userShows = [];
         }
-        saveShowsToStorage();
       } catch (e) {
-        userShows = [...DEFAULT_PRESET_SHOWS];
+        userShows = [];
       }
       renderShowsFeed();
       updateStatsDisplay();
