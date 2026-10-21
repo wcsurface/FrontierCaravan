@@ -22,7 +22,7 @@
     .sort-dropdown { background: #121619; border: 1px solid #222B30; color: #f1f5f9; font-size: 11px; font-weight: 800; border-radius: 8px; padding: 6px 10px; outline: none; text-transform: uppercase; cursor: pointer; }
 
     /* Auth Tab Switcher */
-    .auth-tab-box { display: flex; background: #121619; padding: 4px; border-radius: 9999px; border: 1px solid #222B30; margin-bottom: 16px; width: 100%; }
+    .auth-tab-box { display: flex; background: #121619; padding: 4px; border-radius: 9999px; border: 1px solid #222B30; margin-bottom: 20px; width: 100%; }
     .auth-tab-btn { flex: 1; padding: 12px; border-radius: 9999px; border: none; background: none; color: #94a3b8; font-weight: 900; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
     .auth-tab-btn.active { background: #FFB300; color: #0a0a0a; box-shadow: 0 4px 10px rgba(255,179,0,0.3); }
 
@@ -206,8 +206,8 @@
       <label class="input-label">Notes</label>
       <textarea id="input-notes" class="input-field" placeholder="Notes (Setlist, who were you with, venue vibe, crowd energy)"></textarea>
 
-      <!-- Action Button: + ADD -->
-      <button type="submit" class="btn-cta">+ ADD</button>
+      <!-- Action Button: Changes dynamically between "+ ADD" and "💾 SAVE EDITS" -->
+      <button type="submit" class="btn-cta" id="btn-save-show">+ ADD</button>
     </form>
 
     <!-- Fixed Floating Glassmorphic 4-Button Navigation Bar -->
@@ -401,6 +401,7 @@
     let userShows = [];
     let currentSort = 'newest';
     let activeDetailIndex = -1;
+    let editingShowIndex = -1;
 
     function showScreen(screenId) {
       document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
@@ -543,7 +544,8 @@
 
     function triggerEditShow() {
       if (activeDetailIndex < 0 || activeDetailIndex >= userShows.length) return;
-      const show = userShows[activeDetailIndex];
+      editingShowIndex = activeDetailIndex;
+      const show = userShows[editingShowIndex];
 
       document.getElementById('input-headline').value = show.headline || '';
       document.getElementById('input-venue').value = show.venue || '';
@@ -559,6 +561,10 @@
           <input type="text" class="input-field input-opener" value="${op}" placeholder="Opener" />
         `).join('');
       }
+
+      // Change button text to SAVE EDITS
+      const btnSave = document.getElementById('btn-save-show');
+      if (btnSave) btnSave.innerText = '💾 SAVE EDITS';
 
       showScreen('log');
     }
@@ -627,6 +633,9 @@
       document.getElementById('log-show-form').reset();
       document.getElementById('venue-dropdown').style.display = 'none';
       document.getElementById('openers-container').innerHTML = '<input type="text" class="input-field input-opener" placeholder="Opener" />';
+      editingShowIndex = -1;
+      const btnSave = document.getElementById('btn-save-show');
+      if (btnSave) btnSave.innerText = '+ ADD';
     }
 
     function cancelShowLog() {
@@ -754,8 +763,10 @@
         const daysArr = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
         userShows.forEach(s => {
+          // 1. Venue Count
           venueCounts[s.venue] = (venueCounts[s.venue] || 0) + 1;
 
+          // 2. Tabulate BOTH Headliner and ALL Opening Acts into Top Artists!
           if (s.headline && s.headline.trim()) {
             const hName = s.headline.trim();
             artistCounts[hName] = (artistCounts[hName] || 0) + 1;
@@ -780,6 +791,7 @@
             artistCounts[opName] = (artistCounts[opName] || 0) + 1;
           });
 
+          // 3. Year & Day of Week
           let dObj = new Date(s.date);
           if (isNaN(dObj.getTime()) && typeof s.date === 'string') {
             const parts = s.date.split(/[\/\.-]/);
@@ -959,7 +971,16 @@
       const openersList = Array.from(openerInputs).map(inp => inp.value.trim()).filter(Boolean);
 
       if (headline && venue) {
-        userShows.unshift({ headline, venue, city, state, country, date, openersList, notes });
+        const updatedShowData = { headline, venue, city, state, country, date, openersList, notes };
+
+        if (editingShowIndex >= 0 && editingShowIndex < userShows.length) {
+          // Update existing show in-place!
+          userShows[editingShowIndex] = updatedShowData;
+        } else {
+          // Create new show entry!
+          userShows.unshift(updatedShowData);
+        }
+
         saveShowsToStorage();
         renderShowsFeed();
         updateStatsDisplay();

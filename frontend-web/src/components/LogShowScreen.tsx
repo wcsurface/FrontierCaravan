@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useEncoreStore } from '../store/useEncoreStore';
 import { parseRawSetlist } from '../engine/setlistParser';
 import { searchVenues, PRESET_VENUES, VenueRecord } from '../engine/venueDataset';
@@ -8,13 +8,14 @@ import { GlassNavBar } from './GlassNavBar';
 import { Plus, Trash2, MapPin, Camera, Crown } from 'lucide-react';
 
 interface LogShowScreenProps {
+  concertIdToEdit?: string;
   onBack: () => void;
   onSaved: () => void;
   onNavigate: (view: 'diary' | 'log' | 'stats' | 'auth') => void;
 }
 
-export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved, onNavigate }) => {
-  const { saveConcert, isPremium } = useEncoreStore();
+export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, onBack, onSaved, onNavigate }) => {
+  const { saveConcert, updateConcert, concerts, artists, venues, setlistItems, isPremium } = useEncoreStore();
 
   const [headlineBand, setHeadlineBand] = useState('');
   const [openers, setOpeners] = useState<string[]>(['']);
@@ -28,6 +29,39 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved, o
 
   const [venueSuggestions, setVenueSuggestions] = useState<VenueRecord[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // Pre-populate if editing existing concert
+  useEffect(() => {
+    if (concertIdToEdit) {
+      const concert = concerts.find(c => c.id === concertIdToEdit);
+      if (concert) {
+        const headliner = artists.find(a => a.id === concert.headlineArtistId);
+        const opener = artists.find(a => a.id === concert.openingArtistId);
+        const venueObj = venues.find(v => v.id === concert.venueId);
+
+        setHeadlineBand(headliner?.name || '');
+        if (opener?.name) {
+          setOpeners(opener.name.split(',').map(s => s.trim()));
+        }
+        setVenueName(venueObj?.name || '');
+        setCity(venueObj?.city || 'Noblesville');
+        setStateProvince(venueObj?.stateProvince || 'Indiana');
+        setCountry(venueObj?.country || 'USA');
+        setNotesText(concert.generalNotes || '');
+        setPhotoUris(concert.photoUris || []);
+
+        if (concert.date) {
+          const dObj = new Date(concert.date);
+          if (!isNaN(dObj.getTime())) {
+            const m = String(dObj.getMonth() + 1).padStart(2, '0');
+            const d = String(dObj.getDate()).padStart(2, '0');
+            const y = String(dObj.getFullYear()).slice(-2);
+            setDateStr(`${m}/${d}/${y}`);
+          }
+        }
+      }
+    }
+  }, [concertIdToEdit, concerts, artists, venues]);
 
   const resetForm = () => {
     setHeadlineBand('');
@@ -140,10 +174,10 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved, o
     if (dateStr) {
       const parts = dateStr.split(/[\/\.-]/);
       if (parts.length === 3) {
-        const day = parseInt(parts[0], 10);
-        const month = parseInt(parts[1], 10) - 1;
+        const month = parseInt(parts[0], 10) - 1;
+        const day = parseInt(parts[1], 10);
         let year = parseInt(parts[2], 10);
-        if (year < 100) year += 2000;
+        if (year < 100) year = year > 30 ? 1900 + year : 2000 + year;
         dateMs = new Date(year, month, day).getTime();
       }
     }
@@ -151,7 +185,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved, o
     const combinedOpeners = openers.filter(o => o.trim().length > 0).join(', ');
     const parsedTracks = parseRawSetlist(notesText);
 
-    saveConcert({
+    const inputData = {
       date: dateMs,
       headlineArtistName: headlineBand.trim(),
       openingArtistName: combinedOpeners,
@@ -163,7 +197,13 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved, o
       notes: notesText.trim(),
       rating: 5.0,
       ticketPrice: 45,
-    });
+    };
+
+    if (concertIdToEdit) {
+      updateConcert(concertIdToEdit, inputData);
+    } else {
+      saveConcert(inputData);
+    }
 
     resetForm();
     onSaved();
@@ -237,11 +277,11 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved, o
         {/* Date Input */}
         <div>
           <label className="block text-[11px] font-bold uppercase tracking-wider text-[#FFB300] mb-1">
-            Date (DD/MM/YY)
+            Date (MM/DD/YY)
           </label>
           <input
             type="text"
-            placeholder="DD/MM/YY"
+            placeholder="MM/DD/YY"
             value={dateStr}
             onChange={handleDateChange}
             maxLength={10}
@@ -400,13 +440,13 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ onBack, onSaved, o
           />
         </div>
 
-        {/* Submit Button */}
+        {/* Submit Button: Changes dynamically between "+ ADD" and "💾 SAVE EDITS" */}
         <div className="my-2">
           <button
             type="submit"
             className="w-full py-4 bg-gradient-to-r from-[#00E676] to-[#00C853] hover:from-[#00FFA3] hover:to-[#00E676] text-slate-950 font-black text-xl uppercase tracking-widest rounded-full shadow-[0_0_22px_rgba(0,230,118,0.5)] active:scale-[0.98] transition-transform"
           >
-            + ADD
+            {concertIdToEdit ? '💾 SAVE EDITS' : '+ ADD'}
           </button>
         </div>
       </form>

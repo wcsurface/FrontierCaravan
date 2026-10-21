@@ -18,6 +18,7 @@ export default function HomeView() {
 
   const [currentView, setCurrentView] = useState<'diary' | 'log' | 'setlist' | 'stats' | 'auth' | 'profile'>('diary');
   const [selectedConcertId, setSelectedConcertId] = useState<string>('');
+  const [editingConcertId, setEditingConcertId] = useState<string | undefined>(undefined);
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'band'>('newest');
 
   useEffect(() => {
@@ -32,11 +33,13 @@ export default function HomeView() {
 
   const handleOpenSetlist = (concertId: string) => {
     setSelectedConcertId(concertId);
+    setEditingConcertId(undefined);
     setCurrentView('setlist');
   };
 
   const handleEditConcert = (concertId: string) => {
     setSelectedConcertId(concertId);
+    setEditingConcertId(concertId);
     setCurrentView('log');
   };
 
@@ -124,16 +127,29 @@ export default function HomeView() {
           </div>
 
           {/* Fixed Floating Glassmorphic 4-Button Navigation Bar */}
-          <GlassNavBar currentView={currentView} onNavigate={(view) => setCurrentView(view === 'auth' ? 'profile' : view)} />
+          <GlassNavBar
+            currentView={currentView}
+            onNavigate={(view) => {
+              if (view === 'log') setEditingConcertId(undefined);
+              setCurrentView(view === 'auth' ? 'profile' : view);
+            }}
+          />
         </div>
       )}
 
       {/* SCREEN 2: LOG SHOW VIEW */}
       {currentView === 'log' && (
         <LogShowScreen
+          concertIdToEdit={editingConcertId}
           onBack={() => setCurrentView('diary')}
-          onSaved={() => setCurrentView('diary')}
-          onNavigate={(view) => setCurrentView(view === 'auth' ? 'profile' : view)}
+          onSaved={() => {
+            setEditingConcertId(undefined);
+            setCurrentView('diary');
+          }}
+          onNavigate={(view) => {
+            setEditingConcertId(undefined);
+            setCurrentView(view === 'auth' ? 'profile' : view);
+          }}
         />
       )}
 

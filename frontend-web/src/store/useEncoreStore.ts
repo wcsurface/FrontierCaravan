@@ -28,6 +28,7 @@ interface EncoreState {
 
   // Actions
   saveConcert: (input: CreateConcertInput) => string;
+  updateConcert: (concertId: string, input: CreateConcertInput) => void;
   deleteConcert: (concertId: string) => void;
   clearAllData: () => void;
   setIsPremium: (status: boolean) => void;
@@ -138,6 +139,88 @@ export const useEncoreStore = create<EncoreState>()(
         get().syncCloudPush();
 
         return concertId;
+      },
+
+      updateConcert: (concertId, input) => {
+        const { concerts, artists, venues, setlistItems } = get();
+
+        const existingConcertIndex = concerts.findIndex(c => c.id === concertId);
+        if (existingConcertIndex < 0) return;
+
+        // 1. Find or create Headliner Artist
+        let headliner = artists.find(a => a.name.toLowerCase() === input.headlineArtistName.toLowerCase());
+        if (!headliner) {
+          headliner = {
+            id: `a_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+            name: input.headlineArtistName,
+            createdAt: Date.now(),
+          };
+          artists.push(headliner);
+        }
+
+        // 2. Find or create Opener
+        let opener: Artist | undefined = undefined;
+        if (input.openingArtistName && input.openingArtistName.trim().length > 0) {
+          opener = artists.find(a => a.name.toLowerCase() === input.openingArtistName!.toLowerCase());
+          if (!opener) {
+            opener = {
+              id: `a_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+              name: input.openingArtistName.trim(),
+              createdAt: Date.now(),
+            };
+            artists.push(opener);
+          }
+        }
+
+        // 3. Find or create Venue
+        let venue = venues.find(v => v.name.toLowerCase() === input.venueName.toLowerCase() && v.city.toLowerCase() === (input.venueCity || 'Local').toLowerCase());
+        if (!venue) {
+          venue = {
+            id: `v_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+            name: input.venueName,
+            city: input.venueCity || 'Noblesville',
+            country: input.venueCountry || 'USA',
+            createdAt: Date.now(),
+          };
+          venues.push(venue);
+        }
+
+        // 4. Update Concert in-place
+        const updatedConcerts = [...concerts];
+        updatedConcerts[existingConcertIndex] = {
+          ...updatedConcerts[existingConcertIndex],
+          date: input.date,
+          venueId: venue.id,
+          headlineArtistId: headliner.id,
+          openingArtistId: opener?.id,
+          tourName: input.tourName,
+          photoUris: input.photoUris || [],
+          generalNotes: input.notes || '',
+          updatedAt: Date.now(),
+          syncStatus: 'pending_update',
+        };
+
+        // 5. Replace Setlist Items
+        const remainingSetlistItems = setlistItems.filter(s => s.concertId !== concertId);
+        const newSetlistItems: SetlistItem[] = input.setlist.map(s => ({
+          id: `s_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+          concertId,
+          artistId: headliner!.id,
+          songTitle: s.songTitle,
+          position: s.position,
+          isEncore: s.isEncore,
+          originalArtist: s.originalArtist,
+        }));
+
+        set({
+          concerts: updatedConcerts,
+          artists: [...artists],
+          venues: [...venues],
+          setlistItems: [...remainingSetlistItems, ...newSetlistItems],
+          cloudSyncStatus: 'syncing',
+        });
+
+        get().syncCloudPush();
       },
 
       deleteConcert: (concertId) => {
