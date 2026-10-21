@@ -113,20 +113,20 @@
       <button class="auth-tab-btn" id="tab-register" onclick="switchAuthMode('register')">Create Account</button>
     </div>
 
-    <form style="flex:1; display:flex; flex-direction:column;" onsubmit="handleLoginSubmit(event)">
+    <div style="flex:1; display:flex; flex-direction:column;">
       <div id="field-name-box" style="display:none;">
         <label class="input-label">Display Name</label>
         <input type="text" id="auth-name" class="input-field" placeholder="Your Name" />
       </div>
 
       <label class="input-label">Email Address *</label>
-      <input type="text" id="auth-email" class="input-field" placeholder="you@example.com" required />
+      <input type="text" id="auth-email" class="input-field" placeholder="you@example.com" />
 
       <label class="input-label">Password *</label>
-      <input type="password" id="auth-password" class="input-field" placeholder="••••••••" required minlength="6" />
+      <input type="password" id="auth-password" class="input-field" placeholder="••••••••" />
 
-      <button type="submit" class="btn-cta" id="btn-auth-submit">LOG IN</button>
-    </form>
+      <button type="button" class="btn-cta" id="btn-auth-submit" onclick="handleLoginSubmit(event)">LOG IN</button>
+    </div>
   </div>
 
   <!-- SCREEN 1: DIARY (HOME PAGE) -->
@@ -429,7 +429,6 @@
     let userShows = [];
     let currentSort = 'newest';
     let activeDetailIndex = -1;
-    let activeUserId = null;
 
     function showScreen(screenId) {
       document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
@@ -674,7 +673,7 @@
         if (currentSort === 'newest') {
           displayList.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         } else if (currentSort === 'oldest') {
-          displayList.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          displayList.sort((a, b) => new Date(a.date).getTime() - new Date(a.date).getTime());
         } else if (currentSort === 'band') {
           displayList.sort((a, b) => a.headline.localeCompare(b.headline));
         }
