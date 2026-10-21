@@ -120,42 +120,61 @@ export class AnalyticsEngine {
 
     const totalInvestment = concerts.reduce((acc, curr) => acc + (curr.ticketPrice || 0), 0);
 
-    // Tabulate Both Headliners and ALL Opening Acts into Top Artists!
-    const artistNameCountMap = new Map<string, number>();
+    // CASE-INSENSITIVE & TRIMMED ARTIST AGGREGATION
+    const artistNormalizedCountMap = new Map<string, number>();
+    const artistDisplayNameMap = new Map<string, string>();
+
+    const recordArtistName = (rawName: string) => {
+      if (!rawName || !rawName.trim()) return;
+      const cleanName = rawName.trim();
+      const normKey = cleanName.toLowerCase();
+
+      artistNormalizedCountMap.set(normKey, (artistNormalizedCountMap.get(normKey) || 0) + 1);
+      if (!artistDisplayNameMap.has(normKey)) {
+        artistDisplayNameMap.set(normKey, cleanName);
+      }
+    };
 
     concerts.forEach(c => {
       // 1. Headliner
       const headlinerObj = artists.find(a => a.id === c.headlineArtistId);
       if (headlinerObj && headlinerObj.name) {
-        const hName = headlinerObj.name.trim();
-        artistNameCountMap.set(hName, (artistNameCountMap.get(hName) || 0) + 1);
+        recordArtistName(headlinerObj.name);
       }
 
-      // 2. Opening Acts (Handles comma-separated openers like "The Stray Cats, Duke Tumatoe")
+      // 2. Opening Acts (Handles comma-separated openers)
       const openerObj = artists.find(a => a.id === c.openingArtistId);
       if (openerObj && openerObj.name) {
         const openerBands = openerObj.name.split(',').map(b => b.trim()).filter(Boolean);
-        openerBands.forEach(bName => {
-          artistNameCountMap.set(bName, (artistNameCountMap.get(bName) || 0) + 1);
-        });
+        openerBands.forEach(bName => recordArtistName(bName));
       }
     });
 
-    const topArtists = Array.from(artistNameCountMap.entries())
-      .map(([name, count]) => ({ name, timesSeen: count }))
+    const topArtists = Array.from(artistNormalizedCountMap.entries())
+      .map(([normKey, count]) => ({ name: artistDisplayNameMap.get(normKey) || normKey, timesSeen: count }))
       .sort((a, b) => b.timesSeen - a.timesSeen)
       .slice(0, 10);
 
-    const venueCountMap = new Map<string, number>();
+    // CASE-INSENSITIVE & TRIMMED VENUE AGGREGATION
+    const venueNormalizedCountMap = new Map<string, number>();
+    const venueDisplayNameMap = new Map<string, { name: string; city: string }>();
+
     concerts.forEach(c => {
-      const current = venueCountMap.get(c.venueId) || 0;
-      venueCountMap.set(c.venueId, current + 1);
+      const vObj = venues.find(v => v.id === c.venueId);
+      const rawName = vObj?.name || 'Unknown Venue';
+      const cleanName = rawName.trim();
+      const normKey = cleanName.toLowerCase();
+
+      venueNormalizedCountMap.set(normKey, (venueNormalizedCountMap.get(normKey) || 0) + 1);
+      if (!venueDisplayNameMap.has(normKey)) {
+        venueDisplayNameMap.set(normKey, { name: cleanName, city: (vObj?.city || '').trim() });
+      }
     });
 
-    const topVenues = Array.from(venueCountMap.entries())
-      .map(([vId, count]) => {
-        const vObj = venues.find(v => v.id === vId);
-        return { name: vObj?.name || 'Unknown Venue', city: vObj?.city || '', visitCount: count };
+    const topVenues = Array.from(venueNormalizedCountMap.entries())
+      .map(([normKey, count]) => {
+        const info = venueDisplayNameMap.get(normKey) || { name: normKey, city: '' };
+        return { name: info.name, city: info.city, visitCount: count };
       })
       .sort((a, b) => b.visitCount - a.visitCount)
       .slice(0, 10);

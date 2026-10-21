@@ -613,10 +613,10 @@
       document.getElementById('detail-venue').innerText = show.venue;
 
       const preset = VENUE_DB.find(v => v.v.toLowerCase() === (show.venue || '').toLowerCase() || v.v.toLowerCase().startsWith((show.venue || '').toLowerCase()));
-      const c = show.city || (preset ? preset.c : 'Noblesville');
+      const c = (show.city || (preset ? preset.c : 'Noblesville')).trim();
       const rawState = show.state || (preset ? preset.s : 'IN');
       const s = toStateAbbr(rawState);
-      const co = show.country || (preset ? preset.co : 'USA');
+      const co = (show.country || (preset ? preset.co : 'USA')).trim();
 
       document.getElementById('detail-location').innerText = `${c}, ${s}, ${co}`;
 
@@ -671,18 +671,18 @@
 
       editingShowId = activeDetailShowId;
 
-      document.getElementById('input-headline').value = show.headline || '';
-      document.getElementById('input-venue').value = show.venue || '';
-      document.getElementById('input-city').value = show.city || 'Noblesville';
+      document.getElementById('input-headline').value = (show.headline || '').trim();
+      document.getElementById('input-venue').value = (show.venue || '').trim();
+      document.getElementById('input-city').value = (show.city || 'Noblesville').trim();
       document.getElementById('input-state').value = toStateAbbr(show.state || 'IN');
-      document.getElementById('input-country').value = show.country || 'USA';
+      document.getElementById('input-country').value = (show.country || 'USA').trim();
       document.getElementById('input-date').value = show.date || '';
-      document.getElementById('input-notes').value = show.notes || '';
+      document.getElementById('input-notes').value = (show.notes || '').trim();
 
       if (show.openersList && show.openersList.length > 0) {
         const openersContainer = document.getElementById('openers-container');
         openersContainer.innerHTML = show.openersList.map(op => `
-          <input type="text" class="input-field input-opener" value="${op}" placeholder="Opener" />
+          <input type="text" class="input-field input-opener" value="${op.trim()}" placeholder="Opener" />
         `).join('');
       }
 
@@ -732,15 +732,15 @@
 
       if (matches.length > 0) {
         const best = matches[0];
-        document.getElementById('input-city').value = best.c;
+        document.getElementById('input-city').value = best.c.trim();
         document.getElementById('input-state').value = toStateAbbr(best.s);
-        document.getElementById('input-country').value = best.co;
+        document.getElementById('input-country').value = best.co.trim();
 
         dropdown.style.display = 'block';
         dropdown.innerHTML = matches.map(item => `
-          <div style="padding:8px 12px; border-bottom:1px solid #222B30; cursor:pointer;" onclick="selectVenue('${item.v.replace(/'/g, "\\'")}', '${item.c.replace(/'/g, "\\'")}', '${toStateAbbr(item.s).replace(/'/g, "\\'")}', '${item.co.replace(/'/g, "\\'")}')">
-            <div style="font-weight:bold; color:#fff;">${item.v}</div>
-            <div style="color:#94a3b8; font-size:10px;">${item.c}, ${toStateAbbr(item.s)}, ${item.co}</div>
+          <div style="padding:8px 12px; border-bottom:1px solid #222B30; cursor:pointer;" onclick="selectVenue('${item.v.replace(/'/g, "\\'").trim()}', '${item.c.replace(/'/g, "\\'").trim()}', '${toStateAbbr(item.s).replace(/'/g, "\\'")}', '${item.co.replace(/'/g, "\\'").trim()}')">
+            <div style="font-weight:bold; color:#fff;">${item.v.trim()}</div>
+            <div style="color:#94a3b8; font-size:10px;">${item.c.trim()}, ${toStateAbbr(item.s)}, ${item.co.trim()}</div>
           </div>
         `).join('');
       } else {
@@ -749,10 +749,10 @@
     }
 
     function selectVenue(v, c, s, co) {
-      document.getElementById('input-venue').value = v;
-      document.getElementById('input-city').value = c;
+      document.getElementById('input-venue').value = v.trim();
+      document.getElementById('input-city').value = c.trim();
       document.getElementById('input-state').value = toStateAbbr(s);
-      document.getElementById('input-country').value = co;
+      document.getElementById('input-country').value = co.trim();
       document.getElementById('venue-dropdown').style.display = 'none';
     }
 
@@ -803,7 +803,14 @@
         if (Array.isArray(userShows)) {
           userShows.forEach(s => {
             if (!s.id) s.id = generateUniqueId();
+            if (s.headline) s.headline = s.headline.trim();
+            if (s.venue) s.venue = s.venue.trim();
+            if (s.city) s.city = s.city.trim();
+            if (s.country) s.country = s.country.trim();
             if (s.state) s.state = toStateAbbr(s.state);
+            if (Array.isArray(s.openersList)) {
+              s.openersList = s.openersList.map(op => typeof op === 'string' ? op.trim() : op).filter(Boolean);
+            }
           });
         } else {
           userShows = [];
@@ -885,7 +892,7 @@
         } else if (currentSort === 'oldest') {
           displayList.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
         } else if (currentSort === 'band') {
-          displayList.sort((a, b) => a.headline.localeCompare(b.headline));
+          displayList.sort((a, b) => (a.headline || '').localeCompare(b.headline || ''));
         }
 
         list.style.display = 'block';
@@ -896,11 +903,12 @@
           card.className = 'ticket-card';
           card.onclick = () => openShowDetails(show.id);
 
-          let bandStackHtml = `<div class="ticket-artist-head">${show.headline.toUpperCase()}</div>`;
+          let bandStackHtml = `<div class="ticket-artist-head">${(show.headline || '').trim().toUpperCase()}</div>`;
           if (show.openersList && show.openersList.length > 0) {
+            const cleanOpeners = show.openersList.map(op => typeof op === 'string' ? op.trim() : op).filter(Boolean);
             bandStackHtml += `
               <div class="ticket-artist-and">and</div>
-              <div class="ticket-artist-openers">${show.openersList.join(', ')}</div>
+              <div class="ticket-artist-openers">${cleanOpeners.join(', ')}</div>
             `;
           }
 
@@ -910,7 +918,7 @@
                 ${bandStackHtml}
               </div>
               <div class="ticket-footer">
-                <span class="ticket-venue">${show.venue}</span>
+                <span class="ticket-venue">${(show.venue || '').trim()}</span>
                 <span class="ticket-date">${show.date}</span>
               </div>
             </div>
@@ -924,45 +932,62 @@
       }
     }
 
+    // CASE-INSENSITIVE & TRIMMED STATS AGGREGATION ENGINE
     function updateStatsDisplay() {
       const count = userShows ? userShows.length : 0;
       document.getElementById('stats-total-count').innerText = count + (count === 1 ? ' SHOW' : ' SHOWS');
 
       if (count > 0) {
-        const venueCounts = {};
-        const artistCounts = {};
+        const venueNormalizedCounts = {};
+        const venueDisplayNames = {};
+
+        const artistNormalizedCounts = {};
+        const artistDisplayNames = {};
+
         const yearCounts = {};
         const dayCounts = { 'Sunday':0, 'Monday':0, 'Tuesday':0, 'Wednesday':0, 'Thursday':0, 'Friday':0, 'Saturday':0 };
         const daysArr = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-        userShows.forEach(s => {
-          // 1. Venue Count
-          venueCounts[s.venue] = (venueCounts[s.venue] || 0) + 1;
+        const recordArtistName = (rawName) => {
+          if (!rawName || !rawName.trim()) return;
+          const cleanName = rawName.trim();
+          const normKey = cleanName.toLowerCase();
 
-          // 2. Tabulate BOTH Headliner and ALL Opening Acts into Top Artists!
-          if (s.headline && s.headline.trim()) {
-            const hName = s.headline.trim();
-            artistCounts[hName] = (artistCounts[hName] || 0) + 1;
+          artistNormalizedCounts[normKey] = (artistNormalizedCounts[normKey] || 0) + 1;
+          if (!artistDisplayNames[normKey]) {
+            artistDisplayNames[normKey] = cleanName;
+          }
+        };
+
+        const recordVenueName = (rawVenue) => {
+          if (!rawVenue || !rawVenue.trim()) return;
+          const cleanVenue = rawVenue.trim();
+          const normKey = cleanVenue.toLowerCase();
+
+          venueNormalizedCounts[normKey] = (venueNormalizedCounts[normKey] || 0) + 1;
+          if (!venueDisplayNames[normKey]) {
+            venueDisplayNames[normKey] = cleanVenue;
+          }
+        };
+
+        userShows.forEach(s => {
+          // 1. Venue Count (Case-Insensitive & Trimmed)
+          recordVenueName(s.venue);
+
+          // 2. Tabulate BOTH Headliner and ALL Opening Acts into Top Artists (Case-Insensitive & Trimmed)
+          if (s.headline) {
+            recordArtistName(s.headline);
           }
 
-          let openersToCount = [];
           if (Array.isArray(s.openersList) && s.openersList.length > 0) {
             s.openersList.forEach(op => {
               if (typeof op === 'string') {
-                op.split(',').forEach(subOp => {
-                  if (subOp.trim()) openersToCount.push(subOp.trim());
-                });
+                op.split(',').forEach(subOp => recordArtistName(subOp));
               }
             });
           } else if (s.opener && typeof s.opener === 'string') {
-            s.opener.split(',').forEach(subOp => {
-              if (subOp.trim()) openersToCount.push(subOp.trim());
-            });
+            s.opener.split(',').forEach(subOp => recordArtistName(subOp));
           }
-
-          openersToCount.forEach(opName => {
-            artistCounts[opName] = (artistCounts[opName] || 0) + 1;
-          });
 
           // 3. Year & Day of Week
           let dObj = new Date(s.date);
@@ -987,8 +1012,16 @@
         });
 
         // Top Years sorted strictly by MOST CONCERTS ATTENDED descending!
-        const topV = Object.entries(venueCounts).sort((a,b) => b[1] - a[1]).slice(0, 10);
-        const topA = Object.entries(artistCounts).sort((a,b) => b[1] - a[1]).slice(0, 10);
+        const topV = Object.entries(venueNormalizedCounts)
+          .map(([normKey, cnt]) => [venueDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1])
+          .slice(0, 10);
+
+        const topA = Object.entries(artistNormalizedCounts)
+          .map(([normKey, cnt]) => [artistDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1])
+          .slice(0, 10);
+
         const topY = Object.entries(yearCounts).sort((a,b) => b[1] - a[1] || b[0] - a[0]).slice(0, 10);
         const topD = Object.entries(dayCounts).filter(d => d[1] > 0).sort((a,b) => b[1] - a[1]).slice(0, 10);
 
@@ -1019,9 +1052,20 @@
       const container = document.getElementById('substats-container');
 
       if (type === 'venues') {
-        const venueCounts = {};
-        userShows.forEach(s => { venueCounts[s.venue] = (venueCounts[s.venue] || 0) + 1; });
-        const topV = Object.entries(venueCounts).sort((a,b) => b[1] - a[1]);
+        const venueNormalizedCounts = {};
+        const venueDisplayNames = {};
+
+        userShows.forEach(s => {
+          if (!s.venue || !s.venue.trim()) return;
+          const cleanVenue = s.venue.trim();
+          const normKey = cleanVenue.toLowerCase();
+          venueNormalizedCounts[normKey] = (venueNormalizedCounts[normKey] || 0) + 1;
+          if (!venueDisplayNames[normKey]) venueDisplayNames[normKey] = cleanVenue;
+        });
+
+        const topV = Object.entries(venueNormalizedCounts)
+          .map(([normKey, cnt]) => [venueDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1]);
 
         container.innerHTML = `
           <div style="color:#00E676; font-size:14px; text-transform:uppercase; margin-bottom:10px;">ALL VENUES (${topV.length})</div>
@@ -1030,31 +1074,31 @@
           `).join('') : '<div style="color:#94a3b8;">No venues logged yet.</div>'}
         `;
       } else if (type === 'artists') {
-        const artistCounts = {};
+        const artistNormalizedCounts = {};
+        const artistDisplayNames = {};
+
+        const recordArtistName = (rawName) => {
+          if (!rawName || !rawName.trim()) return;
+          const cleanName = rawName.trim();
+          const normKey = cleanName.toLowerCase();
+          artistNormalizedCounts[normKey] = (artistNormalizedCounts[normKey] || 0) + 1;
+          if (!artistDisplayNames[normKey]) artistDisplayNames[normKey] = cleanName;
+        };
+
         userShows.forEach(s => {
-          if (s.headline && s.headline.trim()) {
-            const hName = s.headline.trim();
-            artistCounts[hName] = (artistCounts[hName] || 0) + 1;
-          }
-          let openersToCount = [];
+          if (s.headline) recordArtistName(s.headline);
           if (Array.isArray(s.openersList) && s.openersList.length > 0) {
             s.openersList.forEach(op => {
-              if (typeof op === 'string') {
-                op.split(',').forEach(subOp => {
-                  if (subOp.trim()) openersToCount.push(subOp.trim());
-                });
-              }
+              if (typeof op === 'string') op.split(',').forEach(subOp => recordArtistName(subOp));
             });
           } else if (s.opener && typeof s.opener === 'string') {
-            s.opener.split(',').forEach(subOp => {
-              if (subOp.trim()) openersToCount.push(subOp.trim());
-            });
+            s.opener.split(',').forEach(subOp => recordArtistName(subOp));
           }
-          openersToCount.forEach(opName => {
-            artistCounts[opName] = (artistCounts[opName] || 0) + 1;
-          });
         });
-        const topA = Object.entries(artistCounts).sort((a,b) => b[1] - a[1]);
+
+        const topA = Object.entries(artistNormalizedCounts)
+          .map(([normKey, cnt]) => [artistDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1]);
 
         container.innerHTML = `
           <div style="color:#FFB300; font-size:14px; text-transform:uppercase; margin-bottom:10px;">ALL ARTISTS (${topA.length})</div>
@@ -1133,13 +1177,13 @@
 
     function saveNewShow(e) {
       e.preventDefault();
-      const headline = document.getElementById('input-headline').value;
-      const venue = document.getElementById('input-venue').value;
-      const city = document.getElementById('input-city').value || 'Noblesville';
-      const state = toStateAbbr(document.getElementById('input-state').value || 'IN');
-      const country = document.getElementById('input-country').value || 'USA';
-      const date = document.getElementById('input-date').value || '08/02/88';
-      const notes = document.getElementById('input-notes').value || '';
+      const headline = document.getElementById('input-headline').value.trim();
+      const venue = document.getElementById('input-venue').value.trim();
+      const city = (document.getElementById('input-city').value || 'Noblesville').trim();
+      const state = toStateAbbr((document.getElementById('input-state').value || 'IN').trim());
+      const country = (document.getElementById('input-country').value || 'USA').trim();
+      const date = document.getElementById('input-date').value.trim() || '08/02/88';
+      const notes = (document.getElementById('input-notes').value || '').trim();
 
       const openerInputs = document.querySelectorAll('.input-opener');
       const openersList = Array.from(openerInputs).map(inp => inp.value.trim()).filter(Boolean);
@@ -1164,7 +1208,7 @@
       }
     }
 
-    // Explicitly WIPE ALL local concert keys once and for all!
+    // Force WIPE ALL Concert Data ONCE on page initialization so wcsurface@gmail.com starts 100% clean!
     (function forceWipeAllLocalConcerts() {
       try {
         localStorage.removeItem('livelore_local_shows');
