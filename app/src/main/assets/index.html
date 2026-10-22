@@ -328,8 +328,8 @@
     </div>
 
     <!-- Action Buttons: EDIT CONCERT & DELETE CONCERT -->
-    <button class="btn-edit" id="btn-edit-show" style="font-size:16px; padding:14px;" onclick="triggerEditShow()">âœ EDIT CONCERT</button>
-    <button class="btn-delete" id="btn-delete-show" style="font-size:15px; padding:14px;" onclick="triggerDeleteShow()">ðŸ—‘ DELETE CONCERT</button>
+    <button class="btn-edit" id="btn-edit-show" style="font-size:16px; padding:14px;" onclick="triggerEditShow()">EDIT CONCERT</button>
+    <button class="btn-delete" id="btn-delete-show" style="font-size:15px; padding:14px;" onclick="triggerDeleteShow()">DELETE CONCERT</button>
   </div>
 
   <!-- SCREEN 4: PROFILE DASHBOARD PAGE (VIP AT TOP + 2X LARGER TITLES) -->
@@ -350,42 +350,42 @@
     <!-- 1. LIVELORE VIP PASS (MOVED TO TOP OF LIST ABOVE TICKET STUB COLOR THEME) -->
     <div class="detail-card" style="background: linear-gradient(135deg, rgba(255,179,0,0.22), #121619); border-color: #FFB300; padding: 22px; margin-bottom: 20px;">
       <div style="display:flex; justify-between; align-items:center; margin-bottom:12px; border-bottom: 1px solid #222B30; padding-bottom:8px;">
-        <span style="font-size:20px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px;">ðŸ‘‘ LIVELORE VIP PASS</span>
-        <span style="background:#00E676; color:#0a0a0a; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">âœ“ VIP CONFIRMED</span>
+        <span style="font-size:20px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px;">LIVELORE VIP PASS</span>
+        <span style="background:#00E676; color:#0a0a0a; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">✓ VIP CONFIRMED</span>
       </div>
-      <div style="font-weight:900; font-size:19px; color:#00E676; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">âœ“ YOU ARE A VIP MEMBER!</div>
+      <div style="font-weight:900; font-size:19px; color:#00E676; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">✓ YOU ARE A VIP MEMBER!</div>
       <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.5; background:#0A0D0E; padding:12px; border-radius:10px; border:1px solid rgba(0,230,118,0.4);">
-        ðŸŽ‰ Your LiveLore VIP status is active! You have permanent 100% ad-free concert vaulting and full photo memory attachments enabled.
+        Your LiveLore VIP status is active! You have permanent 100% ad-free concert vaulting and full photo memory attachments enabled.
       </div>
     </div>
 
     <!-- 2. DOWNLOAD CONCERT DATA (CSV) BUTTON (POSITIONED ABOVE TICKET STUB COLOR TOGGLE) -->
     <div class="detail-card" style="padding: 20px; margin-bottom: 20px;">
-      <div class="detail-label" style="color:#00E676;">ðŸ“¥ CONCERT DATA EXPORT</div>
+      <div class="detail-label" style="color:#00E676;">CONCERT DATA EXPORT</div>
       <div style="font-size:13px; color:#e2e8f0; font-weight:600; margin-bottom:14px; line-height:1.5;">
         Download your entire concert vault (dates, artists, openers, venues, location, notes) as a CSV spreadsheet.
       </div>
-      <button class="btn-cta" style="font-size:15px; padding:14px;" onclick="exportConcertsCsv()">ðŸ“¥ DOWNLOAD CONCERT DATA (CSV)</button>
+      <button class="btn-cta" style="font-size:15px; padding:14px;" onclick="exportConcertsCsv()">DOWNLOAD CONCERT DATA (CSV)</button>
     </div>
 
     <!-- 3. TICKET STUB COLOR THEME TOGGLE -->
     <div class="detail-card" style="padding: 20px; margin-bottom: 20px;">
-      <div class="detail-label">ðŸŽ¨ TICKET STUB COLOR THEME</div>
+      <div class="detail-label">TICKET STUB COLOR THEME</div>
       <div class="theme-toggle-box">
-        <button type="button" class="theme-toggle-btn active" id="theme-btn-multicolor" onclick="switchTicketTheme('multicolor')">ðŸŽ¨ Multi-Colored</button>
-        <button type="button" class="theme-toggle-btn" id="theme-btn-classic" onclick="switchTicketTheme('classic')">ðŸ“œ Classic Beige</button>
+        <button type="button" class="theme-toggle-btn active" id="theme-btn-multicolor" onclick="switchTicketTheme('multicolor')">Multi-Colored</button>
+        <button type="button" class="theme-toggle-btn" id="theme-btn-classic" onclick="switchTicketTheme('classic')">Classic Beige</button>
       </div>
     </div>
 
     <!-- 4. Account Details Card -->
     <div class="detail-card" style="padding: 22px; margin-bottom: 20px;">
-      <div class="detail-label">ðŸ‘¤ ACCOUNT EMAIL</div>
+      <div class="detail-label">ACCOUNT EMAIL</div>
       <div style="font-size:18px; font-weight:900; color:#ffffff; margin-bottom:20px;" id="profile-email-display">wcsurface@gmail.com</div>
 
       <div style="border-top: 1px solid #222B30; padding-top: 16px;">
-        <div class="detail-label">ðŸ”‘ CHANGE PASSWORD</div>
+        <div class="detail-label">CHANGE PASSWORD</div>
         <input type="password" id="profile-new-pass" class="input-field" placeholder="New Password (min 6 chars)" style="margin-top:6px; margin-bottom:12px;" />
-        <button type="button" class="btn-update-pass" onclick="alert('âœ“ Password updated successfully!')">Update Password</button>
+        <button type="button" class="btn-update-pass" onclick="alert('✓ Password updated successfully!')">Update Password</button>
       </div>
     </div>
 
@@ -396,7 +396,7 @@
 
     <!-- 6. DELETE ACCOUNT & ALL DATA BUTTON (POSITIONED BELOW LOG OUT) -->
     <div style="margin-top:8px; width:100%;">
-      <button class="btn-delete" style="font-size:15px; padding:14px; background:rgba(225, 29, 72, 0.25); border-color:rgba(225, 29, 72, 0.8);" onclick="handleDeleteAccountAndData()">ðŸ—‘ DELETE ACCOUNT & ALL DATA</button>
+      <button class="btn-delete" style="font-size:15px; padding:14px; background:rgba(225, 29, 72, 0.25); border-color:rgba(225, 29, 72, 0.8);" onclick="handleDeleteAccountAndData()">DELETE ACCOUNT & ALL DATA</button>
     </div>
 
     <!-- Footer Legal Links & Dynamic Copyright -->
