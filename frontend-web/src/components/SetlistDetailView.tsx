@@ -1,11 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useEncoreStore } from '../store/useEncoreStore';
 import { PRESET_VENUES, toStateAbbr } from '../engine/venueDataset';
 import { TicketStubCard } from './TicketStubCard';
 import { GlassNavBar } from './GlassNavBar';
-import { MapPin, Calendar, Users, FileText, Music, Edit3, Trash2, Camera, Star } from 'lucide-react';
+import { MapPin, Calendar, Users, FileText, Music, Edit3, Trash2, Camera, Star, ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 interface SetlistDetailViewProps {
   concertId: string;
@@ -16,6 +16,8 @@ interface SetlistDetailViewProps {
 
 export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId, onBack, onEdit, onNavigate }) => {
   const { concerts, artists, venues, setlistItems, deleteConcert, isPremium } = useEncoreStore();
+
+  const [activePhotoIdx, setActivePhotoIdx] = useState<number | null>(null);
 
   const concert = concerts.find((c) => c.id === concertId) || concerts[0];
   if (!concert) {
@@ -30,6 +32,8 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
   const opener = artists.find((a) => a.id === concert.openingArtistId);
   const venue = venues.find((v) => v.id === concert.venueId);
   const items = setlistItems.filter((s) => s.concertId === concert.id);
+
+  const photoUris = concert.photoUris || [];
 
   const formattedDate = new Date(concert.date).toLocaleDateString('en-US', {
     weekday: 'long',
@@ -59,9 +63,21 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
     }
   };
 
+  const handlePrevPhoto = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (activePhotoIdx === null || photoUris.length === 0) return;
+    setActivePhotoIdx((activePhotoIdx - 1 + photoUris.length) % photoUris.length);
+  };
+
+  const handleNextPhoto = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (activePhotoIdx === null || photoUris.length === 0) return;
+    setActivePhotoIdx((activePhotoIdx + 1) % photoUris.length);
+  };
+
   return (
-    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between min-h-screen">
-      {/* Header with LiveLore Logo - Byte-for-byte identical to Home page header */}
+    <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between min-h-screen relative">
+      {/* Header with LiveLore Logo */}
       <header className="relative flex flex-col items-center justify-center w-full pt-4 sm:pt-6 pb-2 shrink-0">
         <img
           src="/assets/livelore_logo.png"
@@ -125,29 +141,6 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
             </p>
           </div>
 
-          {/* Concert Photo Memories Gallery (VIP Feature - Up to 5 Photos) */}
-          {isPremium && concert.photoUris && concert.photoUris.length > 0 && (
-            <div className="border-t border-[#222B30] pt-3.5">
-              <span className="text-xs sm:text-sm font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-2">
-                <Camera size={16} /> CONCERT PHOTO MEMORIES ({concert.photoUris.length}/5)
-              </span>
-              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                {concert.photoUris.map((uri, idx) => (
-                  <div key={idx} className={`relative aspect-square rounded-xl overflow-hidden border shadow-md ${
-                    idx === 0 ? 'border-[#FFB300] ring-2 ring-[#FFB300]/50' : 'border-[#222B30]'
-                  }`}>
-                    <img src={uri} alt={`Concert Memory ${idx + 1}`} className="w-full h-full object-cover" />
-                    {idx === 0 && (
-                      <div className="absolute top-1 left-1 bg-[#FFB300] text-slate-950 font-black text-[8px] px-1 py-0.5 rounded uppercase tracking-tighter flex items-center gap-0.5 shadow-md">
-                        <Star size={8} className="fill-slate-950" /> PRIMARY
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* Concert Notes */}
           {concert.generalNotes && (
             <div className="border-t border-[#222B30] pt-3.5">
@@ -188,6 +181,35 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
             </div>
           )}
 
+          {/* Concert Photo Memories Gallery (POSITIONED DIRECTLY ABOVE EDIT CONCERT BUTTON) */}
+          {isPremium && photoUris.length > 0 && (
+            <div className="border-t border-[#222B30] pt-4 my-2">
+              <span className="text-xs sm:text-sm font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-2">
+                <Camera size={18} /> CONCERT PHOTO MEMORIES ({photoUris.length}/5)
+              </span>
+              <p className="text-[11px] text-slate-400 font-semibold mb-2">Tap any photo to view full screen & cycle through gallery</p>
+
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                {photoUris.map((uri, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => setActivePhotoIdx(idx)}
+                    className={`relative aspect-square rounded-xl overflow-hidden border-2 cursor-pointer transition-transform hover:scale-105 active:scale-95 shadow-md ${
+                      idx === 0 ? 'border-[#FFB300] ring-2 ring-[#FFB300]/50' : 'border-[#222B30]'
+                    }`}
+                  >
+                    <img src={uri} alt={`Concert Memory ${idx + 1}`} className="w-full h-full object-cover" />
+                    {idx === 0 && (
+                      <div className="absolute top-1 left-1 bg-[#FFB300] text-slate-950 font-black text-[8px] px-1 py-0.5 rounded uppercase tracking-tighter flex items-center gap-0.5 shadow-md">
+                        <Star size={8} className="fill-slate-950" /> PRIMARY
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* EDIT CONCERT & DELETE CONCERT Buttons */}
           <div className="pt-3 space-y-3">
             <button
@@ -207,6 +229,82 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
           </div>
         </div>
       </div>
+
+      {/* Full-Screen Interactive Photo Gallery Lightbox Modal */}
+      {activePhotoIdx !== null && photoUris.length > 0 && (
+        <div
+          onClick={() => setActivePhotoIdx(null)}
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-lg flex flex-col justify-between p-4"
+        >
+          {/* Top Bar */}
+          <div className="flex items-center justify-between w-full max-w-md mx-auto pt-2 px-2 shrink-0 z-10">
+            <span className="text-sm font-black text-[#FFB300] uppercase tracking-wider">
+              Photo {activePhotoIdx + 1} of {photoUris.length}
+            </span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setActivePhotoIdx(null);
+              }}
+              className="p-2 text-slate-300 hover:text-white bg-slate-900/80 rounded-full border border-slate-700"
+            >
+              <X size={22} />
+            </button>
+          </div>
+
+          {/* Centered Image View with Left / Right Arrows */}
+          <div className="relative flex-1 flex items-center justify-center w-full max-w-md mx-auto my-auto py-2">
+            <img
+              src={photoUris[activePhotoIdx]}
+              alt={`Concert Photo ${activePhotoIdx + 1}`}
+              className="max-h-[75vh] max-w-full object-contain rounded-2xl border border-[#FFB300]/40 shadow-2xl"
+            />
+
+            {/* Left Arrow */}
+            {photoUris.length > 1 && (
+              <button
+                type="button"
+                onClick={handlePrevPhoto}
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-slate-900/80 hover:bg-[#FFB300] text-[#FFB300] hover:text-slate-950 p-3 rounded-full border border-[#FFB300]/60 shadow-xl transition active:scale-95"
+              >
+                <ChevronLeft size={28} />
+              </button>
+            )}
+
+            {/* Right Arrow */}
+            {photoUris.length > 1 && (
+              <button
+                type="button"
+                onClick={handleNextPhoto}
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-slate-900/80 hover:bg-[#FFB300] text-[#FFB300] hover:text-slate-950 p-3 rounded-full border border-[#FFB300]/60 shadow-xl transition active:scale-95"
+              >
+                <ChevronRight size={28} />
+              </button>
+            )}
+          </div>
+
+          {/* Bottom Bar Controls */}
+          {photoUris.length > 1 && (
+            <div className="w-full max-w-md mx-auto flex items-center justify-between px-4 pb-4 shrink-0 gap-3">
+              <button
+                type="button"
+                onClick={handlePrevPhoto}
+                className="flex-1 py-3 bg-[#121619] border border-[#222B30] hover:border-[#FFB300] text-[#FFB300] font-black text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-1"
+              >
+                <ChevronLeft size={16} /> PREVIOUS
+              </button>
+              <button
+                type="button"
+                onClick={handleNextPhoto}
+                className="flex-1 py-3 bg-[#121619] border border-[#222B30] hover:border-[#FFB300] text-[#FFB300] font-black text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-1"
+              >
+                NEXT <ChevronRight size={16} />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
