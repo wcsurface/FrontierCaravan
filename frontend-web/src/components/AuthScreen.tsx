@@ -7,15 +7,18 @@ import { LogIn, UserPlus, AlertCircle } from 'lucide-react';
 interface AuthScreenProps {
   onBack: () => void;
   onSuccess: () => void;
+  onOpenLegal?: (view: 'terms' | 'privacy' | 'faq') => void;
 }
 
-export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => {
+export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess, onOpenLegal }) => {
   const { login, register, error, clearError, isLoading } = useAuthStore();
 
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
+
+  const currentYear = new Date().getFullYear();
 
   const handleModeSwitch = (newMode: 'login' | 'register') => {
     setMode(newMode);
@@ -69,12 +72,12 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
 
   return (
     <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none bg-grid-lines justify-between overflow-y-auto min-h-screen">
-      {/* Header with Enlarged LiveLore Logo */}
-      <header className="relative flex items-center justify-center w-full pt-8 sm:pt-12 pb-6 shrink-0">
+      {/* Header with LiveLore Logo */}
+      <header className="relative flex items-center justify-center w-full pt-6 sm:pt-10 pb-4 shrink-0">
         <img
           src="/assets/livelore_logo.png"
           alt="LiveLore"
-          className="h-24 sm:h-28 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.45)] filter contrast-105"
+          className="h-28 sm:h-32 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.45)] filter contrast-105"
         />
       </header>
 
@@ -199,6 +202,26 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess }) => 
           </button>
         </form>
       </div>
+
+      {/* Footer Legal Links & Dynamic Copyright */}
+      <footer className="w-full max-w-md mx-auto pt-6 pb-2 text-center text-xs font-extrabold text-slate-400 space-y-2">
+        <div className="flex items-center justify-center gap-4 text-[#FFB300]">
+          <button type="button" onClick={() => onOpenLegal && onOpenLegal('terms')} className="hover:underline">
+            Terms of Service
+          </button>
+          <span>•</span>
+          <button type="button" onClick={() => onOpenLegal && onOpenLegal('privacy')} className="hover:underline">
+            Privacy Policy
+          </button>
+          <span>•</span>
+          <button type="button" onClick={() => onOpenLegal && onOpenLegal('faq')} className="hover:underline">
+            FAQ
+          </button>
+        </div>
+        <p className="text-slate-500 font-bold uppercase tracking-widest text-[11px]">
+          © {currentYear} Surface Apps. All rights reserved.
+        </p>
+      </footer>
     </div>
   );
 };

@@ -10,14 +10,17 @@ interface ProfileViewProps {
   onBack: () => void;
   onNavigate: (view: 'diary' | 'log' | 'stats' | 'auth') => void;
   onSwitchAccount?: () => void;
+  onOpenLegal?: (view: 'terms' | 'privacy' | 'faq') => void;
 }
 
-export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate, onSwitchAccount }) => {
+export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate, onSwitchAccount, onOpenLegal }) => {
   const { user, logout } = useAuthStore();
   const { isPremium, setIsPremium, ticketTheme, setTicketTheme } = useEncoreStore();
 
   const [newPassword, setNewPassword] = useState('');
   const [passUpdated, setPassUpdated] = useState(false);
+
+  const currentYear = new Date().getFullYear();
 
   const handlePurchasePremium = () => {
     setIsPremium(true);
@@ -189,6 +192,26 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate, on
             <LogOut size={20} /> LOG OUT
           </button>
         </div>
+
+        {/* Footer Legal Links & Dynamic Copyright */}
+        <footer className="w-full max-w-md mx-auto pt-4 pb-2 text-center text-xs font-extrabold text-slate-400 space-y-2">
+          <div className="flex items-center justify-center gap-4 text-[#FFB300]">
+            <button type="button" onClick={() => onOpenLegal && onOpenLegal('terms')} className="hover:underline">
+              Terms of Service
+            </button>
+            <span>•</span>
+            <button type="button" onClick={() => onOpenLegal && onOpenLegal('privacy')} className="hover:underline">
+              Privacy Policy
+            </button>
+            <span>•</span>
+            <button type="button" onClick={() => onOpenLegal && onOpenLegal('faq')} className="hover:underline">
+              FAQ
+            </button>
+          </div>
+          <p className="text-slate-500 font-bold uppercase tracking-widest text-[11px]">
+            © {currentYear} Surface Apps. All rights reserved.
+          </p>
+        </footer>
       </div>
     </div>
   );

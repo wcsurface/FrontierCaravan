@@ -9,6 +9,9 @@ import { SetlistDetailView } from '../components/SetlistDetailView';
 import { StatsView } from '../components/StatsView';
 import { AuthScreen } from '../components/AuthScreen';
 import { ProfileView } from '../components/ProfileView';
+import { TermsView } from '../components/TermsView';
+import { PrivacyView } from '../components/PrivacyView';
+import { FaqView } from '../components/FaqView';
 import { GlassNavBar } from '../components/GlassNavBar';
 import { Sparkles, ArrowUp, SlidersHorizontal } from 'lucide-react';
 
@@ -16,7 +19,7 @@ export default function HomeView() {
   const { user, token, checkMe } = useAuthStore();
   const { concerts, artists, venues } = useEncoreStore();
 
-  const [currentView, setCurrentView] = useState<'diary' | 'log' | 'setlist' | 'stats' | 'auth' | 'profile'>('diary');
+  const [currentView, setCurrentView] = useState<'diary' | 'log' | 'setlist' | 'stats' | 'auth' | 'profile' | 'terms' | 'privacy' | 'faq'>('diary');
   const [selectedConcertId, setSelectedConcertId] = useState<string>('');
   const [editingConcertId, setEditingConcertId] = useState<string | undefined>(undefined);
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'band'>('newest');
@@ -176,6 +179,7 @@ export default function HomeView() {
           onBack={() => setCurrentView('diary')}
           onNavigate={(view) => setCurrentView(view === 'auth' ? 'profile' : view)}
           onSwitchAccount={() => setCurrentView('auth')}
+          onOpenLegal={(legalView) => setCurrentView(legalView)}
         />
       )}
 
@@ -184,6 +188,31 @@ export default function HomeView() {
         <AuthScreen
           onBack={() => setCurrentView('diary')}
           onSuccess={() => setCurrentView('diary')}
+          onOpenLegal={(legalView) => setCurrentView(legalView)}
+        />
+      )}
+
+      {/* SCREEN 7: TERMS OF SERVICE */}
+      {currentView === 'terms' && (
+        <TermsView
+          onBack={() => setCurrentView('profile')}
+          onNavigate={(view) => setCurrentView(view === 'auth' ? 'profile' : view)}
+        />
+      )}
+
+      {/* SCREEN 8: PRIVACY POLICY */}
+      {currentView === 'privacy' && (
+        <PrivacyView
+          onBack={() => setCurrentView('profile')}
+          onNavigate={(view) => setCurrentView(view === 'auth' ? 'profile' : view)}
+        />
+      )}
+
+      {/* SCREEN 9: FAQ */}
+      {currentView === 'faq' && (
+        <FaqView
+          onBack={() => setCurrentView('profile')}
+          onNavigate={(view) => setCurrentView(view === 'auth' ? 'profile' : view)}
         />
       )}
     </main>
