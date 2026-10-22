@@ -162,6 +162,20 @@
 
       <button type="submit" class="btn-cta" id="btn-auth-submit">LOG IN</button>
     </form>
+
+    <!-- Footer Legal Links & Dynamic Copyright -->
+    <footer style="text-align:center; padding: 20px 0 10px 0; width:100%; font-size:12px; font-weight:800; color:#94a3b8;">
+      <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin-bottom:6px; color:#FFB300;">
+        <a href="#" onclick="showScreen('terms'); return false;" style="color:#FFB300; text-decoration:none;">Terms of Service</a>
+        <span>•</span>
+        <a href="#" onclick="showScreen('privacy'); return false;" style="color:#FFB300; text-decoration:none;">Privacy Policy</a>
+        <span>•</span>
+        <a href="#" onclick="showScreen('faq'); return false;" style="color:#FFB300; text-decoration:none;">FAQ</a>
+      </div>
+      <div style="color:#64748b; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px;">
+        © <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
+      </div>
+    </footer>
   </div>
 
   <!-- SCREEN 1: DIARY (HOME PAGE) -->
@@ -362,6 +376,20 @@
     <div style="margin-top:12px; width:100%;">
       <button class="btn-delete" style="font-size:16px; padding:16px;" onclick="handleLogout()">LOG OUT</button>
     </div>
+
+    <!-- Footer Legal Links & Dynamic Copyright -->
+    <footer style="text-align:center; padding: 20px 0 10px 0; width:100%; font-size:12px; font-weight:800; color:#94a3b8;">
+      <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin-bottom:6px; color:#FFB300;">
+        <a href="#" onclick="showScreen('terms'); return false;" style="color:#FFB300; text-decoration:none;">Terms of Service</a>
+        <span>•</span>
+        <a href="#" onclick="showScreen('privacy'); return false;" style="color:#FFB300; text-decoration:none;">Privacy Policy</a>
+        <span>•</span>
+        <a href="#" onclick="showScreen('faq'); return false;" style="color:#FFB300; text-decoration:none;">FAQ</a>
+      </div>
+      <div style="color:#64748b; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px;">
+        © <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
+      </div>
+    </footer>
   </div>
 
   <!-- SCREEN 5: STATS MAIN OVERVIEW PAGE -->
@@ -454,6 +482,102 @@
     <div id="substats-container" style="flex:1; font-size:16px; font-weight:800; padding-bottom:20px; margin-top:10px;"></div>
   </div>
 
+  <!-- SCREEN 7: TERMS OF SERVICE -->
+  <div id="view-terms" class="screen-view">
+    <div class="header">
+      <button type="button" onclick="showScreen('profile')" style="position:absolute; left:12px; top:50px; background:none; border:none; color:#FFB300; font-weight:900; font-size:14px; cursor:pointer; z-index:10;">
+        ← BACK
+      </button>
+      <div class="header-logo-box">
+        <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
+      <div class="glass-nav-bar">
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-label">📄 TERMS OF SERVICE</div>
+      <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.6;">
+        <p style="margin-bottom:12px;">Welcome to <strong>LiveLore: Concert Diary & Setlist Vault</strong> by <strong>Surface Apps</strong>.</p>
+        <p style="margin-bottom:10px;"><strong>1. User Accounts:</strong> You are responsible for safeguarding your account credentials.</p>
+        <p style="margin-bottom:10px;"><strong>2. Data Ownership:</strong> You retain full ownership of all concert logs, setlists, and photos.</p>
+        <p style="margin-bottom:10px;"><strong>3. VIP Pass ($4.99):</strong> One-time purchase permanently unlocking photo attachments & removing ads.</p>
+        <p><strong>4. Disclaimer:</strong> LiveLore is provided as-is without warranties.</p>
+      </div>
+    </div>
+    <footer style="text-align:center; padding:10px 0; color:#64748b; font-size:11px; font-weight:700;">
+      © <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
+    </footer>
+  </div>
+
+  <!-- SCREEN 8: PRIVACY POLICY -->
+  <div id="view-privacy" class="screen-view">
+    <div class="header">
+      <button type="button" onclick="showScreen('profile')" style="position:absolute; left:12px; top:50px; background:none; border:none; color:#FFB300; font-weight:900; font-size:14px; cursor:pointer; z-index:10;">
+        ← BACK
+      </button>
+      <div class="header-logo-box">
+        <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
+      <div class="glass-nav-bar">
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-label" style="color:#00E676;">🔒 PRIVACY POLICY</div>
+      <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.6;">
+        <p style="margin-bottom:12px; background:#0A0D0E; padding:10px; border-radius:8px; border:1px solid rgba(0,230,118,0.3); color:#00E676; font-weight:800;">
+          Zero Data Sale Guarantee: We NEVER sell or rent your personal information to third parties.
+        </p>
+        <p style="margin-bottom:10px;"><strong>1. Information Collected:</strong> Account email, concert logs, and optional uploaded photos.</p>
+        <p style="margin-bottom:10px;"><strong>2. Cloud Backup:</strong> Data is encrypted and securely synced across your authorized devices.</p>
+        <p style="margin-bottom:10px;"><strong>3. Privacy Controls:</strong> You can export or delete your vault data at any time.</p>
+      </div>
+    </div>
+    <footer style="text-align:center; padding:10px 0; color:#64748b; font-size:11px; font-weight:700;">
+      © <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
+    </footer>
+  </div>
+
+  <!-- SCREEN 9: FAQ -->
+  <div id="view-faq" class="screen-view">
+    <div class="header">
+      <button type="button" onclick="showScreen('profile')" style="position:absolute; left:12px; top:50px; background:none; border:none; color:#FFB300; font-weight:900; font-size:14px; cursor:pointer; z-index:10;">
+        ← BACK
+      </button>
+      <div class="header-logo-box">
+        <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
+      <div class="glass-nav-bar">
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-label" style="color:#00B0FF;">❓ FREQUENTLY ASKED QUESTIONS</div>
+      <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.6;">
+        <p style="margin-bottom:12px;"><strong style="color:#FFB300;">Q: What is LiveLore?</strong><br>A: Your ultimate personal concert diary and setlist vault.</p>
+        <p style="margin-bottom:12px;"><strong style="color:#FFB300;">Q: How does Cloud Sync work?</strong><br>A: When logged in, your concert vault automatically backs up securely to the cloud.</p>
+        <p style="margin-bottom:12px;"><strong style="color:#FFB300;">Q: What comes with the VIP Pass ($4.99)?</strong><br>A: Unlocks 5 photo attachments per show & removes all ads permanently.</p>
+        <p><strong style="color:#FFB300;">Q: Is my data safe?</strong><br>A: Yes! Surface Apps never sells or shares your personal data.</p>
+      </div>
+    </div>
+    <footer style="text-align:center; padding:10px 0; color:#64748b; font-size:11px; font-weight:700;">
+      © <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
+    </footer>
+  </div>
+
   <script>
     // 5-COLOR RANDOM ASSORTMENT VINTAGE PALETTE
     const TICKET_COLOR_PALETTE = [
@@ -466,6 +590,11 @@
 
     let currentTicketTheme = localStorage.getItem('livelore_ticket_theme') || 'multicolor';
     let currentPhotoUris = [];
+
+    function updateDynamicYearSpans() {
+      const year = new Date().getFullYear();
+      document.querySelectorAll('.current-year-span').forEach(el => el.innerText = year);
+    }
 
     function switchTicketTheme(theme) {
       currentTicketTheme = theme;
@@ -555,10 +684,11 @@
 
     function showScreen(screenId) {
       document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
-      document.getElementById('view-' + screenId).classList.add('active');
+      const target = document.getElementById('view-' + screenId);
+      if (target) target.classList.add('active');
 
       if (window.AndroidAdMob) {
-        if (screenId === 'auth') {
+        if (screenId === 'auth' || screenId === 'terms' || screenId === 'privacy' || screenId === 'faq') {
           window.AndroidAdMob.hideBannerAd();
         } else {
           window.AndroidAdMob.showBannerAd();
@@ -989,6 +1119,7 @@
     }
 
     function loadSavedShows() {
+      updateDynamicYearSpans();
       try {
         const rawUser = localStorage.getItem('livelore_active_user');
         let activeEmail = null;
