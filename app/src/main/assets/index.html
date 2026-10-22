@@ -173,15 +173,15 @@
       <!-- Glass Navigation Bar Directly Under Logo -->
       <div class="glass-nav-bar">
         <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
 
-    <!-- Sort Control Bar (Shows Count Twice as Large & Filter at Right Edge) -->
+    <!-- Sort Control Bar (Concerts Count Twice as Large & Filter at Right Edge) -->
     <div class="sort-control-bar" id="sort-control-bar" style="display:none;">
-      <div class="shows-count-title" id="shows-count-label">0 SHOWS LOGGED</div>
+      <div class="shows-count-title" id="shows-count-label">0 CONCERTS LOGGED</div>
       <select class="sort-dropdown" id="sort-dropdown-select" onchange="handleSortChange(this.value)">
         <option value="newest">Newest First</option>
         <option value="oldest">Oldest First</option>
@@ -194,7 +194,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 2: LOG SHOW -->
+  <!-- SCREEN 2: LOG CONCERT -->
   <div id="view-log" class="screen-view">
     <div class="header">
       <div class="header-logo-box">
@@ -203,7 +203,7 @@
       <!-- Glass Navigation Bar Directly Under Logo -->
       <div class="glass-nav-bar">
         <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
@@ -261,7 +261,7 @@
     </form>
   </div>
 
-  <!-- SCREEN 3: SHOW DETAILS & SETLIST -->
+  <!-- SCREEN 3: CONCERT DETAILS & SETLIST -->
   <div id="view-setlist" class="screen-view">
     <div class="header">
       <div class="header-logo-box">
@@ -270,7 +270,7 @@
       <!-- Glass Navigation Bar Directly Under Logo -->
       <div class="glass-nav-bar">
         <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
@@ -279,7 +279,7 @@
     <!-- Featured Ticket Stub Preview -->
     <div id="detail-ticket-preview" style="margin-bottom:12px;"></div>
 
-    <!-- Detailed Show Info Card -->
+    <!-- Detailed Concert Info Card -->
     <div class="detail-card">
       <div class="detail-label">HEADLINE ARTIST</div>
       <div class="detail-val-headline" id="detail-headline">STEVIE RAY VAUGHAN</div>
@@ -306,9 +306,9 @@
       </div>
     </div>
 
-    <!-- Action Buttons: EDIT SHOW & DELETE SHOW -->
-    <button class="btn-edit" id="btn-edit-show" style="font-size:16px; padding:14px;" onclick="triggerEditShow()">✏ EDIT SHOW</button>
-    <button class="btn-delete" id="btn-delete-show" style="font-size:15px; padding:14px;" onclick="triggerDeleteShow()">🗑 DELETE SHOW</button>
+    <!-- Action Buttons: EDIT CONCERT & DELETE CONCERT -->
+    <button class="btn-edit" id="btn-edit-show" style="font-size:16px; padding:14px;" onclick="triggerEditShow()">✏ EDIT CONCERT</button>
+    <button class="btn-delete" id="btn-delete-show" style="font-size:15px; padding:14px;" onclick="triggerDeleteShow()">🗑 DELETE CONCERT</button>
   </div>
 
   <!-- SCREEN 4: PROFILE DASHBOARD PAGE (VIP AT TOP + 2X LARGER TITLES) -->
@@ -320,7 +320,7 @@
       <!-- Glass Navigation Bar Directly Under Logo -->
       <div class="glass-nav-bar">
         <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
@@ -373,19 +373,19 @@
       <!-- Glass Navigation Bar Directly Under Logo -->
       <div class="glass-nav-bar">
         <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
 
-    <div style="text-align:center; font-weight:900; font-size:52px; color:#ffffff; margin: 8px 0;" id="stats-total-count">0 SHOWS</div>
+    <div style="text-align:center; font-weight:900; font-size:52px; color:#ffffff; margin: 8px 0;" id="stats-total-count">0 CONCERTS</div>
 
     <!-- 1. TOP ARTISTS (TOP 10) -->
     <div class="stats-card" onclick="showSubStats('artists')">
       <div class="stats-card-title" style="color:#FFB300;">TOP ARTISTS (TOP 10) <span style="font-size:12px; font-weight:900;">SEE ALL ➔</span></div>
       <div style="font-size:15px; font-weight:800;" id="stats-artists-preview">
-        <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log shows to view your top artists!</div>
+        <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top artists!</div>
       </div>
     </div>
 
@@ -393,7 +393,7 @@
     <div class="stats-card" onclick="showSubStats('venues')">
       <div class="stats-card-title" style="color:#00E676;">TOP VENUES (TOP 10) <span style="font-size:12px; font-weight:900;">SEE ALL ➔</span></div>
       <div style="font-size:15px; font-weight:800;" id="stats-venues-preview">
-        <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log shows to view your top venues!</div>
+        <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top venues!</div>
       </div>
     </div>
 
@@ -401,7 +401,7 @@
     <div class="stats-card" onclick="showSubStats('cities')">
       <div class="stats-card-title" style="color:#00B0FF;">TOP CITIES (TOP 10) <span style="font-size:12px; font-weight:900;">SEE ALL ➔</span></div>
       <div style="font-size:15px; font-weight:800;" id="stats-cities-preview">
-        <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log shows to view your top cities!</div>
+        <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top cities!</div>
       </div>
     </div>
 
@@ -409,7 +409,7 @@
     <div class="stats-card" onclick="showSubStats('states')">
       <div class="stats-card-title" style="color:#E040FB;">TOP STATES (TOP 10) <span style="font-size:12px; font-weight:900;">SEE ALL ➔</span></div>
       <div style="font-size:15px; font-weight:800;" id="stats-states-preview">
-        <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log shows to view your top states!</div>
+        <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top states!</div>
       </div>
     </div>
 
@@ -417,7 +417,7 @@
     <div class="stats-card" onclick="showSubStats('years')">
       <div class="stats-card-title" style="color:#FF7A00;">TOP YEARS (TOP 10) <span style="font-size:12px; font-weight:900;">SEE ALL ➔</span></div>
       <div style="font-size:15px; font-weight:800;" id="stats-years-preview">
-        <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log shows to view your top years!</div>
+        <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top years!</div>
       </div>
     </div>
 
@@ -425,7 +425,7 @@
     <div class="stats-card" onclick="showSubStats('days')">
       <div class="stats-card-title" style="color:#FF4081;">DAYS OF THE WEEK <span style="font-size:12px; font-weight:900;">SEE ALL ➔</span></div>
       <div style="font-size:15px; font-weight:800;" id="stats-days-preview">
-        <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log shows to view days of week breakdown!</div>
+        <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view days of week breakdown!</div>
       </div>
     </div>
   </div>
@@ -445,7 +445,7 @@
       <!-- Glass Navigation Bar Directly Under Logo -->
       <div class="glass-nav-bar">
         <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add Show</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="showScreen('log')"><span class="glass-btn-text">Add</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
@@ -908,7 +908,7 @@
       const indexToDelete = userShows.findIndex(s => s.id === activeDetailShowId);
       if (indexToDelete < 0) return;
 
-      if (confirm('Are you sure you want to delete this show from your vault?')) {
+      if (confirm('Are you sure you want to delete this concert from your vault?')) {
         userShows.splice(indexToDelete, 1);
         activeDetailShowId = null;
         saveShowsToStorage();
@@ -1102,7 +1102,7 @@
         `;
       } else {
         if (sortBar) sortBar.style.display = 'flex';
-        if (countLabel) countLabel.innerText = userShows.length + (userShows.length === 1 ? ' SHOW LOGGED' : ' SHOWS LOGGED');
+        if (countLabel) countLabel.innerText = userShows.length + (userShows.length === 1 ? ' CONCERT LOGGED' : ' CONCERTS LOGGED');
 
         let displayList = [...userShows];
         if (currentSort === 'newest') {
@@ -1165,7 +1165,7 @@
     // CASE-INSENSITIVE & TRIMMED STATS AGGREGATION ENGINE (ENLARGED HIGH-READABILITY TEXT)
     function updateStatsDisplay() {
       const count = userShows ? userShows.length : 0;
-      document.getElementById('stats-total-count').innerText = count + (count === 1 ? ' SHOW' : ' SHOWS');
+      document.getElementById('stats-total-count').innerText = count + (count === 1 ? ' CONCERT' : ' CONCERTS');
 
       if (count > 0) {
         const artistNormalizedCounts = {};
@@ -1297,19 +1297,19 @@
         `).join('');
 
         document.getElementById('stats-years-preview').innerHTML = topY.map((item, i) => `
-          <div style="margin-bottom:8px;" class="stats-item-text">${i+1}. Year ${item[0]} - <span style="color:#FF7A00; font-weight:900;">${item[1]} ${item[1] === 1 ? 'show' : 'shows'}</span></div>
+          <div style="margin-bottom:8px;" class="stats-item-text">${i+1}. Year ${item[0]} - <span style="color:#FF7A00; font-weight:900;">${item[1]} ${item[1] === 1 ? 'concert' : 'concerts'}</span></div>
         `).join('');
 
         document.getElementById('stats-days-preview').innerHTML = topD.map((item, i) => `
-          <div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#FF4081; font-weight:900;">${item[1]} shows (${Math.round((item[1]/count)*100)}%)</span></div>
+          <div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#FF4081; font-weight:900;">${item[1]} concerts (${Math.round((item[1]/count)*100)}%)</span></div>
         `).join('');
       } else {
-        document.getElementById('stats-artists-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log shows to view your top artists!</div>';
-        document.getElementById('stats-venues-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log shows to view your top venues!</div>';
-        document.getElementById('stats-cities-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log shows to view your top cities!</div>';
-        document.getElementById('stats-states-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log shows to view your top states!</div>';
-        document.getElementById('stats-years-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log shows to view your top years!</div>';
-        document.getElementById('stats-days-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log shows to view days of week breakdown!</div>';
+        document.getElementById('stats-artists-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top artists!</div>';
+        document.getElementById('stats-venues-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top venues!</div>';
+        document.getElementById('stats-cities-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top cities!</div>';
+        document.getElementById('stats-states-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top states!</div>';
+        document.getElementById('stats-years-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top years!</div>';
+        document.getElementById('stats-days-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view days of week breakdown!</div>';
       }
     }
 
@@ -1368,7 +1368,7 @@
         container.innerHTML = `
           <div style="color:#00E676; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">ALL VENUES (${topV.length})</div>
           ${topV.length > 0 ? topV.map((item, i) => `
-            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. ${item[0]} - <span style="color:#00E676;">${item[1]} ${item[1] === 1 ? 'Show' : 'Shows'}</span></div>
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. ${item[0]} - <span style="color:#00E676;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'}</span></div>
           `).join('') : '<div style="color:#94a3b8; font-size:14px;">No venues logged yet.</div>'}
         `;
       } else if (type === 'cities') {
@@ -1391,7 +1391,7 @@
         container.innerHTML = `
           <div style="color:#00B0FF; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">ALL CITIES (${topC.length})</div>
           ${topC.length > 0 ? topC.map((item, i) => `
-            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. ${item[0]} - <span style="color:#00B0FF;">${item[1]} ${item[1] === 1 ? 'Show' : 'Shows'}</span></div>
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. ${item[0]} - <span style="color:#00B0FF;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'}</span></div>
           `).join('') : '<div style="color:#94a3b8; font-size:14px;">No cities logged yet.</div>'}
         `;
       } else if (type === 'states') {
@@ -1408,7 +1408,7 @@
         container.innerHTML = `
           <div style="color:#E040FB; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">ALL STATES (${topS.length})</div>
           ${topS.length > 0 ? topS.map((item, i) => `
-            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. ${item[0]} - <span style="color:#E040FB;">${item[1]} ${item[1] === 1 ? 'Show' : 'Shows'}</span></div>
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. ${item[0]} - <span style="color:#E040FB;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'}</span></div>
           `).join('') : '<div style="color:#94a3b8; font-size:14px;">No states logged yet.</div>'}
         `;
       } else if (type === 'years') {
@@ -1435,7 +1435,7 @@
         container.innerHTML = `
           <div style="color:#FF7A00; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">ALL YEARS (${topY.length})</div>
           ${topY.length > 0 ? topY.map((item, i) => `
-            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. Year ${item[0]} - <span style="color:#FF7A00;">${item[1]} ${item[1] === 1 ? 'Show' : 'Shows'}</span></div>
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. Year ${item[0]} - <span style="color:#FF7A00;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'}</span></div>
           `).join('') : '<div style="color:#94a3b8; font-size:14px;">No years logged yet.</div>'}
         `;
       } else {
@@ -1463,7 +1463,7 @@
         container.innerHTML = `
           <div style="color:#FF4081; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">DAYS OF THE WEEK</div>
           ${topD.length > 0 ? topD.map((item, i) => `
-            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${item[0]} - <span style="color:#FF4081;">${item[1]} ${item[1] === 1 ? 'Show' : 'Shows'} (${Math.round((item[1]/userShows.length)*100)}%)</span></div>
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${item[0]} - <span style="color:#FF4081;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'} (${Math.round((item[1]/userShows.length)*100)}%)</span></div>
           `).join('') : '<div style="color:#94a3b8; font-size:14px;">No days logged yet.</div>'}
         `;
       }

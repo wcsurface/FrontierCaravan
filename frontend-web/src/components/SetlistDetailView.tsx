@@ -21,7 +21,7 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
   if (!concert) {
     return (
       <div className="p-4 text-center text-slate-400">
-        Show not found. <button onClick={onBack} className="text-[#00E676] underline">Go Back</button>
+        Concert not found. <button onClick={onBack} className="text-[#00E676] underline">Go Back</button>
       </div>
     );
   }
@@ -53,7 +53,7 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
   const encoreTracks = items.filter((s) => s.isEncore);
 
   const handleDelete = () => {
-    if (confirm('Are you sure you want to delete this show from your vault?')) {
+    if (confirm('Are you sure you want to delete this concert from your vault?')) {
       deleteConcert(concert.id);
       onBack();
     }
@@ -78,7 +78,7 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
           <TicketStubCard concert={concert} artist={headliner} venue={venue} />
         </div>
 
-        {/* Show Details Card - Enlarged Readability Across All Fields */}
+        {/* Concert Details Card */}
         <div className="w-full bg-[#121619] p-6 rounded-2xl border border-[#222B30] shadow-xl space-y-4 my-3">
           {/* Headline Artist */}
           <div>
@@ -148,7 +148,7 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
             </div>
           )}
 
-          {/* Show Notes */}
+          {/* Concert Notes */}
           {concert.generalNotes && (
             <div className="border-t border-[#222B30] pt-3.5">
               <span className="text-xs sm:text-sm font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-1.5">
@@ -188,21 +188,21 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
             </div>
           )}
 
-          {/* EDIT SHOW & DELETE SHOW Buttons */}
+          {/* EDIT CONCERT & DELETE CONCERT Buttons */}
           <div className="pt-3 space-y-3">
             <button
               onClick={() => onEdit(concert.id)}
               className="w-full py-3.5 bg-gradient-to-r from-[#FFB300] to-[#FFA000] hover:from-[#FFC107] hover:to-[#FFB300] text-slate-950 font-black text-sm sm:text-base uppercase tracking-wider rounded-xl shadow-[0_0_15px_rgba(255,179,0,0.3)] active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
             >
-              <Edit3 size={18} /> EDIT SHOW
+              <Edit3 size={18} /> EDIT CONCERT
             </button>
 
-            {/* DELETE SHOW Button */}
+            {/* DELETE CONCERT Button */}
             <button
               onClick={handleDelete}
               className="w-full py-3.5 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 hover:text-white font-black text-sm sm:text-base uppercase tracking-wider rounded-xl border border-rose-900/60 active:scale-[0.98] transition flex items-center justify-center gap-2"
             >
-              <Trash2 size={18} /> DELETE SHOW
+              <Trash2 size={18} /> DELETE CONCERT
             </button>
           </div>
         </div>

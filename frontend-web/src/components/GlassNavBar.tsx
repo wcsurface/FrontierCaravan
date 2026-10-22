@@ -26,7 +26,7 @@ export const GlassNavBar: React.FC<GlassNavBarProps> = ({ currentView, onNavigat
         </button>
       </div>
 
-      {/* 2. ADD SHOW BUTTON */}
+      {/* 2. ADD BUTTON (Requested exception: "ADD SHOW" button just says "ADD") */}
       <div className="relative group flex-1">
         <div className="absolute -inset-0.5 rounded-xl bg-gradient-to-b from-[#2DE38E]/45 to-teal-700/35 blur-md opacity-90 group-hover:opacity-100 transition"></div>
         <button
@@ -37,7 +37,7 @@ export const GlassNavBar: React.FC<GlassNavBarProps> = ({ currentView, onNavigat
           }`}
         >
           <span className="text-[#2DE38E] font-black text-xs sm:text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] uppercase tracking-wider block truncate">
-            Add Show
+            Add
           </span>
         </button>
       </div>

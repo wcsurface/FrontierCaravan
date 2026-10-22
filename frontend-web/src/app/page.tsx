@@ -61,7 +61,7 @@ export default function HomeView() {
       {/* SCREEN 1: DIARY VIEW */}
       {currentView === 'diary' && (
         <div className="flex flex-col w-full max-w-md h-screen p-4 overflow-y-auto justify-between">
-          {/* Centered LiveLore Header - Enlarged Logo 20% (h-28 sm:h-32) safely clearing camera notch */}
+          {/* Centered LiveLore Header */}
           <header className="relative flex flex-col items-center justify-center w-full pt-4 sm:pt-6 pb-2 shrink-0">
             <img
               src="/assets/livelore_logo.png"
@@ -78,11 +78,11 @@ export default function HomeView() {
             />
           </header>
 
-          {/* Sort Dropdown & Show Count Bar */}
+          {/* Sort Dropdown & Concert Count Bar */}
           {concerts.length > 0 && (
             <div className="flex items-center justify-between px-1 my-2">
               <span className="text-xl font-black uppercase text-slate-100 font-sans">
-                {concerts.length} {concerts.length === 1 ? 'Show' : 'Shows'} Logged
+                {concerts.length} {concerts.length === 1 ? 'Concert' : 'Concerts'} Logged
               </span>
               <div className="flex items-center gap-1.5 bg-[#121619] border border-[#222B30] rounded-lg px-2.5 py-1.5 shadow-sm">
                 <SlidersHorizontal size={14} className="text-[#FFB300]" />
