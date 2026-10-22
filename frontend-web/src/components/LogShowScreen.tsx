@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useEncoreStore } from '../store/useEncoreStore';
 import { parseRawSetlist } from '../engine/setlistParser';
 import { searchVenues, PRESET_VENUES, VenueRecord } from '../engine/venueDataset';
 import { GlassNavBar } from './GlassNavBar';
-import { Plus, Trash2, MapPin, Camera, Crown, Star, MoveHorizontal } from 'lucide-react';
+import { Plus, Trash2, MapPin, Camera, Crown, Star, MoveHorizontal, Image as ImageIcon, X } from 'lucide-react';
 
 interface LogShowScreenProps {
   concertIdToEdit?: string;
@@ -30,8 +30,12 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
   const [venueSuggestions, setVenueSuggestions] = useState<VenueRecord[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
+  const [showPhotoSourceModal, setShowPhotoSourceModal] = useState(false);
 
-  // Pre-populate if editing existing concert
+  const cameraInputRef = useRef<HTMLInputElement | null>(null);
+  const galleryInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Pre-populate if editing existing concert, OR reset if creating a new concert
   useEffect(() => {
     if (concertIdToEdit) {
       const concert = concerts.find(c => c.id === concertIdToEdit);
@@ -61,6 +65,9 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
           }
         }
       }
+    } else {
+      // ALWAYS Reset Form for a Clean New Entry Form
+      resetForm();
     }
   }, [concertIdToEdit, concerts, artists, venues]);
 
@@ -110,6 +117,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
       };
       reader.readAsDataURL(file);
     });
+    setShowPhotoSourceModal(false);
   };
 
   const handleRemovePhoto = (index: number) => {
@@ -238,6 +246,23 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
 
   return (
     <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none bg-grid-lines overflow-y-auto justify-between">
+      {/* Hidden File Inputs for Camera vs Camera Roll Choice */}
+      <input
+        type="file"
+        accept="image/*"
+        capture="environment"
+        ref={cameraInputRef}
+        onChange={handlePhotoUpload}
+        className="hidden"
+      />
+      <input
+        type="file"
+        accept="image/*"
+        ref={galleryInputRef}
+        onChange={handlePhotoUpload}
+        className="hidden"
+      />
+
       {/* Header with LiveLore Logo */}
       <header className="relative flex flex-col items-center justify-center w-full pt-4 sm:pt-6 pb-2 shrink-0">
         <img
@@ -478,16 +503,14 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
 
                 {/* Add Photo Button (Disabled when 5/5 max reached) */}
                 {photoUris.length < 5 ? (
-                  <label className="aspect-square rounded-xl border-2 border-dashed border-[#FFB300]/60 bg-[#111618] hover:bg-[#1a2126] transition flex flex-col items-center justify-center cursor-pointer text-[#FFB300] p-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowPhotoSourceModal(true)}
+                    className="aspect-square rounded-xl border-2 border-dashed border-[#FFB300]/60 bg-[#111618] hover:bg-[#1a2126] transition flex flex-col items-center justify-center cursor-pointer text-[#FFB300] p-1"
+                  >
                     <Plus size={22} />
                     <span className="text-[10px] font-black uppercase mt-1">Add Photo</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handlePhotoUpload}
-                      className="hidden"
-                    />
-                  </label>
+                  </button>
                 ) : (
                   <div className="aspect-square rounded-xl border-2 border-dashed border-slate-700 bg-slate-900/50 flex flex-col items-center justify-center text-slate-500 text-[9px] font-bold text-center p-1">
                     <span>5/5 Max</span>
@@ -519,10 +542,52 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
             type="submit"
             className="w-full py-4 bg-gradient-to-r from-[#00E676] to-[#00C853] hover:from-[#00FFA3] hover:to-[#00E676] text-slate-950 font-black text-xl uppercase tracking-widest rounded-full shadow-[0_0_22px_rgba(0,230,118,0.5)] active:scale-[0.98] transition-transform"
           >
-            {concertIdToEdit ? '💾 SAVE EDITS' : '+ ADD SHOW'}
+            {concertIdToEdit ? '💾 SAVE EDITS' : '+ ADD CONCERT'}
           </button>
         </div>
       </form>
+
+      {/* Photo Source Selection Popup Modal (Live Photo / Camera vs Camera Roll) */}
+      {showPhotoSourceModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-[#121619] border border-[#FFB300] rounded-2xl p-6 max-w-xs w-full space-y-4 shadow-2xl relative text-center">
+            <button
+              onClick={() => setShowPhotoSourceModal(false)}
+              className="absolute top-3 right-3 text-slate-400 hover:text-white p-1 rounded-full"
+            >
+              <X size={20} />
+            </button>
+
+            <h3 className="text-lg font-black text-[#FFB300] uppercase tracking-wider">
+              Choose Photo Source
+            </h3>
+
+            <div className="space-y-3 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowPhotoSourceModal(false);
+                  if (cameraInputRef.current) cameraInputRef.current.click();
+                }}
+                className="w-full py-3.5 bg-gradient-to-r from-[#FFB300] to-[#FFA000] text-slate-950 font-black text-sm uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-95 transition"
+              >
+                <Camera size={20} /> 📸 Take Live Photo (Camera)
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowPhotoSourceModal(false);
+                  if (galleryInputRef.current) galleryInputRef.current.click();
+                }}
+                className="w-full py-3.5 bg-[#1C2128] border border-[#FFB300] text-[#FFB300] font-black text-sm uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-95 transition"
+              >
+                <ImageIcon size={20} /> 🖼️ Camera Roll (Gallery)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

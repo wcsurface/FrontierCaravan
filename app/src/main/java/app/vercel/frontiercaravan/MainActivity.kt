@@ -5,26 +5,35 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import android.provider.MediaStore
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
+import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.activity.ComponentActivity
+import androidx.core.content.FileProvider
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
+import java.io.File
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
 
@@ -32,6 +41,10 @@ class MainActivity : ComponentActivity() {
     private lateinit var adView: AdView
     private lateinit var adContainerLayout: LinearLayout
     private val REQUEST_CODE_PICK_ACCOUNT = 1002
+    private val FILE_CHOOSER_REQUEST_CODE = 1001
+
+    private var filePathCallback: ValueCallback<Array<Uri>>? = null
+    private var cameraImageUri: Uri? = null
 
     // Official Google AdMob Test Banner Unit ID
     private val ADMOB_BANNER_TEST_UNIT_ID = "ca-app-pub-3940256099942544/6300978111"
@@ -75,7 +88,57 @@ class MainActivity : ComponentActivity() {
         settings.displayZoomControls = false
 
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
-        webView.webChromeClient = WebChromeClient()
+
+        // WebChromeClient with onShowFileChooser for Camera vs Camera Roll Photo Selection
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onShowFileChooser(
+                view: WebView?,
+                filePathCallback: ValueCallback<Array<Uri>>?,
+                fileChooserParams: FileChooserParams?
+            ): Boolean {
+                this@MainActivity.filePathCallback?.onReceiveValue(null)
+                this@MainActivity.filePathCallback = filePathCallback
+
+                var takePictureIntent: Intent? = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                if (takePictureIntent?.resolveActivity(packageManager) != null) {
+                    var photoFile: File? = null
+                    try {
+                        photoFile = createImageFile()
+                        takePictureIntent.putExtra("PhotoPath", photoFile.absolutePath)
+                    } catch (ex: IOException) {
+                        // Error occurred while creating the File
+                    }
+
+                    if (photoFile != null) {
+                        cameraImageUri = FileProvider.getUriForFile(
+                            this@MainActivity,
+                            "${applicationContext.packageName}.fileprovider",
+                            photoFile
+                        )
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraImageUri)
+                    } else {
+                        takePictureIntent = null
+                    }
+                }
+
+                val contentSelectionIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "image/*"
+                }
+
+                val intentArray: Array<Intent> = takePictureIntent?.let { arrayOf(it) } ?: emptyArray()
+
+                val chooserIntent = Intent(Intent.ACTION_CHOOSER).apply {
+                    putExtra(Intent.EXTRA_INTENT, contentSelectionIntent)
+                    putExtra(Intent.EXTRA_TITLE, "Select Photo Source")
+                    putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
+                }
+
+                startActivityForResult(chooserIntent, FILE_CHOOSER_REQUEST_CODE)
+                return true
+            }
+        }
+
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
@@ -119,6 +182,17 @@ class MainActivity : ComponentActivity() {
         webView.loadUrl(targetUrl)
     }
 
+    @Throws(IOException::class)
+    private fun createImageFile(): File {
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+        val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "JPEG_${timeStamp}_",
+            ".jpg",
+            storageDir
+        )
+    }
+
     private fun hideSystemUI() {
         @Suppress("DEPRECATION")
         window.decorView.systemUiVisibility = (
@@ -141,7 +215,27 @@ class MainActivity : ComponentActivity() {
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_PICK_ACCOUNT && resultCode == RESULT_OK && data != null) {
+
+        if (requestCode == FILE_CHOOSER_REQUEST_CODE) {
+            if (filePathCallback == null) return
+            var results: Array<Uri>? = null
+
+            if (resultCode == RESULT_OK) {
+                if (data == null || data.data == null) {
+                    if (cameraImageUri != null) {
+                        results = arrayOf(cameraImageUri!!)
+                    }
+                } else {
+                    val dataString = data.dataString
+                    if (dataString != null) {
+                        results = arrayOf(Uri.parse(dataString))
+                    }
+                }
+            }
+
+            filePathCallback?.onReceiveValue(results)
+            filePathCallback = null
+        } else if (requestCode == REQUEST_CODE_PICK_ACCOUNT && resultCode == RESULT_OK && data != null) {
             val accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
             if (!accountName.isNullOrEmpty()) {
                 val safeEmail = accountName.lowercase().trim()
@@ -152,7 +246,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // Native AdMob Interface to show/hide banner on specific screens
+    // Native AdMob Interface
     inner class AndroidAdMobInterface {
         @JavascriptInterface
         fun showBannerAd() {
