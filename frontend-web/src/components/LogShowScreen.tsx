@@ -485,13 +485,13 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
           ) : (
             /* Non-VIP Interactive Upgrade Prompt */
             <div className="p-3 bg-[#111618] rounded-xl border border-[#222B30] text-center space-y-2">
-              <p className="text-xs sm:text-sm text-slate-200 font-bold">
-                Upgrade to VIP status to attach concert photos!
+              <p className="text-xs sm:text-sm text-slate-100 font-bold leading-relaxed">
+                Upgrade to VIP status and add photos of the band, ticket stubs, your crew, and more!
               </p>
               <button
                 type="button"
                 onClick={() => onNavigate('auth')}
-                className="w-full py-3 bg-[#FFB300] hover:bg-amber-400 text-slate-950 font-black text-sm uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-[0.98] transition"
+                className="w-full py-3.5 bg-[#FFB300] hover:bg-amber-400 text-slate-950 font-black text-sm uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-[0.98] transition"
               >
                 <Camera size={18} /> + ADD PHOTOS (UPGRADE TO VIP)
               </button>
