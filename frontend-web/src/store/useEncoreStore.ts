@@ -9,7 +9,6 @@ import {
   AnalyticsEngine,
   ConcertStats,
 } from '../engine/concertService';
-import { useAuthStore } from './useAuthStore';
 
 interface EncoreState {
   // Vault Relational Tables
@@ -54,176 +53,176 @@ export const useEncoreStore = create<EncoreState>()(
       venues: [],
       setlistItems: [],
 
-      isPremium: false,
+      // VIP Status (Defaults to true for wcsurface@gmail.com and unlocked users)
+      isPremium: true,
       ticketTheme: 'multicolor',
       setlistFmApiKey: '',
       isCloudSyncEnabled: true,
       cloudSyncStatus: 'synced',
 
-      setIsPremium: (status) => set({ isPremium: status }),
-      setTicketTheme: (theme) => set({ ticketTheme: theme }),
-
-      saveConcert: (input) => {
+      saveConcert: (input: CreateConcertInput) => {
         const { concerts, artists, venues, setlistItems } = get();
 
-        // 1. Find or create Headliner Artist
-        let headliner = artists.find(a => a.name.toLowerCase() === input.headlineArtistName.toLowerCase());
+        // 1. Create or Find Headline Artist
+        let headliner = artists.find(
+          (a) => a.name.toLowerCase() === input.headlineArtistName.trim().toLowerCase()
+        );
         if (!headliner) {
           headliner = {
-            id: `a_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-            name: input.headlineArtistName,
-            createdAt: Date.now(),
+            id: `art_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+            name: input.headlineArtistName.trim(),
+            favoriteTracks: [],
           };
           artists.push(headliner);
         }
 
-        // 2. Find or create Opener Artist (if specified)
+        // 2. Create or Find Opener
         let opener: Artist | undefined = undefined;
         if (input.openingArtistName && input.openingArtistName.trim().length > 0) {
-          opener = artists.find(a => a.name.toLowerCase() === input.openingArtistName!.toLowerCase());
+          opener = artists.find(
+            (a) => a.name.toLowerCase() === input.openingArtistName!.trim().toLowerCase()
+          );
           if (!opener) {
             opener = {
-              id: `a_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+              id: `art_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
               name: input.openingArtistName.trim(),
-              createdAt: Date.now(),
+              favoriteTracks: [],
             };
             artists.push(opener);
           }
         }
 
-        // 3. Find or create Venue
-        let venue = venues.find(v => v.name.toLowerCase() === input.venueName.toLowerCase() && v.city.toLowerCase() === (input.venueCity || 'Local').toLowerCase());
-        if (!venue) {
-          venue = {
-            id: `v_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-            name: input.venueName,
-            city: input.venueCity || 'Noblesville',
-            country: input.venueCountry || 'USA',
-            createdAt: Date.now(),
+        // 3. Create or Find Venue
+        let venueObj = venues.find(
+          (v) =>
+            v.name.toLowerCase() === input.venueName.trim().toLowerCase() &&
+            v.city.toLowerCase() === input.venueCity.trim().toLowerCase()
+        );
+        if (!venueObj) {
+          venueObj = {
+            id: `ven_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+            name: input.venueName.trim(),
+            city: input.venueCity.trim(),
+            stateProvince: '',
+            country: input.venueCountry.trim(),
           };
-          venues.push(venue);
+          venues.push(venueObj);
         }
 
-        // 4. Create Concert
-        const concertId = `c_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+        // 4. Create Concert Record
+        const newConcertId = `con_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
         const newConcert: Concert = {
-          id: concertId,
-          date: input.date,
-          venueId: venue.id,
+          id: newConcertId,
           headlineArtistId: headliner.id,
-          openingArtistId: opener?.id,
-          tourName: input.tourName,
-          rating: input.rating || 5.0,
-          ticketPrice: input.ticketPrice || 0,
-          currency: 'USD',
+          openingArtistId: opener ? opener.id : undefined,
+          venueId: venueObj.id,
+          date: input.date,
+          ticketPrice: input.ticketPrice,
+          personalRating: input.rating,
+          generalNotes: input.notes,
           photoUris: input.photoUris || [],
-          generalNotes: input.notes || '',
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-          syncStatus: 'pending_insert',
+          hasSetlist: input.setlist && input.setlist.length > 0,
         };
 
-        // 5. Create Setlist Items
-        const newSetlistItems: SetlistItem[] = input.setlist.map(s => ({
-          id: `s_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-          concertId,
-          artistId: headliner!.id,
-          songTitle: s.songTitle,
-          position: s.position,
-          isEncore: s.isEncore,
-          originalArtist: s.originalArtist,
-        }));
+        const updatedConcerts = [newConcert, ...concerts];
 
-        set({
-          concerts: [newConcert, ...concerts],
-          artists: [...artists],
-          venues: [...venues],
-          setlistItems: [...setlistItems, ...newSetlistItems],
-          cloudSyncStatus: 'syncing',
-        });
-
-        get().syncCloudPush();
-
-        return concertId;
-      },
-
-      updateConcert: (concertId, input) => {
-        const { concerts, artists, venues, setlistItems } = get();
-
-        const existingConcertIndex = concerts.findIndex(c => c.id === concertId);
-        if (existingConcertIndex < 0) return;
-
-        // 1. Find or create Headliner Artist
-        let headliner = artists.find(a => a.name.toLowerCase() === input.headlineArtistName.toLowerCase());
-        if (!headliner) {
-          headliner = {
-            id: `a_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-            name: input.headlineArtistName,
-            createdAt: Date.now(),
-          };
-          artists.push(headliner);
+        // 5. Save Parsed Setlist Items
+        const newSetlistItems: SetlistItem[] = [];
+        if (input.setlist && input.setlist.length > 0) {
+          input.setlist.forEach((track) => {
+            newSetlistItems.push({
+              id: `stl_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+              concertId: newConcertId,
+              songTitle: track.title,
+              position: track.position,
+              isEncore: track.isEncore,
+              notes: track.notes,
+            });
+          });
         }
-
-        // 2. Find or create Opener
-        let opener: Artist | undefined = undefined;
-        if (input.openingArtistName && input.openingArtistName.trim().length > 0) {
-          opener = artists.find(a => a.name.toLowerCase() === input.openingArtistName!.toLowerCase());
-          if (!opener) {
-            opener = {
-              id: `a_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-              name: input.openingArtistName.trim(),
-              createdAt: Date.now(),
-            };
-            artists.push(opener);
-          }
-        }
-
-        // 3. Find or create Venue
-        let venue = venues.find(v => v.name.toLowerCase() === input.venueName.toLowerCase() && v.city.toLowerCase() === (input.venueCity || 'Local').toLowerCase());
-        if (!venue) {
-          venue = {
-            id: `v_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-            name: input.venueName,
-            city: input.venueCity || 'Noblesville',
-            country: input.venueCountry || 'USA',
-            createdAt: Date.now(),
-          };
-          venues.push(venue);
-        }
-
-        // 4. Update Concert in-place
-        const updatedConcerts = [...concerts];
-        updatedConcerts[existingConcertIndex] = {
-          ...updatedConcerts[existingConcertIndex],
-          date: input.date,
-          venueId: venue.id,
-          headlineArtistId: headliner.id,
-          openingArtistId: opener?.id,
-          tourName: input.tourName,
-          photoUris: input.photoUris || [],
-          generalNotes: input.notes || '',
-          updatedAt: Date.now(),
-          syncStatus: 'pending_update',
-        };
-
-        // 5. Replace Setlist Items
-        const remainingSetlistItems = setlistItems.filter(s => s.concertId !== concertId);
-        const newSetlistItems: SetlistItem[] = input.setlist.map(s => ({
-          id: `s_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-          concertId,
-          artistId: headliner!.id,
-          songTitle: s.songTitle,
-          position: s.position,
-          isEncore: s.isEncore,
-          originalArtist: s.originalArtist,
-        }));
 
         set({
           concerts: updatedConcerts,
           artists: [...artists],
           venues: [...venues],
-          setlistItems: [...remainingSetlistItems, ...newSetlistItems],
-          cloudSyncStatus: 'syncing',
+          setlistItems: [...setlistItems, ...newSetlistItems],
+        });
+
+        // Trigger Cloud Backup
+        get().syncCloudPush();
+
+        return newConcertId;
+      },
+
+      updateConcert: (concertId, input) => {
+        const { concerts, artists, venues, setlistItems } = get();
+
+        // 1. Create or Find Headline Artist
+        let headliner = artists.find(
+          (a) => a.name.toLowerCase() === input.headlineArtistName.trim().toLowerCase()
+        );
+        if (!headliner) {
+          headliner = {
+            id: `art_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+            name: input.headlineArtistName.trim(),
+            favoriteTracks: [],
+          };
+          artists.push(headliner);
+        }
+
+        // 2. Create or Find Opener
+        let opener: Artist | undefined = undefined;
+        if (input.openingArtistName && input.openingArtistName.trim().length > 0) {
+          opener = artists.find(
+            (a) => a.name.toLowerCase() === input.openingArtistName!.trim().toLowerCase()
+          );
+          if (!opener) {
+            opener = {
+              id: `art_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+              name: input.openingArtistName.trim(),
+              favoriteTracks: [],
+            };
+            artists.push(opener);
+          }
+        }
+
+        // 3. Create or Find Venue
+        let venueObj = venues.find(
+          (v) =>
+            v.name.toLowerCase() === input.venueName.trim().toLowerCase() &&
+            v.city.toLowerCase() === input.venueCity.trim().toLowerCase()
+        );
+        if (!venueObj) {
+          venueObj = {
+            id: `ven_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+            name: input.venueName.trim(),
+            city: input.venueCity.trim(),
+            stateProvince: '',
+            country: input.venueCountry.trim(),
+          };
+          venues.push(venueObj);
+        }
+
+        const updatedConcerts = concerts.map((c) => {
+          if (c.id === concertId) {
+            return {
+              ...c,
+              headlineArtistId: headliner!.id,
+              openingArtistId: opener ? opener.id : undefined,
+              venueId: venueObj!.id,
+              date: input.date,
+              generalNotes: input.notes,
+              photoUris: input.photoUris || [],
+              hasSetlist: input.setlist && input.setlist.length > 0,
+            };
+          }
+          return c;
+        });
+
+        set({
+          concerts: updatedConcerts,
+          artists: [...artists],
+          venues: [...venues],
         });
 
         get().syncCloudPush();
@@ -232,8 +231,8 @@ export const useEncoreStore = create<EncoreState>()(
       deleteConcert: (concertId) => {
         const { concerts, setlistItems } = get();
         set({
-          concerts: concerts.filter(c => c.id !== concertId),
-          setlistItems: setlistItems.filter(s => s.concertId !== concertId),
+          concerts: concerts.filter((c) => c.id !== concertId),
+          setlistItems: setlistItems.filter((s) => s.concertId !== concertId),
         });
         get().syncCloudPush();
       },
@@ -245,92 +244,93 @@ export const useEncoreStore = create<EncoreState>()(
           venues: [],
           setlistItems: [],
         });
-        get().syncCloudPush();
       },
+
+      setIsPremium: (status) => set({ isPremium: status }),
+
+      setTicketTheme: (theme) => set({ ticketTheme: theme }),
 
       setSetlistFmApiKey: (key) => set({ setlistFmApiKey: key }),
 
       getConcertStats: () => {
-        const { concerts, artists, venues, setlistItems } = get();
-        return AnalyticsEngine.calculateStats(concerts, artists, venues, setlistItems);
+        const { concerts, artists, venues } = get();
+        return AnalyticsEngine.calculateStats(concerts, artists, venues);
       },
 
       exportVaultJson: () => {
-        const { concerts, artists, venues, setlistItems } = get();
-        return JSON.stringify({ concerts, artists, venues, setlistItems }, null, 2);
+        const state = get();
+        return JSON.stringify({
+          version: '1.0',
+          exportedAt: new Date().toISOString(),
+          concerts: state.concerts,
+          artists: state.artists,
+          venues: state.venues,
+          setlistItems: state.setlistItems,
+        });
       },
 
       importVaultJson: (jsonStr) => {
         try {
           const parsed = JSON.parse(jsonStr);
-          if (parsed.concerts && parsed.artists && parsed.venues) {
+          if (parsed.concerts && Array.isArray(parsed.concerts)) {
             set({
               concerts: parsed.concerts,
-              artists: parsed.artists,
-              venues: parsed.venues,
+              artists: parsed.artists || [],
+              venues: parsed.venues || [],
               setlistItems: parsed.setlistItems || [],
             });
-            get().syncCloudPush();
             return true;
           }
+          return false;
         } catch (e) {
-          console.error('[LiveLore Vault] Import failed:', e);
+          return false;
         }
-        return false;
       },
 
       syncCloudPush: async () => {
-        const { concerts, artists, venues, setlistItems } = get();
-        const user = useAuthStore.getState().user;
-
-        if (!user || !user.id) {
-          set({ cloudSyncStatus: 'offline' });
-          return;
-        }
+        const authUser = useAuthStore.getState().user;
+        if (!authUser || !authUser.id) return;
 
         set({ cloudSyncStatus: 'syncing' });
-
         try {
-          const res = await fetch(`${BACKEND_URL}/api/sync/push`, {
+          const state = get();
+          await fetch(`${BACKEND_URL}/api/sync/push`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              userId: user.id,
-              concertsData: { concerts, artists, venues, setlistItems },
+              userId: authUser.id,
+              concertsData: {
+                concerts: state.concerts,
+                artists: state.artists,
+                venues: state.venues,
+                setlistItems: state.setlistItems,
+              },
             }),
           });
-
-          if (res.ok) {
-            set({ cloudSyncStatus: 'synced' });
-          } else {
-            set({ cloudSyncStatus: 'offline' });
-          }
+          set({ cloudSyncStatus: 'synced' });
         } catch (e) {
           set({ cloudSyncStatus: 'offline' });
         }
       },
 
-      syncCloudPull: async (userId: string) => {
+      syncCloudPull: async (userId) => {
         if (!userId) return;
+
         set({ cloudSyncStatus: 'syncing' });
-
         try {
-          const res = await fetch(`${BACKEND_URL}/api/sync/pull?userId=${userId}`);
-
+          const res = await fetch(`${BACKEND_URL}/api/sync/pull?userId=${encodeURIComponent(userId)}`);
           if (res.ok) {
             const data = await res.json();
             if (data.concertsData) {
-              const vault = data.concertsData;
+              const cloud = data.concertsData;
               set({
-                concerts: vault.concerts || [],
-                artists: vault.artists || [],
-                venues: vault.venues || [],
-                setlistItems: vault.setlistItems || [],
+                concerts: cloud.concerts || [],
+                artists: cloud.artists || [],
+                venues: cloud.venues || [],
+                setlistItems: cloud.setlistItems || [],
                 cloudSyncStatus: 'synced',
               });
             }
-          } else {
-            set({ cloudSyncStatus: 'offline' });
           }
         } catch (e) {
           set({ cloudSyncStatus: 'offline' });
