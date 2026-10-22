@@ -235,12 +235,16 @@ class MainActivity : ComponentActivity() {
 
             filePathCallback?.onReceiveValue(results)
             filePathCallback = null
-        } else if (requestCode == REQUEST_CODE_PICK_ACCOUNT && resultCode == RESULT_OK && data != null) {
-            val accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
-            if (!accountName.isNullOrEmpty()) {
-                val safeEmail = accountName.lowercase().trim()
-                webView.post {
-                    webView.evaluateJavascript("onNativeGoogleAuthSuccess('$safeEmail')", null)
+        } else if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
+            if (resultCode == RESULT_OK && data != null) {
+                val accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
+                    ?: data.getStringExtra("authAccount")
+                    ?: data.getStringExtra("accountName")
+                if (!accountName.isNullOrEmpty()) {
+                    val safeEmail = accountName.lowercase().trim()
+                    webView.post {
+                        webView.evaluateJavascript("onNativeGoogleAuthSuccess('$safeEmail')", null)
+                    }
                 }
             }
         }
@@ -268,15 +272,23 @@ class MainActivity : ComponentActivity() {
         fun launchGoogleSignIn() {
             runOnUiThread {
                 try {
-                    val intent = AccountManager.newChooseAccountIntent(
-                        null, null, arrayOf("com.google"), false, null, null, null, null
-                    )
+                    val intent = Intent("com.google.android.gms.common.account.CHOOSE_ACCOUNT").apply {
+                        setPackage("com.google.android.gms")
+                        putExtra("allowableAccountTypes", arrayOf("com.google"))
+                    }
                     startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
                 } catch (e: Exception) {
-                    val fallbackIntent = Intent(Intent.ACTION_MAIN).apply {
-                        addCategory(Intent.CATEGORY_LAUNCHER)
+                    try {
+                        @Suppress("DEPRECATION")
+                        val fallbackIntent = AccountManager.newChooseAccountIntent(
+                            null, null, arrayOf("com.google"), true, null, null, null, null
+                        )
+                        startActivityForResult(fallbackIntent, REQUEST_CODE_PICK_ACCOUNT)
+                    } catch (ex: Exception) {
+                        webView.post {
+                            webView.evaluateJavascript("showErrorBanner('Google Account Chooser unavailable. Please log in with email.')", null)
+                        }
                     }
-                    startActivityForResult(fallbackIntent, REQUEST_CODE_PICK_ACCOUNT)
                 }
             }
         }
