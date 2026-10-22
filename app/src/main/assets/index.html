@@ -99,9 +99,9 @@
     }
     .bounce-pointer { animation: bounceUp 1.5s infinite; }
 
-    /* Detail Card Box - Enlarged Labels & Values */
-    .detail-card { background: #121619; border: 1px solid #222B30; border-radius: 16px; padding: 20px; margin-bottom: 12px; width: 100%; }
-    .detail-label { font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #FFB300; margin-bottom: 6px; }
+    /* Detail Card Box - 2X Larger Section Titles */
+    .detail-card { background: #121619; border: 1px solid #222B30; border-radius: 16px; padding: 22px; margin-bottom: 16px; width: 100%; }
+    .detail-label { font-size: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #FFB300; margin-bottom: 10px; border-bottom: 1px solid #222B30; padding-bottom: 8px; }
     .detail-val-headline { font-size: 26px; font-weight: 900; text-transform: uppercase; font-family: serif; color: #ffffff; margin-bottom: 12px; }
     .detail-val-text { font-size: 17px; font-weight: 800; color: #f1f5f9; margin-bottom: 12px; }
 
@@ -112,7 +112,7 @@
 
     /* Theme Toggle Switch */
     .theme-toggle-box { display: flex; background: #111618; padding: 4px; border-radius: 12px; border: 1px solid #222B30; margin-top: 8px; width: 100%; }
-    .theme-toggle-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; background: none; color: #94a3b8; font-weight: 900; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; }
+    .theme-toggle-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; background: none; color: #94a3b8; font-weight: 900; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; }
     .theme-toggle-btn.active { background: #FFB300; color: #0a0a0a; box-shadow: 0 4px 10px rgba(255,179,0,0.3); }
   </style>
 </head>
@@ -311,7 +311,7 @@
     <button class="btn-delete" id="btn-delete-show" style="font-size:15px; padding:14px;" onclick="triggerDeleteShow()">🗑 DELETE SHOW</button>
   </div>
 
-  <!-- SCREEN 4: PROFILE DASHBOARD PAGE ($4.99 PRICE & 6 SPECIFIC REFINEMENTS) -->
+  <!-- SCREEN 4: PROFILE DASHBOARD PAGE (VIP AT TOP + 2X LARGER TITLES) -->
   <div id="view-profile" class="screen-view">
     <div class="header">
       <div class="header-logo-box">
@@ -326,19 +326,10 @@
       </div>
     </div>
 
-    <!-- 1. TICKET STUB COLOR THEME TOGGLE (FIRST THING ON PROFILE PAGE ABOVE VIP BOX) -->
-    <div class="detail-card" style="padding: 20px; margin-bottom: 20px;">
-      <div class="detail-label" style="font-size:13px; margin-bottom:8px;">🎨 TICKET STUB COLOR THEME</div>
-      <div class="theme-toggle-box">
-        <button type="button" class="theme-toggle-btn active" id="theme-btn-multicolor" onclick="switchTicketTheme('multicolor')">🎨 Multi-Colored</button>
-        <button type="button" class="theme-toggle-btn" id="theme-btn-classic" onclick="switchTicketTheme('classic')">📜 Classic Beige</button>
-      </div>
-    </div>
-
-    <!-- 2. Enlarged VIP Pass Area with $4.99 PRICE -->
+    <!-- 1. LIVELORE VIP PASS (MOVED TO TOP OF LIST ABOVE TICKET STUB COLOR THEME) -->
     <div class="detail-card" style="background: linear-gradient(135deg, rgba(255,179,0,0.22), #121619); border-color: #FFB300; padding: 22px; margin-bottom: 20px;">
-      <div style="display:flex; justify-between; align-items:center; margin-bottom:12px;">
-        <span style="font-size:13px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px;">👑 LIVELORE VIP PASS</span>
+      <div style="display:flex; justify-between; align-items:center; margin-bottom:12px; border-bottom: 1px solid #222B30; padding-bottom:8px;">
+        <span style="font-size:20px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px;">👑 LIVELORE VIP PASS</span>
         <span style="background:#FFB300; color:#0a0a0a; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">$4.99 ONE-TIME</span>
       </div>
       <div style="font-weight:900; font-size:19px; color:#ffffff; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">Unlock Photo Feature & 100% AD-Free Experience!</div>
@@ -346,13 +337,22 @@
       <button class="btn-edit" style="font-size:16px; padding:14px;" onclick="buyAppPremium()">⭐ GO PREMIUM FOR $4.99</button>
     </div>
 
+    <!-- 2. TICKET STUB COLOR THEME TOGGLE -->
+    <div class="detail-card" style="padding: 20px; margin-bottom: 20px;">
+      <div class="detail-label">🎨 TICKET STUB COLOR THEME</div>
+      <div class="theme-toggle-box">
+        <button type="button" class="theme-toggle-btn active" id="theme-btn-multicolor" onclick="switchTicketTheme('multicolor')">🎨 Multi-Colored</button>
+        <button type="button" class="theme-toggle-btn" id="theme-btn-classic" onclick="switchTicketTheme('classic')">📜 Classic Beige</button>
+      </div>
+    </div>
+
     <!-- 3. Account Details Card -->
     <div class="detail-card" style="padding: 22px; margin-bottom: 20px;">
-      <div class="detail-label" style="font-size:13px; margin-bottom:6px;">👤 ACCOUNT EMAIL</div>
+      <div class="detail-label">👤 ACCOUNT EMAIL</div>
       <div style="font-size:18px; font-weight:900; color:#ffffff; margin-bottom:20px;" id="profile-email-display">you@example.com</div>
 
       <div style="border-top: 1px solid #222B30; padding-top: 16px;">
-        <div class="detail-label" style="font-size:13px; margin-bottom:8px;">🔑 CHANGE PASSWORD</div>
+        <div class="detail-label">🔑 CHANGE PASSWORD</div>
         <input type="password" id="profile-new-pass" class="input-field" placeholder="New Password (min 6 chars)" style="margin-top:6px; margin-bottom:12px;" />
         <button type="button" class="btn-update-pass" onclick="alert('✓ Password updated successfully!')">Update Password</button>
       </div>
