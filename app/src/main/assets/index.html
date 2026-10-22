@@ -12,12 +12,12 @@
     .screen-view { display: none; width: 100%; max-width: 420px; height: 100%; flex-direction: column; justify-between; overflow-y: auto; padding-bottom: 20px; }
     .screen-view.active { display: flex; }
 
-    /* Centered Header with LiveLore Logo & Glass Navbar Directly Under Logo */
-    .header { position: relative; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 24px 0 12px 0; min-height: 120px; }
+    /* Centered Header with LiveLore Logo & Glass Navbar Directly Under Logo - Generous Top Clearance (52px) Clearing Camera Notch */
+    .header { position: relative; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 52px 0 12px 0; min-height: 150px; }
     .header-logo-box { display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 6px; }
     .header-logo-img { height: 80px; width: auto; object-fit: contain; filter: drop-shadow(0 0 16px rgba(0,230,118,0.4)); }
 
-    /* Sort Control Bar (Shows Count Twice as Large & Filter at Right Edge) */
+    /* Sort Control Bar */
     .sort-control-bar { display: flex; justify-between; align-items: center; width: 100%; margin-bottom: 12px; padding: 0 2px; }
     .shows-count-title { font-size: 22px; font-weight: 900; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px; }
     .sort-dropdown { background: #121619; border: 1.5px solid #222B30; color: #f1f5f9; font-size: 11px; font-weight: 800; border-radius: 8px; padding: 7px 10px; outline: none; text-transform: uppercase; cursor: pointer; margin-left: auto; }
@@ -421,7 +421,7 @@
   <!-- SCREEN 6: SUB-STATS DETAIL -->
   <div id="view-substats" class="screen-view">
     <div class="header">
-      <button type="button" onclick="showScreen('stats')" style="position:absolute; left:12px; top:36px; background:none; border:none; color:#FFB300; cursor:pointer; display:flex; align-items:center; justify-center; padding:8px; z-index:10;">
+      <button type="button" onclick="showScreen('stats')" style="position:absolute; left:12px; top:52px; background:none; border:none; color:#FFB300; cursor:pointer; display:flex; align-items:center; justify-center; padding:8px; z-index:10;">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFB300" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
           <line x1="19" y1="12" x2="5" y2="12"></line>
           <polyline points="12 19 5 12 12 5"></polyline>
