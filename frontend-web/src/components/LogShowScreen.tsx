@@ -108,7 +108,6 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
     const files = Array.from(e.target.files);
 
     files.forEach(file => {
-      if (photoUris.length >= 5) return;
       const reader = new FileReader();
       reader.onloadend = () => {
         if (reader.result) {
@@ -246,7 +245,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
 
   return (
     <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none bg-grid-lines overflow-y-auto justify-between">
-      {/* Hidden File Inputs for Camera vs Camera Roll Choice */}
+      {/* Hidden File Inputs for Camera vs Multi-Select Camera Roll Choice */}
       <input
         type="file"
         accept="image/*"
@@ -258,6 +257,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
       <input
         type="file"
         accept="image/*"
+        multiple
         ref={galleryInputRef}
         onChange={handlePhotoUpload}
         className="hidden"
@@ -547,7 +547,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
         </div>
       </form>
 
-      {/* Photo Source Selection Popup Modal (Live Photo / Camera vs Camera Roll) */}
+      {/* Photo Source Selection Popup Modal (Live Photo / Camera vs Multi-Select Camera Roll) */}
       {showPhotoSourceModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-[#121619] border border-[#FFB300] rounded-2xl p-6 max-w-xs w-full space-y-4 shadow-2xl relative text-center">
@@ -571,7 +571,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
                 }}
                 className="w-full py-3.5 bg-gradient-to-r from-[#FFB300] to-[#FFA000] text-slate-950 font-black text-sm uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-95 transition"
               >
-                <Camera size={20} /> 📸 Take Live Photo (Camera)
+                <Camera size={20} /> 📸 Take Live Photo
               </button>
 
               <button
@@ -582,7 +582,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
                 }}
                 className="w-full py-3.5 bg-[#1C2128] border border-[#FFB300] text-[#FFB300] font-black text-sm uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-95 transition"
               >
-                <ImageIcon size={20} /> 🖼️ Camera Roll (Gallery)
+                <ImageIcon size={20} /> 🖼️ Select Up to 5 Photos
               </button>
             </div>
           </div>

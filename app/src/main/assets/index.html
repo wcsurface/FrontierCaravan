@@ -1114,7 +1114,7 @@
         addBtn.innerHTML = `
           <span style="font-size:18px;">+</span>
           <span>PHOTO</span>
-          <input type="file" accept="image/*" style="display:none;" onchange="handlePhotoSelect(event)" />
+          <input type="file" accept="image/*" multiple style="display:none;" onchange="handlePhotoSelect(event)" />
         `;
         grid.appendChild(addBtn);
       } else {
@@ -1139,15 +1139,20 @@
 
     function handlePhotoSelect(e) {
       if (!e.target.files || e.target.files.length === 0) return;
-      if (currentPhotoUris.length >= 5) return;
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onloadend = function() {
-        if (reader.result) {
-          currentPhotoUris.push(reader.result);
-          renderPhotosGrid();
-        }
-      };
+      const files = Array.from(e.target.files);
+
+      files.forEach(file => {
+        if (currentPhotoUris.length >= 5) return;
+        const reader = new FileReader();
+        reader.onloadend = function() {
+          if (reader.result) {
+            currentPhotoUris.push(reader.result);
+            renderPhotosGrid();
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
       reader.readAsDataURL(file);
     }
 
