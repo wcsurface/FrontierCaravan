@@ -32,12 +32,12 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
 
   return (
     <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between min-h-screen">
-      {/* Header with LiveLore Logo & Glass Navbar Positioned Directly Under Logo */}
-      <header className="relative flex flex-col items-center justify-center w-full pt-6 sm:pt-10 pb-4 shrink-0">
+      {/* Header with LiveLore Logo - Exactly matching all other screen header paddings */}
+      <header className="relative flex flex-col items-center justify-center w-full pt-4 sm:pt-6 pb-2 shrink-0">
         {activeSubView !== 'main' && (
           <button
             onClick={() => setActiveSubView('main')}
-            className="absolute left-2 top-8 p-2 text-slate-200 hover:text-white transition rounded-full z-10"
+            className="absolute left-2 top-4 p-2 text-slate-200 hover:text-white transition rounded-full z-10"
           >
             <ArrowLeft size={28} />
           </button>
@@ -45,7 +45,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
         <img
           src="/assets/livelore_logo.png"
           alt="LiveLore"
-          className="h-20 sm:h-24 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.4)] filter contrast-105"
+          className="h-24 sm:h-28 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.45)] filter contrast-105"
         />
         <GlassNavBar currentView="stats" onNavigate={onNavigate} />
       </header>
