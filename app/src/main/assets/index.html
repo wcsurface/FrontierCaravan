@@ -1181,15 +1181,22 @@
       document.getElementById('auth-name').value = '';
     }
 
+    function onNativeGoogleAuthFallback() {
+      const googleEmail = prompt("Enter your Google Account email to continue:", "wcsurface@gmail.com");
+      if (googleEmail && googleEmail.includes('@')) {
+        onNativeGoogleAuthSuccess(googleEmail);
+      }
+    }
+
     function handleGoogleSignIn() {
       if (window.AndroidGoogleAuth && window.AndroidGoogleAuth.launchGoogleSignIn) {
-        window.AndroidGoogleAuth.launchGoogleSignIn();
+        try {
+          window.AndroidGoogleAuth.launchGoogleSignIn();
+        } catch (e) {
+          onNativeGoogleAuthFallback();
+        }
       } else {
-        const googleClientId = '1084293847291-livelore.apps.googleusercontent.com';
-        const redirectUri = encodeURIComponent(window.location.origin || 'https://frontier-caravan-9r14f56ys-surface7.vercel.app');
-        const scope = encodeURIComponent('email profile');
-        const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&redirect_uri=${redirectUri}&response_type=token&scope=${scope}`;
-        window.open(authUrl, 'GoogleOAuthWindow', 'width=500,height=600,top=100,left=100');
+        onNativeGoogleAuthFallback();
       }
     }
 

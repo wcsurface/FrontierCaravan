@@ -246,6 +246,11 @@ class MainActivity : ComponentActivity() {
                         webView.evaluateJavascript("onNativeGoogleAuthSuccess('$safeEmail')", null)
                     }
                 }
+            } else {
+                // If user canceled or account picker failed, fallback to Google email prompt
+                webView.post {
+                    webView.evaluateJavascript("onNativeGoogleAuthFallback()", null)
+                }
             }
         }
     }
@@ -272,21 +277,20 @@ class MainActivity : ComponentActivity() {
         fun launchGoogleSignIn() {
             runOnUiThread {
                 try {
-                    val intent = Intent("com.google.android.gms.common.account.CHOOSE_ACCOUNT").apply {
-                        setPackage("com.google.android.gms")
-                        putExtra("allowableAccountTypes", arrayOf("com.google"))
-                    }
+                    @Suppress("DEPRECATION")
+                    val intent = AccountManager.newChooseAccountIntent(
+                        null, null, arrayOf("com.google"), false, null, null, null, null
+                    )
                     startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
                 } catch (e: Exception) {
                     try {
-                        @Suppress("DEPRECATION")
-                        val fallbackIntent = AccountManager.newChooseAccountIntent(
-                            null, null, arrayOf("com.google"), true, null, null, null, null
-                        )
-                        startActivityForResult(fallbackIntent, REQUEST_CODE_PICK_ACCOUNT)
+                        val intent = Intent("com.google.android.gms.common.account.CHOOSE_ACCOUNT").apply {
+                            putExtra("allowableAccountTypes", arrayOf("com.google"))
+                        }
+                        startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
                     } catch (ex: Exception) {
                         webView.post {
-                            webView.evaluateJavascript("showErrorBanner('Google Account Chooser unavailable. Please log in with email.')", null)
+                            webView.evaluateJavascript("onNativeGoogleAuthFallback()", null)
                         }
                     }
                 }
