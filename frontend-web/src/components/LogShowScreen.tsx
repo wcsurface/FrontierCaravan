@@ -395,23 +395,23 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
           </div>
         </div>
 
-        {/* Concert Photo Attachment (VIP Feature - Up to 5 Photos with Primary Drag/Reorder) */}
+        {/* Concert Photo Attachment Section */}
         <div className="bg-[#121619] p-4 rounded-xl border border-[#222B30] space-y-3">
-          <div className="flex items-center justify-between">
+          <div>
             <label className="text-xs sm:text-sm font-black uppercase tracking-wider text-[#FFB300] flex items-center gap-1.5">
               <Camera size={18} /> CONCERT PHOTOS ({photoUris.length}/5)
             </label>
             {!isPremium && (
-              <span className="text-[10px] font-black uppercase text-[#FFB300] bg-[#FFB300]/10 px-2 py-0.5 rounded border border-[#FFB300]/30 flex items-center gap-1">
-                <Crown size={10} /> VIP Pass ($4.99)
-              </span>
+              <div className="text-sm sm:text-base font-black uppercase text-[#FFB300] flex items-center gap-1.5 mt-1">
+                <Crown size={16} /> VIP PASS ($4.99 ONE-TIME)
+              </div>
             )}
           </div>
 
           {isPremium ? (
             <div className="space-y-3">
               {photoUris.length > 0 && (
-                <div className="text-[11px] text-slate-400 font-bold flex items-center gap-1">
+                <div className="text-[11px] text-slate-300 font-bold flex items-center gap-1">
                   <MoveHorizontal size={14} className="text-[#FFB300]" />
                   <span>First photo is the <strong>Primary Photo</strong> on ticket stub. Drag or tap ⭐ to set Primary!</span>
                 </div>
@@ -483,7 +483,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
               </div>
             </div>
           ) : (
-            /* Non-VIP Upgrade Prompt */
+            /* Non-VIP Interactive Upgrade Prompt */
             <div className="p-3 bg-[#111618] rounded-xl border border-[#222B30] text-center space-y-2">
               <p className="text-xs sm:text-sm text-slate-200 font-bold">
                 Upgrade to VIP status to attach concert photos!
@@ -491,9 +491,9 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
               <button
                 type="button"
                 onClick={() => onNavigate('auth')}
-                className="text-xs font-black text-[#FFB300] hover:underline uppercase tracking-wider flex items-center justify-center gap-1.5 mx-auto bg-[#FFB300]/10 px-3 py-1.5 rounded-lg border border-[#FFB300]/30"
+                className="w-full py-3 bg-[#FFB300] hover:bg-amber-400 text-slate-950 font-black text-sm uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-[0.98] transition"
               >
-                <Crown size={14} /> Upgrade to VIP Status ($4.99)
+                <Camera size={18} /> + ADD PHOTOS (UPGRADE TO VIP)
               </button>
             </div>
           )}
