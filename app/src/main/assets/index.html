@@ -344,11 +344,12 @@
     <div class="detail-card" style="background: linear-gradient(135deg, rgba(255,179,0,0.22), #121619); border-color: #FFB300; padding: 22px; margin-bottom: 20px;">
       <div style="display:flex; justify-between; align-items:center; margin-bottom:12px; border-bottom: 1px solid #222B30; padding-bottom:8px;">
         <span style="font-size:20px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px;">👑 LIVELORE VIP PASS</span>
-        <span style="background:#FFB300; color:#0a0a0a; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">$4.99 ONE-TIME</span>
+        <span style="background:#00E676; color:#0a0a0a; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">✓ VIP CONFIRMED</span>
       </div>
-      <div style="font-weight:900; font-size:19px; color:#ffffff; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">Unlock Photo Feature & 100% AD-Free Experience!</div>
-      <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.5; margin-bottom:16px;">Attach and save photos from concerts. Remove all ads.</div>
-      <button class="btn-edit" style="font-size:16px; padding:14px;" onclick="buyAppPremium()">⭐ GO PREMIUM FOR $4.99</button>
+      <div style="font-weight:900; font-size:19px; color:#00E676; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">✓ YOU ARE A VIP MEMBER!</div>
+      <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.5; background:#0A0D0E; padding:12px; border-radius:10px; border:1px solid rgba(0,230,118,0.4);">
+        🎉 Your LiveLore VIP status is active! You have permanent 100% ad-free concert vaulting and full photo memory attachments enabled.
+      </div>
     </div>
 
     <!-- 2. DOWNLOAD CONCERT DATA (CSV) BUTTON (POSITIONED ABOVE TICKET STUB COLOR TOGGLE) -->
@@ -372,7 +373,7 @@
     <!-- 4. Account Details Card -->
     <div class="detail-card" style="padding: 22px; margin-bottom: 20px;">
       <div class="detail-label">👤 ACCOUNT EMAIL</div>
-      <div style="font-size:18px; font-weight:900; color:#ffffff; margin-bottom:20px;" id="profile-email-display">you@example.com</div>
+      <div style="font-size:18px; font-weight:900; color:#ffffff; margin-bottom:20px;" id="profile-email-display">wcsurface@gmail.com</div>
 
       <div style="border-top: 1px solid #222B30; padding-top: 16px;">
         <div class="detail-label">🔑 CHANGE PASSWORD</div>
@@ -806,16 +807,6 @@
       if (countLabel) countLabel.innerText = currentPhotoUris.length;
 
       grid.innerHTML = '';
-      if (currentPhotoUris.length === 0) {
-        grid.innerHTML = `
-          <div style="grid-column: span 5; padding:12px; background:#111618; border-radius:10px; border:1px solid #222B30; text-align:center;">
-            <p style="font-size:13px; color:#f1f5f9; font-weight:bold; margin-bottom:8px; line-height:1.4;">Upgrade to VIP status and add photos of the band, ticket stubs, your crew, and more!</p>
-            <button type="button" onclick="showScreen('profile')" style="width:100%; padding:10px; background:#FFB300; color:#0a0a0a; font-weight:900; font-size:13px; text-transform:uppercase; border:none; border-radius:8px; cursor:pointer;">📷 + ADD PHOTOS (UPGRADE TO VIP)</button>
-          </div>
-        `;
-        return;
-      }
-
       currentPhotoUris.forEach((uri, idx) => {
         const item = document.createElement('div');
         item.style.position = 'relative';
