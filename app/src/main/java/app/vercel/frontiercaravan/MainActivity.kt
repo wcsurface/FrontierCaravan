@@ -86,7 +86,9 @@ class MainActivity : ComponentActivity() {
         settings.setSupportZoom(false)
         settings.builtInZoomControls = false
         settings.displayZoomControls = false
+        settings.cacheMode = WebSettings.LOAD_NO_CACHE
 
+        webView.clearCache(true)
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
 
         // WebChromeClient with onShowFileChooser for Camera vs Camera Roll Photo Selection
@@ -245,9 +247,12 @@ class MainActivity : ComponentActivity() {
                     webView.post {
                         webView.evaluateJavascript("onNativeGoogleAuthSuccess('$safeEmail')", null)
                     }
+                } else {
+                    webView.post {
+                        webView.evaluateJavascript("onNativeGoogleAuthFallback()", null)
+                    }
                 }
             } else {
-                // If user canceled or account picker failed, fallback to Google email prompt
                 webView.post {
                     webView.evaluateJavascript("onNativeGoogleAuthFallback()", null)
                 }
