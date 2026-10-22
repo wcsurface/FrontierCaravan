@@ -12,9 +12,46 @@ const JWT_SECRET = process.env.JWT_SECRET || 'livelore_secret_jwt_key_2026_x89!'
 app.use(cors({ origin: '*' }));
 app.use(express.json({ limit: '10mb' }));
 
-// In-memory user fallback if Railway DATABASE_URL is temporarily unconnected
+// In-memory user & vault fallback if Railway DATABASE_URL is temporarily unconnected
 const memoryUsers = new Map<string, any>();
 const memoryVaults = new Map<string, any>();
+
+// Community Crowdsourced Venue Tracking Engine (Threshold = 5 Unique Users)
+interface CommunityVenueRecord {
+  venue: string;
+  city: string;
+  stateProvince: string;
+  country: string;
+  users: Set<string>;
+}
+
+const communityVenueTracker = new Map<string, CommunityVenueRecord>();
+
+// Helper: Register/Track Venue from a pushed concert
+function trackUserVenue(userId: string, venueName: string, city: string, state: string, country: string) {
+  if (!venueName || !city || !userId) return;
+
+  const cleanV = venueName.trim();
+  const cleanC = city.trim();
+  const cleanS = state ? state.trim().toUpperCase() : 'IN';
+  const cleanCo = country ? country.trim() : 'USA';
+
+  const key = `${cleanV.toLowerCase()}_${cleanC.toLowerCase()}_${cleanS.toLowerCase()}`;
+
+  let record = communityVenueTracker.get(key);
+  if (!record) {
+    record = {
+      venue: cleanV,
+      city: cleanC,
+      stateProvince: cleanS,
+      country: cleanCo,
+      users: new Set<string>(),
+    };
+    communityVenueTracker.set(key, record);
+  }
+
+  record.users.add(userId);
+}
 
 // Health Check Endpoint
 app.get('/health', async (_req: Request, res: Response) => {
@@ -43,11 +80,9 @@ app.post('/api/auth/register', async (req: Request, res: Response) => {
     const cleanedEmail = email.toLowerCase().trim();
     const name = displayName?.trim() || cleanedEmail.split('@')[0];
 
-    // Password hashing
     const passwordHash = await bcrypt.hash(password, 10);
 
     if (prisma) {
-      // Check existing user
       const existingUser = await prisma.user.findUnique({
         where: { email: cleanedEmail },
       });
@@ -56,7 +91,6 @@ app.post('/api/auth/register', async (req: Request, res: Response) => {
         return res.status(400).json({ error: 'An account with this email already exists.' });
       }
 
-      // Create new user in Railway PostgreSQL
       const user = await prisma.user.create({
         data: {
           email: cleanedEmail,
@@ -73,7 +107,6 @@ app.post('/api/auth/register', async (req: Request, res: Response) => {
         user: { id: user.id, email: user.email, displayName: user.displayName },
       });
     } else {
-      // In-Memory Fallback
       if (memoryUsers.has(cleanedEmail)) {
         return res.status(400).json({ error: 'An account with this email already exists.' });
       }
@@ -129,7 +162,6 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
         user: { id: user.id, email: user.email, displayName: user.displayName },
       });
     } else {
-      // In-memory fallback
       const user = memoryUsers.get(cleanedEmail);
       if (!user) {
         return res.status(401).json({ error: 'Invalid email or password.' });
@@ -140,7 +172,7 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
         return res.status(401).json({ error: 'Invalid email or password.' });
       }
 
-      const token = generateToken(user.id, user.email);
+      const token = generateToken(user.id, cleanedEmail);
 
       return res.json({
         success: true,
@@ -186,13 +218,27 @@ app.get('/api/auth/me', async (req: Request, res: Response) => {
   }
 });
 
-// 4. POST /api/sync/push - Push Concert Vault Backup to Railway PostgreSQL
+// 4. POST /api/sync/push - Push Concert Vault Backup & Analyze Community Venues
 app.post('/api/sync/push', async (req: Request, res: Response) => {
   try {
     const { userId, concertsData } = req.body;
 
     if (!userId || !concertsData) {
       return res.status(400).json({ error: 'userId and concertsData required' });
+    }
+
+    // Process and track venues logged by this user for community threshold promotion
+    if (concertsData.concerts && Array.isArray(concertsData.concerts)) {
+      concertsData.concerts.forEach((c: any) => {
+        const vName = c.venue || c.venueName;
+        const vCity = c.city || c.venueCity;
+        const vState = c.state || c.venueState;
+        const vCountry = c.country || c.venueCountry;
+
+        if (vName && vCity) {
+          trackUserVenue(userId, vName, vCity, vState, vCountry);
+        }
+      });
     }
 
     if (prisma) {
@@ -213,7 +259,7 @@ app.post('/api/sync/push', async (req: Request, res: Response) => {
   }
 });
 
-// 5. GET /api/sync/pull - Pull Concert Vault Backup from Railway PostgreSQL
+// 5. GET /api/sync/pull - Pull Concert Vault Backup
 app.get('/api/sync/pull', async (req: Request, res: Response) => {
   try {
     const { userId } = req.query;
@@ -235,6 +281,35 @@ app.get('/api/sync/pull', async (req: Request, res: Response) => {
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Sync pull failed';
     return res.status(500).json({ error: message });
+  }
+});
+
+// 6. GET /api/venues/community - Promoted Community Venues (Threshold = 5 Unique Users)
+app.get('/api/venues/community', async (_req: Request, res: Response) => {
+  try {
+    const PROMOTION_THRESHOLD = 5;
+    const promotedVenues: Array<{ venue: string; city: string; stateProvince: string; country: string; userCount: number }> = [];
+
+    communityVenueTracker.forEach((record) => {
+      if (record.users.size >= PROMOTION_THRESHOLD) {
+        promotedVenues.push({
+          venue: record.venue,
+          city: record.city,
+          stateProvince: record.stateProvince,
+          country: record.country,
+          userCount: record.users.size,
+        });
+      }
+    });
+
+    return res.json({
+      success: true,
+      threshold: PROMOTION_THRESHOLD,
+      totalPromoted: promotedVenues.length,
+      venues: promotedVenues,
+    });
+  } catch (err: unknown) {
+    return res.status(500).json({ error: 'Failed to fetch community venues' });
   }
 });
 
