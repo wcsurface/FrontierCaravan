@@ -112,7 +112,7 @@
 
     /* Theme Toggle Switch */
     .theme-toggle-box { display: flex; background: #111618; padding: 4px; border-radius: 12px; border: 1px solid #222B30; margin-top: 8px; width: 100%; }
-    .theme-toggle-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; background: none; color: #94a3b8; font-weight: 900; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; }
+    .theme-toggle-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; background: none; color: #94a3b8; font-weight: 900; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; }
     .theme-toggle-btn.active { background: #FFB300; color: #0a0a0a; box-shadow: 0 4px 10px rgba(255,179,0,0.3); }
   </style>
 </head>
@@ -241,7 +241,10 @@
         </div>
       </div>
 
-      <!-- CONCERT PHOTOS (VIP FEATURE - UP TO 5 PHOTOS WITH PRIMARY REORDERING) -->
+      <label class="input-label">Notes</label>
+      <textarea id="input-notes" class="input-field" placeholder="Notes (Setlist, who were you with, venue vibe, crowd energy)"></textarea>
+
+      <!-- CONCERT PHOTOS (VIP FEATURE - POSITIONED DIRECTLY BELOW NOTES & ABOVE SUBMIT BUTTON) -->
       <div style="background:#121619; border:1px solid #222B30; border-radius:12px; padding:14px; margin-bottom:12px;">
         <div>
           <label class="input-label" style="margin-bottom:0;">📷 CONCERT PHOTOS (<span id="photo-count-label">0</span>/5)</label>
@@ -252,9 +255,6 @@
           <!-- Dynamic photos grid or VIP upgrade prompt -->
         </div>
       </div>
-
-      <label class="input-label">Notes</label>
-      <textarea id="input-notes" class="input-field" placeholder="Notes (Setlist, who were you with, venue vibe, crowd energy)"></textarea>
 
       <!-- Action Button: Changes dynamically between "+ ADD" and "💾 SAVE EDITS" -->
       <button type="submit" class="btn-cta" id="btn-save-show">+ ADD</button>

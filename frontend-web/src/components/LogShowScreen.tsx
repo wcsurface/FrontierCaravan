@@ -395,8 +395,22 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
           </div>
         </div>
 
-        {/* Concert Photo Attachment Section */}
-        <div className="bg-[#121619] p-4 rounded-xl border border-[#222B30] space-y-3">
+        {/* Combined Notes / Setlist Field */}
+        <div className="flex-1 flex flex-col min-h-[140px]">
+          <label className="block text-sm sm:text-base font-black uppercase tracking-wider text-[#FFB300] mb-1.5">
+            Notes
+          </label>
+          <textarea
+            placeholder="Notes (Setlist, who were you with, venue vibe, crowd energy)"
+            value={notesText}
+            onChange={(e) => setNotesText(e.target.value)}
+            rows={4}
+            className="w-full flex-1 bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg p-4 text-base sm:text-lg font-extrabold text-slate-100 placeholder:text-slate-400 placeholder:font-semibold outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition resize-none leading-relaxed"
+          />
+        </div>
+
+        {/* Concert Photo Attachment Section - POSITIONED DIRECTLY BELOW NOTES & ABOVE SUBMIT BUTTON */}
+        <div className="bg-[#121619] p-4 rounded-xl border border-[#222B30] space-y-3 my-1">
           <div>
             <label className="text-xs sm:text-sm font-black uppercase tracking-wider text-[#FFB300] flex items-center gap-1.5">
               <Camera size={18} /> CONCERT PHOTOS ({photoUris.length}/5)
@@ -497,20 +511,6 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
               </button>
             </div>
           )}
-        </div>
-
-        {/* Combined Notes / Setlist Field */}
-        <div className="flex-1 flex flex-col min-h-[140px]">
-          <label className="block text-sm sm:text-base font-black uppercase tracking-wider text-[#FFB300] mb-1.5">
-            Notes
-          </label>
-          <textarea
-            placeholder="Notes (Setlist, who were you with, venue vibe, crowd energy)"
-            value={notesText}
-            onChange={(e) => setNotesText(e.target.value)}
-            rows={4}
-            className="w-full flex-1 bg-[#111618] border-[1.5px] border-[#FFB300] rounded-lg p-4 text-base sm:text-lg font-extrabold text-slate-100 placeholder:text-slate-400 placeholder:font-semibold outline-none shadow-[0_0_10px_rgba(255,179,0,0.15)] focus:shadow-[0_0_15px_rgba(255,179,0,0.3)] transition resize-none leading-relaxed"
-          />
         </div>
 
         {/* Submit Button */}
