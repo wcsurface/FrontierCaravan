@@ -61,12 +61,12 @@ export default function HomeView() {
       {/* SCREEN 1: DIARY VIEW */}
       {currentView === 'diary' && (
         <div className="flex flex-col w-full max-w-md h-screen p-4 overflow-y-auto justify-between">
-          {/* Centered LiveLore Header - Enlarged Logo safely clearing camera notch */}
+          {/* Centered LiveLore Header - Enlarged Logo 20% (h-28 sm:h-32) safely clearing camera notch */}
           <header className="relative flex flex-col items-center justify-center w-full pt-4 sm:pt-6 pb-2 shrink-0">
             <img
               src="/assets/livelore_logo.png"
               alt="LiveLore"
-              className="h-24 sm:h-28 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.45)] filter contrast-105"
+              className="h-28 sm:h-32 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.45)] filter contrast-105"
             />
             {/* Glass Navigation Bar Rendered Under Logo */}
             <GlassNavBar

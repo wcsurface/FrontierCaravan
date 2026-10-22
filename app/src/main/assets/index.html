@@ -12,10 +12,10 @@
     .screen-view { display: none; width: 100%; max-width: 420px; height: 100%; flex-direction: column; justify-start; overflow-y: auto; padding-bottom: 20px; }
     .screen-view.active { display: flex; }
 
-    /* Fixed Top Header - Identical top clearance (54px) & min-height across all pages */
-    .header { position: relative; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding-top: 54px; padding-bottom: 12px; min-height: 140px; flex-shrink: 0; }
-    .header-logo-box { display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 6px; }
-    .header-logo-img { height: 84px; width: auto; object-fit: contain; filter: drop-shadow(0 0 16px rgba(0,230,118,0.4)); }
+    /* Fixed Top Header - Logo Enlarged 20% (102px height) with identical top clearance & min-height */
+    .header { position: relative; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding-top: 50px; padding-bottom: 10px; min-height: 155px; flex-shrink: 0; }
+    .header-logo-box { display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 4px; }
+    .header-logo-img { height: 102px; width: auto; object-fit: contain; filter: drop-shadow(0 0 18px rgba(0,230,118,0.45)); }
 
     /* Sort Control Bar */
     .sort-control-bar { display: flex; justify-between; align-items: center; width: 100%; margin-top: 6px; margin-bottom: 12px; padding: 0 2px; }
@@ -120,7 +120,7 @@
 
   <!-- SCREEN 0: MANDATORY AUTH / LOG IN & REGISTER -->
   <div id="view-auth" class="screen-view active">
-    <div class="header">
+    <div class="header" style="margin-bottom:36px; padding-bottom:12px;">
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
       </div>
@@ -299,7 +299,7 @@
     <button class="btn-delete" id="btn-delete-show" style="font-size:15px; padding:14px;" onclick="triggerDeleteShow()">🗑 DELETE SHOW</button>
   </div>
 
-  <!-- SCREEN 4: PROFILE DASHBOARD PAGE -->
+  <!-- SCREEN 4: PROFILE DASHBOARD PAGE ($4.99 PRICE & 6 SPECIFIC REFINEMENTS) -->
   <div id="view-profile" class="screen-view">
     <div class="header">
       <div class="header-logo-box">
@@ -421,7 +421,7 @@
   <!-- SCREEN 6: SUB-STATS DETAIL -->
   <div id="view-substats" class="screen-view">
     <div class="header">
-      <button type="button" onclick="showScreen('stats')" style="position:absolute; left:12px; top:54px; background:none; border:none; color:#FFB300; cursor:pointer; display:flex; align-items:center; justify-center; padding:8px; z-index:10;">
+      <button type="button" onclick="showScreen('stats')" style="position:absolute; left:12px; top:50px; background:none; border:none; color:#FFB300; cursor:pointer; display:flex; align-items:center; justify-center; padding:8px; z-index:10;">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFB300" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
           <line x1="19" y1="12" x2="5" y2="12"></line>
           <polyline points="12 19 5 12 12 5"></polyline>

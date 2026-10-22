@@ -40,7 +40,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate, on
         <img
           src="/assets/livelore_logo.png"
           alt="LiveLore"
-          className="h-24 sm:h-28 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.45)] filter contrast-105"
+          className="h-28 sm:h-32 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,230,118,0.45)] filter contrast-105"
         />
         {/* Navigation Bar Positioned Under Logo */}
         <GlassNavBar currentView="auth" onNavigate={onNavigate} />
