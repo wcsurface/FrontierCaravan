@@ -32,8 +32,8 @@ export const StatsView: React.FC<StatsViewProps> = ({ onBack, onNavigate }) => {
 
   return (
     <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between min-h-screen">
-      {/* Header with LiveLore Logo - Exactly matching all other screen header paddings */}
-      <header className="relative flex flex-col items-center justify-center w-full pt-4 sm:pt-6 pb-2 shrink-0">
+      {/* Header with LiveLore Logo - Exactly matching Home and Add Show Header Padding & Dimensions */}
+      <header className="relative flex flex-col items-center justify-center w-full pt-12 sm:pt-16 pb-2 shrink-0">
         {activeSubView !== 'main' && (
           <button
             onClick={() => setActiveSubView('main')}
