@@ -145,7 +145,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        // 4. AdMob Banner Container Anchored securely at Bottom
+        // 4. AdMob Banner Container (Hidden by default for VIP members)
         adContainerLayout = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
@@ -154,7 +154,7 @@ class MainActivity : ComponentActivity() {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
-            visibility = View.VISIBLE
+            visibility = View.GONE
         }
 
         adView = AdView(this).apply {

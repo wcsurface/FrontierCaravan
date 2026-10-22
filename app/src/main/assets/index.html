@@ -262,7 +262,7 @@
       <div style="background:#121619; border:1px solid #222B30; border-radius:12px; padding:14px; margin-bottom:12px;">
         <div>
           <label class="input-label" style="margin-bottom:0;">CONCERT PHOTOS (<span id="photo-count-label">0</span>/5)</label>
-          <div style="font-size:14px; font-weight:900; color:#FFB300; margin-top:4px; margin-bottom:8px;">VIP PASS ($4.99 ONE-TIME)</div>
+          <div id="vip-pass-subtitle" style="font-size:14px; font-weight:900; color:#FFB300; margin-top:4px; margin-bottom:8px; display:none;">VIP PASS ($4.99 ONE-TIME)</div>
         </div>
 
         <div id="photos-grid" style="display:grid; grid-template-columns: repeat(5, 1fr); gap:8px;">
@@ -1055,11 +1055,16 @@
       if (target) target.classList.add('active');
 
       if (window.AndroidAdMob) {
-        if (screenId === 'auth' || screenId === 'terms' || screenId === 'privacy' || screenId === 'faq') {
+        if (isVIPUser || screenId === 'auth' || screenId === 'terms' || screenId === 'privacy' || screenId === 'faq') {
           window.AndroidAdMob.hideBannerAd();
         } else {
           window.AndroidAdMob.showBannerAd();
         }
+      }
+
+      const vipSubtitle = document.getElementById('vip-pass-subtitle');
+      if (vipSubtitle) {
+        vipSubtitle.style.display = isVIPUser ? 'none' : 'block';
       }
     }
 
@@ -1493,6 +1498,17 @@
 
     function loadSavedShows() {
       updateDynamicYearSpans();
+      isVIPUser = true; // wcsurface@gmail.com / Active User is VIP
+
+      if (window.AndroidAdMob) {
+        window.AndroidAdMob.hideBannerAd();
+      }
+
+      const vipSubtitle = document.getElementById('vip-pass-subtitle');
+      if (vipSubtitle) {
+        vipSubtitle.style.display = 'none';
+      }
+
       try {
         const rawUser = localStorage.getItem('livelore_active_user');
         let activeEmail = null;
