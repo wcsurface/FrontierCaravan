@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useEncoreStore } from '../store/useEncoreStore';
 import { GlassNavBar } from './GlassNavBar';
-import { Crown, LogOut, Sparkles, KeyRound, Palette, CheckCircle2, User } from 'lucide-react';
+import { Crown, LogOut, Sparkles, KeyRound, Palette, CheckCircle2, User, Download, Trash2 } from 'lucide-react';
 
 interface ProfileViewProps {
   onBack: () => void;
@@ -15,7 +15,7 @@ interface ProfileViewProps {
 
 export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate, onSwitchAccount, onOpenLegal }) => {
   const { user, logout } = useAuthStore();
-  const { isPremium, setIsPremium, ticketTheme, setTicketTheme } = useEncoreStore();
+  const { isPremium, setIsPremium, ticketTheme, setTicketTheme, concerts, artists, venues } = useEncoreStore();
 
   const [newPassword, setNewPassword] = useState('');
   const [passUpdated, setPassUpdated] = useState(false);
@@ -33,6 +33,89 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate, on
       setPassUpdated(true);
       setNewPassword('');
       setTimeout(() => setPassUpdated(false), 3000);
+    }
+  };
+
+  const handleExportCsv = () => {
+    if (concerts.length === 0) {
+      alert('Your concert vault is empty. Log concerts to export CSV data!');
+      return;
+    }
+
+    const headers = ['Date', 'Headline Artist', 'Opener(s)', 'Venue', 'City', 'State', 'Country', 'Notes'];
+
+    const escapeCsv = (str: string) => {
+      if (!str) return '""';
+      const clean = str.replace(/"/g, '""');
+      return `"${clean}"`;
+    };
+
+    const rows = concerts.map((concert) => {
+      const headliner = artists.find((a) => a.id === concert.headlineArtistId);
+      const opener = artists.find((a) => a.id === concert.openingArtistId);
+      const venueObj = venues.find((v) => v.id === concert.venueId);
+
+      const dStr = concert.date ? new Date(concert.date).toLocaleDateString('en-US') : '';
+      const hStr = headliner?.name || '';
+      const oStr = opener?.name || '';
+      const vStr = venueObj?.name || '';
+      const cStr = venueObj?.city || 'Noblesville';
+      const sStr = venueObj?.stateProvince || 'IN';
+      const coStr = venueObj?.country || 'USA';
+      const nStr = concert.generalNotes || '';
+
+      return [
+        escapeCsv(dStr),
+        escapeCsv(hStr),
+        escapeCsv(oStr),
+        escapeCsv(vStr),
+        escapeCsv(cStr),
+        escapeCsv(sStr),
+        escapeCsv(coStr),
+        escapeCsv(nStr),
+      ].join(',');
+    });
+
+    const csvData = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `livelore_concert_vault_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDeleteAccount = async () => {
+    if (confirm('⚠️ ARE YOU SURE YOU WANT TO PERMANENTLY DELETE YOUR ACCOUNT & ALL CONCERT DATA?\n\nThis action CANNOT be undone.')) {
+      if (confirm('🚨 FINAL CONFIRMATION: Tap OK to permanently wipe your user credentials and all saved concerts from cloud and local storage.')) {
+        const activeEmail = user?.email;
+
+        localStorage.removeItem('livelore_active_user');
+        localStorage.removeItem('livelore_local_shows');
+        localStorage.removeItem('livelore_vault_v1');
+        localStorage.removeItem('livelore_backup_shows');
+
+        if (activeEmail) {
+          const userKey = `livelore_shows_${activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_')}`;
+          localStorage.removeItem(userKey);
+
+          fetch('/api/sync/push', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: `u_cloud_${activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_')}`,
+              concertsData: { concerts: [] }
+            })
+          }).catch(() => {});
+        }
+
+        logout();
+        alert('✓ Your account and concert vault have been permanently deleted.');
+        if (onSwitchAccount) onSwitchAccount();
+      }
     }
   };
 
@@ -106,7 +189,24 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate, on
           )}
         </div>
 
-        {/* 2. TICKET STUB COLOR THEME CARD */}
+        {/* 2. DOWNLOAD CONCERT DATA (CSV) BUTTON (POSITIONED ABOVE TICKET STUB COLOR TOGGLE) */}
+        <div className="bg-[#121619] p-5 rounded-2xl border border-[#222B30] shadow-xl space-y-3">
+          <span className="text-xl sm:text-2xl font-black text-[#00E676] uppercase tracking-wide flex items-center gap-2 block border-b border-[#222B30] pb-2">
+            <Download size={24} /> CONCERT DATA EXPORT
+          </span>
+          <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">
+            Download your entire concert vault (dates, artists, openers, venues, location, notes) as a CSV spreadsheet.
+          </p>
+          <button
+            type="button"
+            onClick={handleExportCsv}
+            className="w-full py-3.5 bg-gradient-to-r from-[#00E676] to-[#00C853] hover:from-[#00FFA3] hover:to-[#00E676] text-slate-950 font-black text-sm uppercase tracking-wider rounded-xl shadow-md active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+          >
+            <Download size={18} /> DOWNLOAD CONCERT DATA (CSV)
+          </button>
+        </div>
+
+        {/* 3. TICKET STUB COLOR THEME CARD */}
         <div className="bg-[#121619] p-6 rounded-2xl border border-[#222B30] shadow-xl space-y-4">
           {/* Section Title 2X Larger: TICKET STUB COLOR THEME */}
           <span className="text-xl sm:text-2xl font-black text-[#FFB300] uppercase tracking-wide flex items-center gap-2 block border-b border-[#222B30] pb-3">
@@ -138,7 +238,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate, on
           </div>
         </div>
 
-        {/* 3. ACCOUNT DETAILS & PASSWORD CARD */}
+        {/* 4. ACCOUNT DETAILS & PASSWORD CARD */}
         <div className="bg-[#121619] p-6 rounded-2xl border border-[#222B30] space-y-5 shadow-xl">
           <div>
             {/* Section Title 2X Larger: ACCOUNT EMAIL */}
@@ -180,7 +280,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate, on
           </div>
         </div>
 
-        {/* Log Out Button */}
+        {/* 5. LOG OUT BUTTON */}
         <div className="pt-2">
           <button
             onClick={() => {
@@ -190,6 +290,17 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate, on
             className="w-full py-4 bg-[#121619] hover:bg-rose-950/40 text-rose-400 font-black text-base uppercase tracking-wider rounded-full border border-rose-900/50 shadow-lg active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
           >
             <LogOut size={20} /> LOG OUT
+          </button>
+        </div>
+
+        {/* 6. DELETE ACCOUNT & ALL DATA BUTTON (POSITIONED BELOW LOG OUT) */}
+        <div>
+          <button
+            type="button"
+            onClick={handleDeleteAccount}
+            className="w-full py-3.5 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 hover:text-white font-black text-sm uppercase tracking-wider rounded-full border border-rose-900/60 shadow-lg active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+          >
+            <Trash2 size={18} /> DELETE ACCOUNT & ALL DATA
           </button>
         </div>
 

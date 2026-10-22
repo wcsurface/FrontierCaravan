@@ -351,7 +351,16 @@
       <button class="btn-edit" style="font-size:16px; padding:14px;" onclick="buyAppPremium()">⭐ GO PREMIUM FOR $4.99</button>
     </div>
 
-    <!-- 2. TICKET STUB COLOR THEME TOGGLE -->
+    <!-- 2. DOWNLOAD CONCERT DATA (CSV) BUTTON (POSITIONED ABOVE TICKET STUB COLOR TOGGLE) -->
+    <div class="detail-card" style="padding: 20px; margin-bottom: 20px;">
+      <div class="detail-label" style="color:#00E676;">📥 CONCERT DATA EXPORT</div>
+      <div style="font-size:13px; color:#e2e8f0; font-weight:600; margin-bottom:14px; line-height:1.5;">
+        Download your entire concert vault (dates, artists, openers, venues, location, notes) as a CSV spreadsheet.
+      </div>
+      <button class="btn-cta" style="font-size:15px; padding:14px;" onclick="exportConcertsCsv()">📥 DOWNLOAD CONCERT DATA (CSV)</button>
+    </div>
+
+    <!-- 3. TICKET STUB COLOR THEME TOGGLE -->
     <div class="detail-card" style="padding: 20px; margin-bottom: 20px;">
       <div class="detail-label">🎨 TICKET STUB COLOR THEME</div>
       <div class="theme-toggle-box">
@@ -360,7 +369,7 @@
       </div>
     </div>
 
-    <!-- 3. Account Details Card -->
+    <!-- 4. Account Details Card -->
     <div class="detail-card" style="padding: 22px; margin-bottom: 20px;">
       <div class="detail-label">👤 ACCOUNT EMAIL</div>
       <div style="font-size:18px; font-weight:900; color:#ffffff; margin-bottom:20px;" id="profile-email-display">you@example.com</div>
@@ -372,9 +381,14 @@
       </div>
     </div>
 
-    <!-- Log Out Button -->
+    <!-- 5. Log Out Button -->
     <div style="margin-top:12px; width:100%;">
       <button class="btn-delete" style="font-size:16px; padding:16px;" onclick="handleLogout()">LOG OUT</button>
+    </div>
+
+    <!-- 6. DELETE ACCOUNT & ALL DATA BUTTON (POSITIONED BELOW LOG OUT) -->
+    <div style="margin-top:8px; width:100%;">
+      <button class="btn-delete" style="font-size:15px; padding:14px; background:rgba(225, 29, 72, 0.25); border-color:rgba(225, 29, 72, 0.8);" onclick="handleDeleteAccountAndData()">🗑 DELETE ACCOUNT & ALL DATA</button>
     </div>
 
     <!-- Footer Legal Links & Dynamic Copyright -->
@@ -594,6 +608,94 @@
     function updateDynamicYearSpans() {
       const year = new Date().getFullYear();
       document.querySelectorAll('.current-year-span').forEach(el => el.innerText = year);
+    }
+
+    function exportConcertsCsv() {
+      if (!userShows || userShows.length === 0) {
+        alert('Your concert vault is empty. Log concerts to export CSV data!');
+        return;
+      }
+
+      const headers = ['Date', 'Headline Artist', 'Opener(s)', 'Venue', 'City', 'State', 'Country', 'Notes'];
+
+      const escapeCsv = (str) => {
+        if (!str) return '""';
+        const clean = String(str).replace(/"/g, '""');
+        return `"${clean}"`;
+      };
+
+      const rows = userShows.map((concert) => {
+        const dStr = concert.date || '';
+        const hStr = concert.headline || '';
+        const oStr = (concert.openersList && concert.openersList.length > 0) ? concert.openersList.join(', ') : '';
+        const vStr = concert.venue || '';
+        const cStr = concert.city || 'Noblesville';
+        const sStr = concert.state || 'IN';
+        const coStr = concert.country || 'USA';
+        const nStr = concert.notes || '';
+
+        return [
+          escapeCsv(dStr),
+          escapeCsv(hStr),
+          escapeCsv(oStr),
+          escapeCsv(vStr),
+          escapeCsv(cStr),
+          escapeCsv(sStr),
+          escapeCsv(coStr),
+          escapeCsv(nStr),
+        ].join(',');
+      });
+
+      const csvData = [headers.join(','), ...rows].join('\n');
+      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `livelore_concert_vault_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    function handleDeleteAccountAndData() {
+      if (confirm('⚠️ ARE YOU SURE YOU WANT TO PERMANENTLY DELETE YOUR ACCOUNT & ALL CONCERT DATA?\n\nThis action CANNOT be undone.')) {
+        if (confirm('🚨 FINAL CONFIRMATION: Tap OK to permanently wipe your user credentials and all saved concerts from cloud and local storage.')) {
+          userShows = [];
+
+          const rawUser = localStorage.getItem('livelore_active_user');
+          let activeEmail = null;
+          if (rawUser) {
+            try {
+              activeEmail = JSON.parse(rawUser).email;
+            } catch(e) {}
+          }
+
+          localStorage.removeItem('livelore_active_user');
+          localStorage.removeItem('livelore_local_shows');
+          localStorage.removeItem('livelore_vault_v1');
+          localStorage.removeItem('livelore_backup_shows');
+
+          if (activeEmail) {
+            const userKey = `livelore_shows_${activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_')}`;
+            localStorage.removeItem(userKey);
+
+            fetch('/api/sync/push', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                userId: `u_cloud_${activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_')}`,
+                concertsData: { concerts: [] }
+              })
+            }).catch(function(err) {});
+          }
+
+          renderShowsFeed();
+          updateStatsDisplay();
+          handleLogout();
+          alert('✓ Your account and concert vault have been permanently deleted.');
+        }
+      }
     }
 
     function switchTicketTheme(theme) {
