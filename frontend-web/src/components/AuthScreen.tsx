@@ -203,19 +203,19 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onBack, onSuccess, onOpe
         </form>
       </div>
 
-      {/* Footer Legal Links & Dynamic Copyright */}
+      {/* Footer Legal Links & Dynamic Copyright (Terms of Service • FAQ • Privacy Policy) */}
       <footer className="w-full max-w-md mx-auto pt-6 pb-2 text-center text-xs font-extrabold text-slate-400 space-y-2">
         <div className="flex items-center justify-center gap-4 text-[#FFB300]">
           <button type="button" onClick={() => onOpenLegal && onOpenLegal('terms')} className="hover:underline">
             Terms of Service
           </button>
           <span>•</span>
-          <button type="button" onClick={() => onOpenLegal && onOpenLegal('privacy')} className="hover:underline">
-            Privacy Policy
-          </button>
-          <span>•</span>
           <button type="button" onClick={() => onOpenLegal && onOpenLegal('faq')} className="hover:underline">
             FAQ
+          </button>
+          <span>•</span>
+          <button type="button" onClick={() => onOpenLegal && onOpenLegal('privacy')} className="hover:underline">
+            Privacy Policy
           </button>
         </div>
         <p className="text-slate-500 font-bold uppercase tracking-widest text-[11px]">
