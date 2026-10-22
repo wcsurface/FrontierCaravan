@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -158,7 +158,7 @@
       <input type="text" id="auth-email" class="input-field" placeholder="you@example.com" autocomplete="off" />
 
       <label class="input-label">Password *</label>
-      <input type="password" id="auth-password" class="input-field" placeholder="••••••••" autocomplete="new-password" />
+      <input type="password" id="auth-password" class="input-field" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" autocomplete="new-password" />
 
       <button type="submit" class="btn-cta" id="btn-auth-submit">LOG IN</button>
     </form>
@@ -167,13 +167,13 @@
     <footer style="text-align:center; padding: 20px 0 10px 0; width:100%; font-size:12px; font-weight:800; color:#94a3b8;">
       <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin-bottom:6px; color:#FFB300;">
         <a href="#" onclick="showScreen('terms'); return false;" style="color:#FFB300; text-decoration:none;">Terms of Service</a>
-        <span>•</span>
+        <span>â€¢</span>
         <a href="#" onclick="showScreen('privacy'); return false;" style="color:#FFB300; text-decoration:none;">Privacy Policy</a>
-        <span>•</span>
+        <span>â€¢</span>
         <a href="#" onclick="showScreen('faq'); return false;" style="color:#FFB300; text-decoration:none;">FAQ</a>
       </div>
       <div style="color:#64748b; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px;">
-        © <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
+        Â© <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
       </div>
     </footer>
   </div>
@@ -261,8 +261,8 @@
       <!-- CONCERT PHOTOS (VIP FEATURE - POSITIONED DIRECTLY BELOW NOTES & ABOVE SUBMIT BUTTON) -->
       <div style="background:#121619; border:1px solid #222B30; border-radius:12px; padding:14px; margin-bottom:12px;">
         <div>
-          <label class="input-label" style="margin-bottom:0;">📷 CONCERT PHOTOS (<span id="photo-count-label">0</span>/5)</label>
-          <div style="font-size:14px; font-weight:900; color:#FFB300; margin-top:4px; margin-bottom:8px;">👑 VIP PASS ($4.99 ONE-TIME)</div>
+          <label class="input-label" style="margin-bottom:0;">ðŸ“· CONCERT PHOTOS (<span id="photo-count-label">0</span>/5)</label>
+          <div style="font-size:14px; font-weight:900; color:#FFB300; margin-top:4px; margin-bottom:8px;">ðŸ‘‘ VIP PASS ($4.99 ONE-TIME)</div>
         </div>
 
         <div id="photos-grid" style="display:grid; grid-template-columns: repeat(5, 1fr); gap:8px;">
@@ -270,7 +270,7 @@
         </div>
       </div>
 
-      <!-- Action Button: Changes dynamically between "+ ADD CONCERT" and "💾 SAVE EDITS" -->
+      <!-- Action Button: Changes dynamically between "+ ADD CONCERT" and "ðŸ’¾ SAVE EDITS" -->
       <button type="submit" class="btn-cta" id="btn-save-show">+ ADD CONCERT</button>
     </form>
   </div>
@@ -321,15 +321,15 @@
 
       <!-- Concert Photo Memories Thumbnails Gallery (POSITIONED DIRECTLY ABOVE EDIT CONCERT BUTTON) -->
       <div id="detail-photos-gallery-box" style="display:none; margin-top:14px; border-top:1px solid #222B30; padding-top:10px;">
-        <div class="detail-label" style="color:#FFB300;">📷 CONCERT PHOTO MEMORIES</div>
+        <div class="detail-label" style="color:#FFB300;">ðŸ“· CONCERT PHOTO MEMORIES</div>
         <div style="font-size:11px; color:#94a3b8; margin-bottom:8px; font-weight:bold;">Tap any photo to view full screen & cycle through gallery</div>
         <div id="detail-photos-grid" style="display:grid; grid-template-columns: repeat(5, 1fr); gap:8px;"></div>
       </div>
     </div>
 
     <!-- Action Buttons: EDIT CONCERT & DELETE CONCERT -->
-    <button class="btn-edit" id="btn-edit-show" style="font-size:16px; padding:14px;" onclick="triggerEditShow()">✏ EDIT CONCERT</button>
-    <button class="btn-delete" id="btn-delete-show" style="font-size:15px; padding:14px;" onclick="triggerDeleteShow()">🗑 DELETE CONCERT</button>
+    <button class="btn-edit" id="btn-edit-show" style="font-size:16px; padding:14px;" onclick="triggerEditShow()">âœ EDIT CONCERT</button>
+    <button class="btn-delete" id="btn-delete-show" style="font-size:15px; padding:14px;" onclick="triggerDeleteShow()">ðŸ—‘ DELETE CONCERT</button>
   </div>
 
   <!-- SCREEN 4: PROFILE DASHBOARD PAGE (VIP AT TOP + 2X LARGER TITLES) -->
@@ -350,42 +350,42 @@
     <!-- 1. LIVELORE VIP PASS (MOVED TO TOP OF LIST ABOVE TICKET STUB COLOR THEME) -->
     <div class="detail-card" style="background: linear-gradient(135deg, rgba(255,179,0,0.22), #121619); border-color: #FFB300; padding: 22px; margin-bottom: 20px;">
       <div style="display:flex; justify-between; align-items:center; margin-bottom:12px; border-bottom: 1px solid #222B30; padding-bottom:8px;">
-        <span style="font-size:20px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px;">👑 LIVELORE VIP PASS</span>
-        <span style="background:#00E676; color:#0a0a0a; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">✓ VIP CONFIRMED</span>
+        <span style="font-size:20px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px;">ðŸ‘‘ LIVELORE VIP PASS</span>
+        <span style="background:#00E676; color:#0a0a0a; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">âœ“ VIP CONFIRMED</span>
       </div>
-      <div style="font-weight:900; font-size:19px; color:#00E676; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">✓ YOU ARE A VIP MEMBER!</div>
+      <div style="font-weight:900; font-size:19px; color:#00E676; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">âœ“ YOU ARE A VIP MEMBER!</div>
       <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.5; background:#0A0D0E; padding:12px; border-radius:10px; border:1px solid rgba(0,230,118,0.4);">
-        🎉 Your LiveLore VIP status is active! You have permanent 100% ad-free concert vaulting and full photo memory attachments enabled.
+        ðŸŽ‰ Your LiveLore VIP status is active! You have permanent 100% ad-free concert vaulting and full photo memory attachments enabled.
       </div>
     </div>
 
     <!-- 2. DOWNLOAD CONCERT DATA (CSV) BUTTON (POSITIONED ABOVE TICKET STUB COLOR TOGGLE) -->
     <div class="detail-card" style="padding: 20px; margin-bottom: 20px;">
-      <div class="detail-label" style="color:#00E676;">📥 CONCERT DATA EXPORT</div>
+      <div class="detail-label" style="color:#00E676;">ðŸ“¥ CONCERT DATA EXPORT</div>
       <div style="font-size:13px; color:#e2e8f0; font-weight:600; margin-bottom:14px; line-height:1.5;">
         Download your entire concert vault (dates, artists, openers, venues, location, notes) as a CSV spreadsheet.
       </div>
-      <button class="btn-cta" style="font-size:15px; padding:14px;" onclick="exportConcertsCsv()">📥 DOWNLOAD CONCERT DATA (CSV)</button>
+      <button class="btn-cta" style="font-size:15px; padding:14px;" onclick="exportConcertsCsv()">ðŸ“¥ DOWNLOAD CONCERT DATA (CSV)</button>
     </div>
 
     <!-- 3. TICKET STUB COLOR THEME TOGGLE -->
     <div class="detail-card" style="padding: 20px; margin-bottom: 20px;">
-      <div class="detail-label">🎨 TICKET STUB COLOR THEME</div>
+      <div class="detail-label">ðŸŽ¨ TICKET STUB COLOR THEME</div>
       <div class="theme-toggle-box">
-        <button type="button" class="theme-toggle-btn active" id="theme-btn-multicolor" onclick="switchTicketTheme('multicolor')">🎨 Multi-Colored</button>
-        <button type="button" class="theme-toggle-btn" id="theme-btn-classic" onclick="switchTicketTheme('classic')">📜 Classic Beige</button>
+        <button type="button" class="theme-toggle-btn active" id="theme-btn-multicolor" onclick="switchTicketTheme('multicolor')">ðŸŽ¨ Multi-Colored</button>
+        <button type="button" class="theme-toggle-btn" id="theme-btn-classic" onclick="switchTicketTheme('classic')">ðŸ“œ Classic Beige</button>
       </div>
     </div>
 
     <!-- 4. Account Details Card -->
     <div class="detail-card" style="padding: 22px; margin-bottom: 20px;">
-      <div class="detail-label">👤 ACCOUNT EMAIL</div>
+      <div class="detail-label">ðŸ‘¤ ACCOUNT EMAIL</div>
       <div style="font-size:18px; font-weight:900; color:#ffffff; margin-bottom:20px;" id="profile-email-display">wcsurface@gmail.com</div>
 
       <div style="border-top: 1px solid #222B30; padding-top: 16px;">
-        <div class="detail-label">🔑 CHANGE PASSWORD</div>
+        <div class="detail-label">ðŸ”‘ CHANGE PASSWORD</div>
         <input type="password" id="profile-new-pass" class="input-field" placeholder="New Password (min 6 chars)" style="margin-top:6px; margin-bottom:12px;" />
-        <button type="button" class="btn-update-pass" onclick="alert('✓ Password updated successfully!')">Update Password</button>
+        <button type="button" class="btn-update-pass" onclick="alert('âœ“ Password updated successfully!')">Update Password</button>
       </div>
     </div>
 
@@ -396,20 +396,20 @@
 
     <!-- 6. DELETE ACCOUNT & ALL DATA BUTTON (POSITIONED BELOW LOG OUT) -->
     <div style="margin-top:8px; width:100%;">
-      <button class="btn-delete" style="font-size:15px; padding:14px; background:rgba(225, 29, 72, 0.25); border-color:rgba(225, 29, 72, 0.8);" onclick="handleDeleteAccountAndData()">🗑 DELETE ACCOUNT & ALL DATA</button>
+      <button class="btn-delete" style="font-size:15px; padding:14px; background:rgba(225, 29, 72, 0.25); border-color:rgba(225, 29, 72, 0.8);" onclick="handleDeleteAccountAndData()">ðŸ—‘ DELETE ACCOUNT & ALL DATA</button>
     </div>
 
     <!-- Footer Legal Links & Dynamic Copyright -->
     <footer style="text-align:center; padding: 20px 0 10px 0; width:100%; font-size:12px; font-weight:800; color:#94a3b8;">
       <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin-bottom:6px; color:#FFB300;">
         <a href="#" onclick="showScreen('terms'); return false;" style="color:#FFB300; text-decoration:none;">Terms of Service</a>
-        <span>•</span>
+        <span>â€¢</span>
         <a href="#" onclick="showScreen('privacy'); return false;" style="color:#FFB300; text-decoration:none;">Privacy Policy</a>
-        <span>•</span>
+        <span>â€¢</span>
         <a href="#" onclick="showScreen('faq'); return false;" style="color:#FFB300; text-decoration:none;">FAQ</a>
       </div>
       <div style="color:#64748b; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px;">
-        © <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
+        Â© <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
       </div>
     </footer>
   </div>
@@ -433,7 +433,7 @@
 
     <!-- 1. TOP ARTISTS (TOP 10) -->
     <div class="stats-card" onclick="showSubStats('artists')">
-      <div class="stats-card-title" style="color:#FFB300;">TOP ARTISTS (TOP 10) <span style="font-size:12px; font-weight:900;">SEE ALL ➔</span></div>
+      <div class="stats-card-title" style="color:#FFB300;">TOP ARTISTS (TOP 10) <span style="font-size:12px; font-weight:900;">SEE ALL âž”</span></div>
       <div style="font-size:15px; font-weight:800;" id="stats-artists-preview">
         <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top artists!</div>
       </div>
@@ -441,7 +441,7 @@
 
     <!-- 2. TOP VENUES (TOP 10) -->
     <div class="stats-card" onclick="showSubStats('venues')">
-      <div class="stats-card-title" style="color:#00E676;">TOP VENUES (TOP 10) <span style="font-size:12px; font-weight:900;">SEE ALL ➔</span></div>
+      <div class="stats-card-title" style="color:#00E676;">TOP VENUES (TOP 10) <span style="font-size:12px; font-weight:900;">SEE ALL âž”</span></div>
       <div style="font-size:15px; font-weight:800;" id="stats-venues-preview">
         <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top venues!</div>
       </div>
@@ -449,7 +449,7 @@
 
     <!-- 3. TOP CITIES (TOP 10) -->
     <div class="stats-card" onclick="showSubStats('cities')">
-      <div class="stats-card-title" style="color:#00B0FF;">TOP CITIES (TOP 10) <span style="font-size:12px; font-weight:900;">SEE ALL ➔</span></div>
+      <div class="stats-card-title" style="color:#00B0FF;">TOP CITIES (TOP 10) <span style="font-size:12px; font-weight:900;">SEE ALL âž”</span></div>
       <div style="font-size:15px; font-weight:800;" id="stats-cities-preview">
         <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top cities!</div>
       </div>
@@ -457,7 +457,7 @@
 
     <!-- 4. TOP STATES (TOP 10) -->
     <div class="stats-card" onclick="showSubStats('states')">
-      <div class="stats-card-title" style="color:#E040FB;">TOP STATES (TOP 10) <span style="font-size:12px; font-weight:900;">SEE ALL ➔</span></div>
+      <div class="stats-card-title" style="color:#E040FB;">TOP STATES (TOP 10) <span style="font-size:12px; font-weight:900;">SEE ALL âž”</span></div>
       <div style="font-size:15px; font-weight:800;" id="stats-states-preview">
         <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top states!</div>
       </div>
@@ -465,7 +465,7 @@
 
     <!-- 5. TOP YEARS (TOP 10 - SORTED BY MOST CONCERTS ATTENDED) -->
     <div class="stats-card" onclick="showSubStats('years')">
-      <div class="stats-card-title" style="color:#FF7A00;">TOP YEARS (TOP 10) <span style="font-size:12px; font-weight:900;">SEE ALL ➔</span></div>
+      <div class="stats-card-title" style="color:#FF7A00;">TOP YEARS (TOP 10) <span style="font-size:12px; font-weight:900;">SEE ALL âž”</span></div>
       <div style="font-size:15px; font-weight:800;" id="stats-years-preview">
         <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top years!</div>
       </div>
@@ -473,7 +473,7 @@
 
     <!-- 6. DAYS OF THE WEEK -->
     <div class="stats-card" onclick="showSubStats('days')">
-      <div class="stats-card-title" style="color:#FF4081;">DAYS OF THE WEEK <span style="font-size:12px; font-weight:900;">SEE ALL ➔</span></div>
+      <div class="stats-card-title" style="color:#FF4081;">DAYS OF THE WEEK <span style="font-size:12px; font-weight:900;">SEE ALL âž”</span></div>
       <div style="font-size:15px; font-weight:800;" id="stats-days-preview">
         <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view days of week breakdown!</div>
       </div>
@@ -508,7 +508,7 @@
   <div id="view-terms" class="screen-view">
     <div class="header">
       <button type="button" onclick="showScreen('profile')" style="position:absolute; left:12px; top:50px; background:none; border:none; color:#FFB300; font-weight:900; font-size:14px; cursor:pointer; z-index:10;">
-        ← BACK
+        â† BACK
       </button>
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
@@ -522,7 +522,7 @@
     </div>
 
     <div class="detail-card">
-      <div class="detail-label">📄 TERMS OF SERVICE</div>
+      <div class="detail-label">ðŸ“„ TERMS OF SERVICE</div>
       <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.6;">
         <p style="margin-bottom:12px;">Welcome to <strong>LiveLore: Concert Diary & Setlist Vault</strong> by <strong>Surface Apps</strong>.</p>
         <p style="margin-bottom:10px;"><strong>1. User Accounts:</strong> You are responsible for safeguarding your account credentials.</p>
@@ -532,7 +532,7 @@
       </div>
     </div>
     <footer style="text-align:center; padding:10px 0; color:#64748b; font-size:11px; font-weight:700;">
-      © <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
+      Â© <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
     </footer>
   </div>
 
@@ -540,7 +540,7 @@
   <div id="view-privacy" class="screen-view">
     <div class="header">
       <button type="button" onclick="showScreen('profile')" style="position:absolute; left:12px; top:50px; background:none; border:none; color:#FFB300; font-weight:900; font-size:14px; cursor:pointer; z-index:10;">
-        ← BACK
+        â† BACK
       </button>
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
@@ -554,7 +554,7 @@
     </div>
 
     <div class="detail-card">
-      <div class="detail-label" style="color:#00E676;">🔒 PRIVACY POLICY</div>
+      <div class="detail-label" style="color:#00E676;">ðŸ”’ PRIVACY POLICY</div>
       <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.6;">
         <p style="margin-bottom:12px; background:#0A0D0E; padding:10px; border-radius:8px; border:1px solid rgba(0,230,118,0.3); color:#00E676; font-weight:800;">
           Zero Data Sale Guarantee: We NEVER sell or rent your personal information to third parties.
@@ -565,7 +565,7 @@
       </div>
     </div>
     <footer style="text-align:center; padding:10px 0; color:#64748b; font-size:11px; font-weight:700;">
-      © <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
+      Â© <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
     </footer>
   </div>
 
@@ -573,7 +573,7 @@
   <div id="view-faq" class="screen-view">
     <div class="header">
       <button type="button" onclick="showScreen('profile')" style="position:absolute; left:12px; top:50px; background:none; border:none; color:#FFB300; font-weight:900; font-size:14px; cursor:pointer; z-index:10;">
-        ← BACK
+        â† BACK
       </button>
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
@@ -587,7 +587,7 @@
     </div>
 
     <div class="detail-card">
-      <div class="detail-label" style="color:#00B0FF;">❓ FREQUENTLY ASKED QUESTIONS</div>
+      <div class="detail-label" style="color:#00B0FF;">â“ FREQUENTLY ASKED QUESTIONS</div>
       <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.6;">
         <p style="margin-bottom:12px;"><strong style="color:#FFB300;">Q: What is LiveLore?</strong><br>A: Your ultimate personal concert diary and setlist vault.</p>
         <p style="margin-bottom:12px;"><strong style="color:#FFB300;">Q: How does Cloud Sync work?</strong><br>A: When logged in, your concert vault automatically backs up securely to the cloud.</p>
@@ -596,7 +596,7 @@
       </div>
     </div>
     <footer style="text-align:center; padding:10px 0; color:#64748b; font-size:11px; font-weight:700;">
-      © <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
+      Â© <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
     </footer>
   </div>
 
@@ -604,18 +604,18 @@
   <div id="photo-lightbox-modal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.95); backdrop-filter:blur(10px); flex-direction:column; justify-between; padding:16px;" onclick="closePhotoModal()">
     <div style="display:flex; justify-between; align-items:center; width:100%; max-width:420px; margin:0 auto; padding-top:20px;">
       <span style="font-size:14px; font-weight:900; color:#FFB300; text-transform:uppercase;" id="lightbox-counter-label">Photo 1 of 1</span>
-      <button type="button" onclick="closePhotoModal()" style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid #475569; border-radius:50%; width:36px; height:36px; font-size:18px; font-weight:bold; cursor:pointer;">✕</button>
+      <button type="button" onclick="closePhotoModal()" style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid #475569; border-radius:50%; width:36px; height:36px; font-size:18px; font-weight:bold; cursor:pointer;">âœ•</button>
     </div>
 
     <div style="position:relative; flex:1; display:flex; align-items:center; justify-center; width:100%; max-width:420px; margin:auto;">
       <img id="lightbox-img" src="" alt="Concert Photo Lightbox" style="max-height:70vh; max-width:100%; object-fit:contain; border-radius:16px; border:1px solid rgba(255,179,0,0.4);" onclick="event.stopPropagation();" />
-      <button type="button" onclick="prevModalPhoto(event)" style="position:absolute; left:8px; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.8); color:#FFB300; border:1px solid #FFB300; border-radius:50%; width:44px; height:44px; font-size:22px; font-weight:bold; cursor:pointer;">◀</button>
-      <button type="button" onclick="nextModalPhoto(event)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.8); color:#FFB300; border:1px solid #FFB300; border-radius:50%; width:44px; height:44px; font-size:22px; font-weight:bold; cursor:pointer;">▶</button>
+      <button type="button" onclick="prevModalPhoto(event)" style="position:absolute; left:8px; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.8); color:#FFB300; border:1px solid #FFB300; border-radius:50%; width:44px; height:44px; font-size:22px; font-weight:bold; cursor:pointer;">â—€</button>
+      <button type="button" onclick="nextModalPhoto(event)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.8); color:#FFB300; border:1px solid #FFB300; border-radius:50%; width:44px; height:44px; font-size:22px; font-weight:bold; cursor:pointer;">â–¶</button>
     </div>
 
     <div style="width:100%; max-width:420px; margin:0 auto; display:flex; gap:12px; padding-bottom:12px;" onclick="event.stopPropagation();">
-      <button type="button" onclick="prevModalPhoto(event)" style="flex:1; padding:12px; background:#121619; border:1px solid #FFB300; color:#FFB300; font-weight:900; font-size:13px; text-transform:uppercase; border-radius:10px; cursor:pointer;">◀ PREVIOUS</button>
-      <button type="button" onclick="nextModalPhoto(event)" style="flex:1; padding:12px; background:#121619; border:1px solid #FFB300; color:#FFB300; font-weight:900; font-size:13px; text-transform:uppercase; border-radius:10px; cursor:pointer;">NEXT ▶</button>
+      <button type="button" onclick="prevModalPhoto(event)" style="flex:1; padding:12px; background:#121619; border:1px solid #FFB300; color:#FFB300; font-weight:900; font-size:13px; text-transform:uppercase; border-radius:10px; cursor:pointer;">â—€ PREVIOUS</button>
+      <button type="button" onclick="nextModalPhoto(event)" style="flex:1; padding:12px; background:#121619; border:1px solid #FFB300; color:#FFB300; font-weight:900; font-size:13px; text-transform:uppercase; border-radius:10px; cursor:pointer;">NEXT â–¶</button>
     </div>
   </div>
 
@@ -719,8 +719,8 @@
     }
 
     function handleDeleteAccountAndData() {
-      if (confirm('⚠️ ARE YOU SURE YOU WANT TO PERMANENTLY DELETE YOUR ACCOUNT & ALL CONCERT DATA?\n\nThis action CANNOT be undone.')) {
-        if (confirm('🚨 FINAL CONFIRMATION: Tap OK to permanently wipe your user credentials and all saved concerts from cloud and local storage.')) {
+      if (confirm('âš ï¸ ARE YOU SURE YOU WANT TO PERMANENTLY DELETE YOUR ACCOUNT & ALL CONCERT DATA?\n\nThis action CANNOT be undone.')) {
+        if (confirm('ðŸš¨ FINAL CONFIRMATION: Tap OK to permanently wipe your user credentials and all saved concerts from cloud and local storage.')) {
           userShows = [];
 
           const rawUser = localStorage.getItem('livelore_active_user');
@@ -753,7 +753,7 @@
           renderShowsFeed();
           updateStatsDisplay();
           handleLogout();
-          alert('✓ Your account and concert vault have been permanently deleted.');
+          alert('âœ“ Your account and concert vault have been permanently deleted.');
         }
       }
     }
@@ -782,39 +782,244 @@
     }
 
     // PRESET VENUES WITH OFFICIAL 2-LETTER U.S. STATE ABBREVIATIONS
-    const VENUE_DB = [
+        const VENUE_DB = [
       { v: "Deer Creek Music Center", c: "Noblesville", s: "IN", co: "USA" },
       { v: "Klipsch Music Center", c: "Noblesville", s: "IN", co: "USA" },
       { v: "Ruoff Music Center", c: "Noblesville", s: "IN", co: "USA" },
+      { v: "Ruoff Home Mortgage Music Center", c: "Noblesville", s: "IN", co: "USA" },
       { v: "Verizon Wireless Music Center (Noblesville)", c: "Noblesville", s: "IN", co: "USA" },
-      { v: "Market Square Arena", c: "Indianapolis", s: "IN", co: "USA" },
       { v: "Red Rocks Amphitheatre", c: "Morrison", s: "CO", co: "USA" },
-      { v: "The Gorge Amphitheatre", c: "George", s: "WA", co: "USA" },
-      { v: "Madison Square Garden", c: "New York", s: "NY", co: "USA" },
-      { v: "The Fillmore", c: "San Francisco", s: "CA", co: "USA" },
-      { v: "Hollywood Bowl", c: "Los Angeles", s: "CA", co: "USA" },
-      { v: "Ryman Auditorium", c: "Nashville", s: "TN", co: "USA" },
-      { v: "First Avenue", c: "Minneapolis", s: "MN", co: "USA" },
-      { v: "9:30 Club", c: "Washington", s: "DC", co: "USA" },
-      { v: "The Stone Pony", c: "Asbury Park", s: "NJ", co: "USA" },
-      { v: "The Forum (Kia Forum)", c: "Inglewood", s: "CA", co: "USA" },
       { v: "Dick's Sporting Goods Park", c: "Commerce City", s: "CO", co: "USA" },
       { v: "Fiddler's Green Amphitheatre", c: "Greenwood Village", s: "CO", co: "USA" },
       { v: "Boulder Theater", c: "Boulder", s: "CO", co: "USA" },
+      { v: "Macky Auditorium", c: "Boulder", s: "CO", co: "USA" },
       { v: "The Fillmore Auditorium", c: "Denver", s: "CO", co: "USA" },
       { v: "Ogden Theatre", c: "Denver", s: "CO", co: "USA" },
       { v: "Gothic Theatre", c: "Englewood", s: "CO", co: "USA" },
       { v: "Bluebird Theater", c: "Denver", s: "CO", co: "USA" },
+      { v: "Cervantes' Masterpiece Ballroom", c: "Denver", s: "CO", co: "USA" },
+      { v: "Paramount Theatre", c: "Denver", s: "CO", co: "USA" },
+      { v: "Oriental Theater", c: "Denver", s: "CO", co: "USA" },
+      { v: "Civic Center Park", c: "Denver", s: "CO", co: "USA" },
+      { v: "Mission Ballroom", c: "Denver", s: "CO", co: "USA" },
+      { v: "Mishawaka Amphitheatre", c: "Bellvue", s: "CO", co: "USA" },
+      { v: "Planet Bluegrass (Folks Festival)", c: "Lyons", s: "CO", co: "USA" },
+      { v: "1stBank Center", c: "Broomfield", s: "CO", co: "USA" },
+      { v: "Elitch Gardens Arena", c: "Denver", s: "CO", co: "USA" },
+      { v: "Quixote's True Blue", c: "Denver", s: "CO", co: "USA" },
+      { v: "Bohemian Nights Festival", c: "Fort Collins", s: "CO", co: "USA" },
+      { v: "McNichols Sports Arena", c: "Denver", s: "CO", co: "USA" },
+      { v: "Market Square Arena", c: "Indianapolis", s: "IN", co: "USA" },
       { v: "Hoosier Dome", c: "Indianapolis", s: "IN", co: "USA" },
       { v: "Murat Theatre", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Old National Centre (Murat Shrine)", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Hilton U. Brown Theatre", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "The Vogue", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "World Mardi Gras", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Military Park (Indy Jazz Fest)", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Star Plaza Theatre", c: "Merrillville", s: "IN", co: "USA" },
+      { v: "Bluebird Nightclub", c: "Bloomington", s: "IN", co: "USA" },
+      { v: "Headliners", c: "Muncie", s: "IN", co: "USA" },
+      { v: "Worthen Arena (Ball State)", c: "Muncie", s: "IN", co: "USA" },
+      { v: "Emens Auditorium", c: "Muncie", s: "IN", co: "USA" },
       { v: "Buckeye Lake Music Center", c: "Millersport", s: "OH", co: "USA" },
       { v: "Richfield Coliseum", c: "Richfield", s: "OH", co: "USA" },
       { v: "Blossom Music Center", c: "Cuyahoga Falls", s: "OH", co: "USA" },
-      { v: "Riverport Amphitheater", c: "St. Louis", s: "MO", co: "USA" },
+      { v: "Riverbend Music Center", c: "Cincinnati", s: "OH", co: "USA" },
+      { v: "Hara Arena", c: "Dayton", s: "OH", co: "USA" },
+      { v: "Nutter Center", c: "Dayton", s: "OH", co: "USA" },
       { v: "Alpine Valley Music Theatre", c: "East Troy", s: "WI", co: "USA" },
-      { v: "Soldier Field", c: "Chicago", s: "IL", co: "USA" },
       { v: "Rosemont Horizon", c: "Rosemont", s: "IL", co: "USA" },
+      { v: "Soldier Field", c: "Chicago", s: "IL", co: "USA" },
+      { v: "World Music Theatre", c: "Tinley Park", s: "IL", co: "USA" },
+      { v: "Assembly Hall", c: "Champaign", s: "IL", co: "USA" },
+      { v: "Riverport Amphitheater", c: "St. Louis", s: "MO", co: "USA" },
+      { v: "The Palace of Auburn Hills", c: "Auburn Hills", s: "MI", co: "USA" },
+      { v: "Palace Theatre", c: "Louisville", s: "KY", co: "USA" },
+      { v: "Mud Island Amphitheater", c: "Memphis", s: "TN", co: "USA" },
+      { v: "Concrete Street Amphitheater", c: "Corpus Christi", s: "TX", co: "USA" },
+      { v: "MGM Grand Garden Arena", c: "Las Vegas", s: "NV", co: "USA" },
+      { v: "Fox Theater", c: "Oakland", s: "CA", co: "USA" },
+      { v: "Golden State Theatre", c: "Monterey", s: "CA", co: "USA" },
+      { v: "Greek Theatre (UC Berkeley)", c: "Berkeley", s: "CA", co: "USA" },
       { v: "Chase Center", c: "San Francisco", s: "CA", co: "USA" },
+      { v: "The Spectrum", c: "Philadelphia", s: "PA", co: "USA" },
+      { v: "Giants Stadium", c: "East Rutherford", s: "NJ", co: "USA" },
+      { v: "Madison Square Garden", c: "New York", s: "NY", co: "USA" },
+      { v: "Robert F. Kennedy Stadium", c: "Washington", s: "DC", co: "USA" },
+      { v: "Rich Stadium", c: "Buffalo", s: "NY", co: "USA" },
+      { v: "Los Angeles Memorial Coliseum", c: "Los Angeles", s: "CA", co: "USA" },
+      { v: "Franklin County Field", c: "Highgate", s: "VT", co: "USA" },
+      { v: "Sullivan Stadium", c: "Foxboro", s: "MA", co: "USA" },
+      { v: "Oakland-Alameda County Coliseum Stadium", c: "Oakland", s: "CA", co: "USA" },
+      { v: "Orion Amphitheater", c: "Huntsville", s: "AL", co: "USA" },
+      { v: "VyStar Veterans Memorial Arena", c: "Jacksonville", s: "FL", co: "USA" },
+      { v: "Allianz Amphitheater at Riverfront", c: "Richmond", s: "VA", co: "USA" },
+      { v: "Jim Whelan Boardwalk Hall", c: "Atlantic City", s: "NJ", co: "USA" },
+      { v: "Fenway Park", c: "Boston", s: "MA", co: "USA" },
+      { v: "Empower Federal Credit Union Amphitheater at Lakeview", c: "Syracuse", s: "NY", co: "USA" },
+      { v: "Merriweather Post Pavilion", c: "Columbia", s: "MD", co: "USA" },
+      { v: "Coastal Credit Union Music Park at Walnut Creek", c: "Raleigh", s: "NC", co: "USA" },
+      { v: "Enmarket Arena", c: "Savannah", s: "GA", co: "USA" },
+      { v: "Kohl Center", c: "Madison", s: "WI", co: "USA" },
+      { v: "Sphere", c: "Las Vegas", s: "NV", co: "USA" },
+      { v: "Moon Palace", c: "Cancun", s: "Quintana Roo", co: "Mexico" },
+      { v: "Hampton Coliseum", c: "Hampton", s: "VA", co: "USA" },
+      { v: "Ameris Bank Amphitheatre", c: "Alpharetta", s: "GA", co: "USA" },
+      { v: "Coca-Cola Amphitheater", c: "Birmingham", s: "AL", co: "USA" },
+      { v: "Highland Festival Grounds at Kentucky Expo Center", c: "Louisville", s: "KY", co: "USA" },
+      { v: "Broadview Stage at SPAC", c: "Saratoga Springs", s: "NY", co: "USA" },
+      { v: "Forest Hills Stadium", c: "Forest Hills", s: "NY", co: "USA" },
+      { v: "United Center", c: "Chicago", s: "IL", co: "USA" },
+      { v: "TD Pavilion at the Mann", c: "Philadelphia", s: "PA", co: "USA" },
+      { v: "North Charleston Coliseum", c: "North Charleston", s: "SC", co: "USA" },
+      { v: "Jerome Schottenstein Center", c: "Columbus", s: "OH", co: "USA" },
+      { v: "Folsom Field", c: "Boulder", s: "CO", co: "USA" },
+      { v: "Moody Center", c: "Austin", s: "TX", co: "USA" },
+      { v: "Petersen Events Center", c: "Pittsburgh", s: "PA", co: "USA" },
+      { v: "SNHU Arena", c: "Manchester", s: "NH", co: "USA" },
+      { v: "Hollywood Bowl", c: "Hollywood", s: "CA", co: "USA" },
+      { v: "Bill Graham Civic Auditorium", c: "San Francisco", s: "CA", co: "USA" },
+      { v: "Moda Center", c: "Portland", s: "OR", co: "USA" },
+      { v: "Climate Pledge Arena", c: "Seattle", s: "WA", co: "USA" },
+      { v: "MVP Arena", c: "Albany", s: "NY", co: "USA" },
+      { v: "The Woodlands", c: "Dover", s: "DE", co: "USA" },
+      { v: "Bethel Woods Center for the Arts", c: "Bethel", s: "NY", co: "USA" },
+      { v: "Van Andel Arena", c: "Grand Rapids", s: "MI", co: "USA" },
+      { v: "Chaifetz Arena, Saint Louis University", c: "St. Louis", s: "MO", co: "USA" },
+      { v: "Mohegan Sun Arena", c: "Uncasville", s: "CT", co: "USA" },
+      { v: "Xfinity Center", c: "Mansfield", s: "MA", co: "USA" },
+      { v: "Ervin J. Nutter Center, Wright State University", c: "Dayton", s: "OH", co: "USA" },
+      { v: "Bridgestone Arena", c: "Nashville", s: "TN", co: "USA" },
+      { v: "St. Joseph's Health Amphitheater at Lakeview", c: "Syracuse", s: "NY", co: "USA" },
+      { v: "The Pavilion at Star Lake", c: "Burgettstown", s: "PA", co: "USA" },
+      { v: "Live Oak Bank Pavilion at Riverfront Park", c: "Wilmington", s: "NC", co: "USA" },
+      { v: "William Randolph Hearst Greek Theatre, University of California, Berkeley", c: "Berkeley", s: "CA", co: "USA" },
+      { v: "Budweiser Stage", c: "Toronto", s: "Ontario", co: "Canada" },
+      { v: "Atlantic City Beach", c: "Atlantic City", s: "NJ", co: "USA" },
+      { v: "Pine Knob Music Theatre", c: "Clarkston", s: "MI", co: "USA" },
+      { v: "Northwell Health at Jones Beach Theater", c: "Wantagh", s: "NY", co: "USA" },
+      { v: "Xfinity Theatre", c: "Hartford", s: "CT", co: "USA" },
+      { v: "Maine Savings Amphitheater", c: "Bangor", s: "ME", co: "USA" },
+      { v: "Credit One Stadium", c: "Charleston", s: "SC", co: "USA" },
+      { v: "The Wharf Amphitheater", c: "Orange Beach", s: "AL", co: "USA" },
+      { v: "Rock Lititz", c: "Lititz", s: "PA", co: "USA" },
+      { v: "Santa Barbara Bowl", c: "Santa Barbara", s: "CA", co: "USA" },
+      { v: "The Forum", c: "Inglewood", s: "CA", co: "USA" },
+      { v: "North Island Credit Union Amphitheatre", c: "Chula Vista", s: "CA", co: "USA" },
+      { v: "Ak-Chin Pavilion", c: "Phoenix", s: "AZ", co: "USA" },
+      { v: "Matthew Knight Arena", c: "Eugene", s: "OR", co: "USA" },
+      { v: "Golden 1 Center", c: "Sacramento", s: "CA", co: "USA" },
+      { v: "Shoreline Amphitheatre", c: "Mountain View", s: "CA", co: "USA" },
+      { v: "Gorge Amphitheatre", c: "George", s: "WA", co: "USA" },
+      { v: "Hersheypark Stadium", c: "Hershey", s: "PA", co: "USA" },
+      { v: "Ascend Amphitheater", c: "Nashville", s: "TN", co: "USA" },
+      { v: "Oak Mountain Amphitheatre", c: "Pelham", s: "AL", co: "USA" },
+      { v: "Walmart Arkansas Music Pavilion", c: "Rogers", s: "AR", co: "USA" },
+      { v: "Met Philadelphia", c: "Philadelphia", s: "PA", co: "USA" },
+      { v: "Nassau Veterans Memorial Coliseum", c: "Uniondale", s: "NY", co: "USA" },
+      { v: "Dunkin' Donuts Center", c: "Providence", s: "RI", co: "USA" },
+      { v: "Saratoga Performing Arts Center", c: "Saratoga Springs", s: "NY", co: "USA" },
+      { v: "BB&T Pavilion", c: "Camden", s: "NJ", co: "USA" },
+      { v: "Darling's Waterfront Pavilion", c: "Bangor", s: "ME", co: "USA" },
+      { v: "PNC Music Pavilion", c: "Charlotte", s: "NC", co: "USA" },
+      { v: "Bonnaroo Music & Arts Festival", c: "Manchester", s: "TN", co: "USA" },
+      { v: "BarcelÃ³ Maya Beach", c: "Riviera Maya", s: "Quintana Roo", co: "Mexico" },
+      { v: "Allstate Arena", c: "Rosemont", s: "IL", co: "USA" },
+      { v: "Times Union Center", c: "Albany", s: "NY", co: "USA" },
+      { v: "Verizon Wireless Amphitheatre at Encore Park", c: "Alpharetta", s: "GA", co: "USA" },
+      { v: "Austin360 Amphitheater", c: "Del Valle", s: "TX", co: "USA" },
+      { v: "Lake Tahoe Outdoor Arena at Harveys", c: "Stateline", s: "NV", co: "USA" },
+      { v: "Huntington Bank Pavilion at Northerly Island", c: "Chicago", s: "IL", co: "USA" },
+      { v: "Verizon Theatre at Grand Prairie", c: "Grand Prairie", s: "TX", co: "USA" },
+      { v: "Jacksonville Veterans Memorial Arena", c: "Jacksonville", s: "FL", co: "USA" },
+      { v: "Oak Ridge Farm", c: "Arrington", s: "VA", co: "USA" },
+      { v: "Sleep Train Amphitheatre", c: "Chula Vista", s: "CA", co: "USA" },
+      { v: "Lakeview Amphitheater", c: "Syracuse", s: "NY", co: "USA" },
+      { v: "Cross Insurance Arena", c: "Portland", s: "ME", co: "USA" },
+      { v: "The Mann Center for the Performing Arts", c: "Philadelphia", s: "PA", co: "USA" },
+      { v: "Wrigley Field", c: "Chicago", s: "IL", co: "USA" },
+      { v: "Xcel Energy Center", c: "St. Paul", s: "MN", co: "USA" },
+      { v: "Watkins Glen International", c: "Watkins Glen", s: "NY", co: "USA" },
+      { v: "Walnut Creek Amphitheater", c: "Raleigh", s: "NC", co: "USA" },
+      { v: "Starlight Theatre", c: "Kansas City", s: "MO", co: "USA" },
+      { v: "Tuscaloosa Amphitheater", c: "Tuscaloosa", s: "AL", co: "USA" },
+      { v: "Buckeye Lake Music Center", c: "Thornville", s: "OH", co: "USA" },
+      { v: "Hubert H. Humphrey Metrodome", c: "Minneapolis", s: "MN", co: "USA" },
+      { v: "Carter-Finley Stadium, North Carolina State University", c: "Raleigh", s: "NC", co: "USA" },
+      { v: "Wallace Wade Stadium, Duke University", c: "Durham", s: "NC", co: "USA" },
+      { v: "Three Rivers Stadium", c: "Pittsburgh", s: "PA", co: "USA" },
+      { v: "Sam Boyd Silver Bowl", c: "Las Vegas", s: "NV", co: "USA" },
+      { v: "Autzen Stadium, University of Oregon", c: "Eugene", s: "OR", co: "USA" },
+      { v: "Rubber Bowl, University of Akron", c: "Akron", s: "OH", co: "USA" },
+      { v: "The Palace", c: "Auburn Hills", s: "MI", co: "USA" },
+      { v: "Oxford Plains Speedway", c: "Oxford", s: "ME", co: "USA" },
+      { v: "Blockbuster Pavilion", c: "Glen Helen", s: "CA", co: "USA" },
+      { v: "Carrier Dome, Syracuse University", c: "Syracuse", s: "NY", co: "USA" },
+      { v: "Portland Meadows", c: "Portland", s: "OR", co: "USA" },
+      { v: "Tacoma Dome", c: "Tacoma", s: "WA", co: "USA" },
+      { v: "Silver Stadium", c: "Rochester", s: "NY", co: "USA" },
+      { v: "Alumni Stadium, University of Massachusetts", c: "Amherst", s: "MA", co: "USA" },
+      { v: "Compton Terrace Amphitheatre", c: "Chandler", s: "AZ", co: "USA" },
+      { v: "Poplar Creek Music Theatre", c: "Hoffman Estates", s: "IL", co: "USA" },
+      { v: "Roosevelt Stadium", c: "Jersey City", s: "NJ", co: "USA" },
+      { v: "Hershey Park Stadium", c: "Hershey", s: "PA", co: "USA" },
+      { v: "Charlotte Coliseum", c: "Charlotte", s: "NC", co: "USA" },
+      { v: "Mecca", c: "Milwaukee", s: "WI", co: "USA" },
+      { v: "Wrigley Field", c: "Los Angeles", s: "CA", co: "USA" },
+      { v: "Seattle Center Memorial Stadium", c: "Seattle", s: "WA", co: "USA" },
+      { v: "Meadowlands Arena", c: "East Rutherford", s: "NJ", co: "USA" },
+      { v: "The Omni", c: "Atlanta", s: "GA", co: "USA" },
+      { v: "Caldwell College", c: "Caldwell", s: "NJ", co: "USA" },
+      { v: "Spectrum", c: "Philadelphia", s: "PA", co: "USA" },
+      { v: "Laguna Seca Raceway", c: "Salinas", s: "CA", co: "USA" },
+      { v: "Riverport Amphitheatre", c: "Maryland Heights", s: "MO", co: "USA" },
+      { v: "Joe Louis Arena", c: "Detroit", s: "MI", co: "USA" },
+      { v: "Blockbuster Desert Sky Pavilion", c: "Phoenix", s: "AZ", co: "USA" },
+      { v: "Gund Arena", c: "Cleveland", s: "OH", co: "USA" },
+      { v: "Reunion Arena", c: "Dallas", s: "TX", co: "USA" },
+      { v: "Capital Centre", c: "Landover", s: "MD", co: "USA" },
+      { v: "Dean E. Smith Center, University of North Carolina", c: "Chapel Hill", s: "NC", co: "USA" },
+      { v: "St. Paul Civic Center Arena", c: "St. Paul", s: "MN", co: "USA" },
+      { v: "Sandstone Amphitheater", c: "Bonner Springs", s: "KS", co: "USA" },
+      { v: "Freedom Hall", c: "Louisville", s: "KY", co: "USA" },
+      { v: "Metropolitan Sports Center", c: "Bloomington", s: "MN", co: "USA" },
+      { v: "Pittsburgh Civic Arena", c: "Pittsburgh", s: "PA", co: "USA" },
+      { v: "Great Western Forum", c: "Inglewood", s: "CA", co: "USA" },
+      { v: "Buffalo Memorial Auditorium", c: "Buffalo", s: "NY", co: "USA" },
+      { v: "Long Beach Arena", c: "Long Beach", s: "CA", co: "USA" },
+      { v: "Copps Coliseum", c: "Hamilton", s: "", co: "Canada" },
+      { v: "Miami Arena", c: "Miami", s: "FL", co: "USA" },
+      { v: "Knickerbocker Arena", c: "Albany", s: "NY", co: "USA" },
+      { v: "Cow Palace", c: "Daly City", s: "CA", co: "USA" },
+      { v: "Compton Terrace", c: "Tempe", s: "AZ", co: "USA" },
+      { v: "Riverfront Arena", c: "Cincinnati", s: "OH", co: "USA" },
+      { v: "Hartford Civic Center", c: "Hartford", s: "CT", co: "USA" },
+      { v: "Barton Hall, Cornell University", c: "Ithaca", s: "NY", co: "USA" },
+      { v: "Oakland-Alameda County Coliseum Arena", c: "Oakland", s: "CA", co: "USA" },
+      { v: "Greensboro Coliseum", c: "Greensboro", s: "NC", co: "USA" },
+      { v: "Providence Civic Center", c: "Providence", s: "RI", co: "USA" },
+      { v: "Boston Garden", c: "Boston", s: "MA", co: "USA" },
+      { v: "Seattle Center Memorial Coliseum", c: "Seattle", s: "WA", co: "USA" },
+      { v: "Seashore Performing Arts Center", c: "Old Orchard Beach", s: "ME", co: "USA" },
+      { v: "Irvine Meadows Amphitheatre", c: "Irvine", s: "CA", co: "USA" },
+      { v: "Great Woods Center for the Performing Arts", c: "Mansfield", s: "MA", co: "USA" },
+      { v: "Cal Expo Amphitheatre", c: "Sacramento", s: "CA", co: "USA" },
+      { v: "Orlando Arena", c: "Orlando", s: "FL", co: "USA" },
+      { v: "Los Angeles Memorial Sports Arena", c: "Los Angeles", s: "CA", co: "USA" },
+      { v: "The Summit", c: "Houston", s: "TX", co: "USA" },
+      { v: "Pauley Pavilion, UCLA", c: "Los Angeles", s: "CA", co: "USA" },
+      { v: "Devore Field, Southwestern College", c: "Chula Vista", s: "CA", co: "USA" },
+      { v: "Portland Memorial Coliseum", c: "Portland", s: "OR", co: "USA" },
+      { v: "Centrum", c: "Worcester", s: "MA", co: "USA" },
+      { v: "San Diego Sports Arena", c: "San Diego", s: "CA", co: "USA" },
+      { v: "Ventura County Fairgrounds", c: "Ventura", s: "CA", co: "USA" },
+      { v: "Richmond Coliseum", c: "Richmond", s: "VA", co: "USA" },
+      { v: "Crisler Arena, University of Michigan", c: "Ann Arbor", s: "MI", co: "USA" },
+      { v: "Activity Center, University of Colorado", c: "Boulder", s: "CO", co: "USA" },
+      { v: "Baltimore Civic Center", c: "Baltimore", s: "MD", co: "USA" },
+      { v: "Fieldhouse, University of Iowa", c: "Iowa City", s: "IA", co: "USA" },
+      { v: "Carolina Coliseum Arena, Univ. of S. Carolina", c: "Columbia", s: "SC", co: "USA" },
     ];
 
     let authMode = 'login';
@@ -877,11 +1082,11 @@
         item.innerHTML = `
           <img src="${uri}" style="width:100%; height:100%; object-fit:cover;" />
           ${idx === 0 ? `
-            <div style="position:absolute; top:2px; left:2px; background:#FFB300; color:#0a0a0a; font-size:7px; font-weight:900; padding:1px 4px; border-radius:3px;">⭐ PRIMARY</div>
+            <div style="position:absolute; top:2px; left:2px; background:#FFB300; color:#0a0a0a; font-size:7px; font-weight:900; padding:1px 4px; border-radius:3px;">â­ PRIMARY</div>
           ` : `
-            <button type="button" onclick="setPrimaryPhoto(${idx})" style="position:absolute; top:2px; left:2px; background:rgba(0,0,0,0.8); color:#FFB300; border:none; border-radius:50%; width:18px; height:18px; font-size:9px; font-weight:bold; cursor:pointer;">⭐</button>
+            <button type="button" onclick="setPrimaryPhoto(${idx})" style="position:absolute; top:2px; left:2px; background:rgba(0,0,0,0.8); color:#FFB300; border:none; border-radius:50%; width:18px; height:18px; font-size:9px; font-weight:bold; cursor:pointer;">â­</button>
           `}
-          <button type="button" onclick="removePhoto(${idx})" style="position:absolute; top:2px; right:2px; background:rgba(0,0,0,0.8); color:#fecdd3; border:none; border-radius:50%; width:18px; height:18px; font-size:10px; font-weight:bold; cursor:pointer;">✕</button>
+          <button type="button" onclick="removePhoto(${idx})" style="position:absolute; top:2px; right:2px; background:rgba(0,0,0,0.8); color:#fecdd3; border:none; border-radius:50%; width:18px; height:18px; font-size:10px; font-weight:bold; cursor:pointer;">âœ•</button>
         `;
         grid.appendChild(item);
       });
@@ -1059,12 +1264,12 @@
       const cleanedEmail = emailInput.toLowerCase().trim();
 
       if (!cleanedEmail || cleanedEmail.length < 3 || !cleanedEmail.includes('@')) {
-        showErrorBanner('⚠️ Incorrect Email Address or Password. Please try again.');
+        showErrorBanner('âš ï¸ Incorrect Email Address or Password. Please try again.');
         return;
       }
 
       if (!passInput || passInput.length < 4) {
-        showErrorBanner('⚠️ Incorrect Email Address or Password. Please try again.');
+        showErrorBanner('âš ï¸ Incorrect Email Address or Password. Please try again.');
         return;
       }
 
@@ -1080,7 +1285,7 @@
     }
 
     function buyAppPremium() {
-      alert('🎉 Welcome to LiveLore VIP! You now have permanent ad-free access and photo features!');
+      alert('ðŸŽ‰ Welcome to LiveLore VIP! You now have permanent ad-free access and photo features!');
     }
 
     function openShowDetails(showId) {
@@ -1125,7 +1330,7 @@
         photosGrid.innerHTML = show.photoUris.map((uri, idx) => `
           <div onclick="openPhotoModal(${idx})" style="position:relative; aspect-ratio:1/1; border-radius:10px; overflow:hidden; border:${idx === 0 ? '2px solid #FFB300' : '1px solid #222B30'}; cursor:pointer;">
             <img src="${uri}" style="width:100%; height:100%; object-fit:cover;" />
-            ${idx === 0 ? `<div style="position:absolute; top:2px; left:2px; background:#FFB300; color:#0a0a0a; font-size:7px; font-weight:900; padding:1px 4px; border-radius:3px;">⭐ PRIMARY</div>` : ''}
+            ${idx === 0 ? `<div style="position:absolute; top:2px; left:2px; background:#FFB300; color:#0a0a0a; font-size:7px; font-weight:900; padding:1px 4px; border-radius:3px;">â­ PRIMARY</div>` : ''}
           </div>
         `).join('');
       } else {
@@ -1196,7 +1401,7 @@
       }
 
       const btnSave = document.getElementById('btn-save-show');
-      if (btnSave) btnSave.innerText = '💾 SAVE EDITS';
+      if (btnSave) btnSave.innerText = 'ðŸ’¾ SAVE EDITS';
 
       showScreen('log');
     }
@@ -1391,10 +1596,10 @@
         list.style.alignItems = 'center';
         list.innerHTML = `
           <div id="empty-state-box" style="text-align:center; padding: 30px 16px; margin: auto 0;">
-            <div style="font-size:36px; margin-bottom:12px;">🎸</div>
+            <div style="font-size:36px; margin-bottom:12px;">ðŸŽ¸</div>
             <div style="font-weight:900; font-size:24px; color:#ffffff; text-transform:uppercase; margin-bottom:16px;">YOUR CONCERT VAULT IS EMPTY!</div>
             <div class="bounce-pointer" style="color:#FFB300; font-weight:900; font-size:16px; text-transform:uppercase; letter-spacing:1px; margin-top:12px;">
-              <div style="font-size:42px; color:#00E676; margin-bottom:8px; font-weight:900;">↑</div>
+              <div style="font-size:42px; color:#00E676; margin-bottom:8px; font-weight:900;">â†‘</div>
               START ADDING YOUR CONCERTS ABOVE!
             </div>
           </div>
@@ -1817,3 +2022,4 @@
   </script>
 </body>
 </html>
+
