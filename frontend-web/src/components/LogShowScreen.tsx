@@ -519,7 +519,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
             type="submit"
             className="w-full py-4 bg-gradient-to-r from-[#00E676] to-[#00C853] hover:from-[#00FFA3] hover:to-[#00E676] text-slate-950 font-black text-xl uppercase tracking-widest rounded-full shadow-[0_0_22px_rgba(0,230,118,0.5)] active:scale-[0.98] transition-transform"
           >
-            {concertIdToEdit ? '💾 SAVE EDITS' : '+ ADD'}
+            {concertIdToEdit ? '💾 SAVE EDITS' : '+ ADD SHOW'}
           </button>
         </div>
       </form>
