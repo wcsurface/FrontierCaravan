@@ -5,7 +5,7 @@ import { useEncoreStore } from '../store/useEncoreStore';
 import { parseRawSetlist } from '../engine/setlistParser';
 import { searchVenues, PRESET_VENUES, VenueRecord } from '../engine/venueDataset';
 import { GlassNavBar } from './GlassNavBar';
-import { Plus, Trash2, MapPin, Camera, Crown } from 'lucide-react';
+import { Plus, Trash2, MapPin, Camera, Crown, Star, MoveHorizontal } from 'lucide-react';
 
 interface LogShowScreenProps {
   concertIdToEdit?: string;
@@ -29,6 +29,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
 
   const [venueSuggestions, setVenueSuggestions] = useState<VenueRecord[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
 
   // Pre-populate if editing existing concert
   useEffect(() => {
@@ -100,11 +101,11 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
     const files = Array.from(e.target.files);
 
     files.forEach(file => {
-      if (photoUris.length >= 3) return;
+      if (photoUris.length >= 5) return;
       const reader = new FileReader();
       reader.onloadend = () => {
         if (reader.result) {
-          setPhotoUris(prev => (prev.length < 3 ? [...prev, reader.result as string] : prev));
+          setPhotoUris(prev => (prev.length < 5 ? [...prev, reader.result as string] : prev));
         }
       };
       reader.readAsDataURL(file);
@@ -113,6 +114,32 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
 
   const handleRemovePhoto = (index: number) => {
     setPhotoUris(photoUris.filter((_, i) => i !== index));
+  };
+
+  const handleSetPrimaryPhoto = (index: number) => {
+    if (index === 0 || index >= photoUris.length) return;
+    const updated = [...photoUris];
+    const [selected] = updated.splice(index, 1);
+    updated.unshift(selected);
+    setPhotoUris(updated);
+  };
+
+  // Drag and Drop reorder handlers
+  const handleDragStart = (index: number) => {
+    setDraggedIdx(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (targetIdx: number) => {
+    if (draggedIdx === null || draggedIdx === targetIdx) return;
+    const updated = [...photoUris];
+    const [draggedItem] = updated.splice(draggedIdx, 1);
+    updated.splice(targetIdx, 0, draggedItem);
+    setPhotoUris(updated);
+    setDraggedIdx(null);
   };
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -211,7 +238,7 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
 
   return (
     <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none bg-grid-lines overflow-y-auto justify-between">
-      {/* Header with LiveLore Logo - Byte-for-byte identical to Home page header */}
+      {/* Header with LiveLore Logo */}
       <header className="relative flex flex-col items-center justify-center w-full pt-4 sm:pt-6 pb-2 shrink-0">
         <img
           src="/assets/livelore_logo.png"
@@ -368,11 +395,11 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
           </div>
         </div>
 
-        {/* Concert Photo Attachment (Premium Feature - $4.99 Price) */}
-        <div className="bg-[#121619] p-3.5 rounded-xl border border-[#222B30] space-y-2">
+        {/* Concert Photo Attachment (VIP Feature - Up to 5 Photos with Primary Drag/Reorder) */}
+        <div className="bg-[#121619] p-4 rounded-xl border border-[#222B30] space-y-3">
           <div className="flex items-center justify-between">
             <label className="text-xs sm:text-sm font-black uppercase tracking-wider text-[#FFB300] flex items-center gap-1.5">
-              <Camera size={16} /> Concert Photos ({photoUris.length}/3)
+              <Camera size={18} /> CONCERT PHOTOS ({photoUris.length}/5)
             </label>
             {!isPremium && (
               <span className="text-[10px] font-black uppercase text-[#FFB300] bg-[#FFB300]/10 px-2 py-0.5 rounded border border-[#FFB300]/30 flex items-center gap-1">
@@ -382,25 +409,64 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
           </div>
 
           {isPremium ? (
-            <div className="space-y-2">
-              <div className="flex flex-wrap gap-2">
+            <div className="space-y-3">
+              {photoUris.length > 0 && (
+                <div className="text-[11px] text-slate-400 font-bold flex items-center gap-1">
+                  <MoveHorizontal size={14} className="text-[#FFB300]" />
+                  <span>First photo is the <strong>Primary Photo</strong> on ticket stub. Drag or tap ⭐ to set Primary!</span>
+                </div>
+              )}
+
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                 {photoUris.map((uri, idx) => (
-                  <div key={idx} className="relative w-16 h-16 rounded-lg overflow-hidden border border-[#FFB300]/60 group">
-                    <img src={uri} alt="Concert Photo" className="w-full h-full object-cover" />
+                  <div
+                    key={idx}
+                    draggable
+                    onDragStart={() => handleDragStart(idx)}
+                    onDragOver={(e) => handleDragOver(e, idx)}
+                    onDrop={() => handleDrop(idx)}
+                    className={`relative aspect-square rounded-xl overflow-hidden border-2 transition shadow-md group ${
+                      idx === 0
+                        ? 'border-[#FFB300] ring-2 ring-[#FFB300]/50'
+                        : 'border-[#222B30] hover:border-slate-500'
+                    }`}
+                  >
+                    <img src={uri} alt={`Concert Photo ${idx + 1}`} className="w-full h-full object-cover pointer-events-none" />
+
+                    {/* Primary Photo Badge */}
+                    {idx === 0 ? (
+                      <div className="absolute top-1 left-1 bg-[#FFB300] text-slate-950 font-black text-[9px] px-1.5 py-0.5 rounded uppercase tracking-tighter flex items-center gap-0.5 shadow-md">
+                        <Star size={10} className="fill-slate-950" /> PRIMARY
+                      </div>
+                    ) : (
+                      /* Set as Primary Button */
+                      <button
+                        type="button"
+                        onClick={() => handleSetPrimaryPhoto(idx)}
+                        title="Set as Primary Photo"
+                        className="absolute top-1 left-1 bg-black/80 hover:bg-[#FFB300] text-[#FFB300] hover:text-slate-950 p-1 rounded-full transition shadow-md opacity-90 group-hover:opacity-100"
+                      >
+                        <Star size={12} />
+                      </button>
+                    )}
+
+                    {/* Delete Photo Button */}
                     <button
                       type="button"
                       onClick={() => handleRemovePhoto(idx)}
-                      className="absolute top-1 right-1 bg-black/80 text-rose-400 p-1 rounded-full opacity-90 hover:opacity-100 transition"
+                      title="Delete Photo"
+                      className="absolute top-1 right-1 bg-black/80 hover:bg-rose-600 text-rose-300 hover:text-white p-1 rounded-full transition shadow-md opacity-90 group-hover:opacity-100"
                     >
                       <Trash2 size={12} />
                     </button>
                   </div>
                 ))}
 
-                {photoUris.length < 3 && (
-                  <label className="w-16 h-16 rounded-lg border-2 border-dashed border-[#FFB300]/60 bg-[#111618] hover:bg-[#1a2126] transition flex flex-col items-center justify-center cursor-pointer text-[#FFB300]">
-                    <Plus size={20} />
-                    <span className="text-[9px] font-bold uppercase mt-0.5">Photo</span>
+                {/* Add Photo Button (Disabled when 5/5 max reached) */}
+                {photoUris.length < 5 ? (
+                  <label className="aspect-square rounded-xl border-2 border-dashed border-[#FFB300]/60 bg-[#111618] hover:bg-[#1a2126] transition flex flex-col items-center justify-center cursor-pointer text-[#FFB300] p-1">
+                    <Plus size={22} />
+                    <span className="text-[10px] font-black uppercase mt-1">Add Photo</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -408,20 +474,26 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
                       className="hidden"
                     />
                   </label>
+                ) : (
+                  <div className="aspect-square rounded-xl border-2 border-dashed border-slate-700 bg-slate-900/50 flex flex-col items-center justify-center text-slate-500 text-[9px] font-bold text-center p-1">
+                    <span>5/5 Max</span>
+                    <span>Delete to Add</span>
+                  </div>
                 )}
               </div>
             </div>
           ) : (
-            <div className="p-2.5 bg-[#111618] rounded-lg border border-[#222B30] text-center space-y-1.5">
-              <p className="text-xs text-slate-300 font-medium">
-                Unlock Photo Feature & 100% AD-Free Experience!
+            /* Non-VIP Upgrade Prompt */
+            <div className="p-3 bg-[#111618] rounded-xl border border-[#222B30] text-center space-y-2">
+              <p className="text-xs sm:text-sm text-slate-200 font-bold">
+                Upgrade to VIP status to attach concert photos!
               </p>
               <button
                 type="button"
                 onClick={() => onNavigate('auth')}
-                className="text-xs font-black text-[#FFB300] hover:underline uppercase tracking-wider flex items-center justify-center gap-1 mx-auto"
+                className="text-xs font-black text-[#FFB300] hover:underline uppercase tracking-wider flex items-center justify-center gap-1.5 mx-auto bg-[#FFB300]/10 px-3 py-1.5 rounded-lg border border-[#FFB300]/30"
               >
-                <Crown size={12} /> Upgrade for $4.99 One-Time
+                <Crown size={14} /> Upgrade to VIP Status ($4.99)
               </button>
             </div>
           )}

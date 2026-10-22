@@ -5,7 +5,7 @@ import { useEncoreStore } from '../store/useEncoreStore';
 import { PRESET_VENUES, toStateAbbr } from '../engine/venueDataset';
 import { TicketStubCard } from './TicketStubCard';
 import { GlassNavBar } from './GlassNavBar';
-import { MapPin, Calendar, Users, FileText, Music, Edit3, Trash2, Camera } from 'lucide-react';
+import { MapPin, Calendar, Users, FileText, Music, Edit3, Trash2, Camera, Star } from 'lucide-react';
 
 interface SetlistDetailViewProps {
   concertId: string;
@@ -125,16 +125,23 @@ export const SetlistDetailView: React.FC<SetlistDetailViewProps> = ({ concertId,
             </p>
           </div>
 
-          {/* Concert Photo Memories (VIP Feature) */}
+          {/* Concert Photo Memories Gallery (VIP Feature - Up to 5 Photos) */}
           {isPremium && concert.photoUris && concert.photoUris.length > 0 && (
             <div className="border-t border-[#222B30] pt-3.5">
               <span className="text-xs sm:text-sm font-black uppercase tracking-widest text-[#FFB300] flex items-center gap-1.5 mb-2">
-                <Camera size={16} /> CONCERT PHOTO MEMORIES
+                <Camera size={16} /> CONCERT PHOTO MEMORIES ({concert.photoUris.length}/5)
               </span>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                 {concert.photoUris.map((uri, idx) => (
-                  <div key={idx} className="aspect-square rounded-xl overflow-hidden border border-[#FFB300]/50 shadow-md">
-                    <img src={uri} alt="Concert Memory" className="w-full h-full object-cover" />
+                  <div key={idx} className={`relative aspect-square rounded-xl overflow-hidden border shadow-md ${
+                    idx === 0 ? 'border-[#FFB300] ring-2 ring-[#FFB300]/50' : 'border-[#222B30]'
+                  }`}>
+                    <img src={uri} alt={`Concert Memory ${idx + 1}`} className="w-full h-full object-cover" />
+                    {idx === 0 && (
+                      <div className="absolute top-1 left-1 bg-[#FFB300] text-slate-950 font-black text-[8px] px-1 py-0.5 rounded uppercase tracking-tighter flex items-center gap-0.5 shadow-md">
+                        <Star size={8} className="fill-slate-950" /> PRIMARY
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
