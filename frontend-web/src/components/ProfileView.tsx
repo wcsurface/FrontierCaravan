@@ -35,8 +35,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onNavigate, on
 
   return (
     <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between min-h-screen">
-      {/* 1. Header with LiveLore Logo - Matching Home and Add Show Logo Position & Dimensions Exactly */}
-      <header className="relative flex flex-col items-center justify-center w-full pt-12 sm:pt-16 pb-2 shrink-0">
+      {/* 1. Header with LiveLore Logo - Exactly matching Home Page header position, height and padding */}
+      <header className="relative flex flex-col items-center justify-center w-full pt-4 sm:pt-6 pb-2 shrink-0">
         <img
           src="/assets/livelore_logo.png"
           alt="LiveLore"
