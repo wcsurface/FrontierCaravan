@@ -1310,19 +1310,29 @@
         const authKey = `livelore_user_auth_${emailVal.replace(/[^a-z0-9]/g, '_')}`;
         const storedAuth = localStorage.getItem(authKey);
 
-        if (storedAuth) {
-          const authObj = JSON.parse(storedAuth);
-          if (authObj && authObj.passHash && authObj.passHash !== computedHash) {
-            showErrorBanner('Incorrect Password. Please check your password and try again.');
-            return;
-          }
-        } else {
-          // Register new account credentials on first login for this email
+        if (authMode === 'register') {
+          // Create or update account password in Create Account mode
           localStorage.setItem(authKey, JSON.stringify({
             email: emailVal,
             passHash: computedHash,
             createdAt: Date.now()
           }));
+        } else {
+          // Log In mode: Verify password hash
+          if (storedAuth) {
+            const authObj = JSON.parse(storedAuth);
+            if (authObj && authObj.passHash && authObj.passHash !== computedHash) {
+              showErrorBanner('Incorrect Password. Please check your password and try again.');
+              return;
+            }
+          } else {
+            // First time logging in with this email
+            localStorage.setItem(authKey, JSON.stringify({
+              email: emailVal,
+              passHash: computedHash,
+              createdAt: Date.now()
+            }));
+          }
         }
 
         localStorage.setItem('livelore_active_user', JSON.stringify({ email: emailVal, provider: 'email' }));
