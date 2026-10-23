@@ -395,6 +395,73 @@
     }
     window.setPrimaryPhoto = setPrimaryPhoto;
 
+    function formatDateOnInput(elem) {
+      if (!elem) return;
+      var raw = elem.value.replace(/\D/g, '');
+      if (raw.length <= 2) {
+        elem.value = raw;
+      } else if (raw.length <= 4) {
+        elem.value = raw.slice(0, 2) + '/' + raw.slice(2);
+      } else {
+        elem.value = raw.slice(0, 2) + '/' + raw.slice(2, 4) + '/' + raw.slice(4, 8);
+      }
+    }
+    window.formatDateOnInput = formatDateOnInput;
+
+    function addOpenerField() {
+      var container = document.getElementById('openers-container');
+      if (!container) return;
+      var count = container.querySelectorAll('.input-opener').length + 1;
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'input-field input-opener';
+      input.placeholder = 'Opener ' + count;
+      container.appendChild(input);
+    }
+    window.addOpenerField = addOpenerField;
+
+    function saveNewShow(e) {
+      if (e) e.preventDefault();
+      var headlineEl = document.getElementById('input-headline');
+      var venueEl = document.getElementById('input-venue');
+      var cityEl = document.getElementById('input-city');
+      var stateEl = document.getElementById('input-state');
+      var countryEl = document.getElementById('input-country');
+      var dateEl = document.getElementById('input-date');
+      var notesEl = document.getElementById('input-notes');
+
+      var headline = headlineEl ? headlineEl.value.trim() : '';
+      var venue = venueEl ? venueEl.value.trim() : '';
+      var city = (cityEl && cityEl.value ? cityEl.value : 'Noblesville').trim();
+      var state = toStateAbbr((stateEl && stateEl.value ? stateEl.value : 'IN').trim());
+      var country = (countryEl && countryEl.value ? countryEl.value : 'USA').trim();
+      var date = (dateEl && dateEl.value ? dateEl.value : '').trim() || '08/02/88';
+      var notes = (notesEl && notesEl.value ? notesEl.value : '').trim();
+
+      var openerInputs = document.querySelectorAll('.input-opener');
+      var openersList = Array.from(openerInputs).map(function(inp) { return inp.value.trim(); }).filter(Boolean);
+
+      if (headline && venue) {
+        if (editingShowId) {
+          var editIndex = userShows.findIndex(function(s) { return s.id === editingShowId; });
+          if (editIndex >= 0) {
+            userShows[editIndex] = { id: editingShowId, headline: headline, venue: venue, city: city, state: state, country: country, date: date, openersList: openersList, notes: notes, photoUris: currentPhotoUris };
+          }
+        } else {
+          var newShowObj = { id: generateUniqueId(), headline: headline, venue: venue, city: city, state: state, country: country, date: date, openersList: openersList, notes: notes, photoUris: currentPhotoUris };
+          userShows.unshift(newShowObj);
+        }
+
+        saveShowsToStorage();
+        renderShowsFeed();
+        updateStatsDisplay();
+
+        resetLogForm();
+        showScreen('diary');
+      }
+    }
+    window.saveNewShow = saveNewShow;
+
     function handleVenueInput(query) {
       var dropdown = document.getElementById('venue-dropdown');
       if (!dropdown) return;
