@@ -259,7 +259,82 @@
         `;
         grid.appendChild(item);
       });
+
+      if (currentPhotoUris.length < 5) {
+        const addBtn = document.createElement('label');
+        addBtn.style.aspectRatio = '1/1';
+        addBtn.style.borderRadius = '8px';
+        addBtn.style.border = '2px dashed #FFB300';
+        addBtn.style.background = '#111618';
+        addBtn.style.display = 'flex';
+        addBtn.style.flexDirection = 'column';
+        addBtn.style.alignItems = 'center';
+        addBtn.style.justifyContent = 'center';
+        addBtn.style.cursor = 'pointer';
+        addBtn.style.color = '#FFB300';
+        addBtn.style.fontSize = '10px';
+        addBtn.style.fontWeight = '900';
+
+        addBtn.innerHTML = `
+          <span style="font-size:22px; font-weight:900;">+</span>
+          <span>PHOTO</span>
+          <input type="file" accept="image/*" multiple style="display:none;" onchange="handlePhotoSelect(event)" />
+        `;
+        grid.appendChild(addBtn);
+      } else {
+        const maxBtn = document.createElement('div');
+        maxBtn.style.aspectRatio = '1/1';
+        maxBtn.style.borderRadius = '8px';
+        maxBtn.style.border = '1px dashed #64748b';
+        maxBtn.style.background = '#0a0d0e';
+        maxBtn.style.display = 'flex';
+        maxBtn.style.flexDirection = 'column';
+        maxBtn.style.alignItems = 'center';
+        maxBtn.style.justifyContent = 'center';
+        maxBtn.style.color = '#64748b';
+        maxBtn.style.fontSize = '9px';
+        maxBtn.style.fontWeight = 'bold';
+        maxBtn.style.textAlign = 'center';
+        maxBtn.style.padding = '2px';
+        maxBtn.innerHTML = '<span>5/5 Max</span><span>Delete to Add</span>';
+        grid.appendChild(maxBtn);
+      }
     }
+
+    function handlePhotoSelect(e) {
+      if (!e.target.files || e.target.files.length === 0) return;
+      const files = Array.from(e.target.files);
+
+      files.forEach(file => {
+        if (currentPhotoUris.length >= 5) return;
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          if (evt.target && evt.target.result && currentPhotoUris.length < 5) {
+            currentPhotoUris.push(evt.target.result);
+            renderPhotosGrid();
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    window.handlePhotoSelect = handlePhotoSelect;
+
+    function removePhoto(idx) {
+      if (idx >= 0 && idx < currentPhotoUris.length) {
+        currentPhotoUris.splice(idx, 1);
+        renderPhotosGrid();
+      }
+    }
+    window.removePhoto = removePhoto;
+
+    function setPrimaryPhoto(idx) {
+      if (idx > 0 && idx < currentPhotoUris.length) {
+        const selected = currentPhotoUris.splice(idx, 1)[0];
+        currentPhotoUris.unshift(selected);
+        renderPhotosGrid();
+      }
+    }
+    window.setPrimaryPhoto = setPrimaryPhoto;
 
     function saveShowsToStorage() {
       try {
