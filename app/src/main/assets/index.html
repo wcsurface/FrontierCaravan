@@ -1280,15 +1280,18 @@
       showScreen('auth');
     }
 
-    async function hashPassword(email, password) {
-      const text = email.toLowerCase().trim() + ":" + password;
-      const msgUint8 = new TextEncoder().encode(text);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    function hashPassword(email, password) {
+      const str = email.toLowerCase().trim() + ":" + password;
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash |= 0;
+      }
+      return 'hash_' + Math.abs(hash).toString(36) + '_' + str.length;
     }
 
-    async function handleLoginSubmit(e) {
+    function handleLoginSubmit(e) {
       if (e) e.preventDefault();
       clearErrorBanner();
 
@@ -1306,7 +1309,7 @@
       }
 
       try {
-        const computedHash = await hashPassword(emailVal, passVal);
+        const computedHash = hashPassword(emailVal, passVal);
         const authKey = `livelore_user_auth_${emailVal.replace(/[^a-z0-9]/g, '_')}`;
         const storedAuth = localStorage.getItem(authKey);
 

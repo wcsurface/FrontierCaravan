@@ -13,15 +13,19 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.provider.MediaStore
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.ConsoleMessage
 import android.webkit.JavascriptInterface
+import android.webkit.JsPromptResult
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.activity.ComponentActivity
 import androidx.core.content.FileProvider
@@ -89,10 +93,48 @@ class MainActivity : ComponentActivity() {
         settings.cacheMode = WebSettings.LOAD_NO_CACHE
 
         webView.clearCache(true)
-        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
+        webView.setLayerType(View.LAYER_TYPE_NONE, null)
 
-        // WebChromeClient with onShowFileChooser for Camera vs Camera Roll Photo Selection
+        // WebChromeClient with onShowFileChooser, onJsPrompt, & Console Log forwarding
         webView.webChromeClient = object : WebChromeClient() {
+            override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
+                Log.d("LiveLoreConsole", "${consoleMessage?.message()} -- Line ${consoleMessage?.lineNumber()} of ${consoleMessage?.sourceId()}")
+                return true
+            }
+
+            override fun onJsPrompt(
+                view: WebView?,
+                url: String?,
+                message: String?,
+                defaultValue: String?,
+                result: JsPromptResult?
+            ): Boolean {
+                val builder = android.app.AlertDialog.Builder(this@MainActivity)
+                builder.setTitle("Google Sign-In")
+                builder.setMessage(message ?: "Enter your Google Email Address:")
+
+                val input = EditText(this@MainActivity)
+                input.inputType = android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+                if (!defaultValue.isNullOrEmpty()) {
+                    input.setText(defaultValue)
+                }
+                builder.setView(input)
+
+                builder.setPositiveButton("Sign In") { _, _ ->
+                    val userEmail = input.text.toString().trim()
+                    result?.confirm(userEmail)
+                }
+                builder.setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss()
+                    result?.cancel()
+                }
+                builder.setOnCancelListener {
+                    result?.cancel()
+                }
+                builder.show()
+                return true
+            }
+
             override fun onShowFileChooser(
                 view: WebView?,
                 filePathCallback: ValueCallback<Array<Uri>>?,
@@ -144,6 +186,9 @@ class MainActivity : ComponentActivity() {
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
+                view?.evaluateJavascript("document.getElementById('ticket-list') ? document.getElementById('ticket-list').innerHTML : 'NO_ELEMENT'") { result ->
+                    Log.d("LiveLoreDebug", "ticket-list HTML: $result")
+                }
             }
         }
 
@@ -254,7 +299,7 @@ class MainActivity : ComponentActivity() {
                 }
             } else {
                 webView.post {
-                    webView.evaluateJavascript("onNativeGoogleAuthCancel()", null)
+                    webView.evaluateJavascript("onNativeGoogleAuthFallback()", null)
                 }
             }
         }
@@ -282,16 +327,30 @@ class MainActivity : ComponentActivity() {
         fun launchGoogleSignIn() {
             runOnUiThread {
                 try {
-                    @Suppress("DEPRECATION")
-                    val intent = AccountManager.newChooseAccountIntent(
-                        null, null, arrayOf("com.google"), false, null, null, null, null
-                    )
-                    startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
+                    val accountManager = AccountManager.get(context)
+                    val accounts = accountManager.getAccountsByType("com.google")
+                    if (accounts.size == 1) {
+                        val primaryEmail = accounts[0].name.lowercase().trim()
+                        webView.post {
+                            webView.evaluateJavascript("onNativeGoogleAuthSuccess('$primaryEmail')", null)
+                        }
+                    } else if (accounts.size > 1) {
+                        @Suppress("DEPRECATION")
+                        val intent = AccountManager.newChooseAccountIntent(
+                            null, null, arrayOf("com.google"), false, null, null, null, null
+                        )
+                        startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
+                    } else {
+                        webView.post {
+                            webView.evaluateJavascript("onNativeGoogleAuthFallback()", null)
+                        }
+                    }
                 } catch (e: Exception) {
                     try {
-                        val intent = Intent("com.google.android.gms.common.account.CHOOSE_ACCOUNT").apply {
-                            putExtra("allowableAccountTypes", arrayOf("com.google"))
-                        }
+                        @Suppress("DEPRECATION")
+                        val intent = AccountManager.newChooseAccountIntent(
+                            null, null, arrayOf("com.google"), false, null, null, null, null
+                        )
                         startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
                     } catch (ex: Exception) {
                         webView.post {
