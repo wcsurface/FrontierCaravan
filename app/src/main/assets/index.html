@@ -483,24 +483,6 @@
       }
     }
   </script>
-
-        localStorage.setItem('livelore_active_user', JSON.stringify({ email: emailVal, provider: 'email' }));
-
-        loadSavedShows();
-
-        var emailEl = document.getElementById('auth-email');
-        var passEl = document.getElementById('auth-password');
-        var nameEl = document.getElementById('auth-name');
-        if (emailEl) emailEl.value = '';
-        if (passEl) passEl.value = '';
-        if (nameEl) nameEl.value = '';
-
-        showScreen('diary');
-      } catch (err) {
-        showErrorBanner('Authentication error: ' + err.message);
-      }
-    }
-  </script>
 </head>
 <body>
 
