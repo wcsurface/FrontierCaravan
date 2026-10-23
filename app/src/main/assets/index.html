@@ -629,6 +629,27 @@
     let currentPhotoUris = [];
     let modalPhotoUris = [];
     let modalActiveIdx = 0;
+    let userShows = [];
+
+    // AUTH & ERROR BANNER HELPERS
+    function showErrorBanner(msg) {
+      const el = document.getElementById('auth-error-banner');
+      if (el) {
+        el.innerText = msg;
+        el.style.display = 'block';
+      }
+      alert(msg);
+    }
+    window.showErrorBanner = showErrorBanner;
+
+    function clearErrorBanner() {
+      const el = document.getElementById('auth-error-banner');
+      if (el) {
+        el.innerText = '';
+        el.style.display = 'none';
+      }
+    }
+    window.clearErrorBanner = clearErrorBanner;
     function hashPassword(email, password) {
       const str = (email || '').toLowerCase().trim() + ":" + (password || '');
       let hash = 0;
@@ -1331,105 +1352,16 @@
       updateStatsDisplay();
     }
 
-    function showErrorBanner(msg) {
-      const el = document.getElementById('auth-error-banner');
-      if (el) {
-        el.innerText = msg;
-        el.style.display = 'block';
-      }
-      alert(msg);
-    }
-
-    function clearErrorBanner() {
-      const el = document.getElementById('auth-error-banner');
-      if (el) {
-        el.innerText = '';
-        el.style.display = 'none';
-      }
-    }
-
     function handleLogout() {
       clearErrorBanner();
       localStorage.removeItem('livelore_active_user');
-      document.getElementById('auth-email').value = '';
-      document.getElementById('auth-password').value = '';
-      document.getElementById('auth-name').value = '';
+      const emailEl = document.getElementById('auth-email');
+      const passEl = document.getElementById('auth-password');
+      const nameEl = document.getElementById('auth-name');
+      if (emailEl) emailEl.value = '';
+      if (passEl) passEl.value = '';
+      if (nameEl) nameEl.value = '';
       showScreen('auth');
-    }
-
-    function hashPassword(email, password) {
-      const str = email.toLowerCase().trim() + ":" + password;
-      let hash = 0;
-      for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = (hash << 5) - hash + char;
-        hash |= 0;
-      }
-      return 'hash_' + Math.abs(hash).toString(36) + '_' + str.length;
-    }
-
-    function handleLoginSubmit(e) {
-      if (e) e.preventDefault();
-      clearErrorBanner();
-
-      const emailVal = (document.getElementById('auth-email').value || '').toLowerCase().trim();
-      const passVal = (document.getElementById('auth-password').value || '').trim();
-
-      if (!emailVal || emailVal.length < 3 || !emailVal.includes('@')) {
-        showErrorBanner('Please enter a valid email address.');
-        return;
-      }
-
-      if (!passVal || passVal.length < 4) {
-        showErrorBanner('Password must be at least 4 characters long.');
-        return;
-      }
-
-      try {
-        const computedHash = hashPassword(emailVal, passVal);
-        const authKey = `livelore_user_auth_${emailVal.replace(/[^a-z0-9]/g, '_')}`;
-        const storedAuth = localStorage.getItem(authKey);
-
-        if (authMode === 'register') {
-          // Create or update account password in Create Account mode
-          localStorage.setItem(authKey, JSON.stringify({
-            email: emailVal,
-            passHash: computedHash,
-            createdAt: Date.now()
-          }));
-        } else {
-          // Log In mode: Verify password hash
-          if (storedAuth) {
-            const authObj = JSON.parse(storedAuth);
-            if (authObj && authObj.passHash && authObj.passHash !== computedHash) {
-              showErrorBanner('Incorrect Password. Please check your password and try again.');
-              return;
-            }
-          } else {
-            // First time logging in with this email
-            localStorage.setItem(authKey, JSON.stringify({
-              email: emailVal,
-              passHash: computedHash,
-              createdAt: Date.now()
-            }));
-          }
-        }
-
-        localStorage.setItem('livelore_active_user', JSON.stringify({ email: emailVal, provider: 'email' }));
-
-        loadSavedShows();
-
-        const emailEl = document.getElementById('auth-email');
-        const passEl = document.getElementById('auth-password');
-        const nameEl = document.getElementById('auth-name');
-        if (emailEl) emailEl.value = '';
-        if (passEl) passEl.value = '';
-        if (nameEl) nameEl.value = '';
-
-        showScreen('diary');
-      } catch (err) {
-        showErrorBanner('Authentication error: ' + err.message);
-      }
     }
 
     function buyAppPremium() {
