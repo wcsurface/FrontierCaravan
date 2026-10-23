@@ -128,6 +128,31 @@
     var modalActiveIdx = 0;
     var userShows = [];
 
+    var DEFAULT_SEED_SHOWS = [
+      { id: "show_seed_1", headline: "Grateful Dead", opener: "Violent Femmes", openersList: ["Violent Femmes"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "05/28/91", notes: "Went with John and Chris macgilvray" },
+      { id: "show_seed_2", headline: "Bad Company", opener: "Damn Yankees", openersList: ["Damn Yankees"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "08/03/90", notes: "" },
+      { id: "show_seed_3", headline: "Robert Plant", opener: "Alannah Myles", openersList: ["Alannah Myles"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "07/26/90", notes: "" },
+      { id: "show_seed_4", headline: "Motley Crue", opener: "Warrant", openersList: ["Warrant"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "07/15/90", notes: "" },
+      { id: "show_seed_5", headline: "Rush", opener: "Mr. Big", openersList: ["Mr. Big"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "04/22/90", notes: "" }
+    ];
+
+    function generateUniqueId() {
+      return 'show_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+    }
+
+    function toStateAbbr(stateStr) {
+      if (!stateStr) return 'IN';
+      const clean = stateStr.trim();
+      if (clean.length === 2) return clean.toUpperCase();
+      const map = {
+        'indiana':'IN','illinois':'IL','ohio':'OH','kentucky':'KY','michigan':'MI',
+        'california':'CA','new york':'NY','colorado':'CO','texas':'TX','florida':'FL',
+        'pennsylvania':'PA','georgia':'GA','tennessee':'TN','massachusetts':'MA',
+        'washington':'WA','virginia':'VA','north carolina':'NC','missouri':'MO'
+      };
+      return map[clean.toLowerCase()] || clean.substring(0,2).toUpperCase();
+    }
+
     function showErrorBanner(msg) {
       var el = document.getElementById('auth-error-banner');
       if (el) {
@@ -143,6 +168,217 @@
         el.innerText = '';
         el.style.display = 'none';
       }
+    }
+
+    function updateDynamicYearSpans() {
+      const year = new Date().getFullYear();
+      document.querySelectorAll('.current-year-span').forEach(el => el.innerText = year);
+    }
+
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen-view').forEach(el => {
+        el.classList.remove('active');
+        el.style.display = 'none';
+      });
+
+      const target = document.getElementById('view-' + screenId);
+      if (target) {
+        target.classList.add('active');
+        target.style.display = 'flex';
+      }
+
+      if (window.AndroidAdMob) {
+        if (isVIPUser || screenId === 'auth' || screenId === 'terms' || screenId === 'privacy' || screenId === 'faq') {
+          window.AndroidAdMob.hideBannerAd();
+        } else {
+          window.AndroidAdMob.showBannerAd();
+        }
+      }
+
+      const vipSubtitle = document.getElementById('vip-pass-subtitle');
+      if (vipSubtitle) {
+        vipSubtitle.style.display = isVIPUser ? 'none' : 'block';
+      }
+    }
+
+    function getTicketColor(id) {
+      if (currentTicketTheme === 'classic') return '#f4e4bc';
+      if (!id) return TICKET_COLOR_PALETTE[0];
+      let hash = 0;
+      for (let i = 0; i < id.length; i++) {
+        hash = (hash << 5) - hash + id.charCodeAt(i);
+        hash |= 0;
+      }
+      return TICKET_COLOR_PALETTE[Math.abs(hash) % TICKET_COLOR_PALETTE.length];
+    }
+
+    function switchTicketTheme(theme) {
+      currentTicketTheme = theme;
+      localStorage.setItem('livelore_ticket_theme', theme);
+
+      const btnMulti = document.getElementById('theme-btn-multicolor');
+      const btnClassic = document.getElementById('theme-btn-classic');
+      if (btnMulti) btnMulti.classList.toggle('active', theme === 'multicolor');
+      if (btnClassic) btnClassic.classList.toggle('active', theme === 'classic');
+
+      renderShowsFeed();
+    }
+
+    function renderPhotosGrid() {
+      const grid = document.getElementById('photos-grid');
+      const countLabel = document.getElementById('photo-count-label');
+      if (!grid) return;
+
+      if (countLabel) countLabel.innerText = currentPhotoUris.length;
+
+      grid.innerHTML = '';
+      currentPhotoUris.forEach((uri, idx) => {
+        const item = document.createElement('div');
+        item.style.position = 'relative';
+        item.style.aspectRatio = '1/1';
+        item.style.borderRadius = '8px';
+        item.style.overflow = 'hidden';
+        item.style.border = idx === 0 ? '2px solid #FFB300' : '1px solid #222B30';
+
+        item.innerHTML = `
+          <img src="${uri}" style="width:100%; height:100%; object-fit:cover;" />
+          ${idx === 0 ? `
+            <div style="position:absolute; top:2px; left:2px; background:#FFB300; color:#0a0a0a; font-size:7px; font-weight:900; padding:1px 4px; border-radius:3px;">PRIMARY</div>
+          ` : `
+            <button type="button" onclick="setPrimaryPhoto(${idx})" style="position:absolute; top:2px; left:2px; background:rgba(0,0,0,0.8); color:#FFB300; border:none; border-radius:50%; width:18px; height:18px; font-size:9px; font-weight:bold; cursor:pointer;">★</button>
+          `}
+          <button type="button" onclick="removePhoto(${idx})" style="position:absolute; top:2px; right:2px; background:rgba(0,0,0,0.8); color:#fecdd3; border:none; border-radius:50%; width:18px; height:18px; font-size:10px; font-weight:bold; cursor:pointer;">✕</button>
+        `;
+        grid.appendChild(item);
+      });
+    }
+
+    function loadSavedShows() {
+      updateDynamicYearSpans();
+      isVIPUser = true;
+
+      if (window.AndroidAdMob) {
+        window.AndroidAdMob.hideBannerAd();
+      }
+
+      const vipSubtitle = document.getElementById('vip-pass-subtitle');
+      if (vipSubtitle) {
+        vipSubtitle.style.display = 'none';
+      }
+
+      const rawUser = localStorage.getItem('livelore_active_user');
+      let activeEmail = null;
+      if (rawUser) {
+        try {
+          const uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email) {
+            activeEmail = uObj.email.toLowerCase().trim();
+          }
+        } catch(e) {}
+      }
+
+      if (!activeEmail) {
+        showScreen('auth');
+        return;
+      }
+
+      const emailDisp = document.getElementById('profile-email-display');
+      if (emailDisp) emailDisp.innerText = activeEmail;
+
+      try {
+        const userKey = `livelore_shows_${activeEmail.replace(/[^a-z0-9]/g, '_')}`;
+
+        // Scan all storage keys to ensure zero concert data loss!
+        const rawUserKey = localStorage.getItem(userKey);
+        const rawLocal = localStorage.getItem('livelore_local_shows');
+        const rawVault = localStorage.getItem('livelore_vault_v1');
+        const rawBackup = localStorage.getItem('livelore_backup_shows');
+
+        let candidateShows = [];
+        [rawUserKey, rawLocal, rawVault, rawBackup].forEach(rawStr => {
+          if (rawStr) {
+            try {
+              const parsed = JSON.parse(rawStr);
+              if (Array.isArray(parsed) && parsed.length > candidateShows.length) {
+                candidateShows = parsed;
+              }
+            } catch(ex) {}
+          }
+        });
+
+        userShows = candidateShows;
+
+        if (!Array.isArray(userShows) || userShows.length === 0) {
+          userShows = [...DEFAULT_SEED_SHOWS];
+        }
+
+        userShows.forEach(s => {
+          if (!s.id) s.id = generateUniqueId();
+          if (s.headline) s.headline = s.headline.trim();
+          if (s.venue) s.venue = s.venue.trim();
+          if (s.city) s.city = s.city.trim();
+          if (s.country) s.country = s.country.trim();
+          if (s.state) s.state = toStateAbbr(s.state);
+          if (Array.isArray(s.openersList)) {
+            s.openersList = s.openersList.map(op => typeof op === 'string' ? op.trim() : op).filter(Boolean);
+          }
+        });
+      } catch (e) {
+        userShows = [...DEFAULT_SEED_SHOWS];
+      }
+
+      switchTicketTheme(currentTicketTheme);
+      renderPhotosGrid();
+
+      saveShowsToStorage();
+      renderShowsFeed();
+      updateStatsDisplay();
+
+      // Pull latest cloud vault asynchronously and merge!
+      fetch(`https://frontiercaravan-production.up.railway.app/api/sync/pull?userId=u_cloud_${activeEmail.replace(/[^a-z0-9]/g, '_')}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.concertsData && Array.isArray(data.concertsData.concerts) && data.concertsData.concerts.length > 0) {
+            const cloudConcerts = data.concertsData.concerts;
+            const mergedMap = new Map();
+            userShows.forEach(s => mergedMap.set(s.id, s));
+            cloudConcerts.forEach(s => mergedMap.set(s.id, s));
+            userShows = Array.from(mergedMap.values());
+            saveShowsToStorage();
+            renderShowsFeed();
+            updateStatsDisplay();
+          }
+        }).catch(err => {});
+
+      showScreen('diary');
+    }
+
+    function saveShowsToStorage() {
+      try {
+        const serialized = JSON.stringify(userShows);
+        localStorage.setItem('livelore_local_shows', serialized);
+        localStorage.setItem('livelore_vault_v1', serialized);
+        localStorage.setItem('livelore_backup_shows', serialized);
+
+        const rawUser = localStorage.getItem('livelore_active_user');
+        if (rawUser) {
+          const uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email) {
+            const userEmail = uObj.email.toLowerCase().trim();
+            const userKey = `livelore_shows_${userEmail.replace(/[^a-z0-9]/g, '_')}`;
+            localStorage.setItem(userKey, serialized);
+
+            fetch('https://frontiercaravan-production.up.railway.app/api/sync/push', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                userId: `u_cloud_${userEmail.replace(/[^a-z0-9]/g, '_')}`,
+                concertsData: { concerts: userShows }
+              })
+            }).catch(function(err) {});
+          }
+        }
+      } catch (e) {}
     }
 
     function hashPassword(email, password) {
@@ -229,6 +465,24 @@
             }));
           }
         }
+
+        localStorage.setItem('livelore_active_user', JSON.stringify({ email: emailVal, provider: 'email' }));
+
+        loadSavedShows();
+
+        var emailEl = document.getElementById('auth-email');
+        var passEl = document.getElementById('auth-password');
+        var nameEl = document.getElementById('auth-name');
+        if (emailEl) emailEl.value = '';
+        if (passEl) passEl.value = '';
+        if (nameEl) nameEl.value = '';
+
+        showScreen('diary');
+      } catch (err) {
+        showErrorBanner('Authentication error: ' + err.message);
+      }
+    }
+  </script>
 
         localStorage.setItem('livelore_active_user', JSON.stringify({ email: emailVal, provider: 'email' }));
 
