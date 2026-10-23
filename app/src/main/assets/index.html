@@ -253,6 +253,119 @@
       });
     }
 
+    function saveShowsToStorage() {
+      try {
+        const serialized = JSON.stringify(userShows);
+        localStorage.setItem('livelore_local_shows', serialized);
+        localStorage.setItem('livelore_vault_v1', serialized);
+        localStorage.setItem('livelore_backup_shows', serialized);
+
+        const rawUser = localStorage.getItem('livelore_active_user');
+        if (rawUser) {
+          const uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email) {
+            const userEmail = uObj.email.toLowerCase().trim();
+            const userKey = `livelore_shows_${userEmail.replace(/[^a-z0-9]/g, '_')}`;
+            localStorage.setItem(userKey, serialized);
+
+            fetch('https://frontiercaravan-production.up.railway.app/api/sync/push', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                userId: `u_cloud_${userEmail.replace(/[^a-z0-9]/g, '_')}`,
+                concertsData: { concerts: userShows }
+              })
+            }).catch(function(err) {});
+          }
+        }
+      } catch (e) {}
+    }
+
+    function renderShowsFeed() {
+      const list = document.getElementById('ticket-list');
+      const sortBar = document.getElementById('sort-control-bar');
+      const countLabel = document.getElementById('shows-count-label');
+      if (!list) return;
+
+      if (!userShows || userShows.length === 0) {
+        if (sortBar) sortBar.style.display = 'none';
+        list.style.display = 'flex';
+        list.style.flexDirection = 'column';
+        list.style.justifyContent = 'center';
+        list.style.alignItems = 'center';
+        list.innerHTML = `
+          <div id="empty-state-box" style="text-align:center; padding: 30px 16px; margin: auto 0;">
+            <div style="font-size:24px; font-weight:900; color:#FFB300; margin-bottom:12px;">LIVELORE</div>
+            <div style="font-weight:900; font-size:24px; color:#ffffff; text-transform:uppercase; margin-bottom:16px;">YOUR CONCERT VAULT IS EMPTY!</div>
+            <div class="bounce-pointer" style="color:#FFB300; font-weight:900; font-size:16px; text-transform:uppercase; letter-spacing:1px; margin-top:12px;">
+              <div style="font-size:42px; color:#00E676; margin-bottom:8px; font-weight:900;">&uarr;</div>
+              START ADDING YOUR CONCERTS ABOVE!
+            </div>
+          </div>
+        `;
+      } else {
+        if (sortBar) sortBar.style.display = 'flex';
+        if (countLabel) countLabel.innerText = userShows.length + (userShows.length === 1 ? ' CONCERT LOGGED' : ' CONCERTS LOGGED');
+
+        let displayList = [...userShows];
+        if (currentSort === 'newest') {
+          displayList.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        } else if (currentSort === 'oldest') {
+          displayList.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        } else if (currentSort === 'band') {
+          displayList.sort((a, b) => (a.headline || '').localeCompare(b.headline || ''));
+        }
+
+        list.style.display = 'block';
+        list.innerHTML = '';
+        displayList.forEach((show) => {
+          const ticketColor = getTicketColor(show.id);
+          const card = document.createElement('div');
+          card.className = 'ticket-card';
+          card.style.backgroundColor = ticketColor;
+          card.onclick = function() { openShowDetails(show.id); };
+
+          let openersText = '';
+          if (Array.isArray(show.openersList) && show.openersList.length > 0) {
+            openersText = show.openersList.join(', ');
+          } else if (show.opener) {
+            openersText = show.opener;
+          }
+
+          let bandStackHtml = `<div class="ticket-artist-head">${(show.headline || '').toUpperCase()}</div>`;
+          if (openersText) {
+            bandStackHtml += `
+              <div class="ticket-artist-and">and</div>
+              <div class="ticket-artist-openers">${openersText}</div>
+            `;
+          }
+
+          card.innerHTML = `
+            <div class="ticket-left">
+              <div class="ticket-artist-box">
+                ${bandStackHtml}
+              </div>
+              <div class="ticket-footer">
+                <span class="ticket-venue">${(show.venue || '').trim()}</span>
+                <span class="ticket-date">${show.date || ''}</span>
+              </div>
+            </div>
+            <div class="ticket-stub">
+              <div>ADMIT ONE</div>
+              <div style="font-size:8px; color:#221508; margin-top:4px;">SEC 7</div>
+            </div>
+          `;
+          list.appendChild(card);
+        });
+      }
+    }
+
+    function updateStatsDisplay() {
+      const count = userShows ? userShows.length : 0;
+      const statsTotalEl = document.getElementById('stats-total-count');
+      if (statsTotalEl) statsTotalEl.innerText = count + (count === 1 ? ' CONCERT' : ' CONCERTS');
+    }
+
     function loadSavedShows() {
       updateDynamicYearSpans();
       isVIPUser = true;
@@ -1801,6 +1914,119 @@
     function handleSortChange(val) {
       currentSort = val;
       renderShowsFeed();
+    }
+
+    function saveShowsToStorage() {
+      try {
+        const serialized = JSON.stringify(userShows);
+        localStorage.setItem('livelore_local_shows', serialized);
+        localStorage.setItem('livelore_vault_v1', serialized);
+        localStorage.setItem('livelore_backup_shows', serialized);
+
+        const rawUser = localStorage.getItem('livelore_active_user');
+        if (rawUser) {
+          const uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email) {
+            const userEmail = uObj.email.toLowerCase().trim();
+            const userKey = `livelore_shows_${userEmail.replace(/[^a-z0-9]/g, '_')}`;
+            localStorage.setItem(userKey, serialized);
+
+            fetch('https://frontiercaravan-production.up.railway.app/api/sync/push', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                userId: `u_cloud_${userEmail.replace(/[^a-z0-9]/g, '_')}`,
+                concertsData: { concerts: userShows }
+              })
+            }).catch(function(err) {});
+          }
+        }
+      } catch (e) {}
+    }
+
+    function renderShowsFeed() {
+      const list = document.getElementById('ticket-list');
+      const sortBar = document.getElementById('sort-control-bar');
+      const countLabel = document.getElementById('shows-count-label');
+      if (!list) return;
+
+      if (!userShows || userShows.length === 0) {
+        if (sortBar) sortBar.style.display = 'none';
+        list.style.display = 'flex';
+        list.style.flexDirection = 'column';
+        list.style.justifyContent = 'center';
+        list.style.alignItems = 'center';
+        list.innerHTML = `
+          <div id="empty-state-box" style="text-align:center; padding: 30px 16px; margin: auto 0;">
+            <div style="font-size:24px; font-weight:900; color:#FFB300; margin-bottom:12px;">LIVELORE</div>
+            <div style="font-weight:900; font-size:24px; color:#ffffff; text-transform:uppercase; margin-bottom:16px;">YOUR CONCERT VAULT IS EMPTY!</div>
+            <div class="bounce-pointer" style="color:#FFB300; font-weight:900; font-size:16px; text-transform:uppercase; letter-spacing:1px; margin-top:12px;">
+              <div style="font-size:42px; color:#00E676; margin-bottom:8px; font-weight:900;">&uarr;</div>
+              START ADDING YOUR CONCERTS ABOVE!
+            </div>
+          </div>
+        `;
+      } else {
+        if (sortBar) sortBar.style.display = 'flex';
+        if (countLabel) countLabel.innerText = userShows.length + (userShows.length === 1 ? ' CONCERT LOGGED' : ' CONCERTS LOGGED');
+
+        let displayList = [...userShows];
+        if (currentSort === 'newest') {
+          displayList.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        } else if (currentSort === 'oldest') {
+          displayList.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        } else if (currentSort === 'band') {
+          displayList.sort((a, b) => (a.headline || '').localeCompare(b.headline || ''));
+        }
+
+        list.style.display = 'block';
+        list.innerHTML = '';
+        displayList.forEach((show) => {
+          const ticketColor = getTicketColor(show.id);
+          const card = document.createElement('div');
+          card.className = 'ticket-card';
+          card.style.backgroundColor = ticketColor;
+          card.onclick = function() { openShowDetails(show.id); };
+
+          let openersText = '';
+          if (Array.isArray(show.openersList) && show.openersList.length > 0) {
+            openersText = show.openersList.join(', ');
+          } else if (show.opener) {
+            openersText = show.opener;
+          }
+
+          let bandStackHtml = `<div class="ticket-artist-head">${(show.headline || '').toUpperCase()}</div>`;
+          if (openersText) {
+            bandStackHtml += `
+              <div class="ticket-artist-and">and</div>
+              <div class="ticket-artist-openers">${openersText}</div>
+            `;
+          }
+
+          card.innerHTML = `
+            <div class="ticket-left">
+              <div class="ticket-artist-box">
+                ${bandStackHtml}
+              </div>
+              <div class="ticket-footer">
+                <span class="ticket-venue">${(show.venue || '').trim()}</span>
+                <span class="ticket-date">${show.date || ''}</span>
+              </div>
+            </div>
+            <div class="ticket-stub">
+              <div>ADMIT ONE</div>
+              <div style="font-size:8px; color:#221508; margin-top:4px;">SEC 7</div>
+            </div>
+          `;
+          list.appendChild(card);
+        });
+      }
+    }
+
+    function updateStatsDisplay() {
+      const count = userShows ? userShows.length : 0;
+      const statsTotalEl = document.getElementById('stats-total-count');
+      if (statsTotalEl) statsTotalEl.innerText = count + (count === 1 ? ' CONCERT' : ' CONCERTS');
     }
 
     function loadSavedShows() {
