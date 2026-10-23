@@ -559,17 +559,16 @@
       }
 
       try {
-        var blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-        var url = URL.createObjectURL(blob);
+        var encodedUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvData);
         var link = document.createElement('a');
-        link.setAttribute('href', url);
+        link.setAttribute('href', encodedUri);
         link.setAttribute('download', fileName);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
       } catch (ex) {
-        var encodedUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvData);
-        window.open(encodedUri);
+        var win = window.open('data:text/csv;charset=utf-8,' + encodeURIComponent(csvData), '_blank');
+        if (!win) alert('CSV data ready:\n\n' + csvData.slice(0, 300) + '...');
       }
     }
     window.exportConcertsCsv = exportConcertsCsv;

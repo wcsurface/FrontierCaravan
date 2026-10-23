@@ -302,7 +302,10 @@ class MainActivity : ComponentActivity() {
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     }
 
-                    val chooser = Intent.createChooser(shareIntent, "Save or Share Concert Vault CSV")
+                    val chooser = Intent.createChooser(shareIntent, "Save or Share Concert Vault CSV").apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    context.startActivity(chooser)
                     context.startActivity(chooser)
                 } catch (e: Exception) {
                     e.printStackTrace()
