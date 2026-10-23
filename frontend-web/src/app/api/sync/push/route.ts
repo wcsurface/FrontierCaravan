@@ -1,24 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
 
-const VAULT_FILE_PATH = path.join('/tmp', 'livelore_cloud_vaults.json');
-
-function loadVaultsFromDisk(): Record<string, any> {
-  try {
-    if (fs.existsSync(VAULT_FILE_PATH)) {
-      const raw = fs.readFileSync(VAULT_FILE_PATH, 'utf-8');
-      return JSON.parse(raw);
-    }
-  } catch (e) {}
-  return {};
-}
-
-function saveVaultsToDisk(vaults: Record<string, any>) {
-  try {
-    fs.writeFileSync(VAULT_FILE_PATH, JSON.stringify(vaults), 'utf-8');
-  } catch (e) {}
-}
+const globalCloudVaults = new Map<string, any>();
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,9 +11,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'userId is required' }, { status: 400 });
     }
 
-    const vaults = loadVaultsFromDisk();
-    vaults[userId] = concertsData;
-    saveVaultsToDisk(vaults);
+    globalCloudVaults.set(userId, concertsData);
 
     return NextResponse.json({
       success: true,

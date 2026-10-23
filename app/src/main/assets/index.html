@@ -5,12 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>LiveLore: Concert & Setlist Vault</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    input, textarea, select { user-select: text !important; -webkit-user-select: text !important; }
-    body { background-color: #0A0D0E; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 8px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    body { background-color: #0A0D0E; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; align-items: center; justify-start; padding: 8px; }
 
-    /* Screen Views - Strictly justify-content: flex-start to lock header position at top across all screens */
-    .screen-view { display: none; width: 100%; max-width: 420px; height: 100%; flex-direction: column; justify-content: flex-start; overflow-y: auto; padding-bottom: 20px; }
+    /* Screen Views - Strictly justify-start to lock header position at top across all screens */
+    .screen-view { display: none; width: 100%; max-width: 420px; height: 100%; flex-direction: column; justify-start; overflow-y: auto; padding-bottom: 20px; }
     .screen-view.active { display: flex; }
 
     /* Fixed Top Header - Logo Enlarged 20% (102px height) with identical top clearance & min-height */
@@ -19,7 +18,7 @@
     .header-logo-img { height: 102px; width: auto; object-fit: contain; filter: drop-shadow(0 0 18px rgba(0,230,118,0.45)); }
 
     /* Sort Control Bar */
-    .sort-control-bar { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 6px; margin-bottom: 12px; padding: 0 2px; }
+    .sort-control-bar { display: flex; justify-between; align-items: center; width: 100%; margin-top: 6px; margin-bottom: 12px; padding: 0 2px; }
     .shows-count-title { font-size: 22px; font-weight: 900; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px; }
     .sort-dropdown { background: #121619; border: 1.5px solid #222B30; color: #f1f5f9; font-size: 11px; font-weight: 800; border-radius: 8px; padding: 7px 10px; outline: none; text-transform: uppercase; cursor: pointer; margin-left: auto; }
 
@@ -121,6 +120,7 @@
     var authMode = 'login';
     var isVIPUser = true;
     var editingShowId = null;
+    var activeDetailShowId = null;
     var currentSort = 'newest';
     var currentTicketTheme = localStorage.getItem('livelore_ticket_theme') || 'multicolor';
     var currentPhotoUris = [];
@@ -142,6 +142,65 @@
       { id: "show_seed_3", headline: "Robert Plant", opener: "Alannah Myles", openersList: ["Alannah Myles"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "07/26/90", notes: "" },
       { id: "show_seed_4", headline: "Motley Crue", opener: "Warrant", openersList: ["Warrant"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "07/15/90", notes: "" },
       { id: "show_seed_5", headline: "Rush", opener: "Mr. Big", openersList: ["Mr. Big"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "04/22/90", notes: "" }
+    ];
+
+    var VENUE_DB = [
+      { v: "Deer Creek Music Center", c: "Noblesville", s: "IN", co: "USA" },
+      { v: "Klipsch Music Center", c: "Noblesville", s: "IN", co: "USA" },
+      { v: "Ruoff Music Center", c: "Noblesville", s: "IN", co: "USA" },
+      { v: "Ruoff Home Mortgage Music Center", c: "Noblesville", s: "IN", co: "USA" },
+      { v: "Verizon Wireless Music Center (Noblesville)", c: "Noblesville", s: "IN", co: "USA" },
+      { v: "Red Rocks Amphitheatre", c: "Morrison", s: "CO", co: "USA" },
+      { v: "Dick's Sporting Goods Park", c: "Commerce City", s: "CO", co: "USA" },
+      { v: "Fiddler's Green Amphitheatre", c: "Greenwood Village", s: "CO", co: "USA" },
+      { v: "Boulder Theater", c: "Boulder", s: "CO", co: "USA" },
+      { v: "Macky Auditorium", c: "Boulder", s: "CO", co: "USA" },
+      { v: "The Fillmore Auditorium", c: "Denver", s: "CO", co: "USA" },
+      { v: "Ogden Theatre", c: "Denver", s: "CO", co: "USA" },
+      { v: "Gothic Theatre", c: "Englewood", s: "CO", co: "USA" },
+      { v: "Bluebird Theater", c: "Denver", s: "CO", co: "USA" },
+      { v: "Cervantes' Masterpiece Ballroom", c: "Denver", s: "CO", co: "USA" },
+      { v: "Paramount Theatre", c: "Denver", s: "CO", co: "USA" },
+      { v: "Oriental Theater", c: "Denver", s: "CO", co: "USA" },
+      { v: "Civic Center Park", c: "Denver", s: "CO", co: "USA" },
+      { v: "Mission Ballroom", c: "Denver", s: "CO", co: "USA" },
+      { v: "Mishawaka Amphitheatre", c: "Bellvue", s: "CO", co: "USA" },
+      { v: "Planet Bluegrass (Folks Festival)", c: "Lyons", s: "CO", co: "USA" },
+      { v: "1stBank Center", c: "Broomfield", s: "CO", co: "USA" },
+      { v: "Elitch Gardens Arena", c: "Denver", s: "CO", co: "USA" },
+      { v: "Quixote's True Blue", c: "Denver", s: "CO", co: "USA" },
+      { v: "Bohemian Nights Festival", c: "Fort Collins", s: "CO", co: "USA" },
+      { v: "McNichols Sports Arena", c: "Denver", s: "CO", co: "USA" },
+      { v: "Market Square Arena", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Hoosier Dome", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Murat Theatre", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Old National Centre (Murat Shrine)", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Hilton U. Brown Theatre", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "The Vogue", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "World Mardi Gras", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Military Park (Indy Jazz Fest)", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Star Plaza Theatre", c: "Merrillville", s: "IN", co: "USA" },
+      { v: "Bluebird Nightclub", c: "Bloomington", s: "IN", co: "USA" },
+      { v: "Headliners", c: "Muncie", s: "IN", co: "USA" },
+      { v: "Worthen Arena (Ball State)", c: "Muncie", s: "IN", co: "USA" },
+      { v: "Emens Auditorium", c: "Muncie", s: "IN", co: "USA" },
+      { v: "Buckeye Lake Music Center", c: "Millersport", s: "OH", co: "USA" },
+      { v: "Richfield Coliseum", c: "Richfield", s: "OH", co: "USA" },
+      { v: "Blossom Music Center", c: "Cuyahoga Falls", s: "OH", co: "USA" },
+      { v: "Riverbend Music Center", c: "Cincinnati", s: "OH", co: "USA" },
+      { v: "Hara Arena", c: "Dayton", s: "OH", co: "USA" },
+      { v: "Nutter Center", c: "Dayton", s: "OH", co: "USA" },
+      { v: "Alpine Valley Music Theatre", c: "East Troy", s: "WI", co: "USA" },
+      { v: "Rosemont Horizon", c: "Rosemont", s: "IL", co: "USA" },
+      { v: "Soldier Field", c: "Chicago", s: "IL", co: "USA" },
+      { v: "World Music Theatre", c: "Tinley Park", s: "IL", co: "USA" },
+      { v: "Assembly Hall", c: "Champaign", s: "IL", co: "USA" },
+      { v: "Riverport Amphitheater", c: "St. Louis", s: "MO", co: "USA" },
+      { v: "The Palace of Auburn Hills", c: "Auburn Hills", s: "MI", co: "USA" },
+      { v: "Palace Theatre", c: "Louisville", s: "KY", co: "USA" },
+      { v: "Mud Island Amphitheater", c: "Memphis", s: "TN", co: "USA" },
+      { v: "Sphere", c: "Las Vegas", s: "NV", co: "USA" },
+      { v: "Madison Square Garden", c: "New York", s: "NY", co: "USA" }
     ];
 
     function generateUniqueId() {
@@ -335,6 +394,75 @@
       }
     }
     window.setPrimaryPhoto = setPrimaryPhoto;
+
+    function handleVenueInput(query) {
+      var dropdown = document.getElementById('venue-dropdown');
+      if (!dropdown) return;
+      if (!query || query.trim().length === 0) {
+        dropdown.style.display = 'none';
+        var cityEl = document.getElementById('input-city');
+        var stateEl = document.getElementById('input-state');
+        var countryEl = document.getElementById('input-country');
+        if (cityEl) cityEl.value = '';
+        if (stateEl) stateEl.value = '';
+        if (countryEl) countryEl.value = '';
+        return;
+      }
+      var q = query.toLowerCase().trim();
+      var matches = VENUE_DB.filter(function(item) {
+        return (item.v && item.v.toLowerCase().includes(q)) || (item.c && item.c.toLowerCase().includes(q));
+      });
+
+      if (matches.length > 0) {
+        var best = matches[0];
+        var cityEl = document.getElementById('input-city');
+        var stateEl = document.getElementById('input-state');
+        var countryEl = document.getElementById('input-country');
+        if (cityEl) cityEl.value = best.c.trim();
+        if (stateEl) stateEl.value = toStateAbbr(best.s);
+        if (countryEl) countryEl.value = best.co.trim();
+
+        dropdown.style.display = 'block';
+        dropdown.innerHTML = matches.map(function(item) {
+          var cleanV = item.v.trim();
+          var cleanC = item.c.trim();
+          var cleanS = toStateAbbr(item.s);
+          var cleanCo = item.co.trim();
+          return '<div style="padding:10px 14px; border-bottom:1px solid #222B30; cursor:pointer;" data-v="' + cleanV + '" data-c="' + cleanC + '" data-s="' + cleanS + '" data-co="' + cleanCo + '" onclick="selectVenueFromElem(this)">' +
+            '<div style="font-weight:bold; color:#FFB300; font-size:14px;">' + cleanV + '</div>' +
+            '<div style="color:#94a3b8; font-size:11px;">' + cleanC + ', ' + cleanS + ', ' + cleanCo + '</div>' +
+          '</div>';
+        }).join('');
+      } else {
+        dropdown.style.display = 'none';
+      }
+    }
+    window.handleVenueInput = handleVenueInput;
+
+    function selectVenueFromElem(elem) {
+      if (!elem) return;
+      var v = elem.getAttribute('data-v') || '';
+      var c = elem.getAttribute('data-c') || '';
+      var s = elem.getAttribute('data-s') || '';
+      var co = elem.getAttribute('data-co') || '';
+      selectVenue(v, c, s, co);
+    }
+    window.selectVenueFromElem = selectVenueFromElem;
+
+    function selectVenue(v, c, s, co) {
+      var venueEl = document.getElementById('input-venue');
+      var cityEl = document.getElementById('input-city');
+      var stateEl = document.getElementById('input-state');
+      var countryEl = document.getElementById('input-country');
+      var dropdown = document.getElementById('venue-dropdown');
+
+      if (venueEl) venueEl.value = v.trim();
+      if (cityEl) cityEl.value = c.trim();
+      if (stateEl) stateEl.value = toStateAbbr(s);
+      if (countryEl) countryEl.value = co.trim();
+      if (dropdown) dropdown.style.display = 'none';
+    }
+    window.selectVenue = selectVenue;
 
     function saveShowsToStorage() {
       try {
@@ -549,34 +677,6 @@
       showScreen('diary');
     }
 
-    function handleLogout() {
-      clearErrorBanner();
-      localStorage.removeItem('livelore_active_user');
-      var emailEl = document.getElementById('auth-email');
-      var passEl = document.getElementById('auth-password');
-      var nameEl = document.getElementById('auth-name');
-      if (emailEl) emailEl.value = '';
-      if (passEl) passEl.value = '';
-      if (nameEl) nameEl.value = '';
-      showScreen('auth');
-    }
-    window.handleLogout = handleLogout;
-
-    function resetLogForm() {
-      var form = document.getElementById('log-show-form');
-      if (form) form.reset();
-      var dropdown = document.getElementById('venue-dropdown');
-      if (dropdown) dropdown.style.display = 'none';
-      var openers = document.getElementById('openers-container');
-      if (openers) openers.innerHTML = '<input type="text" class="input-field input-opener" placeholder="Opener" />';
-      currentPhotoUris = [];
-      renderPhotosGrid();
-      editingShowId = null;
-      var btnSave = document.getElementById('btn-save-show');
-      if (btnSave) btnSave.innerText = '+ ADD CONCERT';
-    }
-    window.resetLogForm = resetLogForm;
-
     function hashPassword(email, password) {
       var str = (email || '').toLowerCase().trim() + ":" + (password || '');
       var hash = 0;
@@ -678,6 +778,34 @@
         showErrorBanner('Authentication error: ' + err.message);
       }
     }
+
+    function handleLogout() {
+      clearErrorBanner();
+      localStorage.removeItem('livelore_active_user');
+      var emailEl = document.getElementById('auth-email');
+      var passEl = document.getElementById('auth-password');
+      var nameEl = document.getElementById('auth-name');
+      if (emailEl) emailEl.value = '';
+      if (passEl) passEl.value = '';
+      if (nameEl) nameEl.value = '';
+      showScreen('auth');
+    }
+    window.handleLogout = handleLogout;
+
+    function resetLogForm() {
+      var form = document.getElementById('log-show-form');
+      if (form) form.reset();
+      var dropdown = document.getElementById('venue-dropdown');
+      if (dropdown) dropdown.style.display = 'none';
+      var openers = document.getElementById('openers-container');
+      if (openers) openers.innerHTML = '<input type="text" class="input-field input-opener" placeholder="Opener" />';
+      currentPhotoUris = [];
+      renderPhotosGrid();
+      editingShowId = null;
+      var btnSave = document.getElementById('btn-save-show');
+      if (btnSave) btnSave.innerText = '+ ADD CONCERT';
+    }
+    window.resetLogForm = resetLogForm;
   </script>
 </head>
 <body>
@@ -691,7 +819,7 @@
     </div>
 
     <!-- 1-Tap Official Google Sign-In Button with Generous Top Margin Clearing Logo -->
-    <button type="button" class="btn-google" id="btn-google-signin" onclick="handleGoogleSignIn(event)">
+    <button type="button" class="btn-google" onclick="handleGoogleSignIn()">
       <svg width="18" height="18" viewBox="0 0 24 24">
         <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3h3.88c2.27-2.09 3.665-5.17 3.665-9.12z"/>
         <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3c-1.08.72-2.45 1.16-4.05 1.16-3.1 0-5.73-2.09-6.67-4.91H1.29v3.09C3.27 21.3 7.37 24 12 24z"/>
@@ -724,7 +852,7 @@
       <label class="input-label">Password *</label>
       <input type="password" id="auth-password" class="input-field" placeholder="••••••••" autocomplete="new-password" />
 
-      <button type="button" class="btn-cta" id="btn-auth-submit" onclick="handleLoginSubmit(event)">LOG IN</button>
+      <button type="submit" class="btn-cta" id="btn-auth-submit">LOG IN</button>
     </form>
 
     <!-- Footer Legal Links & Dynamic Copyright -->
@@ -787,7 +915,7 @@
       </div>
     </div>
 
-    <form id="log-show-form" style="width:100%; display:flex; flex-direction:column; padding-bottom:10px;" onsubmit="saveNewShow(event)">
+    <form id="log-show-form" style="flex:1; display:flex; flex-direction:column; padding-bottom:10px;" onsubmit="saveNewShow(event)">
       <label class="input-label">Headline Band *</label>
       <input type="text" id="input-headline" class="input-field" placeholder="Headline Band" required />
 
@@ -847,10 +975,10 @@
       </div>
       <!-- Glass Navigation Bar Directly Under Logo -->
       <div class="glass-nav-bar">
-        <div class="glass-btn-wrapper" onclick="showScreen('diary')"><div class="glow-home"></div><button class="glass-btn glass-btn-home"><span class="glass-btn-text">Home</span></button></div>
-        <div class="glass-btn-wrapper" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><div class="glow-add"></div><button class="glass-btn glass-btn-add"><span class="glass-btn-text">Add</span></button></div>
-        <div class="glass-btn-wrapper" onclick="showScreen('profile')"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile"><span class="glass-btn-text">Profile</span></button></div>
-        <div class="glass-btn-wrapper" onclick="showScreen('stats')"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats"><span class="glass-btn-text">Stats</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
 
@@ -904,10 +1032,10 @@
       </div>
       <!-- Glass Navigation Bar Directly Under Logo -->
       <div class="glass-nav-bar">
-        <div class="glass-btn-wrapper" onclick="showScreen('diary')"><div class="glow-home"></div><button class="glass-btn glass-btn-home"><span class="glass-btn-text">Home</span></button></div>
-        <div class="glass-btn-wrapper" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><div class="glow-add"></div><button class="glass-btn glass-btn-add"><span class="glass-btn-text">Add</span></button></div>
-        <div class="glass-btn-wrapper" onclick="showScreen('profile')"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile"><span class="glass-btn-text">Profile</span></button></div>
-        <div class="glass-btn-wrapper" onclick="showScreen('stats')"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats"><span class="glass-btn-text">Stats</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
 
@@ -986,10 +1114,10 @@
       </div>
       <!-- Glass Navigation Bar Directly Under Logo -->
       <div class="glass-nav-bar">
-        <div class="glass-btn-wrapper" onclick="showScreen('diary')"><div class="glow-home"></div><button class="glass-btn glass-btn-home"><span class="glass-btn-text">Home</span></button></div>
-        <div class="glass-btn-wrapper" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><div class="glow-add"></div><button class="glass-btn glass-btn-add"><span class="glass-btn-text">Add</span></button></div>
-        <div class="glass-btn-wrapper" onclick="showScreen('profile')"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile"><span class="glass-btn-text">Profile</span></button></div>
-        <div class="glass-btn-wrapper" onclick="showScreen('stats')"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats"><span class="glass-btn-text">Stats</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
 
@@ -1184,6 +1312,20 @@
   </div>
 
   <script>
+    // 5-COLOR RANDOM ASSORTMENT VINTAGE PALETTE
+    const TICKET_COLOR_PALETTE = [
+      '#F7C252', // Warm Gold
+      '#F7A993', // Vintage Peach
+      '#CAE6AB', // Retro Lime Mint
+      '#D6EBCA', // Pale Sage
+      '#F7E5B3', // Classic Cream
+    ];
+
+    let currentTicketTheme = localStorage.getItem('livelore_ticket_theme') || 'multicolor';
+    let currentPhotoUris = [];
+    let modalPhotoUris = [];
+    let modalActiveIdx = 0;
+
     function openPhotoModal(index) {
       if (!modalPhotoUris || modalPhotoUris.length === 0) return;
       modalActiveIdx = index;
@@ -1600,16 +1742,9 @@
     }
 
     function showScreen(screenId) {
-      document.querySelectorAll('.screen-view').forEach(el => {
-        el.classList.remove('active');
-        el.style.display = 'none';
-      });
-
+      document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
       const target = document.getElementById('view-' + screenId);
-      if (target) {
-        target.classList.add('active');
-        target.style.display = 'flex';
-      }
+      if (target) target.classList.add('active');
 
       if (window.AndroidAdMob) {
         if (isVIPUser || screenId === 'auth' || screenId === 'terms' || screenId === 'privacy' || screenId === 'faq') {
@@ -1710,6 +1845,8 @@
         reader.readAsDataURL(file);
       });
     }
+      reader.readAsDataURL(file);
+    }
 
     function removePhoto(idx) {
       currentPhotoUris.splice(idx, 1);
@@ -1736,6 +1873,35 @@
       document.getElementById('auth-name').value = '';
     }
 
+    function onNativeGoogleAuthFallback() {
+      const googleEmail = prompt("Enter your Google Account email to continue:", "wcsurface@gmail.com");
+      if (googleEmail && googleEmail.includes('@')) {
+        onNativeGoogleAuthSuccess(googleEmail);
+      }
+    }
+
+    function handleGoogleSignIn() {
+      if (window.AndroidGoogleAuth && window.AndroidGoogleAuth.launchGoogleSignIn) {
+        try {
+          window.AndroidGoogleAuth.launchGoogleSignIn();
+        } catch (e) {
+          onNativeGoogleAuthFallback();
+        }
+      } else {
+        onNativeGoogleAuthFallback();
+      }
+    }
+
+    function onNativeGoogleAuthSuccess(googleEmail) {
+      if (!googleEmail || !googleEmail.includes('@')) return;
+      const cleanedEmail = googleEmail.toLowerCase().trim();
+
+      localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
+
+      loadSavedShows();
+      showScreen('diary');
+    }
+
     function handleClearUserVault() {
       userShows = [];
 
@@ -1756,8 +1922,8 @@
         const userKey = `livelore_shows_${activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_')}`;
         localStorage.removeItem(userKey);
 
-        // Push 0 shows directly to Railway Cloud DB
-        fetch('https://frontiercaravan-production.up.railway.app/api/sync/push', {
+        // Push 0 shows directly to Railway PostgreSQL Cloud DB
+        fetch('/api/sync/push', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1771,16 +1937,60 @@
       updateStatsDisplay();
     }
 
+    function showErrorBanner(msg) {
+      const el = document.getElementById('auth-error-banner');
+      if (el) {
+        el.innerText = msg;
+        el.style.display = 'block';
+      }
+      alert(msg);
+    }
+
+    function clearErrorBanner() {
+      const el = document.getElementById('auth-error-banner');
+      if (el) {
+        el.innerText = '';
+        el.style.display = 'none';
+      }
+    }
+
     function handleLogout() {
       clearErrorBanner();
       localStorage.removeItem('livelore_active_user');
-      const emailEl = document.getElementById('auth-email');
-      const passEl = document.getElementById('auth-password');
-      const nameEl = document.getElementById('auth-name');
-      if (emailEl) emailEl.value = '';
-      if (passEl) passEl.value = '';
-      if (nameEl) nameEl.value = '';
+      document.getElementById('auth-email').value = '';
+      document.getElementById('auth-password').value = '';
+      document.getElementById('auth-name').value = '';
       showScreen('auth');
+    }
+
+    function handleLoginSubmit(e) {
+      if (e) e.preventDefault();
+      clearErrorBanner();
+
+      const emailInput = document.getElementById('auth-email').value || '';
+      const passInput = document.getElementById('auth-password').value || '';
+
+      const cleanedEmail = emailInput.toLowerCase().trim();
+
+      if (!cleanedEmail || cleanedEmail.length < 3 || !cleanedEmail.includes('@')) {
+        showErrorBanner('Incorrect Email Address or Password. Please try again.');
+        return;
+      }
+
+      if (!passInput || passInput.length < 4) {
+        showErrorBanner('Incorrect Email Address or Password. Please try again.');
+        return;
+      }
+
+      localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'email' }));
+
+      loadSavedShows();
+
+      document.getElementById('auth-email').value = '';
+      document.getElementById('auth-password').value = '';
+      document.getElementById('auth-name').value = '';
+
+      showScreen('diary');
     }
 
     function buyAppPremium() {
@@ -1951,7 +2161,7 @@
 
         dropdown.style.display = 'block';
         dropdown.innerHTML = matches.map(item => `
-          <div style="padding:8px 12px; border-bottom:1px solid #222B30; cursor:pointer;" data-v="${item.v.trim()}" data-c="${item.c.trim()}" data-s="${toStateAbbr(item.s)}" data-co="${item.co.trim()}" onclick="selectVenueFromElem(this)">
+          <div style="padding:8px 12px; border-bottom:1px solid #222B30; cursor:pointer;" onclick="selectVenue('${item.v.replace(/'/g, "\\'").trim()}', '${item.c.replace(/'/g, "\\'").trim()}', '${toStateAbbr(item.s).replace(/'/g, "\\'")}', '${item.co.replace(/'/g, "\\'").trim()}')">
             <div style="font-weight:bold; color:#fff;">${item.v.trim()}</div>
             <div style="color:#94a3b8; font-size:10px;">${item.c.trim()}, ${toStateAbbr(item.s)}, ${item.co.trim()}</div>
           </div>
@@ -1959,15 +2169,6 @@
       } else {
         dropdown.style.display = 'none';
       }
-    }
-
-    function selectVenueFromElem(elem) {
-      if (!elem) return;
-      const v = elem.getAttribute('data-v') || '';
-      const c = elem.getAttribute('data-c') || '';
-      const s = elem.getAttribute('data-s') || '';
-      const co = elem.getAttribute('data-co') || '';
-      selectVenue(v, c, s, co);
     }
 
     function selectVenue(v, c, s, co) {
@@ -1999,122 +2200,9 @@
       renderShowsFeed();
     }
 
-    function saveShowsToStorage() {
-      try {
-        const serialized = JSON.stringify(userShows);
-        localStorage.setItem('livelore_local_shows', serialized);
-        localStorage.setItem('livelore_vault_v1', serialized);
-        localStorage.setItem('livelore_backup_shows', serialized);
-
-        const rawUser = localStorage.getItem('livelore_active_user');
-        if (rawUser) {
-          const uObj = JSON.parse(rawUser);
-          if (uObj && uObj.email) {
-            const userEmail = uObj.email.toLowerCase().trim();
-            const userKey = `livelore_shows_${userEmail.replace(/[^a-z0-9]/g, '_')}`;
-            localStorage.setItem(userKey, serialized);
-
-            fetch('https://frontiercaravan-production.up.railway.app/api/sync/push', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                userId: `u_cloud_${userEmail.replace(/[^a-z0-9]/g, '_')}`,
-                concertsData: { concerts: userShows }
-              })
-            }).catch(function(err) {});
-          }
-        }
-      } catch (e) {}
-    }
-
-    function renderShowsFeed() {
-      const list = document.getElementById('ticket-list');
-      const sortBar = document.getElementById('sort-control-bar');
-      const countLabel = document.getElementById('shows-count-label');
-      if (!list) return;
-
-      if (!userShows || userShows.length === 0) {
-        if (sortBar) sortBar.style.display = 'none';
-        list.style.display = 'flex';
-        list.style.flexDirection = 'column';
-        list.style.justifyContent = 'center';
-        list.style.alignItems = 'center';
-        list.innerHTML = `
-          <div id="empty-state-box" style="text-align:center; padding: 30px 16px; margin: auto 0;">
-            <div style="font-size:24px; font-weight:900; color:#FFB300; margin-bottom:12px;">LIVELORE</div>
-            <div style="font-weight:900; font-size:24px; color:#ffffff; text-transform:uppercase; margin-bottom:16px;">YOUR CONCERT VAULT IS EMPTY!</div>
-            <div class="bounce-pointer" style="color:#FFB300; font-weight:900; font-size:16px; text-transform:uppercase; letter-spacing:1px; margin-top:12px;">
-              <div style="font-size:42px; color:#00E676; margin-bottom:8px; font-weight:900;">&uarr;</div>
-              START ADDING YOUR CONCERTS ABOVE!
-            </div>
-          </div>
-        `;
-      } else {
-        if (sortBar) sortBar.style.display = 'flex';
-        if (countLabel) countLabel.innerText = userShows.length + (userShows.length === 1 ? ' CONCERT LOGGED' : ' CONCERTS LOGGED');
-
-        let displayList = [...userShows];
-        if (currentSort === 'newest') {
-          displayList.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        } else if (currentSort === 'oldest') {
-          displayList.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        } else if (currentSort === 'band') {
-          displayList.sort((a, b) => (a.headline || '').localeCompare(b.headline || ''));
-        }
-
-        list.style.display = 'block';
-        list.innerHTML = '';
-        displayList.forEach((show) => {
-          const ticketColor = getTicketColor(show.id);
-          const card = document.createElement('div');
-          card.className = 'ticket-card';
-          card.style.backgroundColor = ticketColor;
-          card.onclick = function() { openShowDetails(show.id); };
-
-          let openersText = '';
-          if (Array.isArray(show.openersList) && show.openersList.length > 0) {
-            openersText = show.openersList.join(', ');
-          } else if (show.opener) {
-            openersText = show.opener;
-          }
-
-          let bandStackHtml = `<div class="ticket-artist-head">${(show.headline || '').toUpperCase()}</div>`;
-          if (openersText) {
-            bandStackHtml += `
-              <div class="ticket-artist-and">and</div>
-              <div class="ticket-artist-openers">${openersText}</div>
-            `;
-          }
-
-          card.innerHTML = `
-            <div class="ticket-left">
-              <div class="ticket-artist-box">
-                ${bandStackHtml}
-              </div>
-              <div class="ticket-footer">
-                <span class="ticket-venue">${(show.venue || '').trim()}</span>
-                <span class="ticket-date">${show.date || ''}</span>
-              </div>
-            </div>
-            <div class="ticket-stub">
-              <div>ADMIT ONE</div>
-              <div style="font-size:8px; color:#221508; margin-top:4px;">SEC 7</div>
-            </div>
-          `;
-          list.appendChild(card);
-        });
-      }
-    }
-
-    function updateStatsDisplay() {
-      const count = userShows ? userShows.length : 0;
-      const statsTotalEl = document.getElementById('stats-total-count');
-      if (statsTotalEl) statsTotalEl.innerText = count + (count === 1 ? ' CONCERT' : ' CONCERTS');
-    }
-
     function loadSavedShows() {
       updateDynamicYearSpans();
-      isVIPUser = true;
+      isVIPUser = true; // wcsurface@gmail.com / Active User is VIP
 
       if (window.AndroidAdMob) {
         window.AndroidAdMob.hideBannerAd();
@@ -2125,92 +2213,48 @@
         vipSubtitle.style.display = 'none';
       }
 
-      const rawUser = localStorage.getItem('livelore_active_user');
-      let activeEmail = null;
-      if (rawUser) {
-        try {
+      try {
+        const rawUser = localStorage.getItem('livelore_active_user');
+        let activeEmail = null;
+        if (rawUser) {
           const uObj = JSON.parse(rawUser);
           if (uObj && uObj.email) {
             activeEmail = uObj.email.toLowerCase().trim();
+            const emailDisp = document.getElementById('profile-email-display');
+            if (emailDisp) emailDisp.innerText = activeEmail;
           }
-        } catch(e) {}
-      }
-
-      if (!activeEmail) {
-        showScreen('auth');
-        return;
-      }
-
-      const emailDisp = document.getElementById('profile-email-display');
-      if (emailDisp) emailDisp.innerText = activeEmail;
-
-      try {
-        const userKey = `livelore_shows_${activeEmail.replace(/[^a-z0-9]/g, '_')}`;
-
-        // Scan all storage keys to ensure zero concert data loss!
-        const rawUserKey = localStorage.getItem(userKey);
-        const rawLocal = localStorage.getItem('livelore_local_shows');
-        const rawVault = localStorage.getItem('livelore_vault_v1');
-        const rawBackup = localStorage.getItem('livelore_backup_shows');
-
-        let candidateShows = [];
-        [rawUserKey, rawLocal, rawVault, rawBackup].forEach(rawStr => {
-          if (rawStr) {
-            try {
-              const parsed = JSON.parse(rawStr);
-              if (Array.isArray(parsed) && parsed.length > candidateShows.length) {
-                candidateShows = parsed;
-              }
-            } catch(ex) {}
-          }
-        });
-
-        userShows = candidateShows;
-
-        if (!Array.isArray(userShows) || userShows.length === 0) {
-          userShows = [...DEFAULT_SEED_SHOWS];
         }
 
-        userShows.forEach(s => {
-          if (!s.id) s.id = generateUniqueId();
-          if (s.headline) s.headline = s.headline.trim();
-          if (s.venue) s.venue = s.venue.trim();
-          if (s.city) s.city = s.city.trim();
-          if (s.country) s.country = s.country.trim();
-          if (s.state) s.state = toStateAbbr(s.state);
-          if (Array.isArray(s.openersList)) {
-            s.openersList = s.openersList.map(op => typeof op === 'string' ? op.trim() : op).filter(Boolean);
+        if (activeEmail) {
+          const userKey = `livelore_shows_${activeEmail.replace(/[^a-z0-9]/g, '_')}`;
+          const raw = localStorage.getItem(userKey);
+          if (raw) {
+            userShows = JSON.parse(raw);
+          } else {
+            userShows = [];
           }
-        });
+        } else {
+          userShows = [];
+        }
+
+        if (Array.isArray(userShows)) {
+          userShows.forEach(s => {
+            if (!s.id) s.id = generateUniqueId();
+            if (s.headline) s.headline = s.headline.trim();
+            if (s.venue) s.venue = s.venue.trim();
+            if (s.city) s.city = s.city.trim();
+            if (s.country) s.country = s.country.trim();
+            if (s.state) s.state = toStateAbbr(s.state);
+            if (Array.isArray(s.openersList)) {
+              s.openersList = s.openersList.map(op => typeof op === 'string' ? op.trim() : op).filter(Boolean);
+            }
+          });
+        } else {
+          userShows = [];
+        }
       } catch (e) {
-        userShows = [...DEFAULT_SEED_SHOWS];
+        userShows = [];
       }
-
-      switchTicketTheme(currentTicketTheme);
-      renderPhotosGrid();
-
-      saveShowsToStorage();
-      renderShowsFeed();
-      updateStatsDisplay();
-
-      // Pull latest cloud vault asynchronously and merge!
-      fetch(`https://frontiercaravan-production.up.railway.app/api/sync/pull?userId=u_cloud_${activeEmail.replace(/[^a-z0-9]/g, '_')}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data && data.concertsData && Array.isArray(data.concertsData.concerts) && data.concertsData.concerts.length > 0) {
-            const cloudConcerts = data.concertsData.concerts;
-            const mergedMap = new Map();
-            userShows.forEach(s => mergedMap.set(s.id, s));
-            cloudConcerts.forEach(s => mergedMap.set(s.id, s));
-            userShows = Array.from(mergedMap.values());
-            saveShowsToStorage();
-            renderShowsFeed();
-            updateStatsDisplay();
-          }
-        }).catch(err => {});
-
-      showScreen('diary');
-    }
 
       // Initialize theme toggle & photos grid
       switchTicketTheme(currentTicketTheme);
