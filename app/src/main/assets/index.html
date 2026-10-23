@@ -620,6 +620,15 @@
   </div>
 
   <script>
+    // TOP GLOBAL STATE DECLARATIONS
+    let authMode = 'login';
+    let isVIPUser = true;
+    let editingShowId = null;
+    let currentSort = 'newest';
+    let currentTicketTheme = localStorage.getItem('livelore_ticket_theme') || 'multicolor';
+    let currentPhotoUris = [];
+    let modalPhotoUris = [];
+    let modalActiveIdx = 0;
     function hashPassword(email, password) {
       const str = (email || '').toLowerCase().trim() + ":" + (password || '');
       let hash = 0;
@@ -734,11 +743,6 @@
       '#D6EBCA', // Pale Sage
       '#F7E5B3', // Classic Cream
     ];
-
-    let currentTicketTheme = localStorage.getItem('livelore_ticket_theme') || 'multicolor';
-    let currentPhotoUris = [];
-    let modalPhotoUris = [];
-    let modalActiveIdx = 0;
 
     function openPhotoModal(index) {
       if (!modalPhotoUris || modalPhotoUris.length === 0) return;
