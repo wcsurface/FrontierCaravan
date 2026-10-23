@@ -838,9 +838,311 @@
 
     function updateStatsDisplay() {
       const count = userShows ? userShows.length : 0;
-      const statsTotalEl = document.getElementById('stats-total-count');
-      if (statsTotalEl) statsTotalEl.innerText = count + (count === 1 ? ' CONCERT' : ' CONCERTS');
+      const countEl = document.getElementById('stats-total-count');
+      if (countEl) countEl.innerText = count + (count === 1 ? ' CONCERT' : ' CONCERTS');
+
+      if (count > 0) {
+        const artistNormalizedCounts = {};
+        const artistDisplayNames = {};
+
+        const venueNormalizedCounts = {};
+        const venueDisplayNames = {};
+
+        const cityNormalizedCounts = {};
+        const cityDisplayNames = {};
+
+        const stateNormalizedCounts = {};
+
+        const yearCounts = {};
+        const dayCounts = { 'Sunday':0, 'Monday':0, 'Tuesday':0, 'Wednesday':0, 'Thursday':0, 'Friday':0, 'Saturday':0 };
+        const daysArr = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+        const recordArtistName = (rawName) => {
+          if (!rawName || !rawName.trim()) return;
+          const cleanName = rawName.trim();
+          const normKey = cleanName.toLowerCase();
+
+          artistNormalizedCounts[normKey] = (artistNormalizedCounts[normKey] || 0) + 1;
+          if (!artistDisplayNames[normKey]) {
+            artistDisplayNames[normKey] = cleanName;
+          }
+        };
+
+        const recordVenueName = (rawVenue) => {
+          if (!rawVenue || !rawVenue.trim()) return;
+          const cleanVenue = rawVenue.trim();
+          const normKey = cleanVenue.toLowerCase();
+
+          venueNormalizedCounts[normKey] = (venueNormalizedCounts[normKey] || 0) + 1;
+          if (!venueDisplayNames[normKey]) {
+            venueDisplayNames[normKey] = cleanVenue;
+          }
+        };
+
+        const recordCityName = (rawCity, rawState) => {
+          if (!rawCity || !rawCity.trim()) return;
+          const cleanCity = rawCity.trim();
+          const cleanState = toStateAbbr(rawState || 'IN');
+          const normKey = `${cleanCity.toLowerCase()}_${cleanState.toLowerCase()}`;
+
+          cityNormalizedCounts[normKey] = (cityNormalizedCounts[normKey] || 0) + 1;
+          if (!cityDisplayNames[normKey]) {
+            cityDisplayNames[normKey] = `${cleanCity} (${cleanState})`;
+          }
+        };
+
+        const recordStateName = (rawState) => {
+          if (!rawState) return;
+          const cleanState = toStateAbbr(rawState);
+          stateNormalizedCounts[cleanState] = (stateNormalizedCounts[cleanState] || 0) + 1;
+        };
+
+        userShows.forEach(s => {
+          if (s.headline) recordArtistName(s.headline);
+          if (Array.isArray(s.openersList) && s.openersList.length > 0) {
+            s.openersList.forEach(op => {
+              if (typeof op === 'string') op.split(',').forEach(subOp => recordArtistName(subOp));
+            });
+          } else if (s.opener && typeof s.opener === 'string') {
+            s.opener.split(',').forEach(subOp => recordArtistName(subOp));
+          }
+
+          recordVenueName(s.venue);
+          recordCityName(s.city, s.state);
+          recordStateName(s.state);
+
+          let dObj = new Date(s.date);
+          if (isNaN(dObj.getTime()) && typeof s.date === 'string') {
+            const parts = s.date.split(/[\/\.-]/);
+            if (parts.length === 3) {
+              let m = parseInt(parts[0], 10) - 1;
+              let d = parseInt(parts[1], 10);
+              let y = parseInt(parts[2], 10);
+              if (y < 100) y = y > 30 ? 1900 + y : 2000 + y;
+              dObj = new Date(y, m, d);
+            }
+          }
+
+          if (!isNaN(dObj.getTime())) {
+            const yr = dObj.getFullYear();
+            yearCounts[yr] = (yearCounts[yr] || 0) + 1;
+
+            const dayName = daysArr[dObj.getDay()];
+            if (dayName) dayCounts[dayName] = (dayCounts[dayName] || 0) + 1;
+          }
+        });
+
+        const topA = Object.entries(artistNormalizedCounts)
+          .map(([normKey, cnt]) => [artistDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1])
+          .slice(0, 10);
+
+        const topV = Object.entries(venueNormalizedCounts)
+          .map(([normKey, cnt]) => [venueDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1])
+          .slice(0, 10);
+
+        const topC = Object.entries(cityNormalizedCounts)
+          .map(([normKey, cnt]) => [cityDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1])
+          .slice(0, 10);
+
+        const topS = Object.entries(stateNormalizedCounts)
+          .sort((a,b) => b[1] - a[1])
+          .slice(0, 10);
+
+        const topY = Object.entries(yearCounts).sort((a,b) => b[1] - a[1] || b[0] - a[0]).slice(0, 10);
+        const topD = Object.entries(dayCounts).filter(d => d[1] > 0).sort((a,b) => b[1] - a[1]).slice(0, 10);
+
+        const artPrev = document.getElementById('stats-artists-preview');
+        const venPrev = document.getElementById('stats-venues-preview');
+        const citPrev = document.getElementById('stats-cities-preview');
+        const staPrev = document.getElementById('stats-states-preview');
+        const yrPrev = document.getElementById('stats-years-preview');
+        const dayPrev = document.getElementById('stats-days-preview');
+
+        if (artPrev) artPrev.innerHTML = topA.map((item, i) => `<div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#FFB300; font-weight:900;">${item[1]}</span></div>`).join('');
+        if (venPrev) venPrev.innerHTML = topV.map((item, i) => `<div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#00E676; font-weight:900;">${item[1]}</span></div>`).join('');
+        if (citPrev) citPrev.innerHTML = topC.map((item, i) => `<div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#00B0FF; font-weight:900;">${item[1]}</span></div>`).join('');
+        if (staPrev) staPrev.innerHTML = topS.map((item, i) => `<div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#E040FB; font-weight:900;">${item[1]}</span></div>`).join('');
+        if (yrPrev) yrPrev.innerHTML = topY.map((item, i) => `<div style="margin-bottom:8px;" class="stats-item-text">${i+1}. Year ${item[0]} - <span style="color:#FF7A00; font-weight:900;">${item[1]} ${item[1] === 1 ? 'concert' : 'concerts'}</span></div>`).join('');
+        if (dayPrev) dayPrev.innerHTML = topD.map((item, i) => `<div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#FF4081; font-weight:900;">${item[1]} concerts (${Math.round((item[1]/count)*100)}%)</span></div>`).join('');
+      } else {
+        const artPrev = document.getElementById('stats-artists-preview');
+        const venPrev = document.getElementById('stats-venues-preview');
+        const citPrev = document.getElementById('stats-cities-preview');
+        const staPrev = document.getElementById('stats-states-preview');
+        const yrPrev = document.getElementById('stats-years-preview');
+        const dayPrev = document.getElementById('stats-days-preview');
+
+        if (artPrev) artPrev.innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top artists!</div>';
+        if (venPrev) venPrev.innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top venues!</div>';
+        if (citPrev) citPrev.innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top cities!</div>';
+        if (staPrev) staPrev.innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top states!</div>';
+        if (yrPrev) yrPrev.innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top years!</div>';
+        if (dayPrev) dayPrev.innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view days of week breakdown!</div>';
+      }
     }
+    window.updateStatsDisplay = updateStatsDisplay;
+
+    function showSubStats(type) {
+      const container = document.getElementById('substats-container');
+      if (!container) return;
+
+      if (type === 'artists') {
+        const artistNormalizedCounts = {};
+        const artistDisplayNames = {};
+
+        const recordArtistName = (rawName) => {
+          if (!rawName || !rawName.trim()) return;
+          const cleanName = rawName.trim();
+          const normKey = cleanName.toLowerCase();
+          artistNormalizedCounts[normKey] = (artistNormalizedCounts[normKey] || 0) + 1;
+          if (!artistDisplayNames[normKey]) artistDisplayNames[normKey] = cleanName;
+        };
+
+        userShows.forEach(s => {
+          if (s.headline) recordArtistName(s.headline);
+          if (Array.isArray(s.openersList) && s.openersList.length > 0) {
+            s.openersList.forEach(op => {
+              if (typeof op === 'string') op.split(',').forEach(subOp => recordArtistName(subOp));
+            });
+          } else if (s.opener && typeof s.opener === 'string') {
+            s.opener.split(',').forEach(subOp => recordArtistName(subOp));
+          }
+        });
+
+        const topA = Object.entries(artistNormalizedCounts)
+          .map(([normKey, cnt]) => [artistDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1]);
+
+        container.innerHTML = `
+          <div style="color:#FFB300; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">ALL ARTISTS (${topA.length})</div>
+          ${topA.length > 0 ? topA.map((item, i) => `
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. ${item[0]} - <span style="color:#FFB300;">${item[1]} ${item[1] === 1 ? 'Time' : 'Times'}</span></div>
+          `).join('') : '<div style="color:#94a3b8; font-size:14px;">No artists logged yet.</div>'}
+        `;
+      } else if (type === 'venues') {
+        const venueNormalizedCounts = {};
+        const venueDisplayNames = {};
+
+        userShows.forEach(s => {
+          if (!s.venue || !s.venue.trim()) return;
+          const cleanVenue = s.venue.trim();
+          const normKey = cleanVenue.toLowerCase();
+          venueNormalizedCounts[normKey] = (venueNormalizedCounts[normKey] || 0) + 1;
+          if (!venueDisplayNames[normKey]) venueDisplayNames[normKey] = cleanVenue;
+        });
+
+        const topV = Object.entries(venueNormalizedCounts)
+          .map(([normKey, cnt]) => [venueDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1]);
+
+        container.innerHTML = `
+          <div style="color:#00E676; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">ALL VENUES (${topV.length})</div>
+          ${topV.length > 0 ? topV.map((item, i) => `
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. ${item[0]} - <span style="color:#00E676;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'}</span></div>
+          `).join('') : '<div style="color:#94a3b8; font-size:14px;">No venues logged yet.</div>'}
+        `;
+      } else if (type === 'cities') {
+        const cityNormalizedCounts = {};
+        const cityDisplayNames = {};
+
+        userShows.forEach(s => {
+          if (!s.city || !s.city.trim()) return;
+          const cleanCity = s.city.trim();
+          const cleanState = toStateAbbr(s.state || 'IN');
+          const normKey = `${cleanCity.toLowerCase()}_${cleanState.toLowerCase()}`;
+          cityNormalizedCounts[normKey] = (cityNormalizedCounts[normKey] || 0) + 1;
+          if (!cityDisplayNames[normKey]) cityDisplayNames[normKey] = `${cleanCity} (${cleanState})`;
+        });
+
+        const topC = Object.entries(cityNormalizedCounts)
+          .map(([normKey, cnt]) => [cityDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1]);
+
+        container.innerHTML = `
+          <div style="color:#00B0FF; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">ALL CITIES (${topC.length})</div>
+          ${topC.length > 0 ? topC.map((item, i) => `
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. ${item[0]} - <span style="color:#00B0FF;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'}</span></div>
+          `).join('') : '<div style="color:#94a3b8; font-size:14px;">No cities logged yet.</div>'}
+        `;
+      } else if (type === 'states') {
+        const stateNormalizedCounts = {};
+
+        userShows.forEach(s => {
+          if (!s.state) return;
+          const cleanState = toStateAbbr(s.state);
+          stateNormalizedCounts[cleanState] = (stateNormalizedCounts[cleanState] || 0) + 1;
+        });
+
+        const topS = Object.entries(stateNormalizedCounts).sort((a,b) => b[1] - a[1]);
+
+        container.innerHTML = `
+          <div style="color:#E040FB; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">ALL STATES (${topS.length})</div>
+          ${topS.length > 0 ? topS.map((item, i) => `
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. ${item[0]} - <span style="color:#E040FB;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'}</span></div>
+          `).join('') : '<div style="color:#94a3b8; font-size:14px;">No states logged yet.</div>'}
+        `;
+      } else if (type === 'years') {
+        const yearCounts = {};
+        userShows.forEach(s => {
+          let dObj = new Date(s.date);
+          if (isNaN(dObj.getTime()) && typeof s.date === 'string') {
+            const parts = s.date.split(/[\/\.-]/);
+            if (parts.length === 3) {
+              let m = parseInt(parts[0], 10) - 1;
+              let d = parseInt(parts[1], 10);
+              let y = parseInt(parts[2], 10);
+              if (y < 100) y = y > 30 ? 1900 + y : 2000 + y;
+              dObj = new Date(y, m, d);
+            }
+          }
+          if (!isNaN(dObj.getTime())) {
+            const yr = dObj.getFullYear();
+            yearCounts[yr] = (yearCounts[yr] || 0) + 1;
+          }
+        });
+        const topY = Object.entries(yearCounts).sort((a,b) => b[1] - a[1] || b[0] - a[0]);
+
+        container.innerHTML = `
+          <div style="color:#FF7A00; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">ALL YEARS (${topY.length})</div>
+          ${topY.length > 0 ? topY.map((item, i) => `
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. Year ${item[0]} - <span style="color:#FF7A00;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'}</span></div>
+          `).join('') : '<div style="color:#94a3b8; font-size:14px;">No years logged yet.</div>'}
+        `;
+      } else {
+        const dayCounts = { 'Sunday':0, 'Monday':0, 'Tuesday':0, 'Wednesday':0, 'Thursday':0, 'Friday':0, 'Saturday':0 };
+        const daysArr = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        userShows.forEach(s => {
+          let dObj = new Date(s.date);
+          if (isNaN(dObj.getTime()) && typeof s.date === 'string') {
+            const parts = s.date.split(/[\/\.-]/);
+            if (parts.length === 3) {
+              let m = parseInt(parts[0], 10) - 1;
+              let d = parseInt(parts[1], 10);
+              let y = parseInt(parts[2], 10);
+              if (y < 100) y = y > 30 ? 1900 + y : 2000 + y;
+              dObj = new Date(y, m, d);
+            }
+          }
+          if (!isNaN(dObj.getTime())) {
+            const dayName = daysArr[dObj.getDay()];
+            if (dayName) dayCounts[dayName] = (dayCounts[dayName] || 0) + 1;
+          }
+        });
+        const topD = Object.entries(dayCounts).filter(d => d[1] > 0).sort((a,b) => b[1] - a[1]);
+
+        container.innerHTML = `
+          <div style="color:#FF4081; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">DAYS OF THE WEEK</div>
+          ${topD.length > 0 ? topD.map((item, i) => `
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${item[0]} - <span style="color:#FF4081;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'} (${Math.round((item[1]/userShows.length)*100)}%)</span></div>
+          `).join('') : '<div style="color:#94a3b8; font-size:14px;">No days logged yet.</div>'}
+        `;
+      }
+      showScreen('substats');
+    }
+    window.showSubStats = showSubStats;
 
     function loadSavedShows() {
       updateDynamicYearSpans();
