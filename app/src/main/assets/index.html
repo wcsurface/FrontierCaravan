@@ -462,6 +462,53 @@
     }
     window.saveNewShow = saveNewShow;
 
+    function openPhotoModal(index) {
+      if (!modalPhotoUris || modalPhotoUris.length === 0) return;
+      modalActiveIdx = index;
+      updatePhotoModalView();
+      var modal = document.getElementById('photo-lightbox-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+      }
+    }
+    window.openPhotoModal = openPhotoModal;
+
+    function closePhotoModal() {
+      var modal = document.getElementById('photo-lightbox-modal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    }
+    window.closePhotoModal = closePhotoModal;
+
+    function updatePhotoModalView() {
+      if (!modalPhotoUris || modalPhotoUris.length === 0) return;
+      var img = document.getElementById('lightbox-img');
+      var counter = document.getElementById('lightbox-counter-label');
+      if (img) img.src = modalPhotoUris[modalActiveIdx];
+      if (counter) counter.innerText = 'Photo ' + (modalActiveIdx + 1) + ' of ' + modalPhotoUris.length;
+    }
+    window.updatePhotoModalView = updatePhotoModalView;
+
+    function prevModalPhoto(e) {
+      if (e) {
+        try { e.preventDefault(); e.stopPropagation(); } catch(ex) {}
+      }
+      if (!modalPhotoUris || modalPhotoUris.length === 0) return;
+      modalActiveIdx = (modalActiveIdx - 1 + modalPhotoUris.length) % modalPhotoUris.length;
+      updatePhotoModalView();
+    }
+    window.prevModalPhoto = prevModalPhoto;
+
+    function nextModalPhoto(e) {
+      if (e) {
+        try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
+      if (!modalPhotoUris || modalPhotoUris.length === 0) return;
+      modalActiveIdx = (modalActiveIdx + 1) % modalPhotoUris.length;
+      updatePhotoModalView();
+    }
+    window.nextModalPhoto = nextModalPhoto;
+
     function openShowDetails(showId) {
       if (!showId) return;
       activeDetailShowId = showId;
@@ -2214,6 +2261,53 @@
     function buyAppPremium() {
       alert('Welcome to LiveLore VIP! You now have permanent ad-free access and photo features!');
     }
+
+    function openPhotoModal(index) {
+      if (!modalPhotoUris || modalPhotoUris.length === 0) return;
+      modalActiveIdx = index;
+      updatePhotoModalView();
+      var modal = document.getElementById('photo-lightbox-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+      }
+    }
+    window.openPhotoModal = openPhotoModal;
+
+    function closePhotoModal() {
+      var modal = document.getElementById('photo-lightbox-modal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    }
+    window.closePhotoModal = closePhotoModal;
+
+    function updatePhotoModalView() {
+      if (!modalPhotoUris || modalPhotoUris.length === 0) return;
+      var img = document.getElementById('lightbox-img');
+      var counter = document.getElementById('lightbox-counter-label');
+      if (img) img.src = modalPhotoUris[modalActiveIdx];
+      if (counter) counter.innerText = 'Photo ' + (modalActiveIdx + 1) + ' of ' + modalPhotoUris.length;
+    }
+    window.updatePhotoModalView = updatePhotoModalView;
+
+    function prevModalPhoto(e) {
+      if (e) {
+        try { e.preventDefault(); e.stopPropagation(); } catch(ex) {}
+      }
+      if (!modalPhotoUris || modalPhotoUris.length === 0) return;
+      modalActiveIdx = (modalActiveIdx - 1 + modalPhotoUris.length) % modalPhotoUris.length;
+      updatePhotoModalView();
+    }
+    window.prevModalPhoto = prevModalPhoto;
+
+    function nextModalPhoto(e) {
+      if (e) {
+        try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
+      if (!modalPhotoUris || modalPhotoUris.length === 0) return;
+      modalActiveIdx = (modalActiveIdx + 1) % modalPhotoUris.length;
+      updatePhotoModalView();
+    }
+    window.nextModalPhoto = nextModalPhoto;
 
     function openShowDetails(showId) {
       activeDetailShowId = showId;
