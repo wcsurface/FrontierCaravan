@@ -474,33 +474,33 @@
       showScreen('diary');
     }
 
-    function saveShowsToStorage() {
-      try {
-        const serialized = JSON.stringify(userShows);
-        localStorage.setItem('livelore_local_shows', serialized);
-        localStorage.setItem('livelore_vault_v1', serialized);
-        localStorage.setItem('livelore_backup_shows', serialized);
-
-        const rawUser = localStorage.getItem('livelore_active_user');
-        if (rawUser) {
-          const uObj = JSON.parse(rawUser);
-          if (uObj && uObj.email) {
-            const userEmail = uObj.email.toLowerCase().trim();
-            const userKey = `livelore_shows_${userEmail.replace(/[^a-z0-9]/g, '_')}`;
-            localStorage.setItem(userKey, serialized);
-
-            fetch('https://frontiercaravan-production.up.railway.app/api/sync/push', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                userId: `u_cloud_${userEmail.replace(/[^a-z0-9]/g, '_')}`,
-                concertsData: { concerts: userShows }
-              })
-            }).catch(function(err) {});
-          }
-        }
-      } catch (e) {}
+    function handleLogout() {
+      clearErrorBanner();
+      localStorage.removeItem('livelore_active_user');
+      var emailEl = document.getElementById('auth-email');
+      var passEl = document.getElementById('auth-password');
+      var nameEl = document.getElementById('auth-name');
+      if (emailEl) emailEl.value = '';
+      if (passEl) passEl.value = '';
+      if (nameEl) nameEl.value = '';
+      showScreen('auth');
     }
+    window.handleLogout = handleLogout;
+
+    function resetLogForm() {
+      var form = document.getElementById('log-show-form');
+      if (form) form.reset();
+      var dropdown = document.getElementById('venue-dropdown');
+      if (dropdown) dropdown.style.display = 'none';
+      var openers = document.getElementById('openers-container');
+      if (openers) openers.innerHTML = '<input type="text" class="input-field input-opener" placeholder="Opener" />';
+      currentPhotoUris = [];
+      renderPhotosGrid();
+      editingShowId = null;
+      var btnSave = document.getElementById('btn-save-show');
+      if (btnSave) btnSave.innerText = '+ ADD CONCERT';
+    }
+    window.resetLogForm = resetLogForm;
 
     function hashPassword(email, password) {
       var str = (email || '').toLowerCase().trim() + ":" + (password || '');

@@ -327,30 +327,17 @@ class MainActivity : ComponentActivity() {
         fun launchGoogleSignIn() {
             runOnUiThread {
                 try {
-                    val accountManager = AccountManager.get(context)
-                    val accounts = accountManager.getAccountsByType("com.google")
-                    if (accounts.size == 1) {
-                        val primaryEmail = accounts[0].name.lowercase().trim()
-                        webView.post {
-                            webView.evaluateJavascript("onNativeGoogleAuthSuccess('$primaryEmail')", null)
-                        }
-                    } else if (accounts.size > 1) {
-                        @Suppress("DEPRECATION")
-                        val intent = AccountManager.newChooseAccountIntent(
-                            null, null, arrayOf("com.google"), false, null, null, null, null
-                        )
-                        startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
-                    } else {
-                        webView.post {
-                            webView.evaluateJavascript("onNativeGoogleAuthFallback()", null)
-                        }
-                    }
+                    @Suppress("DEPRECATION")
+                    val intent = AccountManager.newChooseAccountIntent(
+                        null, null, arrayOf("com.google"), true, null, null, null, null
+                    )
+                    startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
                 } catch (e: Exception) {
                     try {
-                        @Suppress("DEPRECATION")
-                        val intent = AccountManager.newChooseAccountIntent(
-                            null, null, arrayOf("com.google"), false, null, null, null, null
-                        )
+                        val intent = Intent("com.google.android.gms.common.account.CHOOSE_ACCOUNT").apply {
+                            putExtra("allowableAccountTypes", arrayOf("com.google"))
+                            putExtra("alwaysPromptForAccount", true)
+                        }
                         startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
                     } catch (ex: Exception) {
                         webView.post {
