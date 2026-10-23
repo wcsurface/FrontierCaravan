@@ -1,7 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
+import fs from 'fs';
+import path from 'path';
 
-// Persistent Multi-Tenant Cloud Vault Map (Key: userId -> Value: { concerts: [...] })
-const globalCloudVaults = new Map<string, any>();
+const VAULT_FILE_PATH = path.join('/tmp', 'livelore_cloud_vaults.json');
+
+function loadVaultsFromDisk(): Record<string, any> {
+  try {
+    if (fs.existsSync(VAULT_FILE_PATH)) {
+      const raw = fs.readFileSync(VAULT_FILE_PATH, 'utf-8');
+      return JSON.parse(raw);
+    }
+  } catch (e) {}
+  return {};
+}
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -11,8 +22,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: true, concertsData: { concerts: [] } });
   }
 
-  // Multi-tenant vault lookup: Every user gets their own clean cloud vault!
-  const userVault = globalCloudVaults.get(userId) || { concerts: [] };
+  const vaults = loadVaultsFromDisk();
+  const userVault = vaults[userId] || { concerts: [] };
 
   return NextResponse.json({
     success: true,
