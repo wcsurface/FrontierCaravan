@@ -767,12 +767,7 @@
           if (Array.isArray(show.photoUris) && show.photoUris.length > 0 && show.photoUris[0]) {
             const primaryPhoto = show.photoUris[0];
             stubExtraStyle = `background-image: url('${primaryPhoto}'); background-size: cover; background-position: center; border-radius: 0 10px 10px 0; overflow: hidden; position: relative;`;
-            stubInnerHtml = `
-              <div style="position:absolute; inset:0; background:rgba(0,0,0,0.35); flex-direction:column; justify-content:center; align-items:center; display:flex;">
-                <div style="font-weight:900; font-size:10px; color:#ffffff; text-shadow:0 1px 4px #000; letter-spacing:0.5px;">ADMIT ONE</div>
-                <div style="font-size:8px; color:#FFB300; font-weight:bold; margin-top:2px; text-shadow:0 1px 3px #000;">SEC 7</div>
-              </div>
-            `;
+            stubInnerHtml = '';
           }
 
           card.innerHTML = `
