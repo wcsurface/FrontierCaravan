@@ -620,27 +620,40 @@
   </div>
 
   <script>
-    window.handleGoogleSignIn = function(e) {
+    function hashPassword(email, password) {
+      const str = (email || '').toLowerCase().trim() + ":" + (password || '');
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash |= 0;
+      }
+      return 'hash_' + Math.abs(hash).toString(36) + '_' + str.length;
+    }
+
+    function handleGoogleSignIn(e) {
       if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
       if (window.AndroidGoogleAuth && window.AndroidGoogleAuth.launchGoogleSignIn) {
         try {
           window.AndroidGoogleAuth.launchGoogleSignIn();
         } catch (err) {
-          window.onNativeGoogleAuthFallback();
+          onNativeGoogleAuthFallback();
         }
       } else {
-        window.onNativeGoogleAuthFallback();
+        onNativeGoogleAuthFallback();
       }
-    };
+    }
+    window.handleGoogleSignIn = handleGoogleSignIn;
 
-    window.onNativeGoogleAuthFallback = function() {
+    function onNativeGoogleAuthFallback() {
       const inputEmail = prompt("Enter your Google Account email to continue:", "you@gmail.com");
       if (inputEmail && inputEmail.includes('@')) {
-        window.onNativeGoogleAuthSuccess(inputEmail);
+        onNativeGoogleAuthSuccess(inputEmail);
       }
-    };
+    }
+    window.onNativeGoogleAuthFallback = onNativeGoogleAuthFallback;
 
-    window.onNativeGoogleAuthSuccess = function(googleEmail) {
+    function onNativeGoogleAuthSuccess(googleEmail) {
       if (!googleEmail || typeof googleEmail !== 'string' || !googleEmail.includes('@')) return;
       const cleanedEmail = googleEmail.toLowerCase().trim();
 
@@ -648,9 +661,10 @@
 
       loadSavedShows();
       showScreen('diary');
-    };
+    }
+    window.onNativeGoogleAuthSuccess = onNativeGoogleAuthSuccess;
 
-    window.handleLoginSubmit = function(e) {
+    function handleLoginSubmit(e) {
       if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
       clearErrorBanner();
 
@@ -709,7 +723,8 @@
       } catch (err) {
         showErrorBanner('Authentication error: ' + err.message);
       }
-    };
+    }
+    window.handleLoginSubmit = handleLoginSubmit;
 
     // 5-COLOR RANDOM ASSORTMENT VINTAGE PALETTE
     const TICKET_COLOR_PALETTE = [
