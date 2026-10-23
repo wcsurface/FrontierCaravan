@@ -462,6 +462,146 @@
     }
     window.saveNewShow = saveNewShow;
 
+    function openShowDetails(showId) {
+      if (!showId) return;
+      activeDetailShowId = showId;
+      var show = userShows.find(function(s) { return s.id === showId; });
+      if (!show) return;
+
+      var headlineEl = document.getElementById('detail-headline');
+      var dateEl = document.getElementById('detail-date');
+      var venueEl = document.getElementById('detail-venue');
+      var locEl = document.getElementById('detail-location');
+
+      if (headlineEl) headlineEl.innerText = (show.headline || '').toUpperCase();
+      if (dateEl) dateEl.innerText = show.date || '';
+      if (venueEl) venueEl.innerText = show.venue || '';
+
+      var preset = VENUE_DB.find(function(v) { return v.v.toLowerCase() === (show.venue || '').toLowerCase() || v.v.toLowerCase().startsWith((show.venue || '').toLowerCase()); });
+      var c = (show.city || (preset ? preset.c : 'Noblesville')).trim();
+      var rawState = show.state || (preset ? preset.s : 'IN');
+      var s = toStateAbbr(rawState);
+      var co = (show.country || (preset ? preset.co : 'USA')).trim();
+
+      if (locEl) locEl.innerText = c + ', ' + s + ', ' + co;
+
+      var openersBox = document.getElementById('detail-openers-box');
+      var openersEl = document.getElementById('detail-openers');
+      var openersText = '';
+      if (Array.isArray(show.openersList) && show.openersList.length > 0) {
+        openersText = show.openersList.join(', ');
+      } else if (show.opener) {
+        openersText = show.opener;
+      }
+
+      if (openersBox) {
+        if (openersText) {
+          openersBox.style.display = 'block';
+          if (openersEl) openersEl.innerText = openersText;
+        } else {
+          openersBox.style.display = 'none';
+        }
+      }
+
+      var notesBox = document.getElementById('detail-notes-box');
+      var notesEl = document.getElementById('detail-notes');
+      if (notesBox) {
+        if (show.notes && show.notes.trim().length > 0) {
+          notesBox.style.display = 'block';
+          if (notesEl) notesEl.innerText = show.notes;
+        } else {
+          notesBox.style.display = 'none';
+        }
+      }
+
+      // Photos Gallery on Details Page
+      var photosBox = document.getElementById('detail-photos-gallery-box');
+      var photosGrid = document.getElementById('detail-photos-grid');
+      if (photosBox && photosGrid) {
+        if (show.photoUris && show.photoUris.length > 0) {
+          modalPhotoUris = [...show.photoUris];
+          photosBox.style.display = 'block';
+          photosGrid.innerHTML = show.photoUris.map(function(uri, idx) {
+            return '<div onclick="openPhotoModal(' + idx + ')" style="position:relative; aspect-ratio:1/1; border-radius:10px; overflow:hidden; border:' + (idx === 0 ? '2px solid #FFB300' : '1px solid #222B30') + '; cursor:pointer;">' +
+              '<img src="' + uri + '" style="width:100%; height:100%; object-fit:cover;" />' +
+              (idx === 0 ? '<div style="position:absolute; top:2px; left:2px; background:#FFB300; color:#0a0a0a; font-size:7px; font-weight:900; padding:1px 4px; border-radius:3px;">PRIMARY</div>' : '') +
+            '</div>';
+          }).join('');
+        } else {
+          photosBox.style.display = 'none';
+        }
+      }
+
+      showScreen('setlist');
+    }
+    window.openShowDetails = openShowDetails;
+
+    function triggerEditShow() {
+      if (!activeDetailShowId) return;
+      var show = userShows.find(function(s) { return s.id === activeDetailShowId; });
+      if (!show) return;
+
+      editingShowId = activeDetailShowId;
+
+      var headlineEl = document.getElementById('input-headline');
+      var venueEl = document.getElementById('input-venue');
+      var cityEl = document.getElementById('input-city');
+      var stateEl = document.getElementById('input-state');
+      var countryEl = document.getElementById('input-country');
+      var dateEl = document.getElementById('input-date');
+      var notesEl = document.getElementById('input-notes');
+
+      if (headlineEl) headlineEl.value = (show.headline || '').trim();
+      if (venueEl) venueEl.value = (show.venue || '').trim();
+
+      var preset = VENUE_DB.find(function(v) { return v.v.toLowerCase() === (show.venue || '').toLowerCase() || v.v.toLowerCase().startsWith((show.venue || '').toLowerCase()); });
+      var c = (show.city || (preset ? preset.c : 'Noblesville')).trim();
+      var rawState = show.state || (preset ? preset.s : 'IN');
+      var s = toStateAbbr(rawState);
+      var co = (show.country || (preset ? preset.co : 'USA')).trim();
+
+      if (cityEl) cityEl.value = c;
+      if (stateEl) stateEl.value = s;
+      if (countryEl) countryEl.value = co;
+      if (dateEl) dateEl.value = show.date || '';
+      if (notesEl) notesEl.value = (show.notes || '').trim();
+
+      currentPhotoUris = show.photoUris ? [...show.photoUris] : [];
+      renderPhotosGrid();
+
+      var openersContainer = document.getElementById('openers-container');
+      if (openersContainer) {
+        var openers = Array.isArray(show.openersList) && show.openersList.length > 0 ? show.openersList : (show.opener ? [show.opener] : []);
+        if (openers.length > 0) {
+          openersContainer.innerHTML = openers.map(function(op) {
+            return '<input type="text" class="input-field input-opener" value="' + op.trim() + '" placeholder="Opener" />';
+          }).join('');
+        }
+      }
+
+      var btnSave = document.getElementById('btn-save-show');
+      if (btnSave) btnSave.innerText = 'SAVE EDITS';
+
+      showScreen('log');
+    }
+    window.triggerEditShow = triggerEditShow;
+
+    function triggerDeleteShow() {
+      if (!activeDetailShowId) return;
+      var indexToDelete = userShows.findIndex(function(s) { return s.id === activeDetailShowId; });
+      if (indexToDelete < 0) return;
+
+      if (confirm('Are you sure you want to delete this concert from your vault?')) {
+        userShows.splice(indexToDelete, 1);
+        activeDetailShowId = null;
+        saveShowsToStorage();
+        renderShowsFeed();
+        updateStatsDisplay();
+        showScreen('diary');
+      }
+    }
+    window.triggerDeleteShow = triggerDeleteShow;
+
     function handleVenueInput(query) {
       var dropdown = document.getElementById('venue-dropdown');
       if (!dropdown) return;
