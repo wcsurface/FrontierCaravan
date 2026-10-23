@@ -1182,10 +1182,14 @@
     }
 
     function onNativeGoogleAuthFallback() {
-      const googleEmail = prompt("Enter your Google Account email to continue:", "wcsurface@gmail.com");
-      if (googleEmail && googleEmail.includes('@')) {
-        onNativeGoogleAuthSuccess(googleEmail);
+      const inputEmail = prompt("Enter your Google Account email to continue:", "you@gmail.com");
+      if (inputEmail && inputEmail.includes('@')) {
+        onNativeGoogleAuthSuccess(inputEmail);
       }
+    }
+
+    function onNativeGoogleAuthCancel() {
+      // User cancelled account chooser
     }
 
     function handleGoogleSignIn() {
@@ -1201,7 +1205,7 @@
     }
 
     function onNativeGoogleAuthSuccess(googleEmail) {
-      if (!googleEmail || !googleEmail.includes('@')) return;
+      if (!googleEmail || typeof googleEmail !== 'string' || !googleEmail.includes('@')) return;
       const cleanedEmail = googleEmail.toLowerCase().trim();
 
       localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
@@ -1275,28 +1279,29 @@
       if (e) e.preventDefault();
       clearErrorBanner();
 
-      const emailInput = document.getElementById('auth-email').value || '';
-      const passInput = document.getElementById('auth-password').value || '';
+      const emailVal = (document.getElementById('auth-email').value || '').toLowerCase().trim();
+      const passVal = (document.getElementById('auth-password').value || '').trim();
 
-      const cleanedEmail = emailInput.toLowerCase().trim();
-
-      if (!cleanedEmail || cleanedEmail.length < 3 || !cleanedEmail.includes('@')) {
-        showErrorBanner('Incorrect Email Address or Password. Please try again.');
+      if (!emailVal || emailVal.length < 3 || !emailVal.includes('@')) {
+        showErrorBanner('Please enter a valid email address.');
         return;
       }
 
-      if (!passInput || passInput.length < 4) {
-        showErrorBanner('Incorrect Email Address or Password. Please try again.');
+      if (!passVal || passVal.length < 4) {
+        showErrorBanner('Password must be at least 4 characters long.');
         return;
       }
 
-      localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'email' }));
+      localStorage.setItem('livelore_active_user', JSON.stringify({ email: emailVal, provider: 'email' }));
 
       loadSavedShows();
 
-      document.getElementById('auth-email').value = '';
-      document.getElementById('auth-password').value = '';
-      document.getElementById('auth-name').value = '';
+      const emailEl = document.getElementById('auth-email');
+      const passEl = document.getElementById('auth-password');
+      const nameEl = document.getElementById('auth-name');
+      if (emailEl) emailEl.value = '';
+      if (passEl) passEl.value = '';
+      if (nameEl) nameEl.value = '';
 
       showScreen('diary');
     }

@@ -254,7 +254,7 @@ class MainActivity : ComponentActivity() {
                 }
             } else {
                 webView.post {
-                    webView.evaluateJavascript("onNativeGoogleAuthFallback()", null)
+                    webView.evaluateJavascript("onNativeGoogleAuthCancel()", null)
                 }
             }
         }
