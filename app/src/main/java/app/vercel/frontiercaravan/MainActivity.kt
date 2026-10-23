@@ -179,6 +179,7 @@ class MainActivity : ComponentActivity() {
         webView.addJavascriptInterface(AndroidHapticsInterface(this), "AndroidHaptics")
         webView.addJavascriptInterface(AndroidGoogleAuthInterface(this), "AndroidGoogleAuth")
         webView.addJavascriptInterface(AndroidAdMobInterface(), "AndroidAdMob")
+        webView.addJavascriptInterface(AndroidCSVInterface(this), "AndroidCSV")
 
         val targetUrl = "file:///android_asset/index.html"
         webView.loadUrl(targetUrl)
@@ -273,6 +274,39 @@ class MainActivity : ComponentActivity() {
         fun hideBannerAd() {
             runOnUiThread {
                 adContainerLayout.visibility = View.GONE
+            }
+        }
+    }
+
+    inner class AndroidCSVInterface(private val context: Context) {
+        @JavascriptInterface
+        fun shareCsv(csvData: String, fileName: String) {
+            runOnUiThread {
+                try {
+                    val cacheDir = File(context.cacheDir, "csv_exports")
+                    if (!cacheDir.exists()) cacheDir.mkdirs()
+
+                    val csvFile = File(cacheDir, if (fileName.endsWith(".csv")) fileName else "$fileName.csv")
+                    csvFile.writeText(csvData)
+
+                    val contentUri: Uri = FileProvider.getUriForFile(
+                        context,
+                        "${context.packageName}.fileprovider",
+                        csvFile
+                    )
+
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/csv"
+                        putExtra(Intent.EXTRA_SUBJECT, "LiveLore Concert Vault CSV Export")
+                        putExtra(Intent.EXTRA_STREAM, contentUri)
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+
+                    val chooser = Intent.createChooser(shareIntent, "Save or Share Concert Vault CSV")
+                    context.startActivity(chooser)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
     }
