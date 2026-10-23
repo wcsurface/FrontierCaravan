@@ -550,7 +550,7 @@
         ].join(',');
       });
 
-      var csvData = [headers.join(','), ...rows].join('\n');
+      var csvData = [headers.join(',')].concat(rows).join('\n');
       var fileName = 'livelore_concert_vault_' + new Date().toISOString().slice(0, 10) + '.csv';
 
       if (window.AndroidCSV && window.AndroidCSV.shareCsv) {
