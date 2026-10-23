@@ -2,6 +2,7 @@ package app.vercel.frontiercaravan
 
 import android.accounts.AccountManager
 import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -23,6 +24,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.core.content.FileProvider
 import com.google.android.gms.ads.AdRequest
@@ -283,32 +285,45 @@ class MainActivity : ComponentActivity() {
         fun shareCsv(csvData: String, fileName: String) {
             runOnUiThread {
                 try {
-                    val cacheDir = File(context.cacheDir, "csv_exports")
-                    if (!cacheDir.exists()) cacheDir.mkdirs()
+                    val cleanFileName = if (fileName.endsWith(".csv")) fileName else "$fileName.csv"
+                    var savedSuccessfully = false
 
-                    val csvFile = File(cacheDir, if (fileName.endsWith(".csv")) fileName else "$fileName.csv")
-                    csvFile.writeText(csvData)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        val resolver = context.contentResolver
+                        val contentValues = ContentValues().apply {
+                            put(MediaStore.MediaColumns.DISPLAY_NAME, cleanFileName)
+                            put(MediaStore.MediaColumns.MIME_TYPE, "text/csv")
+                            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+                        }
 
-                    val contentUri: Uri = FileProvider.getUriForFile(
-                        context,
-                        "${context.packageName}.fileprovider",
-                        csvFile
-                    )
-
-                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                        type = "text/csv"
-                        putExtra(Intent.EXTRA_SUBJECT, "LiveLore Concert Vault CSV Export")
-                        putExtra(Intent.EXTRA_STREAM, contentUri)
-                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+                        if (uri != null) {
+                            resolver.openOutputStream(uri)?.use { stream ->
+                                stream.write(csvData.toByteArray())
+                            }
+                            savedSuccessfully = true
+                        }
+                    } else {
+                        @Suppress("DEPRECATION")
+                        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                        if (!downloadsDir.exists()) downloadsDir.mkdirs()
+                        val file = File(downloadsDir, cleanFileName)
+                        file.writeText(csvData)
+                        savedSuccessfully = true
                     }
 
-                    val chooser = Intent.createChooser(shareIntent, "Save or Share Concert Vault CSV").apply {
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    if (savedSuccessfully) {
+                        Toast.makeText(
+                            context,
+                            "✓ Saved to Downloads: $cleanFileName",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } else {
+                        Toast.makeText(context, "Failed to save CSV to Downloads", Toast.LENGTH_SHORT).show()
                     }
-                    context.startActivity(chooser)
-                    context.startActivity(chooser)
                 } catch (e: Exception) {
                     e.printStackTrace()
+                    Toast.makeText(context, "Error saving CSV: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
         }
