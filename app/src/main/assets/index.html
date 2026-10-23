@@ -128,6 +128,14 @@
     var modalActiveIdx = 0;
     var userShows = [];
 
+    var TICKET_COLOR_PALETTE = [
+      '#F7C252', // Warm Gold
+      '#F7A993', // Vintage Peach
+      '#CAE6AB', // Retro Lime Mint
+      '#D6EBCA', // Pale Sage
+      '#F7E5B3'  // Classic Cream
+    ];
+
     var DEFAULT_SEED_SHOWS = [
       { id: "show_seed_1", headline: "Grateful Dead", opener: "Violent Femmes", openersList: ["Violent Femmes"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "05/28/91", notes: "Went with John and Chris macgilvray" },
       { id: "show_seed_2", headline: "Bad Company", opener: "Damn Yankees", openersList: ["Damn Yankees"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "08/03/90", notes: "" },
@@ -1100,16 +1108,6 @@
     </div>
   </div>
 
-  <script>
-    // 5-COLOR RANDOM ASSORTMENT VINTAGE PALETTE
-    const TICKET_COLOR_PALETTE = [
-      '#F7C252', // Warm Gold
-      '#F7A993', // Vintage Peach
-      '#CAE6AB', // Retro Lime Mint
-      '#D6EBCA', // Pale Sage
-      '#F7E5B3', // Classic Cream
-    ];
-
     function openPhotoModal(index) {
       if (!modalPhotoUris || modalPhotoUris.length === 0) return;
       modalActiveIdx = index;
@@ -1877,7 +1875,7 @@
 
         dropdown.style.display = 'block';
         dropdown.innerHTML = matches.map(item => `
-          <div style="padding:8px 12px; border-bottom:1px solid #222B30; cursor:pointer;" onclick="selectVenue('${item.v.replace(/'/g, "\\'").trim()}', '${item.c.replace(/'/g, "\\'").trim()}', '${toStateAbbr(item.s).replace(/'/g, "\\'")}', '${item.co.replace(/'/g, "\\'").trim()}')">
+          <div style="padding:8px 12px; border-bottom:1px solid #222B30; cursor:pointer;" data-v="${item.v.trim()}" data-c="${item.c.trim()}" data-s="${toStateAbbr(item.s)}" data-co="${item.co.trim()}" onclick="selectVenueFromElem(this)">
             <div style="font-weight:bold; color:#fff;">${item.v.trim()}</div>
             <div style="color:#94a3b8; font-size:10px;">${item.c.trim()}, ${toStateAbbr(item.s)}, ${item.co.trim()}</div>
           </div>
@@ -1885,6 +1883,15 @@
       } else {
         dropdown.style.display = 'none';
       }
+    }
+
+    function selectVenueFromElem(elem) {
+      if (!elem) return;
+      const v = elem.getAttribute('data-v') || '';
+      const c = elem.getAttribute('data-c') || '';
+      const s = elem.getAttribute('data-s') || '';
+      const co = elem.getAttribute('data-co') || '';
+      selectVenue(v, c, s, co);
     }
 
     function selectVenue(v, c, s, co) {
