@@ -1292,39 +1292,6 @@
       document.getElementById('auth-name').value = '';
     }
 
-    function onNativeGoogleAuthFallback() {
-      const inputEmail = prompt("Enter your Google Account email to continue:", "you@gmail.com");
-      if (inputEmail && inputEmail.includes('@')) {
-        onNativeGoogleAuthSuccess(inputEmail);
-      }
-    }
-
-    function onNativeGoogleAuthCancel() {
-      // User cancelled account chooser
-    }
-
-    function handleGoogleSignIn() {
-      if (window.AndroidGoogleAuth && window.AndroidGoogleAuth.launchGoogleSignIn) {
-        try {
-          window.AndroidGoogleAuth.launchGoogleSignIn();
-        } catch (e) {
-          onNativeGoogleAuthFallback();
-        }
-      } else {
-        onNativeGoogleAuthFallback();
-      }
-    }
-
-    function onNativeGoogleAuthSuccess(googleEmail) {
-      if (!googleEmail || typeof googleEmail !== 'string' || !googleEmail.includes('@')) return;
-      const cleanedEmail = googleEmail.toLowerCase().trim();
-
-      localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
-
-      loadSavedShows();
-      showScreen('diary');
-    }
-
     function handleClearUserVault() {
       userShows = [];
 
@@ -1345,8 +1312,8 @@
         const userKey = `livelore_shows_${activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_')}`;
         localStorage.removeItem(userKey);
 
-        // Push 0 shows directly to Railway PostgreSQL Cloud DB
-        fetch('/api/sync/push', {
+        // Push 0 shows directly to Railway Cloud DB
+        fetch('https://frontiercaravan-production.up.railway.app/api/sync/push', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
