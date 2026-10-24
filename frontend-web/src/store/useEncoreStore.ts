@@ -93,18 +93,23 @@ export const useEncoreStore = create<EncoreState>()(
         }
 
         // 3. Create or Find Venue
+        const vCity = (input.venueCity || '').trim();
+        const vCountry = (input.venueCountry || 'USA').trim();
+        const vState = (input.venueState || '').trim();
+
         let venueObj = venues.find(
           (v) =>
             v.name.toLowerCase() === input.venueName.trim().toLowerCase() &&
-            v.city.toLowerCase() === input.venueCity.trim().toLowerCase()
+            v.city.toLowerCase() === vCity.toLowerCase()
         );
         if (!venueObj) {
           venueObj = {
             id: `ven_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
             name: input.venueName.trim(),
-            city: input.venueCity.trim(),
-            stateProvince: '',
-            country: input.venueCountry.trim(),
+            city: vCity,
+            stateProvince: vState,
+            country: vCountry,
+            createdAt: Date.now(),
           };
           venues.push(venueObj);
         }
@@ -133,6 +138,7 @@ export const useEncoreStore = create<EncoreState>()(
             newSetlistItems.push({
               id: `stl_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
               concertId: newConcertId,
+              artistId: headliner!.id,
               songTitle: track.title,
               position: track.position,
               isEncore: track.isEncore,
@@ -155,7 +161,7 @@ export const useEncoreStore = create<EncoreState>()(
       },
 
       updateConcert: (concertId, input) => {
-        const { concerts, artists, venues, setlistItems } = get();
+        const { concerts, artists, venues } = get();
 
         // 1. Create or Find Headline Artist
         let headliner = artists.find(
@@ -165,7 +171,7 @@ export const useEncoreStore = create<EncoreState>()(
           headliner = {
             id: `art_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
             name: input.headlineArtistName.trim(),
-            favoriteTracks: [],
+            createdAt: Date.now(),
           };
           artists.push(headliner);
         }
@@ -180,25 +186,30 @@ export const useEncoreStore = create<EncoreState>()(
             opener = {
               id: `art_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
               name: input.openingArtistName.trim(),
-              favoriteTracks: [],
+              createdAt: Date.now(),
             };
             artists.push(opener);
           }
         }
 
         // 3. Create or Find Venue
+        const vCityEdit = (input.venueCity || '').trim();
+        const vCountryEdit = (input.venueCountry || 'USA').trim();
+        const vStateEdit = (input.venueState || '').trim();
+
         let venueObj = venues.find(
           (v) =>
             v.name.toLowerCase() === input.venueName.trim().toLowerCase() &&
-            v.city.toLowerCase() === input.venueCity.trim().toLowerCase()
+            v.city.toLowerCase() === vCityEdit.toLowerCase()
         );
         if (!venueObj) {
           venueObj = {
             id: `ven_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
             name: input.venueName.trim(),
-            city: input.venueCity.trim(),
-            stateProvince: '',
-            country: input.venueCountry.trim(),
+            city: vCityEdit,
+            stateProvince: vStateEdit,
+            country: vCountryEdit,
+            createdAt: Date.now(),
           };
           venues.push(venueObj);
         }
