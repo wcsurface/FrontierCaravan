@@ -1379,8 +1379,13 @@
     window.triggerEditShow = triggerEditShow;
 
     function triggerDeleteShow() {
-      if (!activeDetailShowId) return;
-      var indexToDelete = userShows.findIndex(function(s) { return s.id === activeDetailShowId; });
+      var targetId = activeDetailShowId;
+      if (!targetId && userShows.length > 0) {
+        targetId = userShows[0].id;
+      }
+      if (!targetId) return;
+
+      var indexToDelete = userShows.findIndex(function(s) { return s.id === targetId; });
       if (indexToDelete < 0) return;
 
       showCustomConfirm({
