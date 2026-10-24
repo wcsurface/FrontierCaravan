@@ -139,7 +139,7 @@ export const useEncoreStore = create<EncoreState>()(
               id: `stl_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
               concertId: newConcertId,
               artistId: headliner!.id,
-              songTitle: track.title,
+              songTitle: track.title || track.songTitle || '',
               position: track.position,
               isEncore: track.isEncore,
               notes: track.notes,
