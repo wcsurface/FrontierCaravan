@@ -71,7 +71,7 @@ export const useEncoreStore = create<EncoreState>()(
           headliner = {
             id: `art_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
             name: input.headlineArtistName.trim(),
-            favoriteTracks: [],
+            createdAt: Date.now(),
           };
           artists.push(headliner);
         }
@@ -86,7 +86,7 @@ export const useEncoreStore = create<EncoreState>()(
             opener = {
               id: `art_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
               name: input.openingArtistName.trim(),
-              favoriteTracks: [],
+              createdAt: Date.now(),
             };
             artists.push(opener);
           }
