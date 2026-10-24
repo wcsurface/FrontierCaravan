@@ -1278,14 +1278,21 @@
       var indexToDelete = userShows.findIndex(function(s) { return s.id === activeDetailShowId; });
       if (indexToDelete < 0) return;
 
-      if (confirm('Are you sure you want to delete this concert from your vault?')) {
+      showCustomConfirm({
+        title: 'DELETE CONCERT',
+        message: 'Are you sure you want to delete this concert from your vault?',
+        confirmText: 'DELETE',
+        cancelText: 'CANCEL',
+        icon: '🗑️',
+        confirmColor: 'linear-gradient(90deg, #E11D48, #BE123C)'
+      }, function() {
         userShows.splice(indexToDelete, 1);
         activeDetailShowId = null;
         saveShowsToStorage();
         renderShowsFeed();
         updateStatsDisplay();
         showScreen('diary');
-      }
+      });
     }
     window.triggerDeleteShow = triggerDeleteShow;
 
@@ -2321,7 +2328,7 @@
       <div style="border-top: 1px solid #222B30; padding-top: 16px;">
         <div class="detail-label">CHANGE PASSWORD</div>
         <input type="password" id="profile-new-pass" class="input-field" placeholder="New Password (min 6 chars)" style="margin-top:6px; margin-bottom:12px;" />
-        <button type="button" class="btn-update-pass" onclick="alert('✓ Password updated successfully!')">Update Password</button>
+        <button type="button" class="btn-update-pass" onclick="handlePasswordUpdate()">Update Password</button>
       </div>
     </div>
 
@@ -2667,43 +2674,48 @@
     window.exportConcertsCsv = exportConcertsCsv;
 
     function handleDeleteAccountAndData() {
-      if (confirm('ARE YOU SURE YOU WANT TO PERMANENTLY DELETE YOUR ACCOUNT & ALL CONCERT DATA?\n\nThis action CANNOT be undone.')) {
-        if (confirm('FINAL CONFIRMATION: Tap OK to permanently wipe your user credentials and all saved concerts from cloud and local storage.')) {
-          userShows = [];
+      showCustomConfirm({
+        title: 'DELETE ACCOUNT',
+        message: 'ARE YOU SURE YOU WANT TO PERMANENTLY DELETE YOUR ACCOUNT & ALL CONCERT DATA?\n\nThis action CANNOT be undone.',
+        confirmText: 'PERMANENTLY DELETE',
+        cancelText: 'CANCEL',
+        icon: '⚠️',
+        confirmColor: 'linear-gradient(90deg, #E11D48, #BE123C)'
+      }, function() {
+        userShows = [];
 
-          const rawUser = localStorage.getItem('livelore_active_user');
-          let activeEmail = null;
-          if (rawUser) {
-            try {
-              activeEmail = JSON.parse(rawUser).email;
-            } catch(e) {}
-          }
-
-          localStorage.removeItem('livelore_active_user');
-          localStorage.removeItem('livelore_local_shows');
-          localStorage.removeItem('livelore_vault_v1');
-          localStorage.removeItem('livelore_backup_shows');
-
-          if (activeEmail) {
-            const userKey = `livelore_shows_${activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_')}`;
-            localStorage.removeItem(userKey);
-
-            fetch('/api/sync/push', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                userId: `u_cloud_${activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_')}`,
-                concertsData: { concerts: [] }
-              })
-            }).catch(function(err) {});
-          }
-
-          renderShowsFeed();
-          updateStatsDisplay();
-          handleLogout();
-          alert('✓ Your account and concert vault have been permanently deleted.');
+        var rawUser = localStorage.getItem('livelore_active_user');
+        var activeEmail = null;
+        if (rawUser) {
+          try {
+            activeEmail = JSON.parse(rawUser).email;
+          } catch(e) {}
         }
-      }
+
+        localStorage.removeItem('livelore_active_user');
+        localStorage.removeItem('livelore_local_shows');
+        localStorage.removeItem('livelore_vault_v1');
+        localStorage.removeItem('livelore_backup_shows');
+
+        if (activeEmail) {
+          var userKey = 'livelore_shows_' + activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_');
+          localStorage.removeItem(userKey);
+
+          fetch('https://frontier-caravan.vercel.app/api/sync/push', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: 'u_cloud_' + activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_'),
+              concertsData: { concerts: [] }
+            })
+          }).catch(function(err) {});
+        }
+
+        renderShowsFeed();
+        updateStatsDisplay();
+        handleLogout();
+        showCustomAlert({ title: 'ACCOUNT DELETED', message: '✓ Your account and concert vault have been permanently deleted.', icon: '🚮' });
+      });
     }
 
     function switchTicketTheme(theme) {
@@ -3701,9 +3713,146 @@
       }
     }
 
+    function handlePasswordUpdate() {
+      var passEl = document.getElementById('profile-new-pass');
+      var newPass = passEl ? passEl.value.trim() : '';
+
+      if (!newPass || newPass.length < 4) {
+        showCustomAlert({ title: 'INVALID PASSWORD', message: 'Please enter a password with at least 4 characters.', icon: '⚠️' });
+        return;
+      }
+
+      var rawUser = localStorage.getItem('livelore_active_user');
+      if (rawUser) {
+        try {
+          var uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email) {
+            var activeEmail = uObj.email.toLowerCase().trim();
+            var authKey = 'livelore_user_auth_' + activeEmail.replace(/[^a-z0-9]/g, '_');
+            var hash = hashPassword(activeEmail, newPass);
+            localStorage.setItem(authKey, JSON.stringify({
+              email: activeEmail,
+              passHash: hash,
+              createdAt: Date.now()
+            }));
+          }
+        } catch(e) {}
+      }
+
+      if (passEl) passEl.value = '';
+      showCustomAlert({ title: 'PASSWORD UPDATED', message: '✓ Your password has been updated successfully!', icon: '🔐' });
+    }
+    window.handlePasswordUpdate = handlePasswordUpdate;
+
+    function showCustomConfirm(options, onConfirm, onCancel) {
+      var modal = document.getElementById('custom-dialog-modal');
+      var iconEl = document.getElementById('custom-dialog-icon');
+      var titleEl = document.getElementById('custom-dialog-title');
+      var msgEl = document.getElementById('custom-dialog-msg');
+      var btnCancel = document.getElementById('custom-dialog-btn-cancel');
+      var btnConfirm = document.getElementById('custom-dialog-btn-confirm');
+
+      if (!modal) return;
+
+      var title = typeof options === 'string' ? 'CONFIRM ACTION' : (options.title || 'CONFIRM ACTION');
+      var message = typeof options === 'string' ? options : (options.message || '');
+      var confirmText = typeof options === 'string' ? 'DELETE' : (options.confirmText || 'CONFIRM');
+      var cancelText = typeof options === 'string' ? 'CANCEL' : (options.cancelText || 'CANCEL');
+      var icon = typeof options === 'string' ? '🗑️' : (options.icon || '⚠️');
+      var confirmColor = (options && options.confirmColor) ? options.confirmColor : 'linear-gradient(90deg, #E11D48, #BE123C)';
+
+      if (iconEl) iconEl.innerText = icon;
+      if (titleEl) titleEl.innerText = title;
+      if (msgEl) msgEl.innerText = message;
+
+      if (btnCancel) {
+        btnCancel.style.display = 'block';
+        btnCancel.innerText = cancelText;
+        btnCancel.onclick = function() {
+          modal.style.display = 'none';
+          if (onCancel) onCancel();
+        };
+      }
+
+      if (btnConfirm) {
+        btnConfirm.innerText = confirmText;
+        btnConfirm.style.background = confirmColor;
+        btnConfirm.onclick = function() {
+          modal.style.display = 'none';
+          if (onConfirm) onConfirm();
+        };
+      }
+
+      modal.style.display = 'flex';
+    }
+    window.showCustomConfirm = showCustomConfirm;
+
+    function showCustomAlert(options, onClose) {
+      var modal = document.getElementById('custom-dialog-modal');
+      var iconEl = document.getElementById('custom-dialog-icon');
+      var titleEl = document.getElementById('custom-dialog-title');
+      var msgEl = document.getElementById('custom-dialog-msg');
+      var btnCancel = document.getElementById('custom-dialog-btn-cancel');
+      var btnConfirm = document.getElementById('custom-dialog-btn-confirm');
+
+      if (!modal) return;
+
+      var title = typeof options === 'string' ? 'NOTICE' : (options.title || 'NOTICE');
+      var message = typeof options === 'string' ? options : (options.message || '');
+      var okText = typeof options === 'string' ? 'OK' : (options.okText || 'OK');
+      var icon = typeof options === 'string' ? 'ℹ️' : (options.icon || 'ℹ️');
+
+      if (iconEl) iconEl.innerText = icon;
+      if (titleEl) titleEl.innerText = title;
+      if (msgEl) msgEl.innerText = message;
+
+      if (btnCancel) btnCancel.style.display = 'none';
+
+      if (btnConfirm) {
+        btnConfirm.innerText = okText;
+        btnConfirm.style.background = 'linear-gradient(90deg, #00E676, #00C853)';
+        btnConfirm.onclick = function() {
+          modal.style.display = 'none';
+          if (onClose) onClose();
+        };
+      }
+
+      modal.style.display = 'flex';
+    }
+    window.showCustomAlert = showCustomAlert;
+
+    // Auto-register requested user account: test@testaccount.com / Tester0!
+    (function initTestAccount() {
+      try {
+        var testEmail = 'test@testaccount.com';
+        var testPass = 'Tester0!';
+        var authKey = 'livelore_user_auth_' + testEmail.replace(/[^a-z0-9]/g, '_');
+        var hash = hashPassword(testEmail, testPass);
+        localStorage.setItem(authKey, JSON.stringify({
+          email: testEmail,
+          passHash: hash,
+          createdAt: Date.now()
+        }));
+      } catch(e) {}
+    })();
+
     document.addEventListener('DOMContentLoaded', loadSavedShows);
     loadSavedShows();
   </script>
+
+  <!-- MODERN GLASS CONFIRM / ALERT MODAL DIALOG -->
+  <div id="custom-dialog-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); z-index:9999; align-items:center; justify-content:center; padding:16px;">
+    <div style="background:#121619; border:1.5px solid #FFB300; border-radius:20px; padding:24px 20px; width:100%; max-width:360px; box-shadow:0 20px 40px rgba(0,0,0,0.8); text-align:center;">
+      <div id="custom-dialog-icon" style="font-size:36px; margin-bottom:10px;">⚠️</div>
+      <div id="custom-dialog-title" style="font-size:18px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">CONFIRM ACTION</div>
+      <div id="custom-dialog-msg" style="font-size:15px; font-weight:700; color:#f1f5f9; line-height:1.5; margin-bottom:20px; white-space:pre-wrap;">Are you sure?</div>
+
+      <div id="custom-dialog-btn-box" style="display:flex; gap:10px;">
+        <button id="custom-dialog-btn-cancel" type="button" style="flex:1; background:#1C2128; color:#94a3b8; font-weight:900; font-size:14px; padding:12px; border-radius:9999px; border:1px solid #222B30; text-transform:uppercase; cursor:pointer;">CANCEL</button>
+        <button id="custom-dialog-btn-confirm" type="button" style="flex:1; background:linear-gradient(90deg, #E11D48, #BE123C); color:#ffffff; font-weight:900; font-size:14px; padding:12px; border-radius:9999px; border:none; text-transform:uppercase; cursor:pointer; box-shadow:0 0 15px rgba(225,29,72,0.4);">DELETE</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
 
