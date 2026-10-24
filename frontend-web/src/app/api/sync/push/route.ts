@@ -1,39 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import fs from 'fs';
+import path from 'path';
 
 export const dynamic = 'force-dynamic';
 
 const globalVaultStore: Record<string, any> = (globalThis as any).__LIVELORE_VAULTS__ || {};
 (globalThis as any).__LIVELORE_VAULTS__ = globalVaultStore;
-
-const CLOUD_STORAGE_API = 'https://api.restful-api.dev/objects';
-
-async function syncToExternalStore(userId: string, concertsData: any): Promise<void> {
-  try {
-    const listRes = await fetch(CLOUD_STORAGE_API, { cache: 'no-store' });
-    let existingId: string | null = null;
-    if (listRes.ok) {
-      const items = await listRes.json();
-      if (Array.isArray(items)) {
-        const match = items.find((item: any) => item && item.name === userId);
-        if (match && match.id) existingId = match.id;
-      }
-    }
-
-    if (existingId) {
-      await fetch(`${CLOUD_STORAGE_API}/${existingId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: userId, data: concertsData }),
-      });
-    } else {
-      await fetch(CLOUD_STORAGE_API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: userId, data: concertsData }),
-      });
-    }
-  } catch (e) {}
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -48,19 +20,32 @@ export async function POST(req: NextRequest) {
       ? concertsData.concerts
       : (Array.isArray(concertsData) ? concertsData : []);
 
-    // Zero-Data-Loss Safeguard
-    const existingData = globalVaultStore[userId];
-    const existingConcerts: any[] = existingData && Array.isArray(existingData.concerts) ? existingData.concerts : [];
+    // 1. Check existing vault from Memory or Vault File
+    let existingVault = globalVaultStore[userId];
+    if (!existingVault) {
+      try {
+        const filePath = path.join(process.cwd(), 'public', 'vaults', `${userId}.json`);
+        if (fs.existsSync(filePath)) {
+          const raw = fs.readFileSync(filePath, 'utf8');
+          existingVault = JSON.parse(raw);
+        }
+      } catch (fErr) {}
+    }
 
+    const existingConcerts: any[] = existingVault && Array.isArray(existingVault.concerts)
+      ? existingVault.concerts
+      : [];
+
+    // Zero-Data-Loss Protection Safeguard
     if (existingConcerts.length > 0 && incomingConcerts.length === 0 && !isExplicitAccountDelete) {
       return NextResponse.json({
         success: true,
         restored: true,
-        concertsData: existingData,
+        concertsData: existingVault,
       });
     }
 
-    // Merge incoming concerts with existing memory concerts by ID
+    // Merge incoming concerts with existing concerts by ID
     const mergedMap = new Map<string, any>();
     if (existingConcerts.length > 0 && !isExplicitAccountDelete) {
       existingConcerts.forEach((c) => { if (c && c.id) mergedMap.set(c.id, c); });
@@ -70,11 +55,8 @@ export async function POST(req: NextRequest) {
     const finalConcerts = Array.from(mergedMap.values());
     const payload = { concerts: finalConcerts };
 
-    // Update Global Store
+    // Update Global In-Memory Store
     globalVaultStore[userId] = payload;
-
-    // Backup to External Cloud Store
-    syncToExternalStore(userId, payload);
 
     return NextResponse.json({
       success: true,
