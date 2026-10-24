@@ -1081,6 +1081,70 @@
     }
     window.setPrimaryPhoto = setPrimaryPhoto;
 
+    function cleanAndValidateDateString(dateStr) {
+      if (!dateStr || typeof dateStr !== 'string') return '';
+      var str = dateStr.trim();
+      var parts = str.split(/[\/\.-]/);
+      if (parts.length === 3) {
+        var m = parseInt(parts[0], 10);
+        var d = parseInt(parts[1], 10);
+        var yStr = parts[2].trim();
+        var y = parseInt(yStr, 10);
+
+        if (isNaN(m) || m < 1) m = 1;
+        if (m > 12) m = 12;
+
+        if (isNaN(y)) y = 2000;
+        if (y < 100) {
+          y = y <= 35 ? 2000 + y : 1900 + y;
+        }
+
+        var maxDays = new Date(y, m, 0).getDate();
+        if (isNaN(d) || d < 1) d = 1;
+        if (d > maxDays) d = maxDays;
+
+        var mm = m < 10 ? '0' + m : '' + m;
+        var dd = d < 10 ? '0' + d : '' + d;
+        var yy = yStr.length === 2 ? (y % 100 < 10 ? '0' + (y % 100) : '' + (y % 100)) : '' + y;
+
+        return mm + '/' + dd + '/' + yy;
+      }
+      return str;
+    }
+    window.cleanAndValidateDateString = cleanAndValidateDateString;
+
+    function parseConcertTimestamp(dateStr) {
+      if (!dateStr || typeof dateStr !== 'string') return 0;
+      var str = dateStr.trim();
+      var parts = str.split(/[\/\.-]/);
+      if (parts.length === 3) {
+        var m = parseInt(parts[0], 10);
+        var d = parseInt(parts[1], 10);
+        var y = parseInt(parts[2], 10);
+
+        if (isNaN(m) || m < 1) m = 1;
+        if (m > 12) m = 12;
+
+        if (isNaN(y)) y = 2000;
+        if (y < 100) {
+          y = y <= 35 ? 2000 + y : 1900 + y;
+        }
+
+        var maxDays = new Date(y, m, 0).getDate();
+        if (isNaN(d) || d < 1) d = 1;
+        if (d > maxDays) d = maxDays;
+
+        var dObj = new Date(y, m - 1, d);
+        if (!isNaN(dObj.getTime())) {
+          return dObj.getTime();
+        }
+      }
+
+      var nativeDate = new Date(str);
+      return isNaN(nativeDate.getTime()) ? 0 : nativeDate.getTime();
+    }
+    window.parseConcertTimestamp = parseConcertTimestamp;
+
     function formatDateOnInput(elem) {
       if (!elem) return;
       var raw = elem.value.replace(/\D/g, '');
@@ -1121,7 +1185,7 @@
       var city = (cityEl && cityEl.value ? cityEl.value : 'Noblesville').trim();
       var state = toStateAbbr((stateEl && stateEl.value ? stateEl.value : 'IN').trim());
       var country = (countryEl && countryEl.value ? countryEl.value : 'USA').trim();
-      var date = (dateEl && dateEl.value ? dateEl.value : '').trim() || '08/02/88';
+      var date = cleanAndValidateDateString((dateEl && dateEl.value ? dateEl.value : '').trim() || '08/02/88');
       var notes = (notesEl && notesEl.value ? notesEl.value : '').trim();
 
       var openerInputs = document.querySelectorAll('.input-opener');
@@ -1539,9 +1603,9 @@
 
         let displayList = [...userShows];
         if (currentSort === 'newest') {
-          displayList.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+          displayList.sort((a, b) => parseConcertTimestamp(b.date) - parseConcertTimestamp(a.date));
         } else if (currentSort === 'oldest') {
-          displayList.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          displayList.sort((a, b) => parseConcertTimestamp(a.date) - parseConcertTimestamp(b.date));
         } else if (currentSort === 'band') {
           displayList.sort((a, b) => (a.headline || '').localeCompare(b.headline || ''));
         }
@@ -1986,6 +2050,7 @@
             if (s.city) s.city = s.city.trim();
             if (s.country) s.country = s.country.trim();
             if (s.state) s.state = toStateAbbr(s.state);
+            if (s.date) s.date = cleanAndValidateDateString(s.date);
             if (Array.isArray(s.openersList)) {
               s.openersList = s.openersList.map(function(op) { return typeof op === 'string' ? op.trim() : op; }).filter(Boolean);
             }
