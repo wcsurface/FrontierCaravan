@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
+const RAILWAY_API = 'https://frontiercaravan-production.up.railway.app/api/sync/push';
 const CLOUD_STORAGE_API = 'https://api.restful-api.dev/objects';
 
 async function findObjectByUserId(userId: string): Promise<string | null> {
@@ -26,6 +27,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'userId and concertsData required' }, { status: 400 });
     }
 
+    // 1. Push directly to Railway Production DB
+    try {
+      await fetch(RAILWAY_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, concertsData }),
+      });
+    } catch (rErr) {}
+
+    // 2. Mirror to Cloud Object Storage
     const existingId = await findObjectByUserId(userId);
 
     if (existingId) {

@@ -1555,10 +1555,10 @@
 
     function saveShowsToStorage() {
       try {
-        var serialized = JSON.stringify(userShows);
-        try { localStorage.setItem('livelore_local_shows', serialized); } catch(e) {}
-        try { localStorage.setItem('livelore_vault_v1', serialized); } catch(e) {}
-        try { localStorage.setItem('livelore_backup_shows', serialized); } catch(e) {}
+        // IMPORTANT: No concert data or related photos stored on the user's phone!
+        try { localStorage.removeItem('livelore_local_shows'); } catch(e) {}
+        try { localStorage.removeItem('livelore_vault_v1'); } catch(e) {}
+        try { localStorage.removeItem('livelore_backup_shows'); } catch(e) {}
 
         var rawUser = localStorage.getItem('livelore_active_user');
         if (rawUser) {
@@ -1567,13 +1567,19 @@
             if (uObj && uObj.email) {
               var userEmail = uObj.email.toLowerCase().trim();
               var userKey = 'livelore_shows_' + userEmail.replace(/[^a-z0-9]/g, '_');
-              try { localStorage.setItem(userKey, serialized); } catch(e) {}
+              try { localStorage.removeItem(userKey); } catch(e) {}
 
-              // Save to Unlimited IndexedDB Storage!
-              saveToIndexedDB(userKey, userShows);
-              saveToIndexedDB('livelore_local_shows', userShows);
+              // Push directly to Railway Production DB (Ultimate Source of Truth)
+              fetch('https://frontiercaravan-production.up.railway.app/api/sync/push', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  userId: 'u_cloud_' + userEmail.replace(/[^a-z0-9]/g, '_'),
+                  concertsData: { concerts: userShows }
+                })
+              }).catch(function(err) {});
 
-              // Push to Vercel Persistent Cloud Sync API
+              // Mirror to Vercel API
               fetch('https://frontier-caravan.vercel.app/api/sync/push', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -2101,91 +2107,75 @@
       var emailDisp = document.getElementById('profile-email-display');
       if (emailDisp) emailDisp.innerText = activeEmail;
 
-      var userKey = 'livelore_shows_' + activeEmail.replace(/[^a-z0-9]/g, '_');
+      var activeUserId = 'u_cloud_' + activeEmail.replace(/[^a-z0-9]/g, '_');
 
-      var performLoadAndMerge = function(idbShows) {
-        try {
-          var rawUserKey = localStorage.getItem(userKey);
-          var localMergedMap = new Map();
+      // IMPORTANT: No concert data or related photos stored on the user's phone!
+      try {
+        localStorage.removeItem('livelore_local_shows');
+        localStorage.removeItem('livelore_vault_v1');
+        localStorage.removeItem('livelore_backup_shows');
+        localStorage.removeItem('livelore_shows_' + activeEmail.replace(/[^a-z0-9]/g, '_'));
+      } catch(e) {}
 
-          // 1. Merge all IndexedDB shows for THIS specific user
-          if (Array.isArray(idbShows)) {
-            idbShows.forEach(function(show) {
-              if (show && show.id) localMergedMap.set(show.id, show);
-            });
-          }
-
-          // 2. Merge LocalStorage shows for THIS specific user
-          if (rawUserKey) {
-            try {
-              var parsed = JSON.parse(rawUserKey);
-              if (Array.isArray(parsed)) {
-                parsed.forEach(function(show) {
-                  if (show && show.id) localMergedMap.set(show.id, show);
-                });
-              }
-            } catch(ex) {}
-          }
-
-          userShows = Array.from(localMergedMap.values());
-
-          userShows.forEach(function(s) {
-            if (!s.id) s.id = generateUniqueId();
-            if (s.headline) s.headline = s.headline.trim();
-            if (s.venue) s.venue = s.venue.trim();
-            if (s.city) s.city = s.city.trim();
-            if (s.country) s.country = s.country.trim();
-            if (s.state) s.state = toStateAbbr(s.state);
-            if (s.date) s.date = cleanAndValidateDateString(s.date);
-            if (Array.isArray(s.openersList)) {
-              s.openersList = s.openersList.map(function(op) { return typeof op === 'string' ? op.trim() : op; }).filter(Boolean);
+      // Fetch user's concert vault directly from Railway DB (Ultimate Source of Truth)
+      fetch('https://frontiercaravan-production.up.railway.app/api/sync/pull?userId=' + encodeURIComponent(activeUserId))
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          var cloudConcerts = [];
+          if (data && data.concertsData) {
+            if (Array.isArray(data.concertsData.concerts)) {
+              cloudConcerts = data.concertsData.concerts;
+            } else if (Array.isArray(data.concertsData)) {
+              cloudConcerts = data.concertsData;
             }
-          });
-        } catch (e) {
-          userShows = [];
-        }
+          }
+
+          if (cloudConcerts.length > 0) {
+            userShows = cloudConcerts;
+            finishLoadAndRender();
+          } else {
+            // Fallback query to Vercel API
+            fetch('https://frontier-caravan.vercel.app/api/sync/pull?userId=' + encodeURIComponent(activeUserId))
+              .then(function(vRes) { return vRes.json(); })
+              .then(function(vData) {
+                if (vData && vData.concertsData) {
+                  if (Array.isArray(vData.concertsData.concerts)) {
+                    userShows = vData.concertsData.concerts;
+                  } else if (Array.isArray(vData.concertsData)) {
+                    userShows = vData.concertsData;
+                  }
+                }
+                finishLoadAndRender();
+              }).catch(function(err) {
+                finishLoadAndRender();
+              });
+          }
+        }).catch(function(err) {
+          finishLoadAndRender();
+        });
+
+      function finishLoadAndRender() {
+        if (!Array.isArray(userShows)) userShows = [];
+
+        userShows.forEach(function(s) {
+          if (!s.id) s.id = generateUniqueId();
+          if (s.headline) s.headline = s.headline.trim();
+          if (s.venue) s.venue = s.venue.trim();
+          if (s.city) s.city = s.city.trim();
+          if (s.country) s.country = s.country.trim();
+          if (s.state) s.state = toStateAbbr(s.state);
+          if (s.date) s.date = cleanAndValidateDateString(s.date);
+          if (Array.isArray(s.openersList)) {
+            s.openersList = s.openersList.map(function(op) { return typeof op === 'string' ? op.trim() : op; }).filter(Boolean);
+          }
+        });
 
         switchTicketTheme(currentTicketTheme);
         renderPhotosGrid();
-
-        saveShowsToStorage();
         renderShowsFeed();
         updateStatsDisplay();
-
-        // Asynchronously pull latest cloud vault from Vercel persistent API & merge cleanly
-        fetch('https://frontier-caravan.vercel.app/api/sync/pull?userId=u_cloud_' + activeEmail.replace(/[^a-z0-9]/g, '_'))
-          .then(function(res) { return res.json(); })
-          .then(function(data) {
-            var cloudConcerts = [];
-            if (data && data.concertsData) {
-              if (Array.isArray(data.concertsData.concerts)) {
-                cloudConcerts = data.concertsData.concerts;
-              } else if (Array.isArray(data.concertsData)) {
-                cloudConcerts = data.concertsData;
-              }
-            }
-
-            if (cloudConcerts.length > 0) {
-              var finalMergedMap = new Map();
-              // Add cloud concerts
-              cloudConcerts.forEach(function(s) { if (s && s.id) finalMergedMap.set(s.id, s); });
-              // Add local concerts (local additions & edits override/preserve)
-              userShows.forEach(function(s) { if (s && s.id) finalMergedMap.set(s.id, s); });
-
-              userShows = Array.from(finalMergedMap.values());
-
-              saveShowsToStorage();
-              renderShowsFeed();
-              updateStatsDisplay();
-            }
-          }).catch(function(err) {});
-
         showScreen('diary');
-      };
-
-      loadFromIndexedDB(userKey, function(idbShows) {
-        performLoadAndMerge(idbShows);
-      });
+      }
     }
     window.loadSavedShows = loadSavedShows;
 
