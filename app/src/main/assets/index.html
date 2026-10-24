@@ -1974,18 +1974,65 @@
     }
     window.showSubStats = showSubStats;
 
+    var VIP_EMAILS = ['wcsurface@gmail.com'];
+
+    function checkIsVIPUser(email) {
+      if (!email) return false;
+      var clean = email.toLowerCase().trim();
+      if (VIP_EMAILS.indexOf(clean) >= 0) return true;
+      var storedVip = localStorage.getItem('livelore_vip_' + clean.replace(/[^a-z0-9]/g, '_'));
+      return storedVip === 'true';
+    }
+    window.checkIsVIPUser = checkIsVIPUser;
+
+    function updateProfileVipCard() {
+      var vipBox = document.getElementById('profile-vip-card-box');
+      if (!vipBox) return;
+
+      if (isVIPUser) {
+        vipBox.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom: 1px solid #222B30; padding-bottom:8px;">
+            <span style="font-size:20px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px;">LIVELORE VIP PASS</span>
+            <span style="background:#00E676; color:#0a0a0a; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">✓ VIP CONFIRMED</span>
+          </div>
+          <div style="font-weight:900; font-size:19px; color:#00E676; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">✓ YOU ARE A VIP MEMBER!</div>
+          <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.5; background:#0A0D0E; padding:12px; border-radius:10px; border:1px solid rgba(0,230,118,0.4);">
+            Your LiveLore VIP status is active! You have permanent 100% ad-free concert vaulting and full photo memory attachments enabled.
+          </div>
+        `;
+      } else {
+        vipBox.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom: 1px solid #222B30; padding-bottom:8px;">
+            <span style="font-size:20px; font-weight:900; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">LIVELORE STANDARD</span>
+            <span style="background:#334155; color:#f8fafc; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">STANDARD MEMBER</span>
+          </div>
+          <div style="font-weight:900; font-size:17px; color:#f1f5f9; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">UPGRADE TO VIP PASS</div>
+          <div style="font-size:14px; color:#94a3b8; font-weight:600; line-height:1.5; background:#0A0D0E; padding:12px; border-radius:10px; border:1px solid #222B30; margin-bottom:14px;">
+            Standard Member account. Upgrade to LiveLore VIP Pass for permanent 100% ad-free experience, unlimited photo memory attachments, and advanced setlist analytics.
+          </div>
+          <button class="btn-cta" style="font-size:15px; padding:14px; background:linear-gradient(90deg, #FFB300, #FF6F00); color:#0a0a0a; border:none;" onclick="handleUpgradeVip()">UPGRADE TO VIP ($4.99)</button>
+        `;
+      }
+    }
+    window.updateProfileVipCard = updateProfileVipCard;
+
+    function handleUpgradeVip() {
+      var rawUser = localStorage.getItem('livelore_active_user');
+      var activeEmail = null;
+      if (rawUser) {
+        try { activeEmail = JSON.parse(rawUser).email; } catch(e) {}
+      }
+      if (!activeEmail) return;
+
+      localStorage.setItem('livelore_vip_' + activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_'), 'true');
+      isVIPUser = true;
+      updateProfileVipCard();
+      showCustomAlert({ title: 'VIP UPGRADED', message: 'Welcome to LiveLore VIP! You now have permanent ad-free access and full photo memory features enabled.', icon: '🌟' });
+    }
+    window.handleUpgradeVip = handleUpgradeVip;
+
     function loadSavedShows() {
       updateDynamicYearSpans();
-      isVIPUser = true;
-
-      if (window.AndroidAdMob) {
-        window.AndroidAdMob.hideBannerAd();
-      }
-
-      var vipSubtitle = document.getElementById('vip-pass-subtitle');
-      if (vipSubtitle) {
-        vipSubtitle.style.display = 'none';
-      }
 
       var rawUser = localStorage.getItem('livelore_active_user');
       var activeEmail = null;
@@ -1999,8 +2046,17 @@
       }
 
       if (!activeEmail) {
+        isVIPUser = false;
         showScreen('auth');
         return;
+      }
+
+      isVIPUser = checkIsVIPUser(activeEmail);
+      updateProfileVipCard();
+
+      var vipSubtitle = document.getElementById('vip-pass-subtitle');
+      if (vipSubtitle) {
+        vipSubtitle.style.display = isVIPUser ? 'none' : 'block';
       }
 
       var emailDisp = document.getElementById('profile-email-display');
@@ -2456,17 +2512,8 @@
       </div>
     </div>
 
-    <!-- 1. LIVELORE VIP PASS (MOVED TO TOP OF LIST ABOVE TICKET STUB COLOR THEME) -->
-    <div class="detail-card" style="background: linear-gradient(135deg, rgba(255,179,0,0.22), #121619); border-color: #FFB300; padding: 22px; margin-bottom: 20px;">
-      <div style="display:flex; justify-between; align-items:center; margin-bottom:12px; border-bottom: 1px solid #222B30; padding-bottom:8px;">
-        <span style="font-size:20px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px;">LIVELORE VIP PASS</span>
-        <span style="background:#00E676; color:#0a0a0a; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">✓ VIP CONFIRMED</span>
-      </div>
-      <div style="font-weight:900; font-size:19px; color:#00E676; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">✓ YOU ARE A VIP MEMBER!</div>
-      <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.5; background:#0A0D0E; padding:12px; border-radius:10px; border:1px solid rgba(0,230,118,0.4);">
-        Your LiveLore VIP status is active! You have permanent 100% ad-free concert vaulting and full photo memory attachments enabled.
-      </div>
-    </div>
+    <!-- 1. LIVELORE VIP PASS / STANDARD MEMBER STATUS CARD -->
+    <div id="profile-vip-card-box" class="detail-card" style="background: linear-gradient(135deg, rgba(255,179,0,0.22), #121619); border-color: #FFB300; padding: 22px; margin-bottom: 20px;"></div>
 
     <!-- 2. DOWNLOAD CONCERT DATA (CSV) BUTTON (POSITIONED ABOVE TICKET STUB COLOR TOGGLE) -->
     <div class="detail-card" style="padding: 20px; margin-bottom: 20px;">
