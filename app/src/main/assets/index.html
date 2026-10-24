@@ -2879,12 +2879,25 @@
           var userKey = 'livelore_shows_' + activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_');
           localStorage.removeItem(userKey);
 
+          var cloudUserId = 'u_cloud_' + activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_');
+
+          fetch('https://frontiercaravan-production.up.railway.app/api/sync/push', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: cloudUserId,
+              concertsData: { concerts: [] },
+              isExplicitAccountDelete: true
+            })
+          }).catch(function(err) {});
+
           fetch('https://frontier-caravan.vercel.app/api/sync/push', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              userId: 'u_cloud_' + activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_'),
-              concertsData: { concerts: [] }
+              userId: cloudUserId,
+              concertsData: { concerts: [] },
+              isExplicitAccountDelete: true
             })
           }).catch(function(err) {});
         }

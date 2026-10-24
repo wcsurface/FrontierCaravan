@@ -5,14 +5,14 @@ export const dynamic = 'force-dynamic';
 const RAILWAY_API = 'https://frontiercaravan-production.up.railway.app/api/sync/push';
 const CLOUD_STORAGE_API = 'https://api.restful-api.dev/objects';
 
-async function findObjectByUserId(userId: string): Promise<string | null> {
+async function findObjectByUserId(userId: string): Promise<{ id: string; data: any } | null> {
   try {
     const res = await fetch(CLOUD_STORAGE_API, { cache: 'no-store' });
     if (!res.ok) return null;
     const items = await res.json();
     if (Array.isArray(items)) {
       const match = items.find((item: any) => item && item.name === userId);
-      if (match && match.id) return match.id;
+      if (match && match.id) return { id: match.id, data: match.data };
     }
   } catch (e) {}
   return null;
@@ -21,47 +21,75 @@ async function findObjectByUserId(userId: string): Promise<string | null> {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { userId, concertsData } = body;
+    const { userId, concertsData, isExplicitAccountDelete } = body;
 
     if (!userId || !concertsData) {
       return NextResponse.json({ error: 'userId and concertsData required' }, { status: 400 });
     }
+
+    const incomingConcerts = Array.isArray(concertsData.concerts)
+      ? concertsData.concerts
+      : (Array.isArray(concertsData) ? concertsData : []);
 
     // 1. Push directly to Railway Production DB
     try {
       await fetch(RAILWAY_API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, concertsData }),
+        body: JSON.stringify({ userId, concertsData: { concerts: incomingConcerts }, isExplicitAccountDelete }),
       });
     } catch (rErr) {}
 
-    // 2. Mirror to Cloud Object Storage
-    const existingId = await findObjectByUserId(userId);
+    // 2. Mirror to Cloud Object Storage with Zero-Data-Loss Merge Protection
+    const existing = await findObjectByUserId(userId);
+    let finalConcerts = incomingConcerts;
 
-    if (existingId) {
-      const putRes = await fetch(`${CLOUD_STORAGE_API}/${existingId}`, {
+    if (existing && existing.data) {
+      const existingConcerts: any[] = Array.isArray(existing.data.concerts)
+        ? existing.data.concerts
+        : (Array.isArray(existing.data) ? existing.data : []);
+
+      if (existingConcerts.length > 0) {
+        if (incomingConcerts.length === 0 && !isExplicitAccountDelete) {
+          return NextResponse.json({
+            success: true,
+            restored: true,
+            concertCount: existingConcerts.length,
+          });
+        }
+
+        const mergedMap = new Map<string, any>();
+        existingConcerts.forEach((c) => { if (c && c.id) mergedMap.set(c.id, c); });
+        incomingConcerts.forEach((c) => { if (c && c.id) mergedMap.set(c.id, c); });
+        finalConcerts = Array.from(mergedMap.values());
+      }
+    }
+
+    const payload = { concerts: finalConcerts };
+
+    if (existing) {
+      const putRes = await fetch(`${CLOUD_STORAGE_API}/${existing.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: userId, data: concertsData }),
+        body: JSON.stringify({ name: userId, data: payload }),
       });
       const data = await putRes.json();
       return NextResponse.json({
         success: true,
         updatedAt: data?.updatedAt || new Date().toISOString(),
-        concertCount: concertsData?.concerts?.length || 0,
+        concertCount: finalConcerts.length,
       });
     } else {
       const postRes = await fetch(CLOUD_STORAGE_API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: userId, data: concertsData }),
+        body: JSON.stringify({ name: userId, data: payload }),
       });
       const data = await postRes.json();
       return NextResponse.json({
         success: true,
         updatedAt: data?.createdAt || new Date().toISOString(),
-        concertCount: concertsData?.concerts?.length || 0,
+        concertCount: finalConcerts.length,
       });
     }
   } catch (e: any) {

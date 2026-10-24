@@ -218,18 +218,54 @@ app.get('/api/auth/me', async (req: Request, res: Response) => {
   }
 });
 
-// 4. POST /api/sync/push - Push Concert Vault Backup & Analyze Community Venues
+// 4. POST /api/sync/push - Push Concert Vault Backup with Zero-Data-Loss Safeguard
 app.post('/api/sync/push', async (req: Request, res: Response) => {
   try {
-    const { userId, concertsData } = req.body;
+    const { userId, concertsData, isExplicitAccountDelete } = req.body;
 
     if (!userId || !concertsData) {
       return res.status(400).json({ error: 'userId and concertsData required' });
     }
 
-    // Process and track venues logged by this user for community threshold promotion
-    if (concertsData.concerts && Array.isArray(concertsData.concerts)) {
-      concertsData.concerts.forEach((c: any) => {
+    const incomingConcerts = Array.isArray(concertsData.concerts)
+      ? concertsData.concerts
+      : (Array.isArray(concertsData) ? concertsData : []);
+
+    if (prisma) {
+      const existingVault = await prisma.concertVault.findUnique({
+        where: { userId },
+      });
+
+      let finalConcerts = incomingConcerts;
+
+      if (existingVault && existingVault.concertsData) {
+        const existingData: any = existingVault.concertsData;
+        const existingConcerts: any[] = Array.isArray(existingData.concerts)
+          ? existingData.concerts
+          : (Array.isArray(existingData) ? existingData : []);
+
+        if (existingConcerts.length > 0) {
+          if (incomingConcerts.length === 0 && !isExplicitAccountDelete) {
+            console.log(`[Zero-Data-Loss] Prevented empty push for ${userId}. Preserved ${existingConcerts.length} existing concerts.`);
+            return res.json({
+              success: true,
+              restored: true,
+              concertsData: existingVault.concertsData,
+            });
+          }
+
+          // Merge concerts by ID so no previously saved concert or photo is ever lost
+          const mergedMap = new Map<string, any>();
+          existingConcerts.forEach((c) => { if (c && c.id) mergedMap.set(c.id, c); });
+          incomingConcerts.forEach((c) => { if (c && c.id) mergedMap.set(c.id, c); });
+          finalConcerts = Array.from(mergedMap.values());
+        }
+      }
+
+      const updatedData = { concerts: finalConcerts };
+
+      // Process and track venues logged by this user for community threshold promotion
+      finalConcerts.forEach((c: any) => {
         const vName = c.venue || c.venueName;
         const vCity = c.city || c.venueCity;
         const vState = c.state || c.venueState;
@@ -239,19 +275,31 @@ app.post('/api/sync/push', async (req: Request, res: Response) => {
           trackUserVenue(userId, vName, vCity, vState, vCountry);
         }
       });
-    }
 
-    if (prisma) {
       const vault = await prisma.concertVault.upsert({
         where: { userId },
-        update: { concertsData },
-        create: { userId, concertsData },
+        update: { concertsData: updatedData },
+        create: { userId, concertsData: updatedData },
       });
 
-      return res.json({ success: true, vaultId: vault.id, updatedAt: vault.updatedAt });
+      return res.json({ success: true, vaultId: vault.id, concertsCount: finalConcerts.length, updatedAt: vault.updatedAt });
     } else {
-      memoryVaults.set(userId, concertsData);
-      return res.json({ success: true, updatedAt: new Date() });
+      const existing = memoryVaults.get(userId);
+      let finalConcerts = incomingConcerts;
+
+      if (existing && existing.concerts && existing.concerts.length > 0) {
+        if (incomingConcerts.length === 0 && !isExplicitAccountDelete) {
+          return res.json({ success: true, restored: true, concertsData: existing });
+        }
+        const mergedMap = new Map<string, any>();
+        existing.concerts.forEach((c: any) => { if (c && c.id) mergedMap.set(c.id, c); });
+        incomingConcerts.forEach((c: any) => { if (c && c.id) mergedMap.set(c.id, c); });
+        finalConcerts = Array.from(mergedMap.values());
+      }
+
+      const updatedData = { concerts: finalConcerts };
+      memoryVaults.set(userId, updatedData);
+      return res.json({ success: true, concertsCount: finalConcerts.length, updatedAt: new Date() });
     }
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Sync push failed';
