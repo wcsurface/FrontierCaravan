@@ -154,6 +154,9 @@ class MainActivity : ComponentActivity() {
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
+                webView.postDelayed({
+                    webView.evaluateJavascript("if (window.saveShowsToStorage) { window.saveShowsToStorage(); }", null)
+                }, 1000)
             }
         }
 
