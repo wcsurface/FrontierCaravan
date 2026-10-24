@@ -54,13 +54,14 @@ export interface CreateConcertInput {
   openingArtistName?: string;
   venueName: string;
   venueCity?: string;
+  venueState?: string;
   venueCountry?: string;
   tourName?: string;
   rating?: number;
   ticketPrice?: number;
   notes?: string;
   photoUris?: string[];
-  setlist: { songTitle: string; position: number; isEncore: boolean; originalArtist?: string }[];
+  setlist: { title: string; songTitle?: string; position: number; isEncore: boolean; originalArtist?: string; notes?: string }[];
 }
 
 export interface ConcertStats {
