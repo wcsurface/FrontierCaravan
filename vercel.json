@@ -1,0 +1,18 @@
+{
+  "buildCommand": "npm run build --prefix frontend-web",
+  "outputDirectory": "frontend-web/.next",
+  "framework": "nextjs",
+  "installCommand": "npm install --prefix frontend-web",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "ALLOWALL" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
+    }
+  ],
+  "env": {
+    "NEXT_PUBLIC_BACKEND_API_URL": "https://frontiercaravan-production.up.railway.app"
+  }
+}
