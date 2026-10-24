@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { useAuthStore } from './useAuthStore';
 import {
   Artist,
   Venue,
