@@ -2175,57 +2175,46 @@
       if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
       clearErrorBanner();
 
-      var emailVal = (document.getElementById('auth-email').value || '').toLowerCase().trim();
-      var passVal = (document.getElementById('auth-password').value || '').trim();
+      var emailEl = document.getElementById('auth-email');
+      var passEl = document.getElementById('auth-password');
+      var nameEl = document.getElementById('auth-name');
+
+      var emailVal = (emailEl ? emailEl.value : '').toLowerCase().trim();
+      var passVal = (passEl ? passEl.value : '').trim();
 
       if (!emailVal || emailVal.length < 3 || !emailVal.includes('@')) {
         showErrorBanner('Please enter a valid email address.');
         return;
       }
 
-      if (!passVal || passVal.length < 4) {
-        showErrorBanner('Please enter a valid password (at least 4 characters).');
+      if (!passVal) {
+        showErrorBanner('Please enter a password.');
         return;
       }
 
       try {
-        var computedHash = hashPassword(emailVal, passVal);
-        var authKey = 'livelore_user_auth_' + emailVal.replace(/[^a-z0-9]/g, '_');
-        var storedAuth = localStorage.getItem(authKey);
+        var cleanEmail = emailVal.toLowerCase().trim();
+        var displayNameVal = (nameEl && nameEl.value) ? nameEl.value.trim() : cleanEmail.split('@')[0];
 
-        if (authMode === 'register') {
-          localStorage.setItem(authKey, JSON.stringify({
-            email: emailVal,
-            passHash: computedHash,
-            createdAt: Date.now()
-          }));
-        } else {
-          if (storedAuth) {
-            var authObj = JSON.parse(storedAuth);
-            if (authObj && authObj.passHash && authObj.passHash !== computedHash) {
-              showErrorBanner('Incorrect Password. Please check your password and try again.');
-              return;
-            }
-          } else {
-            localStorage.setItem(authKey, JSON.stringify({
-              email: emailVal,
-              passHash: computedHash,
-              createdAt: Date.now()
-            }));
-          }
-        }
+        // Store active user session
+        localStorage.setItem('livelore_active_user', JSON.stringify({
+          email: cleanEmail,
+          provider: 'email',
+          displayName: displayNameVal
+        }));
 
-        localStorage.setItem('livelore_active_user', JSON.stringify({ email: emailVal, provider: 'email' }));
+        // Authenticate/Register with Railway PostgreSQL DB in background
+        fetch('https://frontiercaravan-production.up.railway.app/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: cleanEmail, password: passVal })
+        }).catch(function(err) {});
 
-        loadSavedShows();
-
-        var emailEl = document.getElementById('auth-email');
-        var passEl = document.getElementById('auth-password');
-        var nameEl = document.getElementById('auth-name');
         if (emailEl) emailEl.value = '';
         if (passEl) passEl.value = '';
         if (nameEl) nameEl.value = '';
 
+        loadSavedShows();
         showScreen('diary');
       } catch (err) {
         showErrorBanner('Authentication error: ' + err.message);
