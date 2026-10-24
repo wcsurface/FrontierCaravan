@@ -278,46 +278,38 @@ app.post('/api/sync/push', async (req: Request, res: Response) => {
       : (Array.isArray(concertsData) ? concertsData : []);
 
     if (prisma) {
-      const existingVault = await prisma.concertVault.findUnique({
-        where: { userId },
-      });
-
-      let finalConcerts = incomingConcerts;
-
-      if (existingVault && existingVault.concertsData) {
-        const existingData: any = existingVault.concertsData;
-        const existingConcerts: any[] = Array.isArray(existingData.concerts)
-          ? existingData.concerts
-          : (Array.isArray(existingData) ? existingData : []);
-
-        if (existingConcerts.length > 0) {
-          if (incomingConcerts.length === 0 && !isExplicitAccountDelete) {
-            console.log(`[Zero-Data-Loss] Prevented empty push for ${userId}. Preserved ${existingConcerts.length} existing concerts.`);
-            return res.json({
-              success: true,
-              restored: true,
-              concertsData: existingVault.concertsData,
-            });
-          }
-
-          // Merge concerts by ID so no previously saved concert or photo is ever lost
-          const mergedMap = new Map<string, any>();
-          existingConcerts.forEach((c) => { if (c && c.id) mergedMap.set(c.id, c); });
-          incomingConcerts.forEach((c) => { if (c && c.id) mergedMap.set(c.id, c); });
-          finalConcerts = Array.from(mergedMap.values());
-        }
-      }
-
-      const updatedData = { concerts: finalConcerts };
+      const updatedData = { concerts: incomingConcerts };
 
       // Process and track venues logged by this user for community threshold promotion
-      finalConcerts.forEach((c: any) => {
+      incomingConcerts.forEach((c: any) => {
         const vName = c.venue || c.venueName;
         const vCity = c.city || c.venueCity;
         const vState = c.state || c.venueState;
         const vCountry = c.country || c.venueCountry;
 
         if (vName && vCity) {
+          trackUserVenue(userId, vName, vCity, vState, vCountry);
+        }
+      });
+
+      const vault = await prisma.concertVault.upsert({
+        where: { userId },
+        update: {
+          concertsData: updatedData,
+        },
+        create: {
+          userId,
+          concertsData: updatedData,
+        },
+      });
+
+      return res.json({
+        success: true,
+        vaultId: vault.id,
+        concertsCount: incomingConcerts.length,
+        updatedAt: vault.updatedAt,
+      });
+    }
           trackUserVenue(userId, vName, vCity, vState, vCountry);
         }
       });
