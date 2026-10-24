@@ -2782,14 +2782,21 @@
       var btnCancel = document.getElementById('custom-dialog-btn-cancel');
       var btnConfirm = document.getElementById('custom-dialog-btn-confirm');
 
-      if (!modal) return;
-
       var title = typeof options === 'string' ? 'CONFIRM ACTION' : (options.title || 'CONFIRM ACTION');
       var message = typeof options === 'string' ? options : (options.message || '');
       var confirmText = typeof options === 'string' ? 'DELETE' : (options.confirmText || 'CONFIRM');
       var cancelText = typeof options === 'string' ? 'CANCEL' : (options.cancelText || 'CANCEL');
       var icon = typeof options === 'string' ? '🗑️' : (options.icon || '⚠️');
       var confirmColor = (options && options.confirmColor) ? options.confirmColor : 'linear-gradient(90deg, #E11D48, #BE123C)';
+
+      if (!modal) {
+        if (window.confirm(message)) {
+          if (onConfirm) onConfirm();
+        } else {
+          if (onCancel) onCancel();
+        }
+        return;
+      }
 
       if (iconEl) iconEl.innerText = icon;
       if (titleEl) titleEl.innerText = title;
@@ -2798,7 +2805,8 @@
       if (btnCancel) {
         btnCancel.style.display = 'block';
         btnCancel.innerText = cancelText;
-        btnCancel.onclick = function() {
+        btnCancel.onclick = function(e) {
+          if (e) { e.preventDefault(); e.stopPropagation(); }
           modal.style.display = 'none';
           if (onCancel) onCancel();
         };
@@ -2807,7 +2815,8 @@
       if (btnConfirm) {
         btnConfirm.innerText = confirmText;
         btnConfirm.style.background = confirmColor;
-        btnConfirm.onclick = function() {
+        btnConfirm.onclick = function(e) {
+          if (e) { e.preventDefault(); e.stopPropagation(); }
           modal.style.display = 'none';
           if (onConfirm) onConfirm();
         };
