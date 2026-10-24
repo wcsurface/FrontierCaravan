@@ -1543,23 +1543,10 @@
             var uObj = JSON.parse(rawUser);
             if (uObj && uObj.email) {
               var userEmail = uObj.email.toLowerCase().trim();
-              var userKey = 'livelore_shows_' + userEmail.replace(/[^a-z0-9]/g, '_');
-              localStorage.setItem(userKey, JSON.stringify(userShows));
-
               var cloudUserId = 'u_cloud_' + userEmail.replace(/[^a-z0-9]/g, '_');
 
-              // Push directly to Railway Production Cloud Sync API
+              // NOTHING SAVED LOCALLY. PUSH IMMEDIATELY TO RAILWAY POSTGRESQL DB.
               fetch('https://frontiercaravan-production.up.railway.app/api/sync/push', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  userId: cloudUserId,
-                  concertsData: { concerts: userShows }
-                })
-              }).catch(function(err) {});
-
-              // Push directly to Vercel Production Cloud Sync API
-              fetch('https://frontier-caravan.vercel.app/api/sync/push', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -2076,17 +2063,8 @@
         return;
       }
 
-      var userKey = 'livelore_shows_' + activeEmail.replace(/[^a-z0-9]/g, '_');
-      var savedLocalShows = localStorage.getItem(userKey);
-      if (savedLocalShows) {
-        try {
-          userShows = JSON.parse(savedLocalShows);
-        } catch(ex) {
-          userShows = [];
-        }
-      } else {
-        userShows = [];
-      }
+      // NOTHING SAVED LOCALLY. ALWAYS START FRESH BEFORE PULLING FROM RAILWAY DB ONLY.
+      userShows = [];
 
       isVIPUser = checkIsVIPUser(activeEmail);
       updateProfileVipCard();
@@ -2101,8 +2079,8 @@
 
       var activeUserId = 'u_cloud_' + activeEmail.replace(/[^a-z0-9]/g, '_');
 
-      // Fetch user's concert vault directly from Production Cloud Sync API
-      fetch('https://frontier-caravan.vercel.app/api/sync/pull?userId=' + encodeURIComponent(activeUserId) + '&_t=' + Date.now())
+      // Fetch user's concert vault directly from Railway PostgreSQL Cloud Database ONLY
+      fetch('https://frontiercaravan-production.up.railway.app/api/sync/pull?userId=' + encodeURIComponent(activeUserId) + '&_t=' + Date.now())
         .then(function(res) { return res.json(); })
         .then(function(data) {
           if (data && data.concertsData) {
@@ -2110,11 +2088,15 @@
               userShows = data.concertsData.concerts;
             } else if (Array.isArray(data.concertsData)) {
               userShows = data.concertsData;
+            } else {
+              userShows = [];
             }
+          } else {
+            userShows = [];
           }
-          localStorage.setItem(userKey, JSON.stringify(userShows));
           finishLoadAndRender();
         }).catch(function(err) {
+          userShows = [];
           finishLoadAndRender();
         });
 
