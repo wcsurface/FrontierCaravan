@@ -117,6 +117,97 @@
   </style>
 
   <script>
+    function showCustomConfirm(options, onConfirm, onCancel) {
+      var modal = document.getElementById('custom-dialog-modal');
+      var iconEl = document.getElementById('custom-dialog-icon');
+      var titleEl = document.getElementById('custom-dialog-title');
+      var msgEl = document.getElementById('custom-dialog-msg');
+      var btnCancel = document.getElementById('custom-dialog-btn-cancel');
+      var btnConfirm = document.getElementById('custom-dialog-btn-confirm');
+
+      var title = typeof options === 'string' ? 'CONFIRM ACTION' : (options.title || 'CONFIRM ACTION');
+      var message = typeof options === 'string' ? options : (options.message || '');
+      var confirmText = typeof options === 'string' ? 'DELETE' : (options.confirmText || 'CONFIRM');
+      var cancelText = typeof options === 'string' ? 'CANCEL' : (options.cancelText || 'CANCEL');
+      var icon = typeof options === 'string' ? '🗑️' : (options.icon || '⚠️');
+      var confirmColor = (options && options.confirmColor) ? options.confirmColor : 'linear-gradient(90deg, #E11D48, #BE123C)';
+
+      if (!modal) {
+        if (window.confirm(message)) {
+          if (onConfirm) onConfirm();
+        } else {
+          if (onCancel) onCancel();
+        }
+        return;
+      }
+
+      if (iconEl) iconEl.innerText = icon;
+      if (titleEl) titleEl.innerText = title;
+      if (msgEl) msgEl.innerText = message;
+
+      if (btnCancel) {
+        btnCancel.style.display = 'block';
+        btnCancel.innerText = cancelText;
+        btnCancel.onclick = function(e) {
+          if (e) { e.preventDefault(); e.stopPropagation(); }
+          modal.style.display = 'none';
+          if (onCancel) onCancel();
+        };
+      }
+
+      if (btnConfirm) {
+        btnConfirm.innerText = confirmText;
+        btnConfirm.style.background = confirmColor;
+        btnConfirm.onclick = function(e) {
+          if (e) { e.preventDefault(); e.stopPropagation(); }
+          modal.style.display = 'none';
+          if (onConfirm) onConfirm();
+        };
+      }
+
+      modal.style.display = 'flex';
+    }
+    window.showCustomConfirm = showCustomConfirm;
+
+    function showCustomAlert(options, onClose) {
+      var modal = document.getElementById('custom-dialog-modal');
+      var iconEl = document.getElementById('custom-dialog-icon');
+      var titleEl = document.getElementById('custom-dialog-title');
+      var msgEl = document.getElementById('custom-dialog-msg');
+      var btnCancel = document.getElementById('custom-dialog-btn-cancel');
+      var btnConfirm = document.getElementById('custom-dialog-btn-confirm');
+
+      var title = typeof options === 'string' ? 'NOTICE' : (options.title || 'NOTICE');
+      var message = typeof options === 'string' ? options : (options.message || '');
+      var okText = typeof options === 'string' ? 'OK' : (options.okText || 'OK');
+      var icon = typeof options === 'string' ? 'ℹ️' : (options.icon || 'ℹ️');
+
+      if (!modal) {
+        window.alert(message);
+        if (onClose) onClose();
+        return;
+      }
+
+      if (iconEl) iconEl.innerText = icon;
+      if (titleEl) titleEl.innerText = title;
+      if (msgEl) msgEl.innerText = message;
+
+      if (btnCancel) btnCancel.style.display = 'none';
+
+      if (btnConfirm) {
+        btnConfirm.innerText = okText;
+        btnConfirm.style.background = 'linear-gradient(90deg, #00E676, #00C853)';
+        btnConfirm.onclick = function(e) {
+          if (e) { e.preventDefault(); e.stopPropagation(); }
+          modal.style.display = 'none';
+          if (onClose) onClose();
+        };
+      }
+
+      modal.style.display = 'flex';
+    }
+    window.showCustomAlert = showCustomAlert;
+
     var authMode = 'login';
     var isVIPUser = true;
     var editingShowId = null;
@@ -2773,90 +2864,6 @@
       showCustomAlert({ title: 'PASSWORD UPDATED', message: '✓ Your password has been updated successfully!', icon: '🔐' });
     }
     window.handlePasswordUpdate = handlePasswordUpdate;
-
-    function showCustomConfirm(options, onConfirm, onCancel) {
-      var modal = document.getElementById('custom-dialog-modal');
-      var iconEl = document.getElementById('custom-dialog-icon');
-      var titleEl = document.getElementById('custom-dialog-title');
-      var msgEl = document.getElementById('custom-dialog-msg');
-      var btnCancel = document.getElementById('custom-dialog-btn-cancel');
-      var btnConfirm = document.getElementById('custom-dialog-btn-confirm');
-
-      var title = typeof options === 'string' ? 'CONFIRM ACTION' : (options.title || 'CONFIRM ACTION');
-      var message = typeof options === 'string' ? options : (options.message || '');
-      var confirmText = typeof options === 'string' ? 'DELETE' : (options.confirmText || 'CONFIRM');
-      var cancelText = typeof options === 'string' ? 'CANCEL' : (options.cancelText || 'CANCEL');
-      var icon = typeof options === 'string' ? '🗑️' : (options.icon || '⚠️');
-      var confirmColor = (options && options.confirmColor) ? options.confirmColor : 'linear-gradient(90deg, #E11D48, #BE123C)';
-
-      if (!modal) {
-        if (window.confirm(message)) {
-          if (onConfirm) onConfirm();
-        } else {
-          if (onCancel) onCancel();
-        }
-        return;
-      }
-
-      if (iconEl) iconEl.innerText = icon;
-      if (titleEl) titleEl.innerText = title;
-      if (msgEl) msgEl.innerText = message;
-
-      if (btnCancel) {
-        btnCancel.style.display = 'block';
-        btnCancel.innerText = cancelText;
-        btnCancel.onclick = function(e) {
-          if (e) { e.preventDefault(); e.stopPropagation(); }
-          modal.style.display = 'none';
-          if (onCancel) onCancel();
-        };
-      }
-
-      if (btnConfirm) {
-        btnConfirm.innerText = confirmText;
-        btnConfirm.style.background = confirmColor;
-        btnConfirm.onclick = function(e) {
-          if (e) { e.preventDefault(); e.stopPropagation(); }
-          modal.style.display = 'none';
-          if (onConfirm) onConfirm();
-        };
-      }
-
-      modal.style.display = 'flex';
-    }
-    window.showCustomConfirm = showCustomConfirm;
-
-    function showCustomAlert(options, onClose) {
-      var modal = document.getElementById('custom-dialog-modal');
-      var iconEl = document.getElementById('custom-dialog-icon');
-      var titleEl = document.getElementById('custom-dialog-title');
-      var msgEl = document.getElementById('custom-dialog-msg');
-      var btnCancel = document.getElementById('custom-dialog-btn-cancel');
-      var btnConfirm = document.getElementById('custom-dialog-btn-confirm');
-
-      if (!modal) return;
-
-      var title = typeof options === 'string' ? 'NOTICE' : (options.title || 'NOTICE');
-      var message = typeof options === 'string' ? options : (options.message || '');
-      var okText = typeof options === 'string' ? 'OK' : (options.okText || 'OK');
-      var icon = typeof options === 'string' ? 'ℹ️' : (options.icon || 'ℹ️');
-
-      if (iconEl) iconEl.innerText = icon;
-      if (titleEl) titleEl.innerText = title;
-      if (msgEl) msgEl.innerText = message;
-
-      if (btnCancel) btnCancel.style.display = 'none';
-
-      if (btnConfirm) {
-        btnConfirm.innerText = okText;
-        btnConfirm.style.background = 'linear-gradient(90deg, #00E676, #00C853)';
-        btnConfirm.onclick = function() {
-          modal.style.display = 'none';
-          if (onClose) onClose();
-        };
-      }
-
-      modal.style.display = 'flex';
     }
     window.showCustomAlert = showCustomAlert;
 
