@@ -1366,8 +1366,8 @@
               saveToIndexedDB(userKey, userShows);
               saveToIndexedDB('livelore_local_shows', userShows);
 
-              // Push to Railway Cloud Database API
-              fetch('https://frontiercaravan-production.up.railway.app/api/sync/push', {
+              // Push to Vercel Persistent Cloud Sync API
+              fetch('https://frontier-caravan.vercel.app/api/sync/push', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -1872,12 +1872,20 @@
         renderShowsFeed();
         updateStatsDisplay();
 
-        // Asynchronously pull latest cloud vault from Railway production API & merge cleanly
-        fetch('https://frontiercaravan-production.up.railway.app/api/sync/pull?userId=u_cloud_' + activeEmail.replace(/[^a-z0-9]/g, '_'))
+        // Asynchronously pull latest cloud vault from Vercel persistent API & merge cleanly
+        fetch('https://frontier-caravan.vercel.app/api/sync/pull?userId=u_cloud_' + activeEmail.replace(/[^a-z0-9]/g, '_'))
           .then(function(res) { return res.json(); })
           .then(function(data) {
-            if (data && data.concertsData && Array.isArray(data.concertsData.concerts) && data.concertsData.concerts.length > 0) {
-              var cloudConcerts = data.concertsData.concerts;
+            var cloudConcerts = [];
+            if (data && data.concertsData) {
+              if (Array.isArray(data.concertsData.concerts)) {
+                cloudConcerts = data.concertsData.concerts;
+              } else if (Array.isArray(data.concertsData)) {
+                cloudConcerts = data.concertsData;
+              }
+            }
+
+            if (cloudConcerts.length > 0) {
               var finalMergedMap = new Map();
               // Add cloud concerts
               cloudConcerts.forEach(function(s) { if (s && s.id) finalMergedMap.set(s.id, s); });
