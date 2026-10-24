@@ -1588,12 +1588,13 @@
         list.style.justifyContent = 'center';
         list.style.alignItems = 'center';
         list.innerHTML = `
-          <div id="empty-state-box" style="text-align:center; padding: 30px 16px; margin: auto 0;">
-            <div style="font-size:24px; font-weight:900; color:#FFB300; margin-bottom:12px;">LIVELORE</div>
-            <div style="font-weight:900; font-size:24px; color:#ffffff; text-transform:uppercase; margin-bottom:16px;">YOUR CONCERT VAULT IS EMPTY!</div>
+          <div id="empty-state-box" style="text-align:center; padding: 40px 16px; margin: auto 0;">
+            <div style="font-size:52px; margin-bottom:12px;">🎸</div>
+            <div style="font-size:24px; font-weight:900; color:#FFB300; margin-bottom:10px; letter-spacing:1px;">LIVELORE</div>
+            <div style="font-weight:900; font-size:22px; color:#ffffff; text-transform:uppercase; margin-bottom:16px; letter-spacing:0.5px;">YOUR CONCERT VAULT IS EMPTY!</div>
             <div class="bounce-pointer" style="color:#FFB300; font-weight:900; font-size:16px; text-transform:uppercase; letter-spacing:1px; margin-top:12px;">
               <div style="font-size:42px; color:#00E676; margin-bottom:8px; font-weight:900;">&uarr;</div>
-              START ADDING YOUR CONCERTS ABOVE!
+              TAP "ADD" ABOVE TO LOG YOUR FIRST CONCERT!
             </div>
           </div>
         `;
@@ -2010,38 +2011,28 @@
       var performLoadAndMerge = function(idbShows) {
         try {
           var rawUserKey = localStorage.getItem(userKey);
-          var rawLocal = localStorage.getItem('livelore_local_shows');
-          var rawVault = localStorage.getItem('livelore_vault_v1');
-          var rawBackup = localStorage.getItem('livelore_backup_shows');
-
           var localMergedMap = new Map();
 
-          // 1. Merge all IndexedDB shows
+          // 1. Merge all IndexedDB shows for THIS specific user
           if (Array.isArray(idbShows)) {
             idbShows.forEach(function(show) {
               if (show && show.id) localMergedMap.set(show.id, show);
             });
           }
 
-          // 2. Merge all LocalStorage keys
-          [rawUserKey, rawLocal, rawVault, rawBackup].forEach(function(rawStr) {
-            if (rawStr) {
-              try {
-                var parsed = JSON.parse(rawStr);
-                if (Array.isArray(parsed)) {
-                  parsed.forEach(function(show) {
-                    if (show && show.id) localMergedMap.set(show.id, show);
-                  });
-                }
-              } catch(ex) {}
-            }
-          });
+          // 2. Merge LocalStorage shows for THIS specific user
+          if (rawUserKey) {
+            try {
+              var parsed = JSON.parse(rawUserKey);
+              if (Array.isArray(parsed)) {
+                parsed.forEach(function(show) {
+                  if (show && show.id) localMergedMap.set(show.id, show);
+                });
+              }
+            } catch(ex) {}
+          }
 
           userShows = Array.from(localMergedMap.values());
-
-          if (!Array.isArray(userShows) || userShows.length === 0) {
-            userShows = Array.isArray(DEFAULT_SEED_SHOWS) ? [...DEFAULT_SEED_SHOWS] : [];
-          }
 
           userShows.forEach(function(s) {
             if (!s.id) s.id = generateUniqueId();
@@ -2056,7 +2047,7 @@
             }
           });
         } catch (e) {
-          userShows = Array.isArray(DEFAULT_SEED_SHOWS) ? [...DEFAULT_SEED_SHOWS] : [];
+          userShows = [];
         }
 
         switchTicketTheme(currentTicketTheme);
