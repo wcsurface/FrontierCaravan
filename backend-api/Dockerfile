@@ -10,7 +10,7 @@ COPY prisma ./prisma/
 RUN npm install
 
 COPY src ./src
-RUN npx prisma generate && npm run build
+RUN npx prisma generate && npx tsc
 
 FROM node:20-alpine AS runner
 
@@ -21,7 +21,7 @@ ENV NODE_ENV=production
 
 COPY package*.json ./
 COPY prisma ./prisma/
-RUN npm install --only=production && npx prisma generate
+RUN npm install --omit=dev && npx prisma generate
 
 COPY --from=builder /app/dist ./dist
 
