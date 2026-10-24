@@ -2,8 +2,26 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-const RAILWAY_API = 'https://frontiercaravan-production.up.railway.app/api/sync/pull';
+const globalVaultStore: Record<string, any> = (globalThis as any).__LIVELORE_VAULTS__ || {};
+(globalThis as any).__LIVELORE_VAULTS__ = globalVaultStore;
+
 const CLOUD_STORAGE_API = 'https://api.restful-api.dev/objects';
+
+async function fetchFromExternalStore(userId: string): Promise<any | null> {
+  try {
+    const res = await fetch(CLOUD_STORAGE_API, { cache: 'no-store' });
+    if (res.ok) {
+      const items = await res.json();
+      if (Array.isArray(items)) {
+        const match = items.find((item: any) => item && item.name === userId);
+        if (match && match.data) {
+          return match.data;
+        }
+      }
+    }
+  } catch (e) {}
+  return null;
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -14,38 +32,26 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: true, concertsData: { concerts: [] } });
     }
 
-    // 1. Query Railway Production Database First
-    try {
-      const railwayRes = await fetch(`${RAILWAY_API}?userId=${encodeURIComponent(userId)}`, { cache: 'no-store' });
-      if (railwayRes.ok) {
-        const rData = await railwayRes.json();
-        if (rData && rData.concertsData) {
-          const concerts = Array.isArray(rData.concertsData.concerts)
-            ? rData.concertsData.concerts
-            : (Array.isArray(rData.concertsData) ? rData.concertsData : []);
-          if (concerts.length > 0) {
-            return NextResponse.json({ success: true, concertsData: { concerts } });
-          }
-        }
-      }
-    } catch (rErr) {}
+    // 1. Check Global In-Memory Store First
+    let vault = globalVaultStore[userId];
 
-    // 2. Query Cloud Object Storage Fallback
-    const res = await fetch(CLOUD_STORAGE_API, { cache: 'no-store' });
-    if (res.ok) {
-      const items = await res.json();
-      if (Array.isArray(items)) {
-        const match = items.find((item: any) => item && item.name === userId);
-        if (match && match.data) {
-          return NextResponse.json({
-            success: true,
-            concertsData: match.data,
-          });
-        }
+    if (!vault || !Array.isArray(vault.concerts) || vault.concerts.length === 0) {
+      // 2. Query External Cloud Store
+      const externalData = await fetchFromExternalStore(userId);
+      if (externalData) {
+        vault = externalData;
+        globalVaultStore[userId] = vault;
       }
     }
 
-    return NextResponse.json({ success: true, concertsData: { concerts: [] } });
+    const concerts = vault && Array.isArray(vault.concerts)
+      ? vault.concerts
+      : (Array.isArray(vault) ? vault : []);
+
+    return NextResponse.json({
+      success: true,
+      concertsData: { concerts },
+    });
   } catch (e: any) {
     return NextResponse.json({ success: true, concertsData: { concerts: [] } });
   }

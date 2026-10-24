@@ -1555,31 +1555,14 @@
 
     function saveShowsToStorage() {
       try {
-        // IMPORTANT: No concert data or related photos stored on the user's phone!
-        try { localStorage.removeItem('livelore_local_shows'); } catch(e) {}
-        try { localStorage.removeItem('livelore_vault_v1'); } catch(e) {}
-        try { localStorage.removeItem('livelore_backup_shows'); } catch(e) {}
-
         var rawUser = localStorage.getItem('livelore_active_user');
         if (rawUser) {
           try {
             var uObj = JSON.parse(rawUser);
             if (uObj && uObj.email) {
               var userEmail = uObj.email.toLowerCase().trim();
-              var userKey = 'livelore_shows_' + userEmail.replace(/[^a-z0-9]/g, '_');
-              try { localStorage.removeItem(userKey); } catch(e) {}
 
-              // Push directly to Railway Production DB (Ultimate Source of Truth)
-              fetch('https://frontiercaravan-production.up.railway.app/api/sync/push', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  userId: 'u_cloud_' + userEmail.replace(/[^a-z0-9]/g, '_'),
-                  concertsData: { concerts: userShows }
-                })
-              }).catch(function(err) {});
-
-              // Mirror to Vercel API
+              // Push directly to Production Cloud Sync API
               fetch('https://frontier-caravan.vercel.app/api/sync/push', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -2109,16 +2092,8 @@
 
       var activeUserId = 'u_cloud_' + activeEmail.replace(/[^a-z0-9]/g, '_');
 
-      // IMPORTANT: No concert data or related photos stored on the user's phone!
-      try {
-        localStorage.removeItem('livelore_local_shows');
-        localStorage.removeItem('livelore_vault_v1');
-        localStorage.removeItem('livelore_backup_shows');
-        localStorage.removeItem('livelore_shows_' + activeEmail.replace(/[^a-z0-9]/g, '_'));
-      } catch(e) {}
-
-      // Fetch user's concert vault directly from Railway DB (Ultimate Source of Truth)
-      fetch('https://frontiercaravan-production.up.railway.app/api/sync/pull?userId=' + encodeURIComponent(activeUserId))
+      // Fetch user's concert vault directly from Production Cloud Sync API
+      fetch('https://frontier-caravan.vercel.app/api/sync/pull?userId=' + encodeURIComponent(activeUserId))
         .then(function(res) { return res.json(); })
         .then(function(data) {
           var cloudConcerts = [];
@@ -2132,24 +2107,9 @@
 
           if (cloudConcerts.length > 0) {
             userShows = cloudConcerts;
-            finishLoadAndRender();
-          } else {
-            // Fallback query to Vercel API
-            fetch('https://frontier-caravan.vercel.app/api/sync/pull?userId=' + encodeURIComponent(activeUserId))
-              .then(function(vRes) { return vRes.json(); })
-              .then(function(vData) {
-                if (vData && vData.concertsData) {
-                  if (Array.isArray(vData.concertsData.concerts)) {
-                    userShows = vData.concertsData.concerts;
-                  } else if (Array.isArray(vData.concertsData)) {
-                    userShows = vData.concertsData;
-                  }
-                }
-                finishLoadAndRender();
-              }).catch(function(err) {
-                finishLoadAndRender();
-              });
           }
+
+          finishLoadAndRender();
         }).catch(function(err) {
           finishLoadAndRender();
         });
