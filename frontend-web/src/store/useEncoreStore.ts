@@ -264,8 +264,8 @@ export const useEncoreStore = create<EncoreState>()(
       setSetlistFmApiKey: (key) => set({ setlistFmApiKey: key }),
 
       getConcertStats: () => {
-        const { concerts, artists, venues } = get();
-        return AnalyticsEngine.calculateStats(concerts, artists, venues);
+        const { concerts, artists, venues, setlistItems } = get();
+        return AnalyticsEngine.calculateStats(concerts, artists, venues, setlistItems || []);
       },
 
       exportVaultJson: () => {
