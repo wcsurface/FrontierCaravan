@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
     if (!vault || !Array.isArray(vault.concerts) || vault.concerts.length === 0) {
       // 2. Query External Cloud Store
       const externalData = await fetchFromExternalStore(userId);
-      if (externalData) {
+      if (externalData && Array.isArray(externalData.concerts) && externalData.concerts.length > 0) {
         vault = externalData;
         globalVaultStore[userId] = vault;
       }
