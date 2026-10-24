@@ -46,7 +46,103 @@ async function initializeDatabaseSchema() {
   }
 }
 
-initializeDatabaseSchema();
+async function seedInitialWcUser() {
+  if (!prisma) return;
+  try {
+    const wcEmail = 'wcsurface@gmail.com';
+    let user = await prisma.user.findUnique({ where: { email: wcEmail } });
+
+    if (!user) {
+      const defaultHash = await bcrypt.hash('Livelore2026!', 10);
+      user = await prisma.user.create({
+        data: {
+          email: wcEmail,
+          passwordHash: defaultHash,
+          displayName: 'wcsurface',
+        },
+      });
+      console.log('[LiveLore DB] Seeded user wcsurface@gmail.com');
+    }
+
+    const realConcerts = [
+      {
+        id: "c_phish_2026",
+        headline: "PHISH",
+        venue: "DICK'S SPORTING GOODS PARK",
+        city: "Commerce City",
+        state: "CO",
+        country: "USA",
+        date: "09/04/2026",
+        openersList: []
+      },
+      {
+        id: "c_stones_120789",
+        headline: "ROLLING STONES",
+        opener: "Living Color",
+        openersList: ["Living Color"],
+        venue: "HOOSIER DOME",
+        city: "Indianapolis",
+        state: "IN",
+        country: "USA",
+        date: "12/07/1989"
+      },
+      {
+        id: "c_stones_120689",
+        headline: "ROLLING STONES",
+        opener: "Living Color",
+        openersList: ["Living Color"],
+        venue: "HOOSIER DOME",
+        city: "Indianapolis",
+        state: "IN",
+        country: "USA",
+        date: "12/06/1989"
+      },
+      {
+        id: "c_srv_072289",
+        headline: "STEVIE RAY VAUGHAN",
+        opener: "Stray Cats, Duke Tumato",
+        openersList: ["Stray Cats", "Duke Tumato"],
+        venue: "DEER CREEK MUSIC CENTER",
+        city: "Noblesville",
+        state: "IN",
+        country: "USA",
+        date: "07/22/1989"
+      },
+      {
+        id: "c_dead_052891",
+        headline: "GRATEFUL DEAD",
+        opener: "Violent Femmes",
+        openersList: ["Violent Femmes"],
+        venue: "DEER CREEK MUSIC CENTER",
+        city: "Noblesville",
+        state: "IN",
+        country: "USA",
+        date: "05/28/1991"
+      }
+    ];
+
+    const existingVault = await prisma.concertVault.findUnique({ where: { userId: user.id } });
+    if (!existingVault) {
+      await prisma.concertVault.create({
+        data: {
+          userId: user.id,
+          concertsData: { concerts: realConcerts },
+        },
+      });
+      console.log('[LiveLore DB] Seeded 5 real concerts into ConcertVault for wcsurface@gmail.com');
+    }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn('[LiveLore DB] User seed notice:', msg);
+  }
+}
+
+async function bootDb() {
+  await initializeDatabaseSchema();
+  await seedInitialWcUser();
+}
+
+bootDb();
 const app = express();
 const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || 'livelore_secret_jwt_key_2026_x89!';
