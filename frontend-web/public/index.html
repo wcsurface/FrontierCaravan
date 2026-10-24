@@ -241,15 +241,7 @@
       '#F7E5B3'  // Classic Cream
     ];
 
-    var REAL_WCSURFACE_CONCERTS = [
-      { id: "c_phish_2026", headline: "PHISH", venue: "DICK'S SPORTING GOODS PARK", city: "Commerce City", state: "CO", country: "USA", date: "09/04/2026", openersList: [] },
-      { id: "c_stones_120789", headline: "ROLLING STONES", opener: "Living Color", openersList: ["Living Color"], venue: "HOOSIER DOME", city: "Indianapolis", state: "IN", country: "USA", date: "12/07/1989" },
-      { id: "c_stones_120689", headline: "ROLLING STONES", opener: "Living Color", openersList: ["Living Color"], venue: "HOOSIER DOME", city: "Indianapolis", state: "IN", country: "USA", date: "12/06/1989" },
-      { id: "c_srv_072289", headline: "STEVIE RAY VAUGHAN", opener: "Stray Cats, Duke Tumato", openersList: ["Stray Cats", "Duke Tumato"], venue: "DEER CREEK MUSIC CENTER", city: "Noblesville", state: "IN", country: "USA", date: "07/22/1989" },
-      { id: "c_dead_052891", headline: "GRATEFUL DEAD", opener: "Violent Femmes", openersList: ["Violent Femmes"], venue: "DEER CREEK MUSIC CENTER", city: "Noblesville", state: "IN", country: "USA", date: "05/28/1991" }
-    ];
-
-    var DEFAULT_SEED_SHOWS = [...REAL_WCSURFACE_CONCERTS];
+    var DEFAULT_SEED_SHOWS = [];
 
     var VENUE_DB = [
       { v: "Deer Creek Music Center", c: "Noblesville", s: "IN", co: "USA" },
@@ -2118,13 +2110,6 @@
 
       function finishLoadAndRender() {
         if (!Array.isArray(userShows)) userShows = [];
-
-        if (activeEmail === 'wcsurface@gmail.com') {
-          var showMap = new Map();
-          REAL_WCSURFACE_CONCERTS.forEach(function(s) { showMap.set(s.id, s); });
-          userShows.forEach(function(s) { if (s && s.id) showMap.set(s.id, s); });
-          userShows = Array.from(showMap.values());
-        }
 
         userShows.forEach(function(s) {
           if (!s.id) s.id = generateUniqueId();
