@@ -1543,6 +1543,8 @@
             var uObj = JSON.parse(rawUser);
             if (uObj && uObj.email) {
               var userEmail = uObj.email.toLowerCase().trim();
+              var userKey = 'livelore_shows_' + userEmail.replace(/[^a-z0-9]/g, '_');
+              localStorage.setItem(userKey, JSON.stringify(userShows));
 
               var cloudUserId = 'u_cloud_' + userEmail.replace(/[^a-z0-9]/g, '_');
 
@@ -2068,9 +2070,22 @@
       }
 
       if (!activeEmail) {
+        userShows = [];
         isVIPUser = false;
         showScreen('auth');
         return;
+      }
+
+      var userKey = 'livelore_shows_' + activeEmail.replace(/[^a-z0-9]/g, '_');
+      var savedLocalShows = localStorage.getItem(userKey);
+      if (savedLocalShows) {
+        try {
+          userShows = JSON.parse(savedLocalShows);
+        } catch(ex) {
+          userShows = [];
+        }
+      } else {
+        userShows = [];
       }
 
       isVIPUser = checkIsVIPUser(activeEmail);
@@ -2090,18 +2105,18 @@
       fetch('https://frontier-caravan.vercel.app/api/sync/pull?userId=' + encodeURIComponent(activeUserId) + '&_t=' + Date.now())
         .then(function(res) { return res.json(); })
         .then(function(data) {
-          var cloudConcerts = [];
           if (data && data.concertsData) {
             if (Array.isArray(data.concertsData.concerts)) {
-              cloudConcerts = data.concertsData.concerts;
+              userShows = data.concertsData.concerts;
             } else if (Array.isArray(data.concertsData)) {
-              cloudConcerts = data.concertsData;
+              userShows = data.concertsData;
             }
           }
-
-          if (cloudConcerts.length > 0) {
-            userShows = cloudConcerts;
-          }
+          localStorage.setItem(userKey, JSON.stringify(userShows));
+          finishLoadAndRender();
+        }).catch(function(err) {
+          finishLoadAndRender();
+        });
 
           finishLoadAndRender();
         }).catch(function(err) {
@@ -2236,6 +2251,7 @@
     }
 
     function handleLogout() {
+      userShows = [];
       clearErrorBanner();
       localStorage.removeItem('livelore_active_user');
       var emailEl = document.getElementById('auth-email');
@@ -2244,6 +2260,8 @@
       if (emailEl) emailEl.value = '';
       if (passEl) passEl.value = '';
       if (nameEl) nameEl.value = '';
+      renderShowsFeed();
+      updateStatsDisplay();
       showScreen('auth');
     }
     window.handleLogout = handleLogout;
