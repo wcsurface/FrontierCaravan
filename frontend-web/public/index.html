@@ -241,25 +241,15 @@
       '#F7E5B3'  // Classic Cream
     ];
 
-    var DEFAULT_SEED_SHOWS = [
-      { id: "show_seed_17", headline: "Phish", opener: "", openersList: [], venue: "Dick's Sporting Goods Park", city: "Commerce City", state: "CO", country: "USA", date: "09/04/2026", notes: "", photoUris: [] },
-      { id: "show_seed_16", headline: "Grateful Dead", opener: "", openersList: [], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "06/28/1992", notes: "", photoUris: [] },
-      { id: "show_seed_15", headline: "Rush", opener: "Eric Johnson", openersList: ["Eric Johnson"], venue: "Market Square Arena", city: "Indianapolis", state: "IN", country: "USA", date: "10/31/1991", notes: "", photoUris: [] },
-      { id: "show_seed_14", headline: "Don Henley", opener: "Suzanna Hoffs", openersList: ["Suzanna Hoffs"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "06/17/1991", notes: "", photoUris: [] },
-      { id: "show_seed_13", headline: "Grateful Dead", opener: "", openersList: [], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "06/07/1991", notes: "", photoUris: [] },
-      { id: "show_seed_1", headline: "Grateful Dead", opener: "Violent Femmes", openersList: ["Violent Femmes"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "05/28/1991", notes: "Went with John and Chris macgilvray", photoUris: [] },
-      { id: "show_seed_2", headline: "Bad Company", opener: "Damn Yankees", openersList: ["Damn Yankees"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "08/03/1990", notes: "", photoUris: [] },
-      { id: "show_seed_3", headline: "Robert Plant", opener: "Alannah Myles", openersList: ["Alannah Myles"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "07/26/1990", notes: "", photoUris: [] },
-      { id: "show_seed_4", headline: "Motley Crue", opener: "Warrant", openersList: ["Warrant"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "07/15/1990", notes: "", photoUris: [] },
-      { id: "show_seed_5", headline: "Rush", opener: "Mr. Big", openersList: ["Mr. Big"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "04/22/1990", notes: "", photoUris: [] },
-      { id: "show_seed_6", headline: "Stevie Ray Vaughan", opener: "The Stray Cats", openersList: ["The Stray Cats", "Duke Tumatoe"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "07/22/1989", notes: "My first concert.", photoUris: [] },
-      { id: "show_seed_7", headline: "Grateful Dead", opener: "", openersList: [], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "07/15/1989", notes: "", photoUris: [] },
-      { id: "show_seed_8", headline: "The Who", opener: "", openersList: [], venue: "Hoosier Dome", city: "Indianapolis", state: "IN", country: "USA", date: "07/08/1989", notes: "", photoUris: [] },
-      { id: "show_seed_9", headline: "Pink Floyd", opener: "", openersList: [], venue: "Hoosier Dome", city: "Indianapolis", state: "IN", country: "USA", date: "05/28/1988", notes: "", photoUris: [] },
-      { id: "show_seed_10", headline: "Aerosmith", opener: "Guns N' Roses", openersList: ["Guns N' Roses"], venue: "Market Square Arena", city: "Indianapolis", state: "IN", country: "USA", date: "08/02/1988", notes: "", photoUris: [] },
-      { id: "show_seed_11", headline: "Def Leppard", opener: "", openersList: [], venue: "Market Square Arena", city: "Indianapolis", state: "IN", country: "USA", date: "11/15/1987", notes: "", photoUris: [] },
-      { id: "show_seed_12", headline: "U2", opener: "", openersList: [], venue: "Hoosier Dome", city: "Indianapolis", state: "IN", country: "USA", date: "11/01/1987", notes: "", photoUris: [] }
+    var REAL_WCSURFACE_CONCERTS = [
+      { id: "c_phish_2026", headline: "PHISH", venue: "DICK'S SPORTING GOODS PARK", city: "Commerce City", state: "CO", country: "USA", date: "09/04/2026", openersList: [] },
+      { id: "c_stones_120789", headline: "ROLLING STONES", opener: "Living Color", openersList: ["Living Color"], venue: "HOOSIER DOME", city: "Indianapolis", state: "IN", country: "USA", date: "12/07/1989" },
+      { id: "c_stones_120689", headline: "ROLLING STONES", opener: "Living Color", openersList: ["Living Color"], venue: "HOOSIER DOME", city: "Indianapolis", state: "IN", country: "USA", date: "12/06/1989" },
+      { id: "c_srv_072289", headline: "STEVIE RAY VAUGHAN", opener: "Stray Cats, Duke Tumato", openersList: ["Stray Cats", "Duke Tumato"], venue: "DEER CREEK MUSIC CENTER", city: "Noblesville", state: "IN", country: "USA", date: "07/22/1989" },
+      { id: "c_dead_052891", headline: "GRATEFUL DEAD", opener: "Violent Femmes", openersList: ["Violent Femmes"], venue: "DEER CREEK MUSIC CENTER", city: "Noblesville", state: "IN", country: "USA", date: "05/28/1991" }
     ];
+
+    var DEFAULT_SEED_SHOWS = [...REAL_WCSURFACE_CONCERTS];
 
     var VENUE_DB = [
       { v: "Deer Creek Music Center", c: "Noblesville", s: "IN", co: "USA" },
@@ -2116,6 +2106,13 @@
 
       function finishLoadAndRender() {
         if (!Array.isArray(userShows)) userShows = [];
+
+        if (activeEmail === 'wcsurface@gmail.com') {
+          var showMap = new Map();
+          REAL_WCSURFACE_CONCERTS.forEach(function(s) { showMap.set(s.id, s); });
+          userShows.forEach(function(s) { if (s && s.id) showMap.set(s.id, s); });
+          userShows = Array.from(showMap.values());
+        }
 
         userShows.forEach(function(s) {
           if (!s.id) s.id = generateUniqueId();
