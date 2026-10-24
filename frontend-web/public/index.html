@@ -2141,6 +2141,29 @@
       return 'hash_' + Math.abs(hash).toString(36) + '_' + str.length;
     }
 
+    var authMode = 'login';
+
+    function switchAuthMode(mode) {
+      authMode = mode;
+      var tabLogin = document.getElementById('tab-login');
+      var tabRegister = document.getElementById('tab-register');
+      var nameBox = document.getElementById('field-name-box');
+      var submitBtn = document.getElementById('btn-auth-submit');
+
+      if (mode === 'register') {
+        if (tabLogin) tabLogin.classList.remove('active');
+        if (tabRegister) tabRegister.classList.add('active');
+        if (nameBox) nameBox.style.display = 'block';
+        if (submitBtn) submitBtn.innerText = 'CREATE ACCOUNT';
+      } else {
+        if (tabRegister) tabRegister.classList.remove('active');
+        if (tabLogin) tabLogin.classList.add('active');
+        if (nameBox) nameBox.style.display = 'none';
+        if (submitBtn) submitBtn.innerText = 'LOG IN';
+      }
+    }
+    window.switchAuthMode = switchAuthMode;
+
     function handleGoogleSignIn(e) {
       if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
       if (window.AndroidGoogleAuth && window.AndroidGoogleAuth.launchGoogleSignIn) {
@@ -2153,6 +2176,7 @@
         onNativeGoogleAuthFallback();
       }
     }
+    window.handleGoogleSignIn = handleGoogleSignIn;
 
     function onNativeGoogleAuthFallback() {
       var inputEmail = prompt("Enter your Google Account email to continue:", "you@gmail.com");
@@ -2220,6 +2244,9 @@
         showErrorBanner('Authentication error: ' + err.message);
       }
     }
+    window.handleLoginSubmit = handleLoginSubmit;
+    window.onNativeGoogleAuthSuccess = onNativeGoogleAuthSuccess;
+    window.onNativeGoogleAuthFallback = onNativeGoogleAuthFallback;
 
     function handleLogout() {
       userShows = [];
