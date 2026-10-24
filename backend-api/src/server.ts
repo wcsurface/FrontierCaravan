@@ -5,6 +5,48 @@ import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = process.env.DATABASE_URL ? new PrismaClient() : null;
+
+async function initializeDatabaseSchema() {
+  if (!prisma) return;
+  try {
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "User" (
+          "id" TEXT NOT NULL,
+          "email" TEXT NOT NULL,
+          "passwordHash" TEXT NOT NULL,
+          "displayName" TEXT NOT NULL,
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+      );
+    `);
+
+    await prisma.$executeRawUnsafe(`
+      CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
+    `);
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "ConcertVault" (
+          "id" TEXT NOT NULL,
+          "userId" TEXT NOT NULL,
+          "concertsData" JSONB NOT NULL DEFAULT '[]',
+          "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          CONSTRAINT "ConcertVault_pkey" PRIMARY KEY ("id")
+      );
+    `);
+
+    await prisma.$executeRawUnsafe(`
+      CREATE UNIQUE INDEX IF NOT EXISTS "ConcertVault_userId_key" ON "ConcertVault"("userId");
+    `);
+
+    console.log('[LiveLore DB] Railway PostgreSQL schema initialized successfully.');
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn('[LiveLore DB] Schema init notice:', msg);
+  }
+}
+
+initializeDatabaseSchema();
 const app = express();
 const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || 'livelore_secret_jwt_key_2026_x89!';
