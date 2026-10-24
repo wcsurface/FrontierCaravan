@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 const globalCloudVaults = new Map<string, any>();
 
 export async function POST(req: NextRequest) {
@@ -16,6 +18,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       updatedAt: new Date().toISOString(),
+      concertCount: concertsData?.concerts?.length || 0
     });
   } catch (e: any) {
     return NextResponse.json({ error: e.message || 'Sync push failed' }, { status: 500 });

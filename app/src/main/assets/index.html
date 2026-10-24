@@ -1216,16 +1216,16 @@
         window.AndroidAdMob.hideBannerAd();
       }
 
-      const vipSubtitle = document.getElementById('vip-pass-subtitle');
+      var vipSubtitle = document.getElementById('vip-pass-subtitle');
       if (vipSubtitle) {
         vipSubtitle.style.display = 'none';
       }
 
-      const rawUser = localStorage.getItem('livelore_active_user');
-      let activeEmail = null;
+      var rawUser = localStorage.getItem('livelore_active_user');
+      var activeEmail = null;
       if (rawUser) {
         try {
-          const uObj = JSON.parse(rawUser);
+          var uObj = JSON.parse(rawUser);
           if (uObj && uObj.email) {
             activeEmail = uObj.email.toLowerCase().trim();
           }
@@ -1237,37 +1237,41 @@
         return;
       }
 
-      const emailDisp = document.getElementById('profile-email-display');
+      var emailDisp = document.getElementById('profile-email-display');
       if (emailDisp) emailDisp.innerText = activeEmail;
 
       try {
-        const userKey = `livelore_shows_${activeEmail.replace(/[^a-z0-9]/g, '_')}`;
+        var userKey = 'livelore_shows_' + activeEmail.replace(/[^a-z0-9]/g, '_');
 
-        // Scan all storage keys to ensure zero concert data loss!
-        const rawUserKey = localStorage.getItem(userKey);
-        const rawLocal = localStorage.getItem('livelore_local_shows');
-        const rawVault = localStorage.getItem('livelore_vault_v1');
-        const rawBackup = localStorage.getItem('livelore_backup_shows');
+        var rawUserKey = localStorage.getItem(userKey);
+        var rawLocal = localStorage.getItem('livelore_local_shows');
+        var rawVault = localStorage.getItem('livelore_vault_v1');
+        var rawBackup = localStorage.getItem('livelore_backup_shows');
 
-        let candidateShows = [];
-        [rawUserKey, rawLocal, rawVault, rawBackup].forEach(rawStr => {
+        // Merge ALL local storage keys by show ID so no local show is ever lost!
+        var localMergedMap = new Map();
+        [rawUserKey, rawLocal, rawVault, rawBackup].forEach(function(rawStr) {
           if (rawStr) {
             try {
-              const parsed = JSON.parse(rawStr);
-              if (Array.isArray(parsed) && parsed.length > candidateShows.length) {
-                candidateShows = parsed;
+              var parsed = JSON.parse(rawStr);
+              if (Array.isArray(parsed)) {
+                parsed.forEach(function(show) {
+                  if (show && show.id) {
+                    localMergedMap.set(show.id, show);
+                  }
+                });
               }
             } catch(ex) {}
           }
         });
 
-        userShows = candidateShows;
+        userShows = Array.from(localMergedMap.values());
 
         if (!Array.isArray(userShows) || userShows.length === 0) {
-          userShows = [...DEFAULT_SEED_SHOWS];
+          userShows = Array.isArray(DEFAULT_SEED_SHOWS) ? [...DEFAULT_SEED_SHOWS] : [];
         }
 
-        userShows.forEach(s => {
+        userShows.forEach(function(s) {
           if (!s.id) s.id = generateUniqueId();
           if (s.headline) s.headline = s.headline.trim();
           if (s.venue) s.venue = s.venue.trim();
@@ -1275,11 +1279,11 @@
           if (s.country) s.country = s.country.trim();
           if (s.state) s.state = toStateAbbr(s.state);
           if (Array.isArray(s.openersList)) {
-            s.openersList = s.openersList.map(op => typeof op === 'string' ? op.trim() : op).filter(Boolean);
+            s.openersList = s.openersList.map(function(op) { return typeof op === 'string' ? op.trim() : op; }).filter(Boolean);
           }
         });
       } catch (e) {
-        userShows = [...DEFAULT_SEED_SHOWS];
+        userShows = Array.isArray(DEFAULT_SEED_SHOWS) ? [...DEFAULT_SEED_SHOWS] : [];
       }
 
       switchTicketTheme(currentTicketTheme);
@@ -1289,24 +1293,29 @@
       renderShowsFeed();
       updateStatsDisplay();
 
-      // Pull latest cloud vault asynchronously and merge!
-      fetch(`https://frontiercaravan-production.up.railway.app/api/sync/pull?userId=u_cloud_${activeEmail.replace(/[^a-z0-9]/g, '_')}`)
-        .then(res => res.json())
-        .then(data => {
+      // Asynchronously pull latest cloud vault from Railway production API & merge cleanly
+      fetch('https://frontiercaravan-production.up.railway.app/api/sync/pull?userId=u_cloud_' + activeEmail.replace(/[^a-z0-9]/g, '_'))
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
           if (data && data.concertsData && Array.isArray(data.concertsData.concerts) && data.concertsData.concerts.length > 0) {
-            const cloudConcerts = data.concertsData.concerts;
-            const mergedMap = new Map();
-            userShows.forEach(s => mergedMap.set(s.id, s));
-            cloudConcerts.forEach(s => mergedMap.set(s.id, s));
-            userShows = Array.from(mergedMap.values());
+            var cloudConcerts = data.concertsData.concerts;
+            var finalMergedMap = new Map();
+            // 1. Add cloud concerts
+            cloudConcerts.forEach(function(s) { if (s && s.id) finalMergedMap.set(s.id, s); });
+            // 2. Add local concerts (local additions & edits override/preserve)
+            userShows.forEach(function(s) { if (s && s.id) finalMergedMap.set(s.id, s); });
+
+            userShows = Array.from(finalMergedMap.values());
+
             saveShowsToStorage();
             renderShowsFeed();
             updateStatsDisplay();
           }
-        }).catch(err => {});
+        }).catch(function(err) {});
 
       showScreen('diary');
     }
+    window.loadSavedShows = loadSavedShows;
 
     function hashPassword(email, password) {
       var str = (email || '').toLowerCase().trim() + ":" + (password || '');
@@ -2890,107 +2899,7 @@
       renderShowsFeed();
     }
 
-    function loadSavedShows() {
-      updateDynamicYearSpans();
-      isVIPUser = true; // wcsurface@gmail.com / Active User is VIP
 
-      if (window.AndroidAdMob) {
-        window.AndroidAdMob.hideBannerAd();
-      }
-
-      const vipSubtitle = document.getElementById('vip-pass-subtitle');
-      if (vipSubtitle) {
-        vipSubtitle.style.display = 'none';
-      }
-
-      try {
-        const rawUser = localStorage.getItem('livelore_active_user');
-        let activeEmail = null;
-        if (rawUser) {
-          const uObj = JSON.parse(rawUser);
-          if (uObj && uObj.email) {
-            activeEmail = uObj.email.toLowerCase().trim();
-            const emailDisp = document.getElementById('profile-email-display');
-            if (emailDisp) emailDisp.innerText = activeEmail;
-          }
-        }
-
-        if (activeEmail) {
-          const userKey = `livelore_shows_${activeEmail.replace(/[^a-z0-9]/g, '_')}`;
-          const raw = localStorage.getItem(userKey);
-          if (raw) {
-            userShows = JSON.parse(raw);
-          } else {
-            userShows = [];
-          }
-        } else {
-          userShows = [];
-        }
-
-        if (Array.isArray(userShows)) {
-          userShows.forEach(s => {
-            if (!s.id) s.id = generateUniqueId();
-            if (s.headline) s.headline = s.headline.trim();
-            if (s.venue) s.venue = s.venue.trim();
-            if (s.city) s.city = s.city.trim();
-            if (s.country) s.country = s.country.trim();
-            if (s.state) s.state = toStateAbbr(s.state);
-            if (Array.isArray(s.openersList)) {
-              s.openersList = s.openersList.map(op => typeof op === 'string' ? op.trim() : op).filter(Boolean);
-            }
-          });
-        } else {
-          userShows = [];
-        }
-      } catch (e) {
-        userShows = [];
-      }
-
-      // Initialize theme toggle & photos grid
-      switchTicketTheme(currentTicketTheme);
-      renderPhotosGrid();
-
-      saveShowsToStorage();
-      renderShowsFeed();
-      updateStatsDisplay();
-
-      // Persistent Session Check
-      const activeUser = localStorage.getItem('livelore_active_user');
-      if (activeUser) {
-        showScreen('diary');
-      } else {
-        showScreen('auth');
-      }
-    }
-
-    function saveShowsToStorage() {
-      try {
-        const serialized = JSON.stringify(userShows);
-        localStorage.setItem('livelore_local_shows', serialized);
-        localStorage.setItem('livelore_vault_v1', serialized);
-        localStorage.setItem('livelore_backup_shows', serialized);
-
-        const rawUser = localStorage.getItem('livelore_active_user');
-        if (rawUser) {
-          const uObj = JSON.parse(rawUser);
-          if (uObj && uObj.email) {
-            const userEmail = uObj.email.toLowerCase().trim();
-            const userKey = `livelore_shows_${userEmail.replace(/[^a-z0-9]/g, '_')}`;
-            localStorage.setItem(userKey, serialized);
-
-            // Push directly to Railway Cloud Database API attached to this user's email!
-            fetch('/api/sync/push', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                userId: `u_cloud_${userEmail.replace(/[^a-z0-9]/g, '_')}`,
-                concertsData: { concerts: userShows }
-              })
-            }).catch(function(err) {});
-          }
-        }
-      } catch (e) {}
-    }
 
     function renderShowsFeed() {
       const list = document.getElementById('ticket-list');
