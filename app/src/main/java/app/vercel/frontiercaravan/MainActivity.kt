@@ -128,6 +128,7 @@ class MainActivity : ComponentActivity() {
                 val contentSelectionIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
                     type = "image/*"
+                    putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
                 }
 
                 val intentArray: Array<Intent> = takePictureIntent?.let { arrayOf(it) } ?: emptyArray()
@@ -226,14 +227,20 @@ class MainActivity : ComponentActivity() {
             var results: Array<Uri>? = null
 
             if (resultCode == RESULT_OK) {
-                if (data == null || data.data == null) {
+                if (data == null || (data.data == null && data.clipData == null)) {
                     if (cameraImageUri != null) {
                         results = arrayOf(cameraImageUri!!)
                     }
                 } else {
-                    val dataString = data.dataString
-                    if (dataString != null) {
-                        results = arrayOf(Uri.parse(dataString))
+                    if (data.clipData != null) {
+                        val count = data.clipData!!.itemCount
+                        val uriList = mutableListOf<Uri>()
+                        for (i in 0 until count) {
+                            uriList.add(data.clipData!!.getItemAt(i).uri)
+                        }
+                        results = uriList.toTypedArray()
+                    } else if (data.data != null) {
+                        results = arrayOf(data.data!!)
                     }
                 }
             }
