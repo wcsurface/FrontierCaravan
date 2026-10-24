@@ -1260,8 +1260,22 @@
     window.nextModalPhoto = nextModalPhoto;
 
     function exportConcertsCsv() {
+      if (!isVIPUser) {
+        showCustomConfirm({
+          title: 'VIP FEATURE',
+          message: 'CSV Concert Vault Export is an exclusive LiveLore VIP Pass feature.\n\nWould you like to upgrade to VIP to unlock CSV downloads?',
+          confirmText: 'UPGRADE TO VIP',
+          cancelText: 'CANCEL',
+          icon: '🔒',
+          confirmColor: 'linear-gradient(90deg, #FFB300, #FF6F00)'
+        }, function() {
+          handleUpgradeVip();
+        });
+        return;
+      }
+
       if (!userShows || userShows.length === 0) {
-        alert('Your concert vault is empty. Log concerts to export CSV data!');
+        showCustomAlert({ title: 'VAULT IS EMPTY', message: 'Your concert vault is empty. Log concerts to export CSV data!', icon: '📊' });
         return;
       }
 
@@ -1987,31 +2001,52 @@
 
     function updateProfileVipCard() {
       var vipBox = document.getElementById('profile-vip-card-box');
-      if (!vipBox) return;
+      if (vipBox) {
+        if (isVIPUser) {
+          vipBox.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom: 1px solid #222B30; padding-bottom:8px;">
+              <span style="font-size:20px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px;">LIVELORE VIP PASS</span>
+              <span style="background:#00E676; color:#0a0a0a; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">✓ VIP CONFIRMED</span>
+            </div>
+            <div style="font-weight:900; font-size:19px; color:#00E676; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">✓ YOU ARE A VIP MEMBER!</div>
+            <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.5; background:#0A0D0E; padding:12px; border-radius:10px; border:1px solid rgba(0,230,118,0.4);">
+              Your LiveLore VIP status is active! You have permanent 100% ad-free concert vaulting, unlimited photo memory attachments, and CSV download of all concert data enabled.
+            </div>
+          `;
+        } else {
+          vipBox.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom: 1px solid #222B30; padding-bottom:8px;">
+              <span style="font-size:20px; font-weight:900; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">LIVELORE STANDARD</span>
+              <span style="background:#334155; color:#f8fafc; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">STANDARD MEMBER</span>
+            </div>
+            <div style="font-weight:900; font-size:17px; color:#f1f5f9; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">UPGRADE TO VIP PASS</div>
+            <div style="font-size:14px; color:#94a3b8; font-weight:600; line-height:1.5; background:#0A0D0E; padding:12px; border-radius:10px; border:1px solid #222B30; margin-bottom:14px;">
+              Standard Member account. Upgrade to LiveLore VIP Pass for permanent 100% ad-free experience, unlimited photo memory attachments, and CSV download of all concert data.
+            </div>
+            <button class="btn-cta" style="font-size:15px; padding:14px; background:linear-gradient(90deg, #FFB300, #FF6F00); color:#0a0a0a; border:none;" onclick="handleUpgradeVip()">UPGRADE TO VIP ($4.99)</button>
+          `;
+        }
+      }
 
-      if (isVIPUser) {
-        vipBox.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom: 1px solid #222B30; padding-bottom:8px;">
-            <span style="font-size:20px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px;">LIVELORE VIP PASS</span>
-            <span style="background:#00E676; color:#0a0a0a; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">✓ VIP CONFIRMED</span>
-          </div>
-          <div style="font-weight:900; font-size:19px; color:#00E676; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">✓ YOU ARE A VIP MEMBER!</div>
-          <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.5; background:#0A0D0E; padding:12px; border-radius:10px; border:1px solid rgba(0,230,118,0.4);">
-            Your LiveLore VIP status is active! You have permanent 100% ad-free concert vaulting and full photo memory attachments enabled.
-          </div>
-        `;
-      } else {
-        vipBox.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom: 1px solid #222B30; padding-bottom:8px;">
-            <span style="font-size:20px; font-weight:900; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">LIVELORE STANDARD</span>
-            <span style="background:#334155; color:#f8fafc; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">STANDARD MEMBER</span>
-          </div>
-          <div style="font-weight:900; font-size:17px; color:#f1f5f9; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">UPGRADE TO VIP PASS</div>
-          <div style="font-size:14px; color:#94a3b8; font-weight:600; line-height:1.5; background:#0A0D0E; padding:12px; border-radius:10px; border:1px solid #222B30; margin-bottom:14px;">
-            Standard Member account. Upgrade to LiveLore VIP Pass for permanent 100% ad-free experience, unlimited photo memory attachments, and advanced setlist analytics.
-          </div>
-          <button class="btn-cta" style="font-size:15px; padding:14px; background:linear-gradient(90deg, #FFB300, #FF6F00); color:#0a0a0a; border:none;" onclick="handleUpgradeVip()">UPGRADE TO VIP ($4.99)</button>
-        `;
+      var csvBox = document.getElementById('profile-csv-export-card');
+      if (csvBox) {
+        if (isVIPUser) {
+          csvBox.innerHTML = `
+            <div class="detail-label" style="color:#00E676;">CONCERT DATA EXPORT</div>
+            <div style="font-size:13px; color:#e2e8f0; font-weight:600; margin-bottom:14px; line-height:1.5;">
+              Download your entire concert vault (dates, artists, openers, venues, location, notes) as a CSV spreadsheet.
+            </div>
+            <button class="btn-cta" style="font-size:15px; padding:14px;" onclick="exportConcertsCsv()">DOWNLOAD CONCERT DATA (CSV)</button>
+          `;
+        } else {
+          csvBox.innerHTML = `
+            <div class="detail-label" style="color:#FFB300;">CONCERT DATA EXPORT (VIP FEATURE)</div>
+            <div style="font-size:13px; color:#94a3b8; font-weight:600; margin-bottom:14px; line-height:1.5;">
+              CSV concert vault export is a LiveLore VIP Pass exclusive feature. Upgrade to VIP to unlock downloading your entire concert vault as a CSV spreadsheet.
+            </div>
+            <button class="btn-cta" style="font-size:15px; padding:14px; background:#1C2128; border:1.5px solid #FFB300; color:#FFB300;" onclick="handleUpgradeVip()">🔒 UNLOCK WITH VIP ($4.99)</button>
+          `;
+        }
       }
     }
     window.updateProfileVipCard = updateProfileVipCard;
@@ -2515,14 +2550,8 @@
     <!-- 1. LIVELORE VIP PASS / STANDARD MEMBER STATUS CARD -->
     <div id="profile-vip-card-box" class="detail-card" style="background: linear-gradient(135deg, rgba(255,179,0,0.22), #121619); border-color: #FFB300; padding: 22px; margin-bottom: 20px;"></div>
 
-    <!-- 2. DOWNLOAD CONCERT DATA (CSV) BUTTON (POSITIONED ABOVE TICKET STUB COLOR TOGGLE) -->
-    <div class="detail-card" style="padding: 20px; margin-bottom: 20px;">
-      <div class="detail-label" style="color:#00E676;">CONCERT DATA EXPORT</div>
-      <div style="font-size:13px; color:#e2e8f0; font-weight:600; margin-bottom:14px; line-height:1.5;">
-        Download your entire concert vault (dates, artists, openers, venues, location, notes) as a CSV spreadsheet.
-      </div>
-      <button class="btn-cta" style="font-size:15px; padding:14px;" onclick="exportConcertsCsv()">DOWNLOAD CONCERT DATA (CSV)</button>
-    </div>
+    <!-- 2. DOWNLOAD CONCERT DATA (CSV) BUTTON (VIP FEATURE) -->
+    <div id="profile-csv-export-card" class="detail-card" style="padding: 20px; margin-bottom: 20px;"></div>
 
     <!-- 3. TICKET STUB COLOR THEME TOGGLE -->
     <div class="detail-card" style="padding: 20px; margin-bottom: 20px;">
@@ -2826,65 +2855,7 @@
       document.querySelectorAll('.current-year-span').forEach(el => el.innerText = year);
     }
 
-    function exportConcertsCsv() {
-      if (!userShows || userShows.length === 0) {
-        alert('Your concert vault is empty. Log concerts to export CSV data!');
-        return;
-      }
 
-      var headers = ['Date', 'Headline Artist', 'Opener(s)', 'Venue', 'City', 'State', 'Country', 'Notes'];
-
-      var escapeCsv = function(str) {
-        if (!str) return '""';
-        var clean = String(str).replace(/"/g, '""');
-        return '"' + clean + '"';
-      };
-
-      var rows = userShows.map(function(concert) {
-        var dStr = concert.date || '';
-        var hStr = concert.headline || '';
-        var oStr = (concert.openersList && concert.openersList.length > 0) ? concert.openersList.join(', ') : (concert.opener || '');
-        var vStr = concert.venue || '';
-        var cStr = concert.city || 'Noblesville';
-        var sStr = concert.state || 'IN';
-        var coStr = concert.country || 'USA';
-        var nStr = concert.notes || '';
-
-        return [
-          escapeCsv(dStr),
-          escapeCsv(hStr),
-          escapeCsv(oStr),
-          escapeCsv(vStr),
-          escapeCsv(cStr),
-          escapeCsv(sStr),
-          escapeCsv(coStr),
-          escapeCsv(nStr)
-        ].join(',');
-      });
-
-      var csvData = [headers.join(',')].concat(rows).join('\n');
-      var fileName = 'livelore_concert_vault_' + new Date().toISOString().slice(0, 10) + '.csv';
-
-      if (window.AndroidCSV && window.AndroidCSV.shareCsv) {
-        window.AndroidCSV.shareCsv(csvData, fileName);
-        return;
-      }
-
-      try {
-        var blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-        var url = URL.createObjectURL(blob);
-        var link = document.createElement('a');
-        link.setAttribute('href', url);
-        link.setAttribute('download', fileName);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } catch (ex) {
-        var encodedUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvData);
-        window.open(encodedUri);
-      }
-    }
-    window.exportConcertsCsv = exportConcertsCsv;
 
     function handleDeleteAccountAndData() {
       showCustomConfirm({
