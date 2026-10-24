@@ -245,6 +245,19 @@ export const PRESET_VENUES: VenueRecord[] = [
   { venue: "Carolina Coliseum Arena, Univ. of S. Carolina", city: "Columbia", stateProvince: "SC", country: "USA" },
 ];
 
+export function toStateAbbr(stateStr?: string): string {
+  if (!stateStr) return 'IN';
+  const clean = stateStr.trim();
+  if (clean.length === 2) return clean.toUpperCase();
+  const map: Record<string, string> = {
+    'indiana':'IN','illinois':'IL','ohio':'OH','kentucky':'KY','michigan':'MI',
+    'california':'CA','new york':'NY','colorado':'CO','texas':'TX','florida':'FL',
+    'pennsylvania':'PA','georgia':'GA','tennessee':'TN','massachusetts':'MA',
+    'washington':'WA','virginia':'VA','north carolina':'NC','missouri':'MO'
+  };
+  return map[clean.toLowerCase()] || clean.substring(0,2).toUpperCase();
+}
+
 export function searchVenues(query: string): VenueRecord[] {
   if (!query || query.trim().length === 0) return [];
   const q = query.toLowerCase().trim();
