@@ -106,9 +106,9 @@ export async function POST(req: NextRequest) {
 
     const mergedMap = new Map<string, any>();
     if (existingConcerts.length > 0 && !isExplicitAccountDelete) {
-      existingConcerts.forEach((c) => { if (c && c.id) mergedMap.set(c.id, c); });
+      existingConcerts.forEach((c: any) => { if (c && c.id) mergedMap.set(c.id, c); });
     }
-    incomingConcerts.forEach((c) => { if (c && c.id) mergedMap.set(c.id, c); });
+    incomingConcerts.forEach((c: any) => { if (c && c.id) mergedMap.set(c.id, c); });
 
     const finalConcerts = Array.from(mergedMap.values());
     const payload = { concerts: finalConcerts };

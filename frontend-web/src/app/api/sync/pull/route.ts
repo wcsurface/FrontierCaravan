@@ -75,7 +75,7 @@ export async function GET(req: NextRequest) {
 
     // Load initial 5 real concerts for wcsurface account
     if (!isTestAccount) {
-      INITIAL_CONCERTS.forEach((c) => { if (c && c.id) combinedMap.set(c.id, c); });
+      INITIAL_CONCERTS.forEach((c: any) => { if (c && c.id) combinedMap.set(c.id, c); });
     }
 
     // Merge memory vault concerts
