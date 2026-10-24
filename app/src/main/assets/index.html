@@ -2093,7 +2093,7 @@
       var activeUserId = 'u_cloud_' + activeEmail.replace(/[^a-z0-9]/g, '_');
 
       // Fetch user's concert vault directly from Production Cloud Sync API
-      fetch('https://frontier-caravan.vercel.app/api/sync/pull?userId=' + encodeURIComponent(activeUserId))
+      fetch('https://frontier-caravan.vercel.app/api/sync/pull?userId=' + encodeURIComponent(activeUserId) + '&_t=' + Date.now())
         .then(function(res) { return res.json(); })
         .then(function(data) {
           var cloudConcerts = [];
