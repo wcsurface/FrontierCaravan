@@ -125,17 +125,24 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                val contentSelectionIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                    addCategory(Intent.CATEGORY_OPENABLE)
-                    type = "image/*"
-                    putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                val galleryIntent: Intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    Intent(MediaStore.ACTION_PICK_IMAGES).apply {
+                        type = "image/*"
+                        putExtra(MediaStore.EXTRA_PICK_IMAGES_MAX, 5)
+                    }
+                } else {
+                    Intent(Intent.ACTION_GET_CONTENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = "image/*"
+                        putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                    }
                 }
 
                 val intentArray: Array<Intent> = takePictureIntent?.let { arrayOf(it) } ?: emptyArray()
 
                 val chooserIntent = Intent(Intent.ACTION_CHOOSER).apply {
-                    putExtra(Intent.EXTRA_INTENT, contentSelectionIntent)
-                    putExtra(Intent.EXTRA_TITLE, "Select Photo Source")
+                    putExtra(Intent.EXTRA_INTENT, galleryIntent)
+                    putExtra(Intent.EXTRA_TITLE, "Select Photos (Up to 5)")
                     putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
                 }
 
