@@ -21,7 +21,7 @@ interface AuthState {
   checkMe: () => Promise<void>;
 }
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'https://frontier-caravan-9r14f56ys-surface7.vercel.app';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || '';
 
 export const useAuthStore = create<AuthState>()(
   persist(

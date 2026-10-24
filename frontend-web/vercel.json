@@ -19,5 +19,8 @@
         { "key": "Access-Control-Allow-Origin", "value": "*" }
       ]
     }
-  ]
+  ],
+  "env": {
+    "NEXT_PUBLIC_BACKEND_API_URL": "https://frontier-caravan.vercel.app"
+  }
 }
