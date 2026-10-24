@@ -365,17 +365,125 @@
       }
     }
 
+    function compressImageDataUrl(dataUrl, maxWidth, maxHeight, quality, callback) {
+      if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image')) {
+        callback(dataUrl);
+        return;
+      }
+      var img = new Image();
+      img.onload = function() {
+        var canvas = document.createElement('canvas');
+        var width = img.width;
+        var height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round(height * (maxWidth / width));
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round(width * (maxHeight / height));
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        var compressedDataUrl = canvas.toDataURL('image/jpeg', quality || 0.7);
+        callback(compressedDataUrl);
+      };
+      img.onerror = function() {
+        callback(dataUrl);
+      };
+      img.src = dataUrl;
+    }
+
+    var idbDatabase = null;
+    function initIndexedDB(callback) {
+      if (idbDatabase) {
+        if (callback) callback(idbDatabase);
+        return;
+      }
+      try {
+        var request = indexedDB.open('LiveLoreVaultDB', 1);
+        request.onupgradeneeded = function(e) {
+          var db = e.target.result;
+          if (!db.objectStoreNames.contains('vault_store')) {
+            db.createObjectStore('vault_store');
+          }
+        };
+        request.onsuccess = function(e) {
+          idbDatabase = e.target.result;
+          if (callback) callback(idbDatabase);
+        };
+        request.onerror = function() {
+          if (callback) callback(null);
+        };
+      } catch (ex) {
+        if (callback) callback(null);
+      }
+    }
+
+    function saveToIndexedDB(key, dataObj, callback) {
+      initIndexedDB(function(db) {
+        if (!db) {
+          if (callback) callback(false);
+          return;
+        }
+        try {
+          var tx = db.transaction(['vault_store'], 'readwrite');
+          var store = tx.objectStore('vault_store');
+          var req = store.put(dataObj, key);
+          req.onsuccess = function() { if (callback) callback(true); };
+          req.onerror = function() { if (callback) callback(false); };
+        } catch(e) {
+          if (callback) callback(false);
+        }
+      });
+    }
+
+    function loadFromIndexedDB(key, callback) {
+      initIndexedDB(function(db) {
+        if (!db) {
+          if (callback) callback(null);
+          return;
+        }
+        try {
+          var tx = db.transaction(['vault_store'], 'readonly');
+          var store = tx.objectStore('vault_store');
+          var req = store.get(key);
+          req.onsuccess = function(e) {
+            callback(e.target.result || null);
+          };
+          req.onerror = function() {
+            callback(null);
+          };
+        } catch(e) {
+          callback(null);
+        }
+      });
+    }
+
     function handlePhotoSelect(e) {
       if (!e.target.files || e.target.files.length === 0) return;
-      const files = Array.from(e.target.files);
+      var files = Array.from(e.target.files);
 
-      files.forEach(file => {
+      files.forEach(function(file) {
         if (currentPhotoUris.length >= 5) return;
-        const reader = new FileReader();
+        var reader = new FileReader();
         reader.onload = function(evt) {
           if (evt.target && evt.target.result && currentPhotoUris.length < 5) {
-            currentPhotoUris.push(evt.target.result);
-            renderPhotosGrid();
+            compressImageDataUrl(evt.target.result, 800, 800, 0.7, function(compressed) {
+              if (currentPhotoUris.length < 5) {
+                currentPhotoUris.push(compressed);
+                renderPhotosGrid();
+              }
+            });
           }
         };
         reader.readAsDataURL(file);
@@ -784,31 +892,39 @@
 
     function saveShowsToStorage() {
       try {
-        const serialized = JSON.stringify(userShows);
-        localStorage.setItem('livelore_local_shows', serialized);
-        localStorage.setItem('livelore_vault_v1', serialized);
-        localStorage.setItem('livelore_backup_shows', serialized);
+        var serialized = JSON.stringify(userShows);
+        try { localStorage.setItem('livelore_local_shows', serialized); } catch(e) {}
+        try { localStorage.setItem('livelore_vault_v1', serialized); } catch(e) {}
+        try { localStorage.setItem('livelore_backup_shows', serialized); } catch(e) {}
 
-        const rawUser = localStorage.getItem('livelore_active_user');
+        var rawUser = localStorage.getItem('livelore_active_user');
         if (rawUser) {
-          const uObj = JSON.parse(rawUser);
-          if (uObj && uObj.email) {
-            const userEmail = uObj.email.toLowerCase().trim();
-            const userKey = `livelore_shows_${userEmail.replace(/[^a-z0-9]/g, '_')}`;
-            localStorage.setItem(userKey, serialized);
+          try {
+            var uObj = JSON.parse(rawUser);
+            if (uObj && uObj.email) {
+              var userEmail = uObj.email.toLowerCase().trim();
+              var userKey = 'livelore_shows_' + userEmail.replace(/[^a-z0-9]/g, '_');
+              try { localStorage.setItem(userKey, serialized); } catch(e) {}
 
-            fetch('https://frontiercaravan-production.up.railway.app/api/sync/push', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                userId: `u_cloud_${userEmail.replace(/[^a-z0-9]/g, '_')}`,
-                concertsData: { concerts: userShows }
-              })
-            }).catch(function(err) {});
-          }
+              // Save to Unlimited IndexedDB Storage!
+              saveToIndexedDB(userKey, userShows);
+              saveToIndexedDB('livelore_local_shows', userShows);
+
+              // Push to Railway Cloud Database API
+              fetch('https://frontiercaravan-production.up.railway.app/api/sync/push', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  userId: 'u_cloud_' + userEmail.replace(/[^a-z0-9]/g, '_'),
+                  concertsData: { concerts: userShows }
+                })
+              }).catch(function(err) {});
+            }
+          } catch(ex) {}
         }
       } catch (e) {}
     }
+    window.saveShowsToStorage = saveShowsToStorage;
 
     function renderShowsFeed() {
       const list = document.getElementById('ticket-list');
@@ -1240,80 +1356,92 @@
       var emailDisp = document.getElementById('profile-email-display');
       if (emailDisp) emailDisp.innerText = activeEmail;
 
-      try {
-        var userKey = 'livelore_shows_' + activeEmail.replace(/[^a-z0-9]/g, '_');
+      var userKey = 'livelore_shows_' + activeEmail.replace(/[^a-z0-9]/g, '_');
 
-        var rawUserKey = localStorage.getItem(userKey);
-        var rawLocal = localStorage.getItem('livelore_local_shows');
-        var rawVault = localStorage.getItem('livelore_vault_v1');
-        var rawBackup = localStorage.getItem('livelore_backup_shows');
+      var performLoadAndMerge = function(idbShows) {
+        try {
+          var rawUserKey = localStorage.getItem(userKey);
+          var rawLocal = localStorage.getItem('livelore_local_shows');
+          var rawVault = localStorage.getItem('livelore_vault_v1');
+          var rawBackup = localStorage.getItem('livelore_backup_shows');
 
-        // Merge ALL local storage keys by show ID so no local show is ever lost!
-        var localMergedMap = new Map();
-        [rawUserKey, rawLocal, rawVault, rawBackup].forEach(function(rawStr) {
-          if (rawStr) {
-            try {
-              var parsed = JSON.parse(rawStr);
-              if (Array.isArray(parsed)) {
-                parsed.forEach(function(show) {
-                  if (show && show.id) {
-                    localMergedMap.set(show.id, show);
-                  }
-                });
-              }
-            } catch(ex) {}
+          var localMergedMap = new Map();
+
+          // 1. Merge all IndexedDB shows
+          if (Array.isArray(idbShows)) {
+            idbShows.forEach(function(show) {
+              if (show && show.id) localMergedMap.set(show.id, show);
+            });
           }
-        });
 
-        userShows = Array.from(localMergedMap.values());
+          // 2. Merge all LocalStorage keys
+          [rawUserKey, rawLocal, rawVault, rawBackup].forEach(function(rawStr) {
+            if (rawStr) {
+              try {
+                var parsed = JSON.parse(rawStr);
+                if (Array.isArray(parsed)) {
+                  parsed.forEach(function(show) {
+                    if (show && show.id) localMergedMap.set(show.id, show);
+                  });
+                }
+              } catch(ex) {}
+            }
+          });
 
-        if (!Array.isArray(userShows) || userShows.length === 0) {
+          userShows = Array.from(localMergedMap.values());
+
+          if (!Array.isArray(userShows) || userShows.length === 0) {
+            userShows = Array.isArray(DEFAULT_SEED_SHOWS) ? [...DEFAULT_SEED_SHOWS] : [];
+          }
+
+          userShows.forEach(function(s) {
+            if (!s.id) s.id = generateUniqueId();
+            if (s.headline) s.headline = s.headline.trim();
+            if (s.venue) s.venue = s.venue.trim();
+            if (s.city) s.city = s.city.trim();
+            if (s.country) s.country = s.country.trim();
+            if (s.state) s.state = toStateAbbr(s.state);
+            if (Array.isArray(s.openersList)) {
+              s.openersList = s.openersList.map(function(op) { return typeof op === 'string' ? op.trim() : op; }).filter(Boolean);
+            }
+          });
+        } catch (e) {
           userShows = Array.isArray(DEFAULT_SEED_SHOWS) ? [...DEFAULT_SEED_SHOWS] : [];
         }
 
-        userShows.forEach(function(s) {
-          if (!s.id) s.id = generateUniqueId();
-          if (s.headline) s.headline = s.headline.trim();
-          if (s.venue) s.venue = s.venue.trim();
-          if (s.city) s.city = s.city.trim();
-          if (s.country) s.country = s.country.trim();
-          if (s.state) s.state = toStateAbbr(s.state);
-          if (Array.isArray(s.openersList)) {
-            s.openersList = s.openersList.map(function(op) { return typeof op === 'string' ? op.trim() : op; }).filter(Boolean);
-          }
-        });
-      } catch (e) {
-        userShows = Array.isArray(DEFAULT_SEED_SHOWS) ? [...DEFAULT_SEED_SHOWS] : [];
-      }
+        switchTicketTheme(currentTicketTheme);
+        renderPhotosGrid();
 
-      switchTicketTheme(currentTicketTheme);
-      renderPhotosGrid();
+        saveShowsToStorage();
+        renderShowsFeed();
+        updateStatsDisplay();
 
-      saveShowsToStorage();
-      renderShowsFeed();
-      updateStatsDisplay();
+        // Asynchronously pull latest cloud vault from Railway production API & merge cleanly
+        fetch('https://frontiercaravan-production.up.railway.app/api/sync/pull?userId=u_cloud_' + activeEmail.replace(/[^a-z0-9]/g, '_'))
+          .then(function(res) { return res.json(); })
+          .then(function(data) {
+            if (data && data.concertsData && Array.isArray(data.concertsData.concerts) && data.concertsData.concerts.length > 0) {
+              var cloudConcerts = data.concertsData.concerts;
+              var finalMergedMap = new Map();
+              // Add cloud concerts
+              cloudConcerts.forEach(function(s) { if (s && s.id) finalMergedMap.set(s.id, s); });
+              // Add local concerts (local additions & edits override/preserve)
+              userShows.forEach(function(s) { if (s && s.id) finalMergedMap.set(s.id, s); });
 
-      // Asynchronously pull latest cloud vault from Railway production API & merge cleanly
-      fetch('https://frontiercaravan-production.up.railway.app/api/sync/pull?userId=u_cloud_' + activeEmail.replace(/[^a-z0-9]/g, '_'))
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-          if (data && data.concertsData && Array.isArray(data.concertsData.concerts) && data.concertsData.concerts.length > 0) {
-            var cloudConcerts = data.concertsData.concerts;
-            var finalMergedMap = new Map();
-            // 1. Add cloud concerts
-            cloudConcerts.forEach(function(s) { if (s && s.id) finalMergedMap.set(s.id, s); });
-            // 2. Add local concerts (local additions & edits override/preserve)
-            userShows.forEach(function(s) { if (s && s.id) finalMergedMap.set(s.id, s); });
+              userShows = Array.from(finalMergedMap.values());
 
-            userShows = Array.from(finalMergedMap.values());
+              saveShowsToStorage();
+              renderShowsFeed();
+              updateStatsDisplay();
+            }
+          }).catch(function(err) {});
 
-            saveShowsToStorage();
-            renderShowsFeed();
-            updateStatsDisplay();
-          }
-        }).catch(function(err) {});
+        showScreen('diary');
+      };
 
-      showScreen('diary');
+      loadFromIndexedDB(userKey, function(idbShows) {
+        performLoadAndMerge(idbShows);
+      });
     }
     window.loadSavedShows = loadSavedShows;
 
