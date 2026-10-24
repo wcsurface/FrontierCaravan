@@ -97,26 +97,36 @@ export function toStateAbbr(stateStr: string): string {
   return map[s.toLowerCase()] || s;
 }
 
-// Robust Helper to parse any date format (milliseconds or "MM/DD/YY" strings)
+// Robust Helper to parse any date format (milliseconds or "MM/DD/YYYY" strings)
 export function parseConcertDate(dateVal: number | string): Date {
-  if (!dateVal) return new Date();
+  if (!dateVal) return new Date(0);
   if (typeof dateVal === 'number') return new Date(dateVal);
   if (typeof dateVal === 'string') {
-    const parts = dateVal.split(/[\/\.-]/);
+    const parts = dateVal.trim().split(/[\/\.-]/);
     if (parts.length === 3) {
-      let m = parseInt(parts[0], 10) - 1;
+      let m = parseInt(parts[0], 10);
       let d = parseInt(parts[1], 10);
       let y = parseInt(parts[2], 10);
+
+      if (isNaN(m) || m < 1) m = 1;
+      if (m > 12) m = 12;
+
+      if (isNaN(y)) y = 2000;
       if (y < 100) {
-        y = y > 30 ? 1900 + y : 2000 + y;
+        y = y <= 35 ? 2000 + y : 1900 + y;
       }
-      const parsed = new Date(y, m, d);
+
+      const maxDays = new Date(y, m, 0).getDate();
+      if (isNaN(d) || d < 1) d = 1;
+      if (d > maxDays) d = maxDays;
+
+      const parsed = new Date(y, m - 1, d);
       if (!isNaN(parsed.getTime())) return parsed;
     }
     const directDate = new Date(dateVal);
     if (!isNaN(directDate.getTime())) return directDate;
   }
-  return new Date();
+  return new Date(0);
 }
 
 export class AnalyticsEngine {

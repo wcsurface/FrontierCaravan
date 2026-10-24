@@ -330,11 +330,11 @@ export const LogShowScreen: React.FC<LogShowScreenProps> = ({ concertIdToEdit, o
         {/* Date Input */}
         <div>
           <label className="block text-sm sm:text-base font-black uppercase tracking-wider text-[#FFB300] mb-1.5">
-            Date (MM/DD/YY)
+            Date (MM/DD/YYYY)
           </label>
           <input
             type="text"
-            placeholder="MM/DD/YY"
+            placeholder="MM/DD/YYYY"
             value={dateStr}
             onChange={handleDateChange}
             maxLength={10}
