@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,13 +18,13 @@ export async function GET(req: NextRequest) {
     let vault = globalVaultStore[userId];
 
     if (!vault || !Array.isArray(vault.concerts) || vault.concerts.length === 0) {
-      // 2. Read Static Vault File from public/vaults/${userId}.json
+      // 2. Fetch Static Vault File from Vercel CDN (/vaults/${userId}.json)
       try {
-        const filePath = path.join(process.cwd(), 'public', 'vaults', `${userId}.json`);
-        if (fs.existsSync(filePath)) {
-          const raw = fs.readFileSync(filePath, 'utf8');
-          vault = JSON.parse(raw);
-          if (vault) {
+        const fileUrl = `${req.nextUrl.origin}/vaults/${userId}.json`;
+        const res = await fetch(fileUrl, { cache: 'no-store' });
+        if (res.ok) {
+          vault = await res.json();
+          if (vault && Array.isArray(vault.concerts)) {
             globalVaultStore[userId] = vault;
           }
         }

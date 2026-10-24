@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,14 +18,14 @@ export async function POST(req: NextRequest) {
       ? concertsData.concerts
       : (Array.isArray(concertsData) ? concertsData : []);
 
-    // 1. Check existing vault from Memory or Vault File
+    // 1. Check existing vault from Memory or CDN File
     let existingVault = globalVaultStore[userId];
-    if (!existingVault) {
+    if (!existingVault || !Array.isArray(existingVault.concerts) || existingVault.concerts.length === 0) {
       try {
-        const filePath = path.join(process.cwd(), 'public', 'vaults', `${userId}.json`);
-        if (fs.existsSync(filePath)) {
-          const raw = fs.readFileSync(filePath, 'utf8');
-          existingVault = JSON.parse(raw);
+        const fileUrl = `${req.nextUrl.origin}/vaults/${userId}.json`;
+        const res = await fetch(fileUrl, { cache: 'no-store' });
+        if (res.ok) {
+          existingVault = await res.json();
         }
       } catch (fErr) {}
     }
