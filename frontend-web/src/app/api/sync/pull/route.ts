@@ -9,27 +9,29 @@ const globalVaultStore: Record<string, any> = (globalThis as any).__LIVELORE_VAU
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const userId = searchParams.get('userId');
+    const rawUserId = searchParams.get('userId') || '';
+    const userId = rawUserId.toLowerCase().trim();
 
     if (!userId) {
       return NextResponse.json({ success: true, concertsData: { concerts: [] } });
     }
 
-    // 1. Check Global In-Memory Store First
-    let vault = globalVaultStore[userId];
+    const initialVault = INITIAL_VAULTS[userId];
+    const memoryVault = globalVaultStore[userId];
 
-    if (!vault || !Array.isArray(vault.concerts) || vault.concerts.length === 0) {
-      // 2. Fall back to INITIAL_VAULTS Module
-      const initialVault = INITIAL_VAULTS[userId];
-      if (initialVault && Array.isArray(initialVault.concerts) && initialVault.concerts.length > 0) {
-        vault = initialVault;
-        globalVaultStore[userId] = vault;
-      }
+    const combinedMap = new Map<string, any>();
+
+    // 1. Add Initial Vault Concerts
+    if (initialVault && Array.isArray(initialVault.concerts)) {
+      initialVault.concerts.forEach((c: any) => { if (c && c.id) combinedMap.set(c.id, c); });
     }
 
-    const concerts = vault && Array.isArray(vault.concerts)
-      ? vault.concerts
-      : (Array.isArray(vault) ? vault : []);
+    // 2. Add Memory Vault Concerts
+    if (memoryVault && Array.isArray(memoryVault.concerts)) {
+      memoryVault.concerts.forEach((c: any) => { if (c && c.id) combinedMap.set(c.id, c); });
+    }
+
+    const concerts = Array.from(combinedMap.values());
 
     return NextResponse.json({
       success: true,
