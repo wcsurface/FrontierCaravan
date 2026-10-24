@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "npm run dev --prefix frontend-web",
-    "build": "cd backend-api && npm install && npx prisma generate && npm run build",
-    "start": "cd backend-api && npm run start",
+    "build": "npm --prefix backend-api install && npm --prefix backend-api run build",
+    "start": "node backend-api/dist/server.js",
     "lint": "npm run lint --prefix frontend-web"
   }
 }
