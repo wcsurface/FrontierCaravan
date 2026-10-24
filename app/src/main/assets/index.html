@@ -781,7 +781,6 @@
         el.innerText = msg;
         el.style.display = 'block';
       }
-      alert(msg);
     }
 
     function clearErrorBanner() {
@@ -2278,6 +2277,40 @@
       if (btnSave) btnSave.innerText = '+ ADD CONCERT';
     }
     window.resetLogForm = resetLogForm;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var tabL = document.getElementById('tab-login');
+      var tabR = document.getElementById('tab-register');
+      var btnG = document.querySelector('.btn-google');
+      var authForm = document.querySelector('#view-auth form');
+
+      if (tabL) {
+        tabL.addEventListener('click', function(e) {
+          e.preventDefault();
+          switchAuthMode('login');
+        });
+      }
+
+      if (tabR) {
+        tabR.addEventListener('click', function(e) {
+          e.preventDefault();
+          switchAuthMode('register');
+        });
+      }
+
+      if (btnG) {
+        btnG.addEventListener('click', function(e) {
+          e.preventDefault();
+          handleGoogleSignIn(e);
+        });
+      }
+
+      if (authForm) {
+        authForm.addEventListener('submit', function(e) {
+          handleLoginSubmit(e);
+        });
+      }
+    });
   </script>
 </head>
 <body>
