@@ -36,16 +36,17 @@ export interface Concert {
   headlineArtistId: string;
   openingArtistId?: string;
   tourName?: string;
-  rating: number; // 0.0 - 5.0
+  rating?: number; // 0.0 - 5.0
+  personalRating?: number;
   ticketPrice?: number;
-  currency: string;
+  currency?: string;
   ticketImageUri?: string;
   photoUris?: string[];
   audioMemoUri?: string;
   generalNotes?: string;
-  createdAt: number;
-  updatedAt: number;
-  syncStatus: 'synced' | 'pending_insert' | 'pending_update' | 'pending_delete';
+  createdAt?: number;
+  updatedAt?: number;
+  syncStatus?: 'synced' | 'pending_insert' | 'pending_update' | 'pending_delete';
 }
 
 export interface CreateConcertInput {
