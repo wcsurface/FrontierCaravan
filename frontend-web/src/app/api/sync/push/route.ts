@@ -15,14 +15,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'userId and concertsData required' }, { status: 400 });
     }
 
+    const cleanKey = userId.toLowerCase().trim().replace(/[^a-z0-9_]/g, '_');
+
     const incomingConcerts = Array.isArray(concertsData.concerts)
       ? concertsData.concerts
       : (Array.isArray(concertsData) ? concertsData : []);
 
     // 1. Check existing vault from Memory or INITIAL_VAULTS Module
-    let existingVault = globalVaultStore[userId];
+    let existingVault = globalVaultStore[cleanKey];
     if (!existingVault || !Array.isArray(existingVault.concerts) || existingVault.concerts.length === 0) {
-      existingVault = INITIAL_VAULTS[userId];
+      existingVault = INITIAL_VAULTS[cleanKey];
+      if (!existingVault && cleanKey.includes('wcsurface')) {
+        existingVault = INITIAL_VAULTS['u_cloud_wcsurface_gmail_com'];
+      }
     }
 
     const existingConcerts: any[] = existingVault && Array.isArray(existingVault.concerts)
@@ -49,7 +54,7 @@ export async function POST(req: NextRequest) {
     const payload = { concerts: finalConcerts };
 
     // Update Global In-Memory Store
-    globalVaultStore[userId] = payload;
+    globalVaultStore[cleanKey] = payload;
 
     return NextResponse.json({
       success: true,

@@ -9,15 +9,21 @@ const globalVaultStore: Record<string, any> = (globalThis as any).__LIVELORE_VAU
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const rawUserId = searchParams.get('userId') || '';
+    const rawUserId = searchParams.get('userId') || searchParams.get('email') || '';
     const userId = rawUserId.toLowerCase().trim();
 
     if (!userId) {
       return NextResponse.json({ success: true, concertsData: { concerts: [] } });
     }
 
-    const initialVault = INITIAL_VAULTS[userId];
-    const memoryVault = globalVaultStore[userId];
+    const cleanKey = userId.replace(/[^a-z0-9_]/g, '_');
+    let initialVault = INITIAL_VAULTS[cleanKey] || INITIAL_VAULTS[userId];
+
+    if (!initialVault && userId.includes('wcsurface')) {
+      initialVault = INITIAL_VAULTS['u_cloud_wcsurface_gmail_com'];
+    }
+
+    const memoryVault = globalVaultStore[cleanKey] || globalVaultStore[userId];
 
     const combinedMap = new Map<string, any>();
 
