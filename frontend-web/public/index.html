@@ -1,0 +1,3472 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>LiveLore: Concert & Setlist Vault</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    body { background-color: #0A0D0E; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; align-items: center; justify-start; padding: 8px; }
+
+    /* Screen Views - Strictly justify-start to lock header position at top across all screens */
+    .screen-view { display: none; width: 100%; max-width: 420px; height: 100%; flex-direction: column; justify-start; overflow-y: auto; padding-bottom: 20px; }
+    .screen-view.active { display: flex; }
+
+    /* Fixed Top Header - Logo Enlarged 20% (102px height) with identical top clearance & min-height */
+    .header { position: relative; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding-top: 50px; padding-bottom: 10px; min-height: 155px; flex-shrink: 0; }
+    .header-logo-box { display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 4px; }
+    .header-logo-img { height: 102px; width: auto; object-fit: contain; filter: drop-shadow(0 0 18px rgba(0,230,118,0.45)); }
+
+    /* Sort Control Bar */
+    .sort-control-bar { display: flex; justify-between; align-items: center; width: 100%; margin-top: 6px; margin-bottom: 12px; padding: 0 2px; }
+    .shows-count-title { font-size: 22px; font-weight: 900; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px; }
+    .sort-dropdown { background: #121619; border: 1.5px solid #222B30; color: #f1f5f9; font-size: 11px; font-weight: 800; border-radius: 8px; padding: 7px 10px; outline: none; text-transform: uppercase; cursor: pointer; margin-left: auto; }
+
+    /* Auth Tab Switcher */
+    .auth-tab-box { display: flex; background: #121619; padding: 4px; border-radius: 9999px; border: 1px solid #222B30; margin-bottom: 16px; width: 100%; }
+    .auth-tab-btn { flex: 1; padding: 12px; border-radius: 9999px; border: none; background: none; color: #94a3b8; font-weight: 900; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
+    .auth-tab-btn.active { background: #FFB300; color: #0a0a0a; box-shadow: 0 4px 10px rgba(255,179,0,0.3); }
+
+    /* Google Sign-In Button */
+    .btn-google { width: 100%; background: #ffffff; color: #1f2937; font-weight: 800; font-size: 14px; padding: 14px; border-radius: 9999px; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.25); margin-top: 12px; margin-bottom: 16px; transition: transform 0.15s ease; }
+    .btn-google:active { transform: scale(0.97); }
+
+    /* Divider */
+    .auth-divider { display: flex; align-items: center; text-align: center; color: #64748b; font-size: 11px; font-weight: 800; margin: 12px 0 16px 0; text-transform: uppercase; letter-spacing: 1px; }
+    .auth-divider::before, .auth-divider::after { content: ''; flex: 1; border-bottom: 1px solid #222B30; }
+    .auth-divider::before { margin-right: 12px; }
+    .auth-divider::after { margin-left: 12px; }
+
+    /* Error Notification Banner */
+    .error-banner { display: none; background: rgba(136, 19, 55, 0.5); border: 1px solid rgba(225, 29, 72, 0.8); color: #fecdd3; padding: 12px 14px; border-radius: 12px; font-size: 12px; font-weight: 700; margin-bottom: 14px; width: 100%; text-align: center; }
+
+    /* Ticket Container & Card - Multi-Color Vintage Assortment Palette */
+    #ticket-list { width: 100%; flex: 1; overflow-y: auto; margin-bottom: 8px; }
+    .ticket-card { position: relative; width: 100%; aspect-ratio: 2.85 / 1; color: #221508; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; display: flex; justify-between; box-shadow: 0 10px 25px rgba(0,0,0,0.6); border: 2px solid rgba(34,21,8,0.25); cursor: pointer; }
+    .ticket-left { width: 70%; display: flex; flex-direction: column; justify-between; border-right: 2px dashed rgba(34,21,8,0.4); padding-right: 8px; }
+    .ticket-artist-box { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; margin: auto 0; }
+    .ticket-artist-head { font-weight: 900; font-size: 19px; text-transform: uppercase; font-family: serif; color: #140b03; line-height: 1.1; }
+    .ticket-artist-and { font-family: serif; font-style: italic; font-weight: bold; font-size: 12px; color: rgba(34,21,8,0.8); margin: 2px 0; }
+    .ticket-artist-openers { font-weight: 900; font-size: 14px; font-family: serif; color: #1c0f04; }
+    .ticket-footer { display: flex; justify-between; border-top: 2px solid rgba(34,21,8,0.4); padding-top: 4px; font-weight: 900; font-size: 13px; }
+    .ticket-venue { color: #1c0f04; text-transform: uppercase; }
+    .ticket-date { color: #b45309; text-transform: uppercase; }
+    .ticket-stub { width: 28%; display: flex; flex-direction: column; justify-center; align-items: center; font-weight: 900; font-size: 10px; text-transform: uppercase; }
+
+    /* Inputs with Amber Borders (#FFB300) - Enlarged Field Titles, Helpers, and User Entered Text */
+    .input-label { font-size: 13px; font-weight: 900; text-transform: uppercase; color: #FFB300; margin-bottom: 6px; display: block; letter-spacing: 0.5px; }
+    .input-field { width: 100%; background: #111618; border: 1.5px solid #FFB300; border-radius: 8px; padding: 14px 14px; color: #f1f5f9; font-size: 16px; font-weight: 800; outline: none; margin-bottom: 8px; box-shadow: 0 0 10px rgba(255,179,0,0.15); }
+    .input-field::placeholder { color: #94a3b8; font-weight: 600; font-size: 15px; }
+    textarea.input-field { min-height: 120px; resize: none; line-height: 1.6; }
+
+    /* Action CTA Buttons & Styled Update Password Button */
+    .btn-cta { width: 100%; background: linear-gradient(90deg, #00E676, #00C853); color: #0a0a0a; font-weight: 900; font-size: 20px; padding: 16px; border-radius: 9999px; border: none; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; box-shadow: 0 0 22px rgba(0,230,118,0.5); margin-top: 12px; margin-bottom: 8px; }
+    .btn-edit { width: 100%; background: linear-gradient(90deg, #FFB300, #FFA000); color: #0a0a0a; font-weight: 900; font-size: 16px; padding: 14px; border-radius: 9999px; border: none; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; box-shadow: 0 0 15px rgba(255,179,0,0.3); margin-top: 8px; margin-bottom: 6px; }
+    .btn-delete { width: 100%; background: rgba(136, 19, 55, 0.4); color: #fecdd3; font-weight: 900; font-size: 15px; padding: 14px; border-radius: 9999px; border: 1px solid rgba(225, 29, 72, 0.6); text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-bottom: 8px; }
+    .btn-update-pass { width: 100%; background: linear-gradient(90deg, #1C2128, #222B30); color: #FFB300; font-weight: 900; font-size: 14px; padding: 12px; border-radius: 9999px; border: 1.5px solid #FFB300; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); margin-top: 8px; }
+    .btn-add-opener { background: none; border: none; color: #FFB300; font-weight: 800; font-size: 13px; cursor: pointer; margin-bottom: 12px; text-align: left; padding: 2px 0; }
+
+    /* GLASSMORPHIC DARK UI 4-BUTTON NAVIGATION BAR (POSITIONED DIRECTLY UNDER LOGO AT TOP) */
+    .glass-nav-bar { width: 100%; max-width: 420px; display: flex; justify-between; align-items: center; gap: 6px; padding: 8px 10px; z-index: 40; background: rgba(10, 13, 14, 0.92); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border: 1px solid rgba(34, 43, 48, 0.8); border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin-top: 6px; }
+    .glass-btn-wrapper { position: relative; flex: 1; }
+
+    .glow-home { position: absolute; inset: -2px; border-radius: 14px; background: linear-gradient(135deg, rgba(255, 140, 0, 0.45), rgba(176, 66, 137, 0.35)); filter: blur(8px); opacity: 0.85; }
+    .glow-add { position: absolute; inset: -2px; border-radius: 14px; background: linear-gradient(180deg, rgba(45, 227, 142, 0.45), rgba(0, 168, 150, 0.30)); filter: blur(8px); opacity: 0.85; }
+    .glow-profile { position: absolute; inset: -2px; border-radius: 14px; background: linear-gradient(180deg, rgba(255, 122, 0, 0.50), rgba(142, 43, 95, 0.35)); filter: blur(8px); opacity: 0.85; }
+    .glow-stats { position: absolute; inset: -2px; border-radius: 14px; background: linear-gradient(180deg, rgba(0, 180, 100, 0.40), rgba(0, 206, 209, 0.25)); filter: blur(8px); opacity: 0.85; }
+
+    .glass-btn { position: relative; width: 100%; padding: 10px 4px; border-radius: 12px; background: rgba(28, 33, 40, 0.80); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), inset 0 -1px 2px rgba(0, 0, 0, 0.5); cursor: pointer; text-align: center; border: 1.5px solid transparent; transition: transform 0.15s ease; }
+    .glass-btn:active { transform: scale(0.95); }
+
+    .glass-btn-home { border-color: rgba(230, 160, 75, 0.70); }
+    .glass-btn-home span { color: #F6B756; }
+
+    .glass-btn-add { border-color: rgba(50, 236, 160, 0.85); }
+    .glass-btn-add span { color: #2DE38E; }
+
+    .glass-btn-profile { border-color: rgba(255, 167, 59, 0.85); }
+    .glass-btn-profile span { color: #F6B756; }
+
+    .glass-btn-stats { border-color: rgba(50, 236, 160, 0.85); }
+    .glass-btn-stats span { color: #2DE38E; }
+
+    .glass-btn-text { font-weight: 900; font-size: 13px; text-transform: uppercase; letter-spacing: 0.8px; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Empty State Pointer Animation Pointing UPWARD to Top Navigation Bar */
+    @keyframes bounceUp {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .bounce-pointer { animation: bounceUp 1.5s infinite; }
+
+    /* Detail Card Box - 2X Larger Section Titles */
+    .detail-card { background: #121619; border: 1px solid #222B30; border-radius: 16px; padding: 22px; margin-bottom: 16px; width: 100%; }
+    .detail-label { font-size: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #FFB300; margin-bottom: 10px; border-bottom: 1px solid #222B30; padding-bottom: 8px; }
+    .detail-val-headline { font-size: 26px; font-weight: 900; text-transform: uppercase; font-family: serif; color: #ffffff; margin-bottom: 12px; }
+    .detail-val-text { font-size: 17px; font-weight: 800; color: #f1f5f9; margin-bottom: 12px; }
+
+    /* Stats Card Box - Enlarged Titles & Content Text */
+    .stats-card { background: #121619; border: 1px solid #222B30; border-radius: 16px; padding: 18px; margin-bottom: 16px; cursor: pointer; }
+    .stats-card-title { font-weight: 900; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #222B30; display: flex; justify-between; align-items: center; }
+    .stats-item-text { font-size: 15px; font-weight: 800; color: #f1f5f9; }
+
+    /* Theme Toggle Switch */
+    .theme-toggle-box { display: flex; background: #111618; padding: 4px; border-radius: 12px; border: 1px solid #222B30; margin-top: 8px; width: 100%; }
+    .theme-toggle-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; background: none; color: #94a3b8; font-weight: 900; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; }
+    .theme-toggle-btn.active { background: #FFB300; color: #0a0a0a; box-shadow: 0 4px 10px rgba(255,179,0,0.3); }
+  </style>
+
+  <script>
+    var authMode = 'login';
+    var isVIPUser = true;
+    var editingShowId = null;
+    var activeDetailShowId = null;
+    var currentSort = 'newest';
+    var currentTicketTheme = localStorage.getItem('livelore_ticket_theme') || 'multicolor';
+    var currentPhotoUris = [];
+    var modalPhotoUris = [];
+    var modalActiveIdx = 0;
+    var userShows = [];
+
+    var TICKET_COLOR_PALETTE = [
+      '#F7C252', // Warm Gold
+      '#F7A993', // Vintage Peach
+      '#CAE6AB', // Retro Lime Mint
+      '#D6EBCA', // Pale Sage
+      '#F7E5B3'  // Classic Cream
+    ];
+
+    var DEFAULT_SEED_SHOWS = [
+      { id: "show_seed_1", headline: "Grateful Dead", opener: "Violent Femmes", openersList: ["Violent Femmes"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "05/28/91", notes: "Went with John and Chris macgilvray" },
+      { id: "show_seed_2", headline: "Bad Company", opener: "Damn Yankees", openersList: ["Damn Yankees"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "08/03/90", notes: "" },
+      { id: "show_seed_3", headline: "Robert Plant", opener: "Alannah Myles", openersList: ["Alannah Myles"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "07/26/90", notes: "" },
+      { id: "show_seed_4", headline: "Motley Crue", opener: "Warrant", openersList: ["Warrant"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "07/15/90", notes: "" },
+      { id: "show_seed_5", headline: "Rush", opener: "Mr. Big", openersList: ["Mr. Big"], venue: "Deer Creek Music Center", city: "Noblesville", state: "IN", country: "USA", date: "04/22/90", notes: "" }
+    ];
+
+    var VENUE_DB = [
+      { v: "Deer Creek Music Center", c: "Noblesville", s: "IN", co: "USA" },
+      { v: "Klipsch Music Center", c: "Noblesville", s: "IN", co: "USA" },
+      { v: "Ruoff Music Center", c: "Noblesville", s: "IN", co: "USA" },
+      { v: "Ruoff Home Mortgage Music Center", c: "Noblesville", s: "IN", co: "USA" },
+      { v: "Verizon Wireless Music Center (Noblesville)", c: "Noblesville", s: "IN", co: "USA" },
+      { v: "Red Rocks Amphitheatre", c: "Morrison", s: "CO", co: "USA" },
+      { v: "Dick's Sporting Goods Park", c: "Commerce City", s: "CO", co: "USA" },
+      { v: "Fiddler's Green Amphitheatre", c: "Greenwood Village", s: "CO", co: "USA" },
+      { v: "Boulder Theater", c: "Boulder", s: "CO", co: "USA" },
+      { v: "Macky Auditorium", c: "Boulder", s: "CO", co: "USA" },
+      { v: "The Fillmore Auditorium", c: "Denver", s: "CO", co: "USA" },
+      { v: "Ogden Theatre", c: "Denver", s: "CO", co: "USA" },
+      { v: "Gothic Theatre", c: "Englewood", s: "CO", co: "USA" },
+      { v: "Bluebird Theater", c: "Denver", s: "CO", co: "USA" },
+      { v: "Cervantes' Masterpiece Ballroom", c: "Denver", s: "CO", co: "USA" },
+      { v: "Paramount Theatre", c: "Denver", s: "CO", co: "USA" },
+      { v: "Oriental Theater", c: "Denver", s: "CO", co: "USA" },
+      { v: "Civic Center Park", c: "Denver", s: "CO", co: "USA" },
+      { v: "Mission Ballroom", c: "Denver", s: "CO", co: "USA" },
+      { v: "Mishawaka Amphitheatre", c: "Bellvue", s: "CO", co: "USA" },
+      { v: "Planet Bluegrass (Folks Festival)", c: "Lyons", s: "CO", co: "USA" },
+      { v: "1stBank Center", c: "Broomfield", s: "CO", co: "USA" },
+      { v: "Elitch Gardens Arena", c: "Denver", s: "CO", co: "USA" },
+      { v: "Quixote's True Blue", c: "Denver", s: "CO", co: "USA" },
+      { v: "Bohemian Nights Festival", c: "Fort Collins", s: "CO", co: "USA" },
+      { v: "McNichols Sports Arena", c: "Denver", s: "CO", co: "USA" },
+      { v: "Market Square Arena", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Hoosier Dome", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Murat Theatre", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Old National Centre (Murat Shrine)", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Hilton U. Brown Theatre", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "The Vogue", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "World Mardi Gras", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Military Park (Indy Jazz Fest)", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Star Plaza Theatre", c: "Merrillville", s: "IN", co: "USA" },
+      { v: "Bluebird Nightclub", c: "Bloomington", s: "IN", co: "USA" },
+      { v: "Headliners", c: "Muncie", s: "IN", co: "USA" },
+      { v: "Worthen Arena (Ball State)", c: "Muncie", s: "IN", co: "USA" },
+      { v: "Emens Auditorium", c: "Muncie", s: "IN", co: "USA" },
+      { v: "Buckeye Lake Music Center", c: "Millersport", s: "OH", co: "USA" },
+      { v: "Richfield Coliseum", c: "Richfield", s: "OH", co: "USA" },
+      { v: "Blossom Music Center", c: "Cuyahoga Falls", s: "OH", co: "USA" },
+      { v: "Riverbend Music Center", c: "Cincinnati", s: "OH", co: "USA" },
+      { v: "Hara Arena", c: "Dayton", s: "OH", co: "USA" },
+      { v: "Nutter Center", c: "Dayton", s: "OH", co: "USA" },
+      { v: "Alpine Valley Music Theatre", c: "East Troy", s: "WI", co: "USA" },
+      { v: "Rosemont Horizon", c: "Rosemont", s: "IL", co: "USA" },
+      { v: "Soldier Field", c: "Chicago", s: "IL", co: "USA" },
+      { v: "World Music Theatre", c: "Tinley Park", s: "IL", co: "USA" },
+      { v: "Assembly Hall", c: "Champaign", s: "IL", co: "USA" },
+      { v: "Riverport Amphitheater", c: "St. Louis", s: "MO", co: "USA" },
+      { v: "The Palace of Auburn Hills", c: "Auburn Hills", s: "MI", co: "USA" },
+      { v: "Palace Theatre", c: "Louisville", s: "KY", co: "USA" },
+      { v: "Mud Island Amphitheater", c: "Memphis", s: "TN", co: "USA" },
+      { v: "Sphere", c: "Las Vegas", s: "NV", co: "USA" },
+      { v: "Madison Square Garden", c: "New York", s: "NY", co: "USA" }
+    ];
+
+    function generateUniqueId() {
+      return 'show_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+    }
+
+    function toStateAbbr(stateStr) {
+      if (!stateStr) return 'IN';
+      const clean = stateStr.trim();
+      if (clean.length === 2) return clean.toUpperCase();
+      const map = {
+        'indiana':'IN','illinois':'IL','ohio':'OH','kentucky':'KY','michigan':'MI',
+        'california':'CA','new york':'NY','colorado':'CO','texas':'TX','florida':'FL',
+        'pennsylvania':'PA','georgia':'GA','tennessee':'TN','massachusetts':'MA',
+        'washington':'WA','virginia':'VA','north carolina':'NC','missouri':'MO'
+      };
+      return map[clean.toLowerCase()] || clean.substring(0,2).toUpperCase();
+    }
+
+    function showErrorBanner(msg) {
+      var el = document.getElementById('auth-error-banner');
+      if (el) {
+        el.innerText = msg;
+        el.style.display = 'block';
+      }
+      alert(msg);
+    }
+
+    function clearErrorBanner() {
+      var el = document.getElementById('auth-error-banner');
+      if (el) {
+        el.innerText = '';
+        el.style.display = 'none';
+      }
+    }
+
+    function updateDynamicYearSpans() {
+      const year = new Date().getFullYear();
+      document.querySelectorAll('.current-year-span').forEach(el => el.innerText = year);
+    }
+
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen-view').forEach(function(el) {
+        el.classList.remove('active');
+        el.style.display = 'none';
+      });
+
+      const target = document.getElementById('view-' + screenId);
+      if (target) {
+        target.classList.add('active');
+        target.style.display = 'flex';
+      }
+
+      if (screenId === 'stats') {
+        updateStatsDisplay();
+      }
+
+      if (window.AndroidAdMob) {
+        if (isVIPUser || screenId === 'auth' || screenId === 'terms' || screenId === 'privacy' || screenId === 'faq') {
+          window.AndroidAdMob.hideBannerAd();
+        } else {
+          window.AndroidAdMob.showBannerAd();
+        }
+      }
+
+      const vipSubtitle = document.getElementById('vip-pass-subtitle');
+      if (vipSubtitle) {
+        vipSubtitle.style.display = isVIPUser ? 'none' : 'block';
+      }
+    }
+    window.showScreen = showScreen;
+
+    function getTicketColor(id) {
+      if (currentTicketTheme === 'classic') return '#f4e4bc';
+      if (!id) return TICKET_COLOR_PALETTE[0];
+      let hash = 0;
+      for (let i = 0; i < id.length; i++) {
+        hash = (hash << 5) - hash + id.charCodeAt(i);
+        hash |= 0;
+      }
+      return TICKET_COLOR_PALETTE[Math.abs(hash) % TICKET_COLOR_PALETTE.length];
+    }
+
+    function switchTicketTheme(theme) {
+      currentTicketTheme = theme;
+      localStorage.setItem('livelore_ticket_theme', theme);
+
+      const btnMulti = document.getElementById('theme-btn-multicolor');
+      const btnClassic = document.getElementById('theme-btn-classic');
+      if (btnMulti) btnMulti.classList.toggle('active', theme === 'multicolor');
+      if (btnClassic) btnClassic.classList.toggle('active', theme === 'classic');
+
+      renderShowsFeed();
+    }
+
+    function renderPhotosGrid() {
+      const grid = document.getElementById('photos-grid');
+      const countLabel = document.getElementById('photo-count-label');
+      if (!grid) return;
+
+      if (countLabel) countLabel.innerText = currentPhotoUris.length;
+
+      grid.innerHTML = '';
+      currentPhotoUris.forEach((uri, idx) => {
+        const item = document.createElement('div');
+        item.style.position = 'relative';
+        item.style.aspectRatio = '1/1';
+        item.style.borderRadius = '8px';
+        item.style.overflow = 'hidden';
+        item.style.border = idx === 0 ? '2px solid #FFB300' : '1px solid #222B30';
+
+        item.innerHTML = `
+          <img src="${uri}" style="width:100%; height:100%; object-fit:cover;" />
+          ${idx === 0 ? `
+            <div style="position:absolute; top:2px; left:2px; background:#FFB300; color:#0a0a0a; font-size:7px; font-weight:900; padding:1px 4px; border-radius:3px;">PRIMARY</div>
+          ` : `
+            <button type="button" onclick="setPrimaryPhoto(${idx})" style="position:absolute; top:2px; left:2px; background:rgba(0,0,0,0.8); color:#FFB300; border:none; border-radius:50%; width:18px; height:18px; font-size:9px; font-weight:bold; cursor:pointer;">★</button>
+          `}
+          <button type="button" onclick="removePhoto(${idx})" style="position:absolute; top:2px; right:2px; background:rgba(0,0,0,0.8); color:#fecdd3; border:none; border-radius:50%; width:18px; height:18px; font-size:10px; font-weight:bold; cursor:pointer;">✕</button>
+        `;
+        grid.appendChild(item);
+      });
+
+      if (currentPhotoUris.length < 5) {
+        const addBtn = document.createElement('label');
+        addBtn.style.aspectRatio = '1/1';
+        addBtn.style.borderRadius = '8px';
+        addBtn.style.border = '2px dashed #FFB300';
+        addBtn.style.background = '#111618';
+        addBtn.style.display = 'flex';
+        addBtn.style.flexDirection = 'column';
+        addBtn.style.alignItems = 'center';
+        addBtn.style.justifyContent = 'center';
+        addBtn.style.cursor = 'pointer';
+        addBtn.style.color = '#FFB300';
+        addBtn.style.fontSize = '10px';
+        addBtn.style.fontWeight = '900';
+
+        addBtn.innerHTML = `
+          <span style="font-size:22px; font-weight:900;">+</span>
+          <span>PHOTO</span>
+          <input type="file" accept="image/*" multiple style="display:none;" onchange="handlePhotoSelect(event)" />
+        `;
+        grid.appendChild(addBtn);
+      } else {
+        const maxBtn = document.createElement('div');
+        maxBtn.style.aspectRatio = '1/1';
+        maxBtn.style.borderRadius = '8px';
+        maxBtn.style.border = '1px dashed #64748b';
+        maxBtn.style.background = '#0a0d0e';
+        maxBtn.style.display = 'flex';
+        maxBtn.style.flexDirection = 'column';
+        maxBtn.style.alignItems = 'center';
+        maxBtn.style.justifyContent = 'center';
+        maxBtn.style.color = '#64748b';
+        maxBtn.style.fontSize = '9px';
+        maxBtn.style.fontWeight = 'bold';
+        maxBtn.style.textAlign = 'center';
+        maxBtn.style.padding = '2px';
+        maxBtn.innerHTML = '<span>5/5 Max</span><span>Delete to Add</span>';
+        grid.appendChild(maxBtn);
+      }
+    }
+
+    function compressImageDataUrl(dataUrl, maxWidth, maxHeight, quality, callback) {
+      if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image')) {
+        callback(dataUrl);
+        return;
+      }
+      var img = new Image();
+      img.onload = function() {
+        var canvas = document.createElement('canvas');
+        var width = img.width;
+        var height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round(height * (maxWidth / width));
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round(width * (maxHeight / height));
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        var compressedDataUrl = canvas.toDataURL('image/jpeg', quality || 0.7);
+        callback(compressedDataUrl);
+      };
+      img.onerror = function() {
+        callback(dataUrl);
+      };
+      img.src = dataUrl;
+    }
+
+    var idbDatabase = null;
+    function initIndexedDB(callback) {
+      if (idbDatabase) {
+        if (callback) callback(idbDatabase);
+        return;
+      }
+      try {
+        var request = indexedDB.open('LiveLoreVaultDB', 1);
+        request.onupgradeneeded = function(e) {
+          var db = e.target.result;
+          if (!db.objectStoreNames.contains('vault_store')) {
+            db.createObjectStore('vault_store');
+          }
+        };
+        request.onsuccess = function(e) {
+          idbDatabase = e.target.result;
+          if (callback) callback(idbDatabase);
+        };
+        request.onerror = function() {
+          if (callback) callback(null);
+        };
+      } catch (ex) {
+        if (callback) callback(null);
+      }
+    }
+
+    function saveToIndexedDB(key, dataObj, callback) {
+      initIndexedDB(function(db) {
+        if (!db) {
+          if (callback) callback(false);
+          return;
+        }
+        try {
+          var tx = db.transaction(['vault_store'], 'readwrite');
+          var store = tx.objectStore('vault_store');
+          var req = store.put(dataObj, key);
+          req.onsuccess = function() { if (callback) callback(true); };
+          req.onerror = function() { if (callback) callback(false); };
+        } catch(e) {
+          if (callback) callback(false);
+        }
+      });
+    }
+
+    function loadFromIndexedDB(key, callback) {
+      initIndexedDB(function(db) {
+        if (!db) {
+          if (callback) callback(null);
+          return;
+        }
+        try {
+          var tx = db.transaction(['vault_store'], 'readonly');
+          var store = tx.objectStore('vault_store');
+          var req = store.get(key);
+          req.onsuccess = function(e) {
+            callback(e.target.result || null);
+          };
+          req.onerror = function() {
+            callback(null);
+          };
+        } catch(e) {
+          callback(null);
+        }
+      });
+    }
+
+    function handlePhotoSelect(e) {
+      if (!e.target.files || e.target.files.length === 0) return;
+      var files = Array.from(e.target.files);
+
+      files.forEach(function(file) {
+        if (currentPhotoUris.length >= 5) return;
+        var reader = new FileReader();
+        reader.onload = function(evt) {
+          if (evt.target && evt.target.result && currentPhotoUris.length < 5) {
+            compressImageDataUrl(evt.target.result, 800, 800, 0.7, function(compressed) {
+              if (currentPhotoUris.length < 5) {
+                currentPhotoUris.push(compressed);
+                renderPhotosGrid();
+              }
+            });
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    window.handlePhotoSelect = handlePhotoSelect;
+
+    function removePhoto(idx) {
+      if (idx >= 0 && idx < currentPhotoUris.length) {
+        currentPhotoUris.splice(idx, 1);
+        renderPhotosGrid();
+      }
+    }
+    window.removePhoto = removePhoto;
+
+    function setPrimaryPhoto(idx) {
+      if (idx > 0 && idx < currentPhotoUris.length) {
+        const selected = currentPhotoUris.splice(idx, 1)[0];
+        currentPhotoUris.unshift(selected);
+        renderPhotosGrid();
+      }
+    }
+    window.setPrimaryPhoto = setPrimaryPhoto;
+
+    function formatDateOnInput(elem) {
+      if (!elem) return;
+      var raw = elem.value.replace(/\D/g, '');
+      if (raw.length <= 2) {
+        elem.value = raw;
+      } else if (raw.length <= 4) {
+        elem.value = raw.slice(0, 2) + '/' + raw.slice(2);
+      } else {
+        elem.value = raw.slice(0, 2) + '/' + raw.slice(2, 4) + '/' + raw.slice(4, 8);
+      }
+    }
+    window.formatDateOnInput = formatDateOnInput;
+
+    function addOpenerField() {
+      var container = document.getElementById('openers-container');
+      if (!container) return;
+      var count = container.querySelectorAll('.input-opener').length + 1;
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'input-field input-opener';
+      input.placeholder = 'Opener ' + count;
+      container.appendChild(input);
+    }
+    window.addOpenerField = addOpenerField;
+
+    function saveNewShow(e) {
+      if (e) e.preventDefault();
+      var headlineEl = document.getElementById('input-headline');
+      var venueEl = document.getElementById('input-venue');
+      var cityEl = document.getElementById('input-city');
+      var stateEl = document.getElementById('input-state');
+      var countryEl = document.getElementById('input-country');
+      var dateEl = document.getElementById('input-date');
+      var notesEl = document.getElementById('input-notes');
+
+      var headline = headlineEl ? headlineEl.value.trim() : '';
+      var venue = venueEl ? venueEl.value.trim() : '';
+      var city = (cityEl && cityEl.value ? cityEl.value : 'Noblesville').trim();
+      var state = toStateAbbr((stateEl && stateEl.value ? stateEl.value : 'IN').trim());
+      var country = (countryEl && countryEl.value ? countryEl.value : 'USA').trim();
+      var date = (dateEl && dateEl.value ? dateEl.value : '').trim() || '08/02/88';
+      var notes = (notesEl && notesEl.value ? notesEl.value : '').trim();
+
+      var openerInputs = document.querySelectorAll('.input-opener');
+      var openersList = Array.from(openerInputs).map(function(inp) { return inp.value.trim(); }).filter(Boolean);
+
+      if (headline && venue) {
+        if (editingShowId) {
+          var editIndex = userShows.findIndex(function(s) { return s.id === editingShowId; });
+          if (editIndex >= 0) {
+            userShows[editIndex] = { id: editingShowId, headline: headline, venue: venue, city: city, state: state, country: country, date: date, openersList: openersList, notes: notes, photoUris: currentPhotoUris };
+          }
+        } else {
+          var newShowObj = { id: generateUniqueId(), headline: headline, venue: venue, city: city, state: state, country: country, date: date, openersList: openersList, notes: notes, photoUris: currentPhotoUris };
+          userShows.unshift(newShowObj);
+        }
+
+        saveShowsToStorage();
+        renderShowsFeed();
+        updateStatsDisplay();
+
+        resetLogForm();
+        showScreen('diary');
+      }
+    }
+    window.saveNewShow = saveNewShow;
+
+    function openPhotoModal(index) {
+      if (!modalPhotoUris || modalPhotoUris.length === 0) return;
+      modalActiveIdx = index;
+      updatePhotoModalView();
+      var modal = document.getElementById('photo-lightbox-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+      }
+    }
+    window.openPhotoModal = openPhotoModal;
+
+    function closePhotoModal() {
+      var modal = document.getElementById('photo-lightbox-modal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    }
+    window.closePhotoModal = closePhotoModal;
+
+    function updatePhotoModalView() {
+      if (!modalPhotoUris || modalPhotoUris.length === 0) return;
+      var img = document.getElementById('lightbox-img');
+      var counter = document.getElementById('lightbox-counter-label');
+      if (img) img.src = modalPhotoUris[modalActiveIdx];
+      if (counter) counter.innerText = 'Photo ' + (modalActiveIdx + 1) + ' of ' + modalPhotoUris.length;
+    }
+    window.updatePhotoModalView = updatePhotoModalView;
+
+    function prevModalPhoto(e) {
+      if (e) {
+        try { e.preventDefault(); e.stopPropagation(); } catch(ex) {}
+      }
+      if (!modalPhotoUris || modalPhotoUris.length === 0) return;
+      modalActiveIdx = (modalActiveIdx - 1 + modalPhotoUris.length) % modalPhotoUris.length;
+      updatePhotoModalView();
+    }
+    window.prevModalPhoto = prevModalPhoto;
+
+    function nextModalPhoto(e) {
+      if (e) {
+        try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
+      if (!modalPhotoUris || modalPhotoUris.length === 0) return;
+      modalActiveIdx = (modalActiveIdx + 1) % modalPhotoUris.length;
+      updatePhotoModalView();
+    }
+    window.nextModalPhoto = nextModalPhoto;
+
+    function exportConcertsCsv() {
+      if (!userShows || userShows.length === 0) {
+        alert('Your concert vault is empty. Log concerts to export CSV data!');
+        return;
+      }
+
+      var headers = ['Date', 'Headline Artist', 'Opener(s)', 'Venue', 'City', 'State', 'Country', 'Notes'];
+
+      var escapeCsv = function(str) {
+        if (!str) return '""';
+        var clean = String(str).replace(/"/g, '""');
+        return '"' + clean + '"';
+      };
+
+      var rows = userShows.map(function(concert) {
+        var dStr = concert.date || '';
+        var hStr = concert.headline || '';
+        var oStr = (concert.openersList && concert.openersList.length > 0) ? concert.openersList.join(', ') : (concert.opener || '');
+        var vStr = concert.venue || '';
+        var cStr = concert.city || 'Noblesville';
+        var sStr = concert.state || 'IN';
+        var coStr = concert.country || 'USA';
+        var nStr = concert.notes || '';
+
+        return [
+          escapeCsv(dStr),
+          escapeCsv(hStr),
+          escapeCsv(oStr),
+          escapeCsv(vStr),
+          escapeCsv(cStr),
+          escapeCsv(sStr),
+          escapeCsv(coStr),
+          escapeCsv(nStr)
+        ].join(',');
+      });
+
+      var csvData = [headers.join(',')].concat(rows).join('\n');
+      var fileName = 'livelore_concert_vault_' + new Date().toISOString().slice(0, 10) + '.csv';
+
+      if (window.AndroidCSV && window.AndroidCSV.shareCsv) {
+        window.AndroidCSV.shareCsv(csvData, fileName);
+        return;
+      }
+
+      try {
+        var encodedUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvData);
+        var link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (ex) {
+        var win = window.open('data:text/csv;charset=utf-8,' + encodeURIComponent(csvData), '_blank');
+        if (!win) alert('CSV data ready:\n\n' + csvData.slice(0, 300) + '...');
+      }
+    }
+    window.exportConcertsCsv = exportConcertsCsv;
+
+    function openShowDetails(showId) {
+      if (!showId) return;
+      activeDetailShowId = showId;
+      var show = userShows.find(function(s) { return s.id === showId; });
+      if (!show) return;
+
+      var headlineEl = document.getElementById('detail-headline');
+      var dateEl = document.getElementById('detail-date');
+      var venueEl = document.getElementById('detail-venue');
+      var locEl = document.getElementById('detail-location');
+
+      if (headlineEl) headlineEl.innerText = (show.headline || '').toUpperCase();
+      if (dateEl) dateEl.innerText = show.date || '';
+      if (venueEl) venueEl.innerText = show.venue || '';
+
+      var preset = VENUE_DB.find(function(v) { return v.v.toLowerCase() === (show.venue || '').toLowerCase() || v.v.toLowerCase().startsWith((show.venue || '').toLowerCase()); });
+      var c = (show.city || (preset ? preset.c : 'Noblesville')).trim();
+      var rawState = show.state || (preset ? preset.s : 'IN');
+      var s = toStateAbbr(rawState);
+      var co = (show.country || (preset ? preset.co : 'USA')).trim();
+
+      if (locEl) locEl.innerText = c + ', ' + s + ', ' + co;
+
+      var openersBox = document.getElementById('detail-openers-box');
+      var openersEl = document.getElementById('detail-openers');
+      var openersText = '';
+      if (Array.isArray(show.openersList) && show.openersList.length > 0) {
+        openersText = show.openersList.join(', ');
+      } else if (show.opener) {
+        openersText = show.opener;
+      }
+
+      if (openersBox) {
+        if (openersText) {
+          openersBox.style.display = 'block';
+          if (openersEl) openersEl.innerText = openersText;
+        } else {
+          openersBox.style.display = 'none';
+        }
+      }
+
+      var notesBox = document.getElementById('detail-notes-box');
+      var notesEl = document.getElementById('detail-notes');
+      if (notesBox) {
+        if (show.notes && show.notes.trim().length > 0) {
+          notesBox.style.display = 'block';
+          if (notesEl) notesEl.innerText = show.notes;
+        } else {
+          notesBox.style.display = 'none';
+        }
+      }
+
+      // Photos Gallery on Details Page
+      var photosBox = document.getElementById('detail-photos-gallery-box');
+      var photosGrid = document.getElementById('detail-photos-grid');
+      if (photosBox && photosGrid) {
+        if (show.photoUris && show.photoUris.length > 0) {
+          modalPhotoUris = [...show.photoUris];
+          photosBox.style.display = 'block';
+          photosGrid.innerHTML = show.photoUris.map(function(uri, idx) {
+            return '<div onclick="openPhotoModal(' + idx + ')" style="position:relative; aspect-ratio:1/1; border-radius:10px; overflow:hidden; border:' + (idx === 0 ? '2px solid #FFB300' : '1px solid #222B30') + '; cursor:pointer;">' +
+              '<img src="' + uri + '" style="width:100%; height:100%; object-fit:cover;" />' +
+              (idx === 0 ? '<div style="position:absolute; top:2px; left:2px; background:#FFB300; color:#0a0a0a; font-size:7px; font-weight:900; padding:1px 4px; border-radius:3px;">PRIMARY</div>' : '') +
+            '</div>';
+          }).join('');
+        } else {
+          photosBox.style.display = 'none';
+        }
+      }
+
+      showScreen('setlist');
+    }
+    window.openShowDetails = openShowDetails;
+
+    function triggerEditShow() {
+      if (!activeDetailShowId) return;
+      var show = userShows.find(function(s) { return s.id === activeDetailShowId; });
+      if (!show) return;
+
+      editingShowId = activeDetailShowId;
+
+      var headlineEl = document.getElementById('input-headline');
+      var venueEl = document.getElementById('input-venue');
+      var cityEl = document.getElementById('input-city');
+      var stateEl = document.getElementById('input-state');
+      var countryEl = document.getElementById('input-country');
+      var dateEl = document.getElementById('input-date');
+      var notesEl = document.getElementById('input-notes');
+
+      if (headlineEl) headlineEl.value = (show.headline || '').trim();
+      if (venueEl) venueEl.value = (show.venue || '').trim();
+
+      var preset = VENUE_DB.find(function(v) { return v.v.toLowerCase() === (show.venue || '').toLowerCase() || v.v.toLowerCase().startsWith((show.venue || '').toLowerCase()); });
+      var c = (show.city || (preset ? preset.c : 'Noblesville')).trim();
+      var rawState = show.state || (preset ? preset.s : 'IN');
+      var s = toStateAbbr(rawState);
+      var co = (show.country || (preset ? preset.co : 'USA')).trim();
+
+      if (cityEl) cityEl.value = c;
+      if (stateEl) stateEl.value = s;
+      if (countryEl) countryEl.value = co;
+      if (dateEl) dateEl.value = show.date || '';
+      if (notesEl) notesEl.value = (show.notes || '').trim();
+
+      currentPhotoUris = show.photoUris ? [...show.photoUris] : [];
+      renderPhotosGrid();
+
+      var openersContainer = document.getElementById('openers-container');
+      if (openersContainer) {
+        var openers = Array.isArray(show.openersList) && show.openersList.length > 0 ? show.openersList : (show.opener ? [show.opener] : []);
+        if (openers.length > 0) {
+          openersContainer.innerHTML = openers.map(function(op) {
+            return '<input type="text" class="input-field input-opener" value="' + op.trim() + '" placeholder="Opener" />';
+          }).join('');
+        }
+      }
+
+      var btnSave = document.getElementById('btn-save-show');
+      if (btnSave) btnSave.innerText = 'SAVE EDITS';
+
+      showScreen('log');
+    }
+    window.triggerEditShow = triggerEditShow;
+
+    function triggerDeleteShow() {
+      if (!activeDetailShowId) return;
+      var indexToDelete = userShows.findIndex(function(s) { return s.id === activeDetailShowId; });
+      if (indexToDelete < 0) return;
+
+      if (confirm('Are you sure you want to delete this concert from your vault?')) {
+        userShows.splice(indexToDelete, 1);
+        activeDetailShowId = null;
+        saveShowsToStorage();
+        renderShowsFeed();
+        updateStatsDisplay();
+        showScreen('diary');
+      }
+    }
+    window.triggerDeleteShow = triggerDeleteShow;
+
+    function handleVenueInput(query) {
+      var dropdown = document.getElementById('venue-dropdown');
+      if (!dropdown) return;
+      if (!query || query.trim().length === 0) {
+        dropdown.style.display = 'none';
+        var cityEl = document.getElementById('input-city');
+        var stateEl = document.getElementById('input-state');
+        var countryEl = document.getElementById('input-country');
+        if (cityEl) cityEl.value = '';
+        if (stateEl) stateEl.value = '';
+        if (countryEl) countryEl.value = '';
+        return;
+      }
+      var q = query.toLowerCase().trim();
+      var matches = VENUE_DB.filter(function(item) {
+        return (item.v && item.v.toLowerCase().includes(q)) || (item.c && item.c.toLowerCase().includes(q));
+      });
+
+      if (matches.length > 0) {
+        var best = matches[0];
+        var cityEl = document.getElementById('input-city');
+        var stateEl = document.getElementById('input-state');
+        var countryEl = document.getElementById('input-country');
+        if (cityEl) cityEl.value = best.c.trim();
+        if (stateEl) stateEl.value = toStateAbbr(best.s);
+        if (countryEl) countryEl.value = best.co.trim();
+
+        dropdown.style.display = 'block';
+        dropdown.innerHTML = matches.map(function(item) {
+          var cleanV = item.v.trim();
+          var cleanC = item.c.trim();
+          var cleanS = toStateAbbr(item.s);
+          var cleanCo = item.co.trim();
+          return '<div style="padding:10px 14px; border-bottom:1px solid #222B30; cursor:pointer;" data-v="' + cleanV + '" data-c="' + cleanC + '" data-s="' + cleanS + '" data-co="' + cleanCo + '" onclick="selectVenueFromElem(this)">' +
+            '<div style="font-weight:bold; color:#FFB300; font-size:14px;">' + cleanV + '</div>' +
+            '<div style="color:#94a3b8; font-size:11px;">' + cleanC + ', ' + cleanS + ', ' + cleanCo + '</div>' +
+          '</div>';
+        }).join('');
+      } else {
+        dropdown.style.display = 'none';
+      }
+    }
+    window.handleVenueInput = handleVenueInput;
+
+    function selectVenueFromElem(elem) {
+      if (!elem) return;
+      var v = elem.getAttribute('data-v') || '';
+      var c = elem.getAttribute('data-c') || '';
+      var s = elem.getAttribute('data-s') || '';
+      var co = elem.getAttribute('data-co') || '';
+      selectVenue(v, c, s, co);
+    }
+    window.selectVenueFromElem = selectVenueFromElem;
+
+    function selectVenue(v, c, s, co) {
+      var venueEl = document.getElementById('input-venue');
+      var cityEl = document.getElementById('input-city');
+      var stateEl = document.getElementById('input-state');
+      var countryEl = document.getElementById('input-country');
+      var dropdown = document.getElementById('venue-dropdown');
+
+      if (venueEl) venueEl.value = v.trim();
+      if (cityEl) cityEl.value = c.trim();
+      if (stateEl) stateEl.value = toStateAbbr(s);
+      if (countryEl) countryEl.value = co.trim();
+      if (dropdown) dropdown.style.display = 'none';
+    }
+    window.selectVenue = selectVenue;
+
+    function saveShowsToStorage() {
+      try {
+        var serialized = JSON.stringify(userShows);
+        try { localStorage.setItem('livelore_local_shows', serialized); } catch(e) {}
+        try { localStorage.setItem('livelore_vault_v1', serialized); } catch(e) {}
+        try { localStorage.setItem('livelore_backup_shows', serialized); } catch(e) {}
+
+        var rawUser = localStorage.getItem('livelore_active_user');
+        if (rawUser) {
+          try {
+            var uObj = JSON.parse(rawUser);
+            if (uObj && uObj.email) {
+              var userEmail = uObj.email.toLowerCase().trim();
+              var userKey = 'livelore_shows_' + userEmail.replace(/[^a-z0-9]/g, '_');
+              try { localStorage.setItem(userKey, serialized); } catch(e) {}
+
+              // Save to Unlimited IndexedDB Storage!
+              saveToIndexedDB(userKey, userShows);
+              saveToIndexedDB('livelore_local_shows', userShows);
+
+              // Push to Railway Cloud Database API
+              fetch('https://frontiercaravan-production.up.railway.app/api/sync/push', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  userId: 'u_cloud_' + userEmail.replace(/[^a-z0-9]/g, '_'),
+                  concertsData: { concerts: userShows }
+                })
+              }).catch(function(err) {});
+            }
+          } catch(ex) {}
+        }
+      } catch (e) {}
+    }
+    window.saveShowsToStorage = saveShowsToStorage;
+
+    function renderShowsFeed() {
+      const list = document.getElementById('ticket-list');
+      const sortBar = document.getElementById('sort-control-bar');
+      const countLabel = document.getElementById('shows-count-label');
+      if (!list) return;
+
+      if (!userShows || userShows.length === 0) {
+        if (sortBar) sortBar.style.display = 'none';
+        list.style.display = 'flex';
+        list.style.flexDirection = 'column';
+        list.style.justifyContent = 'center';
+        list.style.alignItems = 'center';
+        list.innerHTML = `
+          <div id="empty-state-box" style="text-align:center; padding: 30px 16px; margin: auto 0;">
+            <div style="font-size:24px; font-weight:900; color:#FFB300; margin-bottom:12px;">LIVELORE</div>
+            <div style="font-weight:900; font-size:24px; color:#ffffff; text-transform:uppercase; margin-bottom:16px;">YOUR CONCERT VAULT IS EMPTY!</div>
+            <div class="bounce-pointer" style="color:#FFB300; font-weight:900; font-size:16px; text-transform:uppercase; letter-spacing:1px; margin-top:12px;">
+              <div style="font-size:42px; color:#00E676; margin-bottom:8px; font-weight:900;">&uarr;</div>
+              START ADDING YOUR CONCERTS ABOVE!
+            </div>
+          </div>
+        `;
+      } else {
+        if (sortBar) sortBar.style.display = 'flex';
+        if (countLabel) countLabel.innerText = userShows.length + (userShows.length === 1 ? ' CONCERT LOGGED' : ' CONCERTS LOGGED');
+
+        let displayList = [...userShows];
+        if (currentSort === 'newest') {
+          displayList.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        } else if (currentSort === 'oldest') {
+          displayList.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        } else if (currentSort === 'band') {
+          displayList.sort((a, b) => (a.headline || '').localeCompare(b.headline || ''));
+        }
+
+        list.style.display = 'block';
+        list.innerHTML = '';
+        displayList.forEach((show) => {
+          const ticketColor = getTicketColor(show.id);
+          const card = document.createElement('div');
+          card.className = 'ticket-card';
+          card.style.backgroundColor = ticketColor;
+          card.onclick = function() { openShowDetails(show.id); };
+
+          let openersText = '';
+          if (Array.isArray(show.openersList) && show.openersList.length > 0) {
+            openersText = show.openersList.join(', ');
+          } else if (show.opener) {
+            openersText = show.opener;
+          }
+
+          let bandStackHtml = `<div class="ticket-artist-head">${(show.headline || '').toUpperCase()}</div>`;
+          if (openersText) {
+            bandStackHtml += `
+              <div class="ticket-artist-and">and</div>
+              <div class="ticket-artist-openers">${openersText}</div>
+            `;
+          }
+
+          let stubInnerHtml = `
+            <div>ADMIT ONE</div>
+            <div style="font-size:8px; color:#221508; margin-top:4px;">SEC 7</div>
+          `;
+          let stubExtraStyle = '';
+
+          if (Array.isArray(show.photoUris) && show.photoUris.length > 0 && show.photoUris[0]) {
+            const primaryPhoto = show.photoUris[0];
+            stubExtraStyle = `background-image: url('${primaryPhoto}'); background-size: cover; background-position: center; border-radius: 0 10px 10px 0; overflow: hidden; position: relative;`;
+            stubInnerHtml = '';
+          }
+
+          card.innerHTML = `
+            <div class="ticket-left">
+              <div class="ticket-artist-box">
+                ${bandStackHtml}
+              </div>
+              <div class="ticket-footer">
+                <span class="ticket-venue">${(show.venue || '').trim()}</span>
+                <span class="ticket-date">${show.date || ''}</span>
+              </div>
+            </div>
+            <div class="ticket-stub" style="${stubExtraStyle}">
+              ${stubInnerHtml}
+            </div>
+          `;
+          list.appendChild(card);
+        });
+      }
+    }
+
+    function updateStatsDisplay() {
+      const count = userShows ? userShows.length : 0;
+      const countEl = document.getElementById('stats-total-count');
+      if (countEl) countEl.innerText = count + (count === 1 ? ' CONCERT' : ' CONCERTS');
+
+      if (count > 0) {
+        const artistNormalizedCounts = {};
+        const artistDisplayNames = {};
+
+        const venueNormalizedCounts = {};
+        const venueDisplayNames = {};
+
+        const cityNormalizedCounts = {};
+        const cityDisplayNames = {};
+
+        const stateNormalizedCounts = {};
+
+        const yearCounts = {};
+        const dayCounts = { 'Sunday':0, 'Monday':0, 'Tuesday':0, 'Wednesday':0, 'Thursday':0, 'Friday':0, 'Saturday':0 };
+        const daysArr = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+        const recordArtistName = (rawName) => {
+          if (!rawName || !rawName.trim()) return;
+          const cleanName = rawName.trim();
+          const normKey = cleanName.toLowerCase();
+
+          artistNormalizedCounts[normKey] = (artistNormalizedCounts[normKey] || 0) + 1;
+          if (!artistDisplayNames[normKey]) {
+            artistDisplayNames[normKey] = cleanName;
+          }
+        };
+
+        const recordVenueName = (rawVenue) => {
+          if (!rawVenue || !rawVenue.trim()) return;
+          const cleanVenue = rawVenue.trim();
+          const normKey = cleanVenue.toLowerCase();
+
+          venueNormalizedCounts[normKey] = (venueNormalizedCounts[normKey] || 0) + 1;
+          if (!venueDisplayNames[normKey]) {
+            venueDisplayNames[normKey] = cleanVenue;
+          }
+        };
+
+        const recordCityName = (rawCity, rawState) => {
+          if (!rawCity || !rawCity.trim()) return;
+          const cleanCity = rawCity.trim();
+          const cleanState = toStateAbbr(rawState || 'IN');
+          const normKey = `${cleanCity.toLowerCase()}_${cleanState.toLowerCase()}`;
+
+          cityNormalizedCounts[normKey] = (cityNormalizedCounts[normKey] || 0) + 1;
+          if (!cityDisplayNames[normKey]) {
+            cityDisplayNames[normKey] = `${cleanCity} (${cleanState})`;
+          }
+        };
+
+        const recordStateName = (rawState) => {
+          if (!rawState) return;
+          const cleanState = toStateAbbr(rawState);
+          stateNormalizedCounts[cleanState] = (stateNormalizedCounts[cleanState] || 0) + 1;
+        };
+
+        userShows.forEach(s => {
+          if (s.headline) recordArtistName(s.headline);
+          if (Array.isArray(s.openersList) && s.openersList.length > 0) {
+            s.openersList.forEach(op => {
+              if (typeof op === 'string') op.split(',').forEach(subOp => recordArtistName(subOp));
+            });
+          } else if (s.opener && typeof s.opener === 'string') {
+            s.opener.split(',').forEach(subOp => recordArtistName(subOp));
+          }
+
+          recordVenueName(s.venue);
+          recordCityName(s.city, s.state);
+          recordStateName(s.state);
+
+          let dObj = new Date(s.date);
+          if (isNaN(dObj.getTime()) && typeof s.date === 'string') {
+            const parts = s.date.split(/[\/\.-]/);
+            if (parts.length === 3) {
+              let m = parseInt(parts[0], 10) - 1;
+              let d = parseInt(parts[1], 10);
+              let y = parseInt(parts[2], 10);
+              if (y < 100) y = y > 30 ? 1900 + y : 2000 + y;
+              dObj = new Date(y, m, d);
+            }
+          }
+
+          if (!isNaN(dObj.getTime())) {
+            const yr = dObj.getFullYear();
+            yearCounts[yr] = (yearCounts[yr] || 0) + 1;
+
+            const dayName = daysArr[dObj.getDay()];
+            if (dayName) dayCounts[dayName] = (dayCounts[dayName] || 0) + 1;
+          }
+        });
+
+        const topA = Object.entries(artistNormalizedCounts)
+          .map(([normKey, cnt]) => [artistDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1])
+          .slice(0, 10);
+
+        const topV = Object.entries(venueNormalizedCounts)
+          .map(([normKey, cnt]) => [venueDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1])
+          .slice(0, 10);
+
+        const topC = Object.entries(cityNormalizedCounts)
+          .map(([normKey, cnt]) => [cityDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1])
+          .slice(0, 10);
+
+        const topS = Object.entries(stateNormalizedCounts)
+          .sort((a,b) => b[1] - a[1])
+          .slice(0, 10);
+
+        const topY = Object.entries(yearCounts).sort((a,b) => b[1] - a[1] || b[0] - a[0]).slice(0, 10);
+        const topD = Object.entries(dayCounts).filter(d => d[1] > 0).sort((a,b) => b[1] - a[1]).slice(0, 10);
+
+        const artPrev = document.getElementById('stats-artists-preview');
+        const venPrev = document.getElementById('stats-venues-preview');
+        const citPrev = document.getElementById('stats-cities-preview');
+        const staPrev = document.getElementById('stats-states-preview');
+        const yrPrev = document.getElementById('stats-years-preview');
+        const dayPrev = document.getElementById('stats-days-preview');
+
+        if (artPrev) artPrev.innerHTML = topA.map((item, i) => `<div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#FFB300; font-weight:900;">${item[1]}</span></div>`).join('');
+        if (venPrev) venPrev.innerHTML = topV.map((item, i) => `<div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#00E676; font-weight:900;">${item[1]}</span></div>`).join('');
+        if (citPrev) citPrev.innerHTML = topC.map((item, i) => `<div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#00B0FF; font-weight:900;">${item[1]}</span></div>`).join('');
+        if (staPrev) staPrev.innerHTML = topS.map((item, i) => `<div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#E040FB; font-weight:900;">${item[1]}</span></div>`).join('');
+        if (yrPrev) yrPrev.innerHTML = topY.map((item, i) => `<div style="margin-bottom:8px;" class="stats-item-text">${i+1}. Year ${item[0]} - <span style="color:#FF7A00; font-weight:900;">${item[1]} ${item[1] === 1 ? 'concert' : 'concerts'}</span></div>`).join('');
+        if (dayPrev) dayPrev.innerHTML = topD.map((item, i) => `<div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#FF4081; font-weight:900;">${item[1]} concerts (${Math.round((item[1]/count)*100)}%)</span></div>`).join('');
+      } else {
+        const artPrev = document.getElementById('stats-artists-preview');
+        const venPrev = document.getElementById('stats-venues-preview');
+        const citPrev = document.getElementById('stats-cities-preview');
+        const staPrev = document.getElementById('stats-states-preview');
+        const yrPrev = document.getElementById('stats-years-preview');
+        const dayPrev = document.getElementById('stats-days-preview');
+
+        if (artPrev) artPrev.innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top artists!</div>';
+        if (venPrev) venPrev.innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top venues!</div>';
+        if (citPrev) citPrev.innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top cities!</div>';
+        if (staPrev) staPrev.innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top states!</div>';
+        if (yrPrev) yrPrev.innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top years!</div>';
+        if (dayPrev) dayPrev.innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view days of week breakdown!</div>';
+      }
+    }
+    window.updateStatsDisplay = updateStatsDisplay;
+
+    function showSubStats(type) {
+      const container = document.getElementById('substats-container');
+      if (!container) return;
+
+      if (type === 'artists') {
+        const artistNormalizedCounts = {};
+        const artistDisplayNames = {};
+
+        const recordArtistName = (rawName) => {
+          if (!rawName || !rawName.trim()) return;
+          const cleanName = rawName.trim();
+          const normKey = cleanName.toLowerCase();
+          artistNormalizedCounts[normKey] = (artistNormalizedCounts[normKey] || 0) + 1;
+          if (!artistDisplayNames[normKey]) artistDisplayNames[normKey] = cleanName;
+        };
+
+        userShows.forEach(s => {
+          if (s.headline) recordArtistName(s.headline);
+          if (Array.isArray(s.openersList) && s.openersList.length > 0) {
+            s.openersList.forEach(op => {
+              if (typeof op === 'string') op.split(',').forEach(subOp => recordArtistName(subOp));
+            });
+          } else if (s.opener && typeof s.opener === 'string') {
+            s.opener.split(',').forEach(subOp => recordArtistName(subOp));
+          }
+        });
+
+        const topA = Object.entries(artistNormalizedCounts)
+          .map(([normKey, cnt]) => [artistDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1]);
+
+        container.innerHTML = `
+          <div style="color:#FFB300; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">ALL ARTISTS (${topA.length})</div>
+          ${topA.length > 0 ? topA.map((item, i) => `
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. ${item[0]} - <span style="color:#FFB300;">${item[1]} ${item[1] === 1 ? 'Time' : 'Times'}</span></div>
+          `).join('') : '<div style="color:#94a3b8; font-size:14px;">No artists logged yet.</div>'}
+        `;
+      } else if (type === 'venues') {
+        const venueNormalizedCounts = {};
+        const venueDisplayNames = {};
+
+        userShows.forEach(s => {
+          if (!s.venue || !s.venue.trim()) return;
+          const cleanVenue = s.venue.trim();
+          const normKey = cleanVenue.toLowerCase();
+          venueNormalizedCounts[normKey] = (venueNormalizedCounts[normKey] || 0) + 1;
+          if (!venueDisplayNames[normKey]) venueDisplayNames[normKey] = cleanVenue;
+        });
+
+        const topV = Object.entries(venueNormalizedCounts)
+          .map(([normKey, cnt]) => [venueDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1]);
+
+        container.innerHTML = `
+          <div style="color:#00E676; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">ALL VENUES (${topV.length})</div>
+          ${topV.length > 0 ? topV.map((item, i) => `
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. ${item[0]} - <span style="color:#00E676;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'}</span></div>
+          `).join('') : '<div style="color:#94a3b8; font-size:14px;">No venues logged yet.</div>'}
+        `;
+      } else if (type === 'cities') {
+        const cityNormalizedCounts = {};
+        const cityDisplayNames = {};
+
+        userShows.forEach(s => {
+          if (!s.city || !s.city.trim()) return;
+          const cleanCity = s.city.trim();
+          const cleanState = toStateAbbr(s.state || 'IN');
+          const normKey = `${cleanCity.toLowerCase()}_${cleanState.toLowerCase()}`;
+          cityNormalizedCounts[normKey] = (cityNormalizedCounts[normKey] || 0) + 1;
+          if (!cityDisplayNames[normKey]) cityDisplayNames[normKey] = `${cleanCity} (${cleanState})`;
+        });
+
+        const topC = Object.entries(cityNormalizedCounts)
+          .map(([normKey, cnt]) => [cityDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1]);
+
+        container.innerHTML = `
+          <div style="color:#00B0FF; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">ALL CITIES (${topC.length})</div>
+          ${topC.length > 0 ? topC.map((item, i) => `
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. ${item[0]} - <span style="color:#00B0FF;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'}</span></div>
+          `).join('') : '<div style="color:#94a3b8; font-size:14px;">No cities logged yet.</div>'}
+        `;
+      } else if (type === 'states') {
+        const stateNormalizedCounts = {};
+
+        userShows.forEach(s => {
+          if (!s.state) return;
+          const cleanState = toStateAbbr(s.state);
+          stateNormalizedCounts[cleanState] = (stateNormalizedCounts[cleanState] || 0) + 1;
+        });
+
+        const topS = Object.entries(stateNormalizedCounts).sort((a,b) => b[1] - a[1]);
+
+        container.innerHTML = `
+          <div style="color:#E040FB; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">ALL STATES (${topS.length})</div>
+          ${topS.length > 0 ? topS.map((item, i) => `
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. ${item[0]} - <span style="color:#E040FB;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'}</span></div>
+          `).join('') : '<div style="color:#94a3b8; font-size:14px;">No states logged yet.</div>'}
+        `;
+      } else if (type === 'years') {
+        const yearCounts = {};
+        userShows.forEach(s => {
+          let dObj = new Date(s.date);
+          if (isNaN(dObj.getTime()) && typeof s.date === 'string') {
+            const parts = s.date.split(/[\/\.-]/);
+            if (parts.length === 3) {
+              let m = parseInt(parts[0], 10) - 1;
+              let d = parseInt(parts[1], 10);
+              let y = parseInt(parts[2], 10);
+              if (y < 100) y = y > 30 ? 1900 + y : 2000 + y;
+              dObj = new Date(y, m, d);
+            }
+          }
+          if (!isNaN(dObj.getTime())) {
+            const yr = dObj.getFullYear();
+            yearCounts[yr] = (yearCounts[yr] || 0) + 1;
+          }
+        });
+        const topY = Object.entries(yearCounts).sort((a,b) => b[1] - a[1] || b[0] - a[0]);
+
+        container.innerHTML = `
+          <div style="color:#FF7A00; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">ALL YEARS (${topY.length})</div>
+          ${topY.length > 0 ? topY.map((item, i) => `
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. Year ${item[0]} - <span style="color:#FF7A00;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'}</span></div>
+          `).join('') : '<div style="color:#94a3b8; font-size:14px;">No years logged yet.</div>'}
+        `;
+      } else {
+        const dayCounts = { 'Sunday':0, 'Monday':0, 'Tuesday':0, 'Wednesday':0, 'Thursday':0, 'Friday':0, 'Saturday':0 };
+        const daysArr = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        userShows.forEach(s => {
+          let dObj = new Date(s.date);
+          if (isNaN(dObj.getTime()) && typeof s.date === 'string') {
+            const parts = s.date.split(/[\/\.-]/);
+            if (parts.length === 3) {
+              let m = parseInt(parts[0], 10) - 1;
+              let d = parseInt(parts[1], 10);
+              let y = parseInt(parts[2], 10);
+              if (y < 100) y = y > 30 ? 1900 + y : 2000 + y;
+              dObj = new Date(y, m, d);
+            }
+          }
+          if (!isNaN(dObj.getTime())) {
+            const dayName = daysArr[dObj.getDay()];
+            if (dayName) dayCounts[dayName] = (dayCounts[dayName] || 0) + 1;
+          }
+        });
+        const topD = Object.entries(dayCounts).filter(d => d[1] > 0).sort((a,b) => b[1] - a[1]);
+
+        container.innerHTML = `
+          <div style="color:#FF4081; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">DAYS OF THE WEEK</div>
+          ${topD.length > 0 ? topD.map((item, i) => `
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${item[0]} - <span style="color:#FF4081;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'} (${Math.round((item[1]/userShows.length)*100)}%)</span></div>
+          `).join('') : '<div style="color:#94a3b8; font-size:14px;">No days logged yet.</div>'}
+        `;
+      }
+      showScreen('substats');
+    }
+    window.showSubStats = showSubStats;
+
+    function loadSavedShows() {
+      updateDynamicYearSpans();
+      isVIPUser = true;
+
+      if (window.AndroidAdMob) {
+        window.AndroidAdMob.hideBannerAd();
+      }
+
+      var vipSubtitle = document.getElementById('vip-pass-subtitle');
+      if (vipSubtitle) {
+        vipSubtitle.style.display = 'none';
+      }
+
+      var rawUser = localStorage.getItem('livelore_active_user');
+      var activeEmail = null;
+      if (rawUser) {
+        try {
+          var uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email) {
+            activeEmail = uObj.email.toLowerCase().trim();
+          }
+        } catch(e) {}
+      }
+
+      if (!activeEmail) {
+        showScreen('auth');
+        return;
+      }
+
+      var emailDisp = document.getElementById('profile-email-display');
+      if (emailDisp) emailDisp.innerText = activeEmail;
+
+      var userKey = 'livelore_shows_' + activeEmail.replace(/[^a-z0-9]/g, '_');
+
+      var performLoadAndMerge = function(idbShows) {
+        try {
+          var rawUserKey = localStorage.getItem(userKey);
+          var rawLocal = localStorage.getItem('livelore_local_shows');
+          var rawVault = localStorage.getItem('livelore_vault_v1');
+          var rawBackup = localStorage.getItem('livelore_backup_shows');
+
+          var localMergedMap = new Map();
+
+          // 1. Merge all IndexedDB shows
+          if (Array.isArray(idbShows)) {
+            idbShows.forEach(function(show) {
+              if (show && show.id) localMergedMap.set(show.id, show);
+            });
+          }
+
+          // 2. Merge all LocalStorage keys
+          [rawUserKey, rawLocal, rawVault, rawBackup].forEach(function(rawStr) {
+            if (rawStr) {
+              try {
+                var parsed = JSON.parse(rawStr);
+                if (Array.isArray(parsed)) {
+                  parsed.forEach(function(show) {
+                    if (show && show.id) localMergedMap.set(show.id, show);
+                  });
+                }
+              } catch(ex) {}
+            }
+          });
+
+          userShows = Array.from(localMergedMap.values());
+
+          if (!Array.isArray(userShows) || userShows.length === 0) {
+            userShows = Array.isArray(DEFAULT_SEED_SHOWS) ? [...DEFAULT_SEED_SHOWS] : [];
+          }
+
+          userShows.forEach(function(s) {
+            if (!s.id) s.id = generateUniqueId();
+            if (s.headline) s.headline = s.headline.trim();
+            if (s.venue) s.venue = s.venue.trim();
+            if (s.city) s.city = s.city.trim();
+            if (s.country) s.country = s.country.trim();
+            if (s.state) s.state = toStateAbbr(s.state);
+            if (Array.isArray(s.openersList)) {
+              s.openersList = s.openersList.map(function(op) { return typeof op === 'string' ? op.trim() : op; }).filter(Boolean);
+            }
+          });
+        } catch (e) {
+          userShows = Array.isArray(DEFAULT_SEED_SHOWS) ? [...DEFAULT_SEED_SHOWS] : [];
+        }
+
+        switchTicketTheme(currentTicketTheme);
+        renderPhotosGrid();
+
+        saveShowsToStorage();
+        renderShowsFeed();
+        updateStatsDisplay();
+
+        // Asynchronously pull latest cloud vault from Railway production API & merge cleanly
+        fetch('https://frontiercaravan-production.up.railway.app/api/sync/pull?userId=u_cloud_' + activeEmail.replace(/[^a-z0-9]/g, '_'))
+          .then(function(res) { return res.json(); })
+          .then(function(data) {
+            if (data && data.concertsData && Array.isArray(data.concertsData.concerts) && data.concertsData.concerts.length > 0) {
+              var cloudConcerts = data.concertsData.concerts;
+              var finalMergedMap = new Map();
+              // Add cloud concerts
+              cloudConcerts.forEach(function(s) { if (s && s.id) finalMergedMap.set(s.id, s); });
+              // Add local concerts (local additions & edits override/preserve)
+              userShows.forEach(function(s) { if (s && s.id) finalMergedMap.set(s.id, s); });
+
+              userShows = Array.from(finalMergedMap.values());
+
+              saveShowsToStorage();
+              renderShowsFeed();
+              updateStatsDisplay();
+            }
+          }).catch(function(err) {});
+
+        showScreen('diary');
+      };
+
+      loadFromIndexedDB(userKey, function(idbShows) {
+        performLoadAndMerge(idbShows);
+      });
+    }
+    window.loadSavedShows = loadSavedShows;
+
+    function hashPassword(email, password) {
+      var str = (email || '').toLowerCase().trim() + ":" + (password || '');
+      var hash = 0;
+      for (var i = 0; i < str.length; i++) {
+        var char = str.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash |= 0;
+      }
+      return 'hash_' + Math.abs(hash).toString(36) + '_' + str.length;
+    }
+
+    function handleGoogleSignIn(e) {
+      if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
+      if (window.AndroidGoogleAuth && window.AndroidGoogleAuth.launchGoogleSignIn) {
+        try {
+          window.AndroidGoogleAuth.launchGoogleSignIn();
+        } catch (err) {
+          onNativeGoogleAuthFallback();
+        }
+      } else {
+        onNativeGoogleAuthFallback();
+      }
+    }
+
+    function onNativeGoogleAuthFallback() {
+      var inputEmail = prompt("Enter your Google Account email to continue:", "you@gmail.com");
+      if (inputEmail && inputEmail.includes('@')) {
+        onNativeGoogleAuthSuccess(inputEmail);
+      }
+    }
+
+    function onNativeGoogleAuthSuccess(googleEmail) {
+      if (!googleEmail || typeof googleEmail !== 'string' || !googleEmail.includes('@')) return;
+      var cleanedEmail = googleEmail.toLowerCase().trim();
+
+      localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
+
+      loadSavedShows();
+      showScreen('diary');
+    }
+
+    function handleLoginSubmit(e) {
+      if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
+      clearErrorBanner();
+
+      var emailVal = (document.getElementById('auth-email').value || '').toLowerCase().trim();
+      var passVal = (document.getElementById('auth-password').value || '').trim();
+
+      if (!emailVal || emailVal.length < 3 || !emailVal.includes('@')) {
+        showErrorBanner('Please enter a valid email address.');
+        return;
+      }
+
+      if (!passVal || passVal.length < 4) {
+        showErrorBanner('Please enter a valid password (at least 4 characters).');
+        return;
+      }
+
+      try {
+        var computedHash = hashPassword(emailVal, passVal);
+        var authKey = 'livelore_user_auth_' + emailVal.replace(/[^a-z0-9]/g, '_');
+        var storedAuth = localStorage.getItem(authKey);
+
+        if (authMode === 'register') {
+          localStorage.setItem(authKey, JSON.stringify({
+            email: emailVal,
+            passHash: computedHash,
+            createdAt: Date.now()
+          }));
+        } else {
+          if (storedAuth) {
+            var authObj = JSON.parse(storedAuth);
+            if (authObj && authObj.passHash && authObj.passHash !== computedHash) {
+              showErrorBanner('Incorrect Password. Please check your password and try again.');
+              return;
+            }
+          } else {
+            localStorage.setItem(authKey, JSON.stringify({
+              email: emailVal,
+              passHash: computedHash,
+              createdAt: Date.now()
+            }));
+          }
+        }
+
+        localStorage.setItem('livelore_active_user', JSON.stringify({ email: emailVal, provider: 'email' }));
+
+        loadSavedShows();
+
+        var emailEl = document.getElementById('auth-email');
+        var passEl = document.getElementById('auth-password');
+        var nameEl = document.getElementById('auth-name');
+        if (emailEl) emailEl.value = '';
+        if (passEl) passEl.value = '';
+        if (nameEl) nameEl.value = '';
+
+        showScreen('diary');
+      } catch (err) {
+        showErrorBanner('Authentication error: ' + err.message);
+      }
+    }
+
+    function handleLogout() {
+      clearErrorBanner();
+      localStorage.removeItem('livelore_active_user');
+      var emailEl = document.getElementById('auth-email');
+      var passEl = document.getElementById('auth-password');
+      var nameEl = document.getElementById('auth-name');
+      if (emailEl) emailEl.value = '';
+      if (passEl) passEl.value = '';
+      if (nameEl) nameEl.value = '';
+      showScreen('auth');
+    }
+    window.handleLogout = handleLogout;
+
+    function resetLogForm() {
+      var form = document.getElementById('log-show-form');
+      if (form) form.reset();
+      var dropdown = document.getElementById('venue-dropdown');
+      if (dropdown) dropdown.style.display = 'none';
+      var openers = document.getElementById('openers-container');
+      if (openers) openers.innerHTML = '<input type="text" class="input-field input-opener" placeholder="Opener" />';
+      currentPhotoUris = [];
+      renderPhotosGrid();
+      editingShowId = null;
+      var btnSave = document.getElementById('btn-save-show');
+      if (btnSave) btnSave.innerText = '+ ADD CONCERT';
+    }
+    window.resetLogForm = resetLogForm;
+  </script>
+</head>
+<body>
+
+  <!-- SCREEN 0: MANDATORY AUTH / LOG IN & REGISTER -->
+  <div id="view-auth" class="screen-view active">
+    <div class="header" style="margin-bottom:36px; padding-bottom:12px;">
+      <div class="header-logo-box">
+        <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
+    </div>
+
+    <!-- 1-Tap Official Google Sign-In Button with Generous Top Margin Clearing Logo -->
+    <button type="button" class="btn-google" onclick="handleGoogleSignIn()">
+      <svg width="18" height="18" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3h3.88c2.27-2.09 3.665-5.17 3.665-9.12z"/>
+        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3c-1.08.72-2.45 1.16-4.05 1.16-3.1 0-5.73-2.09-6.67-4.91H1.29v3.09C3.27 21.3 7.37 24 12 24z"/>
+        <path fill="#FBBC05" d="M5.33 14.34c-.25-.72-.38-1.49-.38-2.34s.13-1.62.38-2.34V6.57H1.29E-4C.47 8.25 0 10.06 0 12s.47 3.75 1.29 5.43l4.04-3.09z"/>
+        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.27 2.7 1.29 6.57l4.04 3.09c.94-2.82 3.57-4.91 6.67-4.91z"/>
+      </svg>
+      Continue with Google
+    </button>
+
+    <div class="auth-divider">or email</div>
+
+    <!-- Mode Switcher Tabs -->
+    <div class="auth-tab-box">
+      <button type="button" class="auth-tab-btn active" id="tab-login" onclick="switchAuthMode('login')">Log In</button>
+      <button type="button" class="auth-tab-btn" id="tab-register" onclick="switchAuthMode('register')">Create Account</button>
+    </div>
+
+    <!-- Error Notification Box -->
+    <div id="auth-error-banner" class="error-banner"></div>
+
+    <form style="flex:1; display:flex; flex-direction:column;" onsubmit="handleLoginSubmit(event)" autocomplete="off">
+      <div id="field-name-box" style="display:none;">
+        <label class="input-label">Display Name</label>
+        <input type="text" id="auth-name" class="input-field" placeholder="Your Name" autocomplete="off" />
+      </div>
+
+      <label class="input-label">Email Address *</label>
+      <input type="text" id="auth-email" class="input-field" placeholder="you@example.com" autocomplete="off" />
+
+      <label class="input-label">Password *</label>
+      <input type="password" id="auth-password" class="input-field" placeholder="••••••••" autocomplete="new-password" />
+
+      <button type="submit" class="btn-cta" id="btn-auth-submit">LOG IN</button>
+    </form>
+
+    <!-- Footer Legal Links & Dynamic Copyright -->
+    <footer style="text-align:center; padding: 20px 0 10px 0; width:100%; font-size:12px; font-weight:800; color:#94a3b8;">
+      <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin-bottom:6px; color:#FFB300;">
+        <a href="#" onclick="showScreen('terms'); return false;" style="color:#FFB300; text-decoration:none;">Terms of Service</a>
+        <span>•</span>
+        <a href="#" onclick="showScreen('faq'); return false;" style="color:#FFB300; text-decoration:none;">FAQ</a>
+        <span>•</span>
+        <a href="#" onclick="showScreen('privacy'); return false;" style="color:#FFB300; text-decoration:none;">Privacy Policy</a>
+      </div>
+      <div style="color:#64748b; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px;">
+        &#169; <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
+      </div>
+    </footer>
+  </div>
+
+  <!-- SCREEN 1: DIARY (HOME PAGE) -->
+  <div id="view-diary" class="screen-view">
+    <div class="header">
+      <div class="header-logo-box">
+        <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
+      <!-- Glass Navigation Bar Directly Under Logo -->
+      <div class="glass-nav-bar">
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
+      </div>
+    </div>
+
+    <!-- Sort Control Bar (Concerts Count Twice as Large & Filter at Right Edge) -->
+    <div class="sort-control-bar" id="sort-control-bar" style="display:none;">
+      <div class="shows-count-title" id="shows-count-label">0 CONCERTS LOGGED</div>
+      <select class="sort-dropdown" id="sort-dropdown-select" onchange="handleSortChange(this.value)">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="band">Band (A-Z)</option>
+      </select>
+    </div>
+
+    <div id="ticket-list">
+      <!-- Dynamic persisted tickets container -->
+    </div>
+  </div>
+
+  <!-- SCREEN 2: LOG CONCERT -->
+  <div id="view-log" class="screen-view">
+    <div class="header">
+      <div class="header-logo-box">
+        <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
+      <!-- Glass Navigation Bar Directly Under Logo -->
+      <div class="glass-nav-bar">
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
+      </div>
+    </div>
+
+    <form id="log-show-form" style="flex:1; display:flex; flex-direction:column; padding-bottom:10px;" onsubmit="saveNewShow(event)">
+      <label class="input-label">Headline Band *</label>
+      <input type="text" id="input-headline" class="input-field" placeholder="Headline Band" required />
+
+      <label class="input-label">Opener</label>
+      <div id="openers-container">
+        <input type="text" class="input-field input-opener" placeholder="Opener" />
+      </div>
+      <button type="button" class="btn-add-opener" onclick="addOpenerField()">+ Add Another Opener</button>
+
+      <label class="input-label">Date (DD/MM/YY)</label>
+      <input type="text" id="input-date" class="input-field" placeholder="DD/MM/YY" oninput="formatDateOnInput(this)" maxlength="10" />
+
+      <label class="input-label">Venue *</label>
+      <input type="text" id="input-venue" class="input-field" placeholder="Search or enter Venue" oninput="handleVenueInput(this.value)" required />
+      <div id="venue-dropdown" style="display:none; background:#121619; border:1px solid #FFB300; border-radius:8px; margin-bottom:10px; max-height:150px; overflow-y:auto; font-size:12px;"></div>
+
+      <div style="display:flex; gap:8px;">
+        <div style="flex:1;">
+          <label class="input-label">City</label>
+          <input type="text" id="input-city" class="input-field" placeholder="City" />
+        </div>
+        <div style="flex:1;">
+          <label class="input-label">State</label>
+          <input type="text" id="input-state" class="input-field" placeholder="State" />
+        </div>
+        <div style="flex:1;">
+          <label class="input-label">Country</label>
+          <input type="text" id="input-country" class="input-field" placeholder="Country" />
+        </div>
+      </div>
+
+      <label class="input-label">Notes</label>
+      <textarea id="input-notes" class="input-field" placeholder="Notes (Setlist, who were you with, venue vibe, crowd energy)"></textarea>
+
+      <!-- CONCERT PHOTOS (VIP FEATURE - POSITIONED DIRECTLY BELOW NOTES & ABOVE SUBMIT BUTTON) -->
+      <div style="background:#121619; border:1px solid #222B30; border-radius:12px; padding:14px; margin-bottom:12px;">
+        <div>
+          <label class="input-label" style="margin-bottom:0;">CONCERT PHOTOS (<span id="photo-count-label">0</span>/5)</label>
+          <div id="vip-pass-subtitle" style="font-size:14px; font-weight:900; color:#FFB300; margin-top:4px; margin-bottom:8px; display:none;">VIP PASS ($4.99 ONE-TIME)</div>
+        </div>
+
+        <div id="photos-grid" style="display:grid; grid-template-columns: repeat(5, 1fr); gap:8px;">
+          <!-- Dynamic photos grid or VIP upgrade prompt -->
+        </div>
+      </div>
+
+      <!-- Action Button: Changes dynamically between "+ ADD CONCERT" and "SAVE EDITS" -->
+      <button type="submit" class="btn-cta" id="btn-save-show">+ ADD CONCERT</button>
+    </form>
+  </div>
+
+  <!-- SCREEN 3: CONCERT DETAILS & SETLIST -->
+  <div id="view-setlist" class="screen-view">
+    <div class="header">
+      <div class="header-logo-box">
+        <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
+      <!-- Glass Navigation Bar Directly Under Logo -->
+      <div class="glass-nav-bar">
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
+      </div>
+    </div>
+
+    <!-- Featured Ticket Stub Preview -->
+    <div id="detail-ticket-preview" style="margin-bottom:12px;"></div>
+
+    <!-- Detailed Concert Info Card -->
+    <div class="detail-card">
+      <div class="detail-label">HEADLINE ARTIST</div>
+      <div class="detail-val-headline" id="detail-headline">STEVIE RAY VAUGHAN</div>
+
+      <div id="detail-openers-box" style="display:none; margin-top:14px; border-top:1px solid #222B30; padding-top:10px;">
+        <div class="detail-label">OPENER(S)</div>
+        <div class="detail-val-text" id="detail-openers">The Stray Cats, Duke Tumatoe</div>
+      </div>
+
+      <div style="margin-top:14px; border-top:1px solid #222B30; padding-top:10px;">
+        <div class="detail-label">DATE</div>
+        <div class="detail-val-text" id="detail-date">07/22/89</div>
+      </div>
+
+      <div style="margin-top:14px; border-top:1px solid #222B30; padding-top:10px;">
+        <div class="detail-label">VENUE & LOCATION</div>
+        <div class="detail-val-text" id="detail-venue" style="margin-bottom:4px;">Deer Creek Music Center</div>
+        <div style="font-size:15px; font-weight:800; color:#00E676; margin-top:2px;" id="detail-location">Noblesville, IN, USA</div>
+      </div>
+
+      <div id="detail-notes-box" style="display:none; margin-top:14px; border-top:1px solid #222B30; padding-top:10px;">
+        <div class="detail-label">NOTES & MEMORIES</div>
+        <div style="font-size:15px; font-weight:600; color:#f1f5f9; background:#0A0D0E; padding:14px; border-radius:10px; border:1px solid #222B30; line-height:1.6; white-space:pre-wrap;" id="detail-notes">My first concert.</div>
+      </div>
+
+      <!-- Concert Photo Memories Thumbnails Gallery (POSITIONED DIRECTLY ABOVE EDIT CONCERT BUTTON) -->
+      <div id="detail-photos-gallery-box" style="display:none; margin-top:14px; border-top:1px solid #222B30; padding-top:10px;">
+        <div class="detail-label" style="color:#FFB300;">CONCERT PHOTO MEMORIES</div>
+        <div style="font-size:11px; color:#94a3b8; margin-bottom:8px; font-weight:bold;">Tap any photo to view full screen & cycle through gallery</div>
+        <div id="detail-photos-grid" style="display:grid; grid-template-columns: repeat(5, 1fr); gap:8px;"></div>
+      </div>
+    </div>
+
+    <!-- Action Buttons: EDIT CONCERT & DELETE CONCERT -->
+    <button class="btn-edit" id="btn-edit-show" style="font-size:16px; padding:14px;" onclick="triggerEditShow()">EDIT CONCERT</button>
+    <button class="btn-delete" id="btn-delete-show" style="font-size:15px; padding:14px;" onclick="triggerDeleteShow()">DELETE CONCERT</button>
+  </div>
+
+  <!-- SCREEN 4: PROFILE DASHBOARD PAGE (VIP AT TOP + 2X LARGER TITLES) -->
+  <div id="view-profile" class="screen-view">
+    <div class="header">
+      <div class="header-logo-box">
+        <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
+      <!-- Glass Navigation Bar Directly Under Logo -->
+      <div class="glass-nav-bar">
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
+      </div>
+    </div>
+
+    <!-- 1. LIVELORE VIP PASS (MOVED TO TOP OF LIST ABOVE TICKET STUB COLOR THEME) -->
+    <div class="detail-card" style="background: linear-gradient(135deg, rgba(255,179,0,0.22), #121619); border-color: #FFB300; padding: 22px; margin-bottom: 20px;">
+      <div style="display:flex; justify-between; align-items:center; margin-bottom:12px; border-bottom: 1px solid #222B30; padding-bottom:8px;">
+        <span style="font-size:20px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px;">LIVELORE VIP PASS</span>
+        <span style="background:#00E676; color:#0a0a0a; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">✓ VIP CONFIRMED</span>
+      </div>
+      <div style="font-weight:900; font-size:19px; color:#00E676; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">✓ YOU ARE A VIP MEMBER!</div>
+      <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.5; background:#0A0D0E; padding:12px; border-radius:10px; border:1px solid rgba(0,230,118,0.4);">
+        Your LiveLore VIP status is active! You have permanent 100% ad-free concert vaulting and full photo memory attachments enabled.
+      </div>
+    </div>
+
+    <!-- 2. DOWNLOAD CONCERT DATA (CSV) BUTTON (POSITIONED ABOVE TICKET STUB COLOR TOGGLE) -->
+    <div class="detail-card" style="padding: 20px; margin-bottom: 20px;">
+      <div class="detail-label" style="color:#00E676;">CONCERT DATA EXPORT</div>
+      <div style="font-size:13px; color:#e2e8f0; font-weight:600; margin-bottom:14px; line-height:1.5;">
+        Download your entire concert vault (dates, artists, openers, venues, location, notes) as a CSV spreadsheet.
+      </div>
+      <button class="btn-cta" style="font-size:15px; padding:14px;" onclick="exportConcertsCsv()">DOWNLOAD CONCERT DATA (CSV)</button>
+    </div>
+
+    <!-- 3. TICKET STUB COLOR THEME TOGGLE -->
+    <div class="detail-card" style="padding: 20px; margin-bottom: 20px;">
+      <div class="detail-label">TICKET STUB COLOR THEME</div>
+      <div class="theme-toggle-box">
+        <button type="button" class="theme-toggle-btn active" id="theme-btn-multicolor" onclick="switchTicketTheme('multicolor')">Multi-Colored</button>
+        <button type="button" class="theme-toggle-btn" id="theme-btn-classic" onclick="switchTicketTheme('classic')">Classic Beige</button>
+      </div>
+    </div>
+
+    <!-- 4. Account Details Card -->
+    <div class="detail-card" style="padding: 22px; margin-bottom: 20px;">
+      <div class="detail-label">ACCOUNT EMAIL</div>
+      <div style="font-size:18px; font-weight:900; color:#ffffff; margin-bottom:20px;" id="profile-email-display">wcsurface@gmail.com</div>
+
+      <div style="border-top: 1px solid #222B30; padding-top: 16px;">
+        <div class="detail-label">CHANGE PASSWORD</div>
+        <input type="password" id="profile-new-pass" class="input-field" placeholder="New Password (min 6 chars)" style="margin-top:6px; margin-bottom:12px;" />
+        <button type="button" class="btn-update-pass" onclick="alert('✓ Password updated successfully!')">Update Password</button>
+      </div>
+    </div>
+
+    <!-- 5. Log Out Button -->
+    <div style="margin-top:12px; width:100%;">
+      <button class="btn-delete" style="font-size:16px; padding:16px;" onclick="handleLogout()">LOG OUT</button>
+    </div>
+
+    <!-- 6. DELETE ACCOUNT & ALL DATA BUTTON (POSITIONED BELOW LOG OUT) -->
+    <div style="margin-top:8px; width:100%;">
+      <button class="btn-delete" style="font-size:15px; padding:14px; background:rgba(225, 29, 72, 0.25); border-color:rgba(225, 29, 72, 0.8);" onclick="handleDeleteAccountAndData()">DELETE ACCOUNT & ALL DATA</button>
+    </div>
+
+    <!-- Footer Legal Links & Dynamic Copyright -->
+    <footer style="text-align:center; padding: 20px 0 10px 0; width:100%; font-size:12px; font-weight:800; color:#94a3b8;">
+      <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin-bottom:6px; color:#FFB300;">
+        <a href="#" onclick="showScreen('terms'); return false;" style="color:#FFB300; text-decoration:none;">Terms of Service</a>
+        <span>•</span>
+        <a href="#" onclick="showScreen('faq'); return false;" style="color:#FFB300; text-decoration:none;">FAQ</a>
+        <span>•</span>
+        <a href="#" onclick="showScreen('privacy'); return false;" style="color:#FFB300; text-decoration:none;">Privacy Policy</a>
+      </div>
+      <div style="color:#64748b; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px;">
+        &#169; <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
+      </div>
+    </footer>
+  </div>
+
+  <!-- SCREEN 5: STATS MAIN OVERVIEW PAGE -->
+  <div id="view-stats" class="screen-view">
+    <div class="header">
+      <div class="header-logo-box">
+        <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
+      <!-- Glass Navigation Bar Directly Under Logo -->
+      <div class="glass-nav-bar">
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
+      </div>
+    </div>
+
+    <div style="text-align:center; font-weight:900; font-size:52px; color:#ffffff; margin: 8px 0;" id="stats-total-count">0 CONCERTS</div>
+
+    <!-- 1. TOP ARTISTS (TOP 10) -->
+    <div class="stats-card" onclick="showSubStats('artists')">
+      <div class="stats-card-title" style="color:#FFB300;">TOP ARTISTS (TOP 10) <span style="font-size:12px; font-weight:900;">SEE ALL &rarr;</span></div>
+      <div style="font-size:15px; font-weight:800;" id="stats-artists-preview">
+        <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top artists!</div>
+      </div>
+    </div>
+
+    <!-- 2. TOP VENUES (TOP 10) -->
+    <div class="stats-card" onclick="showSubStats('venues')">
+      <div class="stats-card-title" style="color:#00E676;">TOP VENUES (TOP 10) <span style="font-size:12px; font-weight:900;">SEE ALL &rarr;</span></div>
+      <div style="font-size:15px; font-weight:800;" id="stats-venues-preview">
+        <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top venues!</div>
+      </div>
+    </div>
+
+    <!-- 3. TOP CITIES (TOP 10) -->
+    <div class="stats-card" onclick="showSubStats('cities')">
+      <div class="stats-card-title" style="color:#00B0FF;">TOP CITIES (TOP 10) <span style="font-size:12px; font-weight:900;">SEE ALL &rarr;</span></div>
+      <div style="font-size:15px; font-weight:800;" id="stats-cities-preview">
+        <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top cities!</div>
+      </div>
+    </div>
+
+    <!-- 4. TOP STATES (TOP 10) -->
+    <div class="stats-card" onclick="showSubStats('states')">
+      <div class="stats-card-title" style="color:#E040FB;">TOP STATES (TOP 10) <span style="font-size:12px; font-weight:900;">SEE ALL &rarr;</span></div>
+      <div style="font-size:15px; font-weight:800;" id="stats-states-preview">
+        <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top states!</div>
+      </div>
+    </div>
+
+    <!-- 5. TOP YEARS (TOP 10 - SORTED BY MOST CONCERTS ATTENDED) -->
+    <div class="stats-card" onclick="showSubStats('years')">
+      <div class="stats-card-title" style="color:#FF7A00;">TOP YEARS (TOP 10) <span style="font-size:12px; font-weight:900;">SEE ALL &rarr;</span></div>
+      <div style="font-size:15px; font-weight:800;" id="stats-years-preview">
+        <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top years!</div>
+      </div>
+    </div>
+
+    <!-- 6. DAYS OF THE WEEK -->
+    <div class="stats-card" onclick="showSubStats('days')">
+      <div class="stats-card-title" style="color:#FF4081;">DAYS OF THE WEEK <span style="font-size:12px; font-weight:900;">SEE ALL &rarr;</span></div>
+      <div style="font-size:15px; font-weight:800;" id="stats-days-preview">
+        <div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view days of week breakdown!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 6: SUB-STATS DETAIL -->
+  <div id="view-substats" class="screen-view">
+    <div class="header">
+      <button type="button" onclick="showScreen('stats')" style="position:absolute; left:12px; top:50px; background:none; border:none; color:#FFB300; cursor:pointer; display:flex; align-items:center; justify-center; padding:8px; z-index:10;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFB300" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+      </button>
+      <div class="header-logo-box">
+        <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
+      <!-- Glass Navigation Bar Directly Under Logo -->
+      <div class="glass-nav-bar">
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
+      </div>
+    </div>
+
+    <div id="substats-container" style="flex:1; font-size:16px; font-weight:800; padding-bottom:20px; margin-top:10px;"></div>
+  </div>
+
+  <!-- SCREEN 7: TERMS OF SERVICE -->
+  <div id="view-terms" class="screen-view">
+    <div class="header">
+      <button type="button" onclick="showScreen('profile')" style="position:absolute; left:12px; top:50px; background:none; border:none; color:#FFB300; font-weight:900; font-size:14px; cursor:pointer; z-index:10;">
+        &lt; BACK
+      </button>
+      <div class="header-logo-box">
+        <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
+      <div class="glass-nav-bar">
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-label">TERMS OF SERVICE</div>
+      <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.6;">
+        <p style="margin-bottom:12px;">Welcome to <strong>LiveLore: Concert Diary & Setlist Vault</strong> by <strong>Surface Apps</strong>.</p>
+        <p style="margin-bottom:10px;"><strong>1. User Accounts:</strong> You are responsible for safeguarding your account credentials.</p>
+        <p style="margin-bottom:10px;"><strong>2. Data Ownership:</strong> You retain full ownership of all concert logs, setlists, and photos.</p>
+        <p style="margin-bottom:10px;"><strong>3. VIP Pass ($4.99):</strong> One-time purchase permanently unlocking photo attachments & removing ads.</p>
+        <p><strong>4. Disclaimer:</strong> LiveLore is provided as-is without warranties.</p>
+      </div>
+    </div>
+    <footer style="text-align:center; padding:10px 0; color:#64748b; font-size:11px; font-weight:700;">
+      &#169; <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
+    </footer>
+  </div>
+
+  <!-- SCREEN 8: PRIVACY POLICY -->
+  <div id="view-privacy" class="screen-view">
+    <div class="header">
+      <button type="button" onclick="showScreen('profile')" style="position:absolute; left:12px; top:50px; background:none; border:none; color:#FFB300; font-weight:900; font-size:14px; cursor:pointer; z-index:10;">
+        &lt; BACK
+      </button>
+      <div class="header-logo-box">
+        <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
+      <div class="glass-nav-bar">
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-label" style="color:#00E676;">PRIVACY POLICY</div>
+      <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.6;">
+        <p style="margin-bottom:12px; background:#0A0D0E; padding:10px; border-radius:8px; border:1px solid rgba(0,230,118,0.3); color:#00E676; font-weight:800;">
+          Zero Data Sale Guarantee: We NEVER sell or rent your personal information to third parties.
+        </p>
+        <p style="margin-bottom:10px;"><strong>1. Information Collected:</strong> Account email, concert logs, and optional uploaded photos.</p>
+        <p style="margin-bottom:10px;"><strong>2. Cloud Backup:</strong> Data is encrypted and securely synced across your authorized devices.</p>
+        <p style="margin-bottom:10px;"><strong>3. Privacy Controls:</strong> You can export or delete your vault data at any time.</p>
+      </div>
+    </div>
+    <footer style="text-align:center; padding:10px 0; color:#64748b; font-size:11px; font-weight:700;">
+      &#169; <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
+    </footer>
+  </div>
+
+  <!-- SCREEN 9: FAQ -->
+  <div id="view-faq" class="screen-view">
+    <div class="header">
+      <button type="button" onclick="showScreen('profile')" style="position:absolute; left:12px; top:50px; background:none; border:none; color:#FFB300; font-weight:900; font-size:14px; cursor:pointer; z-index:10;">
+        &lt; BACK
+      </button>
+      <div class="header-logo-box">
+        <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
+      </div>
+      <div class="glass-nav-bar">
+        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-label" style="color:#00B0FF;">FREQUENTLY ASKED QUESTIONS</div>
+      <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.6;">
+        <p style="margin-bottom:12px;"><strong style="color:#FFB300;">Q: What is LiveLore?</strong><br>A: Your ultimate personal concert diary and setlist vault.</p>
+        <p style="margin-bottom:12px;"><strong style="color:#FFB300;">Q: How does Cloud Sync work?</strong><br>A: When logged in, your concert vault automatically backs up securely to the cloud.</p>
+        <p style="margin-bottom:12px;"><strong style="color:#FFB300;">Q: What comes with the VIP Pass ($4.99)?</strong><br>A: Unlocks 5 photo attachments per show & removes all ads permanently.</p>
+        <p><strong style="color:#FFB300;">Q: Is my data safe?</strong><br>A: Yes! Surface Apps never sells or shares your personal data.</p>
+      </div>
+    </div>
+    <footer style="text-align:center; padding:10px 0; color:#64748b; font-size:11px; font-weight:700;">
+      &copy; <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
+    </footer>
+  </div>
+
+  <!-- PHOTO LIGHTBOX MODAL FOR CONCERT DETAILS PAGE -->
+  <div id="photo-lightbox-modal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.95); backdrop-filter:blur(10px); flex-direction:column; justify-between; padding:16px;" onclick="closePhotoModal()">
+    <div style="display:flex; justify-between; align-items:center; width:100%; max-width:420px; margin:0 auto; padding-top:20px;">
+      <span style="font-size:14px; font-weight:900; color:#FFB300; text-transform:uppercase;" id="lightbox-counter-label">Photo 1 of 1</span>
+      <button type="button" onclick="closePhotoModal()" style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid #475569; border-radius:50%; width:36px; height:36px; font-size:18px; font-weight:bold; cursor:pointer;">&times;</button>
+    </div>
+
+    <div style="position:relative; flex:1; display:flex; align-items:center; justify-center; width:100%; max-width:420px; margin:auto;">
+      <img id="lightbox-img" src="" alt="Concert Photo Lightbox" style="max-height:70vh; max-width:100%; object-fit:contain; border-radius:16px; border:1px solid rgba(255,179,0,0.4);" onclick="event.stopPropagation();" />
+      <button type="button" onclick="prevModalPhoto(event)" style="position:absolute; left:8px; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.8); color:#FFB300; border:1px solid #FFB300; border-radius:50%; width:44px; height:44px; font-size:22px; font-weight:bold; cursor:pointer;">&lt;</button>
+      <button type="button" onclick="nextModalPhoto(event)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.8); color:#FFB300; border:1px solid #FFB300; border-radius:50%; width:44px; height:44px; font-size:22px; font-weight:bold; cursor:pointer;">&gt;</button>
+    </div>
+
+    <div style="width:100%; max-width:420px; margin:0 auto; display:flex; gap:12px; padding-bottom:12px;" onclick="event.stopPropagation();">
+      <button type="button" onclick="prevModalPhoto(event)" style="flex:1; padding:12px; background:#121619; border:1px solid #FFB300; color:#FFB300; font-weight:900; font-size:13px; text-transform:uppercase; border-radius:10px; cursor:pointer;">&lt; PREVIOUS</button>
+      <button type="button" onclick="nextModalPhoto(event)" style="flex:1; padding:12px; background:#121619; border:1px solid #FFB300; color:#FFB300; font-weight:900; font-size:13px; text-transform:uppercase; border-radius:10px; cursor:pointer;">NEXT &gt;</button>
+    </div>
+  </div>
+
+  <script>
+    // 5-COLOR RANDOM ASSORTMENT VINTAGE PALETTE
+    const TICKET_COLOR_PALETTE = [
+      '#F7C252', // Warm Gold
+      '#F7A993', // Vintage Peach
+      '#CAE6AB', // Retro Lime Mint
+      '#D6EBCA', // Pale Sage
+      '#F7E5B3', // Classic Cream
+    ];
+
+    let currentTicketTheme = localStorage.getItem('livelore_ticket_theme') || 'multicolor';
+    let currentPhotoUris = [];
+    let modalPhotoUris = [];
+    let modalActiveIdx = 0;
+
+    function openPhotoModal(index) {
+      if (!modalPhotoUris || modalPhotoUris.length === 0) return;
+      modalActiveIdx = index;
+      updatePhotoModalView();
+      document.getElementById('photo-lightbox-modal').style.display = 'flex';
+    }
+
+    function closePhotoModal() {
+      document.getElementById('photo-lightbox-modal').style.display = 'none';
+    }
+
+    function updatePhotoModalView() {
+      if (!modalPhotoUris || modalPhotoUris.length === 0) return;
+      document.getElementById('lightbox-img').src = modalPhotoUris[modalActiveIdx];
+      document.getElementById('lightbox-counter-label').innerText = `Photo ${modalActiveIdx + 1} of ${modalPhotoUris.length}`;
+    }
+
+    function prevModalPhoto(e) {
+      if (e) e.stopPropagation();
+      if (!modalPhotoUris || modalPhotoUris.length === 0) return;
+      modalActiveIdx = (modalActiveIdx - 1 + modalPhotoUris.length) % modalPhotoUris.length;
+      updatePhotoModalView();
+    }
+
+    function nextModalPhoto(e) {
+      if (e) e.stopPropagation();
+      if (!modalPhotoUris || modalPhotoUris.length === 0) return;
+      modalActiveIdx = (modalActiveIdx + 1) % modalPhotoUris.length;
+      updatePhotoModalView();
+    }
+
+    function updateDynamicYearSpans() {
+      const year = new Date().getFullYear();
+      document.querySelectorAll('.current-year-span').forEach(el => el.innerText = year);
+    }
+
+    function exportConcertsCsv() {
+      if (!userShows || userShows.length === 0) {
+        alert('Your concert vault is empty. Log concerts to export CSV data!');
+        return;
+      }
+
+      var headers = ['Date', 'Headline Artist', 'Opener(s)', 'Venue', 'City', 'State', 'Country', 'Notes'];
+
+      var escapeCsv = function(str) {
+        if (!str) return '""';
+        var clean = String(str).replace(/"/g, '""');
+        return '"' + clean + '"';
+      };
+
+      var rows = userShows.map(function(concert) {
+        var dStr = concert.date || '';
+        var hStr = concert.headline || '';
+        var oStr = (concert.openersList && concert.openersList.length > 0) ? concert.openersList.join(', ') : (concert.opener || '');
+        var vStr = concert.venue || '';
+        var cStr = concert.city || 'Noblesville';
+        var sStr = concert.state || 'IN';
+        var coStr = concert.country || 'USA';
+        var nStr = concert.notes || '';
+
+        return [
+          escapeCsv(dStr),
+          escapeCsv(hStr),
+          escapeCsv(oStr),
+          escapeCsv(vStr),
+          escapeCsv(cStr),
+          escapeCsv(sStr),
+          escapeCsv(coStr),
+          escapeCsv(nStr)
+        ].join(',');
+      });
+
+      var csvData = [headers.join(',')].concat(rows).join('\n');
+      var fileName = 'livelore_concert_vault_' + new Date().toISOString().slice(0, 10) + '.csv';
+
+      if (window.AndroidCSV && window.AndroidCSV.shareCsv) {
+        window.AndroidCSV.shareCsv(csvData, fileName);
+        return;
+      }
+
+      try {
+        var blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+        var url = URL.createObjectURL(blob);
+        var link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (ex) {
+        var encodedUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvData);
+        window.open(encodedUri);
+      }
+    }
+    window.exportConcertsCsv = exportConcertsCsv;
+
+    function handleDeleteAccountAndData() {
+      if (confirm('ARE YOU SURE YOU WANT TO PERMANENTLY DELETE YOUR ACCOUNT & ALL CONCERT DATA?\n\nThis action CANNOT be undone.')) {
+        if (confirm('FINAL CONFIRMATION: Tap OK to permanently wipe your user credentials and all saved concerts from cloud and local storage.')) {
+          userShows = [];
+
+          const rawUser = localStorage.getItem('livelore_active_user');
+          let activeEmail = null;
+          if (rawUser) {
+            try {
+              activeEmail = JSON.parse(rawUser).email;
+            } catch(e) {}
+          }
+
+          localStorage.removeItem('livelore_active_user');
+          localStorage.removeItem('livelore_local_shows');
+          localStorage.removeItem('livelore_vault_v1');
+          localStorage.removeItem('livelore_backup_shows');
+
+          if (activeEmail) {
+            const userKey = `livelore_shows_${activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_')}`;
+            localStorage.removeItem(userKey);
+
+            fetch('/api/sync/push', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                userId: `u_cloud_${activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_')}`,
+                concertsData: { concerts: [] }
+              })
+            }).catch(function(err) {});
+          }
+
+          renderShowsFeed();
+          updateStatsDisplay();
+          handleLogout();
+          alert('✓ Your account and concert vault have been permanently deleted.');
+        }
+      }
+    }
+
+    function switchTicketTheme(theme) {
+      currentTicketTheme = theme;
+      localStorage.setItem('livelore_ticket_theme', theme);
+
+      const btnMulti = document.getElementById('theme-btn-multicolor');
+      const btnClassic = document.getElementById('theme-btn-classic');
+      if (btnMulti) btnMulti.classList.toggle('active', theme === 'multicolor');
+      if (btnClassic) btnClassic.classList.toggle('active', theme === 'classic');
+
+      renderShowsFeed();
+    }
+
+    function getTicketColor(id) {
+      if (currentTicketTheme === 'classic') return '#f4e4bc';
+      if (!id) return TICKET_COLOR_PALETTE[0];
+      let hash = 0;
+      for (let i = 0; i < id.length; i++) {
+        hash = (hash << 5) - hash + id.charCodeAt(i);
+        hash |= 0;
+      }
+      return TICKET_COLOR_PALETTE[Math.abs(hash) % TICKET_COLOR_PALETTE.length];
+    }
+
+    // PRESET VENUES WITH OFFICIAL 2-LETTER U.S. STATE ABBREVIATIONS
+        const VENUE_DB = [
+      { v: "Deer Creek Music Center", c: "Noblesville", s: "IN", co: "USA" },
+      { v: "Klipsch Music Center", c: "Noblesville", s: "IN", co: "USA" },
+      { v: "Ruoff Music Center", c: "Noblesville", s: "IN", co: "USA" },
+      { v: "Ruoff Home Mortgage Music Center", c: "Noblesville", s: "IN", co: "USA" },
+      { v: "Verizon Wireless Music Center (Noblesville)", c: "Noblesville", s: "IN", co: "USA" },
+      { v: "Red Rocks Amphitheatre", c: "Morrison", s: "CO", co: "USA" },
+      { v: "Dick's Sporting Goods Park", c: "Commerce City", s: "CO", co: "USA" },
+      { v: "Fiddler's Green Amphitheatre", c: "Greenwood Village", s: "CO", co: "USA" },
+      { v: "Boulder Theater", c: "Boulder", s: "CO", co: "USA" },
+      { v: "Macky Auditorium", c: "Boulder", s: "CO", co: "USA" },
+      { v: "The Fillmore Auditorium", c: "Denver", s: "CO", co: "USA" },
+      { v: "Ogden Theatre", c: "Denver", s: "CO", co: "USA" },
+      { v: "Gothic Theatre", c: "Englewood", s: "CO", co: "USA" },
+      { v: "Bluebird Theater", c: "Denver", s: "CO", co: "USA" },
+      { v: "Cervantes' Masterpiece Ballroom", c: "Denver", s: "CO", co: "USA" },
+      { v: "Paramount Theatre", c: "Denver", s: "CO", co: "USA" },
+      { v: "Oriental Theater", c: "Denver", s: "CO", co: "USA" },
+      { v: "Civic Center Park", c: "Denver", s: "CO", co: "USA" },
+      { v: "Mission Ballroom", c: "Denver", s: "CO", co: "USA" },
+      { v: "Mishawaka Amphitheatre", c: "Bellvue", s: "CO", co: "USA" },
+      { v: "Planet Bluegrass (Folks Festival)", c: "Lyons", s: "CO", co: "USA" },
+      { v: "1stBank Center", c: "Broomfield", s: "CO", co: "USA" },
+      { v: "Elitch Gardens Arena", c: "Denver", s: "CO", co: "USA" },
+      { v: "Quixote's True Blue", c: "Denver", s: "CO", co: "USA" },
+      { v: "Bohemian Nights Festival", c: "Fort Collins", s: "CO", co: "USA" },
+      { v: "McNichols Sports Arena", c: "Denver", s: "CO", co: "USA" },
+      { v: "Market Square Arena", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Hoosier Dome", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Murat Theatre", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Old National Centre (Murat Shrine)", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Hilton U. Brown Theatre", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "The Vogue", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "World Mardi Gras", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Military Park (Indy Jazz Fest)", c: "Indianapolis", s: "IN", co: "USA" },
+      { v: "Star Plaza Theatre", c: "Merrillville", s: "IN", co: "USA" },
+      { v: "Bluebird Nightclub", c: "Bloomington", s: "IN", co: "USA" },
+      { v: "Headliners", c: "Muncie", s: "IN", co: "USA" },
+      { v: "Worthen Arena (Ball State)", c: "Muncie", s: "IN", co: "USA" },
+      { v: "Emens Auditorium", c: "Muncie", s: "IN", co: "USA" },
+      { v: "Buckeye Lake Music Center", c: "Millersport", s: "OH", co: "USA" },
+      { v: "Richfield Coliseum", c: "Richfield", s: "OH", co: "USA" },
+      { v: "Blossom Music Center", c: "Cuyahoga Falls", s: "OH", co: "USA" },
+      { v: "Riverbend Music Center", c: "Cincinnati", s: "OH", co: "USA" },
+      { v: "Hara Arena", c: "Dayton", s: "OH", co: "USA" },
+      { v: "Nutter Center", c: "Dayton", s: "OH", co: "USA" },
+      { v: "Alpine Valley Music Theatre", c: "East Troy", s: "WI", co: "USA" },
+      { v: "Rosemont Horizon", c: "Rosemont", s: "IL", co: "USA" },
+      { v: "Soldier Field", c: "Chicago", s: "IL", co: "USA" },
+      { v: "World Music Theatre", c: "Tinley Park", s: "IL", co: "USA" },
+      { v: "Assembly Hall", c: "Champaign", s: "IL", co: "USA" },
+      { v: "Riverport Amphitheater", c: "St. Louis", s: "MO", co: "USA" },
+      { v: "The Palace of Auburn Hills", c: "Auburn Hills", s: "MI", co: "USA" },
+      { v: "Palace Theatre", c: "Louisville", s: "KY", co: "USA" },
+      { v: "Mud Island Amphitheater", c: "Memphis", s: "TN", co: "USA" },
+      { v: "Concrete Street Amphitheater", c: "Corpus Christi", s: "TX", co: "USA" },
+      { v: "MGM Grand Garden Arena", c: "Las Vegas", s: "NV", co: "USA" },
+      { v: "Fox Theater", c: "Oakland", s: "CA", co: "USA" },
+      { v: "Golden State Theatre", c: "Monterey", s: "CA", co: "USA" },
+      { v: "Greek Theatre (UC Berkeley)", c: "Berkeley", s: "CA", co: "USA" },
+      { v: "Chase Center", c: "San Francisco", s: "CA", co: "USA" },
+      { v: "The Spectrum", c: "Philadelphia", s: "PA", co: "USA" },
+      { v: "Giants Stadium", c: "East Rutherford", s: "NJ", co: "USA" },
+      { v: "Madison Square Garden", c: "New York", s: "NY", co: "USA" },
+      { v: "Robert F. Kennedy Stadium", c: "Washington", s: "DC", co: "USA" },
+      { v: "Rich Stadium", c: "Buffalo", s: "NY", co: "USA" },
+      { v: "Los Angeles Memorial Coliseum", c: "Los Angeles", s: "CA", co: "USA" },
+      { v: "Franklin County Field", c: "Highgate", s: "VT", co: "USA" },
+      { v: "Sullivan Stadium", c: "Foxboro", s: "MA", co: "USA" },
+      { v: "Oakland-Alameda County Coliseum Stadium", c: "Oakland", s: "CA", co: "USA" },
+      { v: "Orion Amphitheater", c: "Huntsville", s: "AL", co: "USA" },
+      { v: "VyStar Veterans Memorial Arena", c: "Jacksonville", s: "FL", co: "USA" },
+      { v: "Allianz Amphitheater at Riverfront", c: "Richmond", s: "VA", co: "USA" },
+      { v: "Jim Whelan Boardwalk Hall", c: "Atlantic City", s: "NJ", co: "USA" },
+      { v: "Fenway Park", c: "Boston", s: "MA", co: "USA" },
+      { v: "Empower Federal Credit Union Amphitheater at Lakeview", c: "Syracuse", s: "NY", co: "USA" },
+      { v: "Merriweather Post Pavilion", c: "Columbia", s: "MD", co: "USA" },
+      { v: "Coastal Credit Union Music Park at Walnut Creek", c: "Raleigh", s: "NC", co: "USA" },
+      { v: "Enmarket Arena", c: "Savannah", s: "GA", co: "USA" },
+      { v: "Kohl Center", c: "Madison", s: "WI", co: "USA" },
+      { v: "Sphere", c: "Las Vegas", s: "NV", co: "USA" },
+      { v: "Moon Palace", c: "Cancun", s: "Quintana Roo", co: "Mexico" },
+      { v: "Hampton Coliseum", c: "Hampton", s: "VA", co: "USA" },
+      { v: "Ameris Bank Amphitheatre", c: "Alpharetta", s: "GA", co: "USA" },
+      { v: "Coca-Cola Amphitheater", c: "Birmingham", s: "AL", co: "USA" },
+      { v: "Highland Festival Grounds at Kentucky Expo Center", c: "Louisville", s: "KY", co: "USA" },
+      { v: "Broadview Stage at SPAC", c: "Saratoga Springs", s: "NY", co: "USA" },
+      { v: "Forest Hills Stadium", c: "Forest Hills", s: "NY", co: "USA" },
+      { v: "United Center", c: "Chicago", s: "IL", co: "USA" },
+      { v: "TD Pavilion at the Mann", c: "Philadelphia", s: "PA", co: "USA" },
+      { v: "North Charleston Coliseum", c: "North Charleston", s: "SC", co: "USA" },
+      { v: "Jerome Schottenstein Center", c: "Columbus", s: "OH", co: "USA" },
+      { v: "Folsom Field", c: "Boulder", s: "CO", co: "USA" },
+      { v: "Moody Center", c: "Austin", s: "TX", co: "USA" },
+      { v: "Petersen Events Center", c: "Pittsburgh", s: "PA", co: "USA" },
+      { v: "SNHU Arena", c: "Manchester", s: "NH", co: "USA" },
+      { v: "Hollywood Bowl", c: "Hollywood", s: "CA", co: "USA" },
+      { v: "Bill Graham Civic Auditorium", c: "San Francisco", s: "CA", co: "USA" },
+      { v: "Moda Center", c: "Portland", s: "OR", co: "USA" },
+      { v: "Climate Pledge Arena", c: "Seattle", s: "WA", co: "USA" },
+      { v: "MVP Arena", c: "Albany", s: "NY", co: "USA" },
+      { v: "The Woodlands", c: "Dover", s: "DE", co: "USA" },
+      { v: "Bethel Woods Center for the Arts", c: "Bethel", s: "NY", co: "USA" },
+      { v: "Van Andel Arena", c: "Grand Rapids", s: "MI", co: "USA" },
+      { v: "Chaifetz Arena, Saint Louis University", c: "St. Louis", s: "MO", co: "USA" },
+      { v: "Mohegan Sun Arena", c: "Uncasville", s: "CT", co: "USA" },
+      { v: "Xfinity Center", c: "Mansfield", s: "MA", co: "USA" },
+      { v: "Ervin J. Nutter Center, Wright State University", c: "Dayton", s: "OH", co: "USA" },
+      { v: "Bridgestone Arena", c: "Nashville", s: "TN", co: "USA" },
+      { v: "St. Joseph's Health Amphitheater at Lakeview", c: "Syracuse", s: "NY", co: "USA" },
+      { v: "The Pavilion at Star Lake", c: "Burgettstown", s: "PA", co: "USA" },
+      { v: "Live Oak Bank Pavilion at Riverfront Park", c: "Wilmington", s: "NC", co: "USA" },
+      { v: "William Randolph Hearst Greek Theatre, University of California, Berkeley", c: "Berkeley", s: "CA", co: "USA" },
+      { v: "Budweiser Stage", c: "Toronto", s: "Ontario", co: "Canada" },
+      { v: "Atlantic City Beach", c: "Atlantic City", s: "NJ", co: "USA" },
+      { v: "Pine Knob Music Theatre", c: "Clarkston", s: "MI", co: "USA" },
+      { v: "Northwell Health at Jones Beach Theater", c: "Wantagh", s: "NY", co: "USA" },
+      { v: "Xfinity Theatre", c: "Hartford", s: "CT", co: "USA" },
+      { v: "Maine Savings Amphitheater", c: "Bangor", s: "ME", co: "USA" },
+      { v: "Credit One Stadium", c: "Charleston", s: "SC", co: "USA" },
+      { v: "The Wharf Amphitheater", c: "Orange Beach", s: "AL", co: "USA" },
+      { v: "Rock Lititz", c: "Lititz", s: "PA", co: "USA" },
+      { v: "Santa Barbara Bowl", c: "Santa Barbara", s: "CA", co: "USA" },
+      { v: "The Forum", c: "Inglewood", s: "CA", co: "USA" },
+      { v: "North Island Credit Union Amphitheatre", c: "Chula Vista", s: "CA", co: "USA" },
+      { v: "Ak-Chin Pavilion", c: "Phoenix", s: "AZ", co: "USA" },
+      { v: "Matthew Knight Arena", c: "Eugene", s: "OR", co: "USA" },
+      { v: "Golden 1 Center", c: "Sacramento", s: "CA", co: "USA" },
+      { v: "Shoreline Amphitheatre", c: "Mountain View", s: "CA", co: "USA" },
+      { v: "Gorge Amphitheatre", c: "George", s: "WA", co: "USA" },
+      { v: "Hersheypark Stadium", c: "Hershey", s: "PA", co: "USA" },
+      { v: "Ascend Amphitheater", c: "Nashville", s: "TN", co: "USA" },
+      { v: "Oak Mountain Amphitheatre", c: "Pelham", s: "AL", co: "USA" },
+      { v: "Walmart Arkansas Music Pavilion", c: "Rogers", s: "AR", co: "USA" },
+      { v: "Met Philadelphia", c: "Philadelphia", s: "PA", co: "USA" },
+      { v: "Nassau Veterans Memorial Coliseum", c: "Uniondale", s: "NY", co: "USA" },
+      { v: "Dunkin' Donuts Center", c: "Providence", s: "RI", co: "USA" },
+      { v: "Saratoga Performing Arts Center", c: "Saratoga Springs", s: "NY", co: "USA" },
+      { v: "BB&T Pavilion", c: "Camden", s: "NJ", co: "USA" },
+      { v: "Darling's Waterfront Pavilion", c: "Bangor", s: "ME", co: "USA" },
+      { v: "PNC Music Pavilion", c: "Charlotte", s: "NC", co: "USA" },
+      { v: "Bonnaroo Music & Arts Festival", c: "Manchester", s: "TN", co: "USA" },
+      { v: "BarcelÃ³ Maya Beach", c: "Riviera Maya", s: "Quintana Roo", co: "Mexico" },
+      { v: "Allstate Arena", c: "Rosemont", s: "IL", co: "USA" },
+      { v: "Times Union Center", c: "Albany", s: "NY", co: "USA" },
+      { v: "Verizon Wireless Amphitheatre at Encore Park", c: "Alpharetta", s: "GA", co: "USA" },
+      { v: "Austin360 Amphitheater", c: "Del Valle", s: "TX", co: "USA" },
+      { v: "Lake Tahoe Outdoor Arena at Harveys", c: "Stateline", s: "NV", co: "USA" },
+      { v: "Huntington Bank Pavilion at Northerly Island", c: "Chicago", s: "IL", co: "USA" },
+      { v: "Verizon Theatre at Grand Prairie", c: "Grand Prairie", s: "TX", co: "USA" },
+      { v: "Jacksonville Veterans Memorial Arena", c: "Jacksonville", s: "FL", co: "USA" },
+      { v: "Oak Ridge Farm", c: "Arrington", s: "VA", co: "USA" },
+      { v: "Sleep Train Amphitheatre", c: "Chula Vista", s: "CA", co: "USA" },
+      { v: "Lakeview Amphitheater", c: "Syracuse", s: "NY", co: "USA" },
+      { v: "Cross Insurance Arena", c: "Portland", s: "ME", co: "USA" },
+      { v: "The Mann Center for the Performing Arts", c: "Philadelphia", s: "PA", co: "USA" },
+      { v: "Wrigley Field", c: "Chicago", s: "IL", co: "USA" },
+      { v: "Xcel Energy Center", c: "St. Paul", s: "MN", co: "USA" },
+      { v: "Watkins Glen International", c: "Watkins Glen", s: "NY", co: "USA" },
+      { v: "Walnut Creek Amphitheater", c: "Raleigh", s: "NC", co: "USA" },
+      { v: "Starlight Theatre", c: "Kansas City", s: "MO", co: "USA" },
+      { v: "Tuscaloosa Amphitheater", c: "Tuscaloosa", s: "AL", co: "USA" },
+      { v: "Buckeye Lake Music Center", c: "Thornville", s: "OH", co: "USA" },
+      { v: "Hubert H. Humphrey Metrodome", c: "Minneapolis", s: "MN", co: "USA" },
+      { v: "Carter-Finley Stadium, North Carolina State University", c: "Raleigh", s: "NC", co: "USA" },
+      { v: "Wallace Wade Stadium, Duke University", c: "Durham", s: "NC", co: "USA" },
+      { v: "Three Rivers Stadium", c: "Pittsburgh", s: "PA", co: "USA" },
+      { v: "Sam Boyd Silver Bowl", c: "Las Vegas", s: "NV", co: "USA" },
+      { v: "Autzen Stadium, University of Oregon", c: "Eugene", s: "OR", co: "USA" },
+      { v: "Rubber Bowl, University of Akron", c: "Akron", s: "OH", co: "USA" },
+      { v: "The Palace", c: "Auburn Hills", s: "MI", co: "USA" },
+      { v: "Oxford Plains Speedway", c: "Oxford", s: "ME", co: "USA" },
+      { v: "Blockbuster Pavilion", c: "Glen Helen", s: "CA", co: "USA" },
+      { v: "Carrier Dome, Syracuse University", c: "Syracuse", s: "NY", co: "USA" },
+      { v: "Portland Meadows", c: "Portland", s: "OR", co: "USA" },
+      { v: "Tacoma Dome", c: "Tacoma", s: "WA", co: "USA" },
+      { v: "Silver Stadium", c: "Rochester", s: "NY", co: "USA" },
+      { v: "Alumni Stadium, University of Massachusetts", c: "Amherst", s: "MA", co: "USA" },
+      { v: "Compton Terrace Amphitheatre", c: "Chandler", s: "AZ", co: "USA" },
+      { v: "Poplar Creek Music Theatre", c: "Hoffman Estates", s: "IL", co: "USA" },
+      { v: "Roosevelt Stadium", c: "Jersey City", s: "NJ", co: "USA" },
+      { v: "Hershey Park Stadium", c: "Hershey", s: "PA", co: "USA" },
+      { v: "Charlotte Coliseum", c: "Charlotte", s: "NC", co: "USA" },
+      { v: "Mecca", c: "Milwaukee", s: "WI", co: "USA" },
+      { v: "Wrigley Field", c: "Los Angeles", s: "CA", co: "USA" },
+      { v: "Seattle Center Memorial Stadium", c: "Seattle", s: "WA", co: "USA" },
+      { v: "Meadowlands Arena", c: "East Rutherford", s: "NJ", co: "USA" },
+      { v: "The Omni", c: "Atlanta", s: "GA", co: "USA" },
+      { v: "Caldwell College", c: "Caldwell", s: "NJ", co: "USA" },
+      { v: "Spectrum", c: "Philadelphia", s: "PA", co: "USA" },
+      { v: "Laguna Seca Raceway", c: "Salinas", s: "CA", co: "USA" },
+      { v: "Riverport Amphitheatre", c: "Maryland Heights", s: "MO", co: "USA" },
+      { v: "Joe Louis Arena", c: "Detroit", s: "MI", co: "USA" },
+      { v: "Blockbuster Desert Sky Pavilion", c: "Phoenix", s: "AZ", co: "USA" },
+      { v: "Gund Arena", c: "Cleveland", s: "OH", co: "USA" },
+      { v: "Reunion Arena", c: "Dallas", s: "TX", co: "USA" },
+      { v: "Capital Centre", c: "Landover", s: "MD", co: "USA" },
+      { v: "Dean E. Smith Center, University of North Carolina", c: "Chapel Hill", s: "NC", co: "USA" },
+      { v: "St. Paul Civic Center Arena", c: "St. Paul", s: "MN", co: "USA" },
+      { v: "Sandstone Amphitheater", c: "Bonner Springs", s: "KS", co: "USA" },
+      { v: "Freedom Hall", c: "Louisville", s: "KY", co: "USA" },
+      { v: "Metropolitan Sports Center", c: "Bloomington", s: "MN", co: "USA" },
+      { v: "Pittsburgh Civic Arena", c: "Pittsburgh", s: "PA", co: "USA" },
+      { v: "Great Western Forum", c: "Inglewood", s: "CA", co: "USA" },
+      { v: "Buffalo Memorial Auditorium", c: "Buffalo", s: "NY", co: "USA" },
+      { v: "Long Beach Arena", c: "Long Beach", s: "CA", co: "USA" },
+      { v: "Copps Coliseum", c: "Hamilton", s: "", co: "Canada" },
+      { v: "Miami Arena", c: "Miami", s: "FL", co: "USA" },
+      { v: "Knickerbocker Arena", c: "Albany", s: "NY", co: "USA" },
+      { v: "Cow Palace", c: "Daly City", s: "CA", co: "USA" },
+      { v: "Compton Terrace", c: "Tempe", s: "AZ", co: "USA" },
+      { v: "Riverfront Arena", c: "Cincinnati", s: "OH", co: "USA" },
+      { v: "Hartford Civic Center", c: "Hartford", s: "CT", co: "USA" },
+      { v: "Barton Hall, Cornell University", c: "Ithaca", s: "NY", co: "USA" },
+      { v: "Oakland-Alameda County Coliseum Arena", c: "Oakland", s: "CA", co: "USA" },
+      { v: "Greensboro Coliseum", c: "Greensboro", s: "NC", co: "USA" },
+      { v: "Providence Civic Center", c: "Providence", s: "RI", co: "USA" },
+      { v: "Boston Garden", c: "Boston", s: "MA", co: "USA" },
+      { v: "Seattle Center Memorial Coliseum", c: "Seattle", s: "WA", co: "USA" },
+      { v: "Seashore Performing Arts Center", c: "Old Orchard Beach", s: "ME", co: "USA" },
+      { v: "Irvine Meadows Amphitheatre", c: "Irvine", s: "CA", co: "USA" },
+      { v: "Great Woods Center for the Performing Arts", c: "Mansfield", s: "MA", co: "USA" },
+      { v: "Cal Expo Amphitheatre", c: "Sacramento", s: "CA", co: "USA" },
+      { v: "Orlando Arena", c: "Orlando", s: "FL", co: "USA" },
+      { v: "Los Angeles Memorial Sports Arena", c: "Los Angeles", s: "CA", co: "USA" },
+      { v: "The Summit", c: "Houston", s: "TX", co: "USA" },
+      { v: "Pauley Pavilion, UCLA", c: "Los Angeles", s: "CA", co: "USA" },
+      { v: "Devore Field, Southwestern College", c: "Chula Vista", s: "CA", co: "USA" },
+      { v: "Portland Memorial Coliseum", c: "Portland", s: "OR", co: "USA" },
+      { v: "Centrum", c: "Worcester", s: "MA", co: "USA" },
+      { v: "San Diego Sports Arena", c: "San Diego", s: "CA", co: "USA" },
+      { v: "Ventura County Fairgrounds", c: "Ventura", s: "CA", co: "USA" },
+      { v: "Richmond Coliseum", c: "Richmond", s: "VA", co: "USA" },
+      { v: "Crisler Arena, University of Michigan", c: "Ann Arbor", s: "MI", co: "USA" },
+      { v: "Activity Center, University of Colorado", c: "Boulder", s: "CO", co: "USA" },
+      { v: "Baltimore Civic Center", c: "Baltimore", s: "MD", co: "USA" },
+      { v: "Fieldhouse, University of Iowa", c: "Iowa City", s: "IA", co: "USA" },
+      { v: "Carolina Coliseum Arena, Univ. of S. Carolina", c: "Columbia", s: "SC", co: "USA" },
+    ];
+
+    let authMode = 'login';
+    let userShows = [];
+    let currentSort = 'newest';
+    let activeDetailShowId = null;
+    let editingShowId = null;
+
+    function toStateAbbr(stateStr) {
+      if (!stateStr) return 'IN';
+      const s = stateStr.trim();
+      if (s.length === 2) return s.toUpperCase();
+      const map = {
+        'california': 'CA', 'indiana': 'IN', 'colorado': 'CO', 'new york': 'NY',
+        'ohio': 'OH', 'illinois': 'IL', 'michigan': 'MI', 'wisconsin': 'WI',
+        'kentucky': 'KY', 'tennessee': 'TN', 'missouri': 'MO', 'texas': 'TX',
+        'nevada': 'NV', 'washington': 'WA', 'oregon': 'OR', 'pennsylvania': 'PA',
+        'new jersey': 'NJ', 'massachusetts': 'MA', 'connecticut': 'CT', 'rhode island': 'RI',
+        'maryland': 'MD', 'georgia': 'GA', 'north carolina': 'NC', 'florida': 'FL',
+        'arkansas': 'AR', 'kansas': 'KS', 'nebraska': 'NE', 'minnesota': 'MN',
+        'arizona': 'AZ', 'district of columbia': 'DC'
+      };
+      return map[s.toLowerCase()] || s;
+    }
+
+    function generateUniqueId() {
+      return 'show_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+    }
+
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById('view-' + screenId);
+      if (target) target.classList.add('active');
+
+      if (window.AndroidAdMob) {
+        if (isVIPUser || screenId === 'auth' || screenId === 'terms' || screenId === 'privacy' || screenId === 'faq') {
+          window.AndroidAdMob.hideBannerAd();
+        } else {
+          window.AndroidAdMob.showBannerAd();
+        }
+      }
+
+      const vipSubtitle = document.getElementById('vip-pass-subtitle');
+      if (vipSubtitle) {
+        vipSubtitle.style.display = isVIPUser ? 'none' : 'block';
+      }
+    }
+
+    function renderPhotosGrid() {
+      const grid = document.getElementById('photos-grid');
+      const countLabel = document.getElementById('photo-count-label');
+      if (!grid) return;
+
+      if (countLabel) countLabel.innerText = currentPhotoUris.length;
+
+      grid.innerHTML = '';
+      currentPhotoUris.forEach((uri, idx) => {
+        const item = document.createElement('div');
+        item.style.position = 'relative';
+        item.style.aspectRatio = '1/1';
+        item.style.borderRadius = '8px';
+        item.style.overflow = 'hidden';
+        item.style.border = idx === 0 ? '2px solid #FFB300' : '1px solid #222B30';
+
+        item.innerHTML = `
+          <img src="${uri}" style="width:100%; height:100%; object-fit:cover;" />
+          ${idx === 0 ? `
+            <div style="position:absolute; top:2px; left:2px; background:#FFB300; color:#0a0a0a; font-size:7px; font-weight:900; padding:1px 4px; border-radius:3px;">PRIMARY</div>
+          ` : `
+            <button type="button" onclick="setPrimaryPhoto(${idx})" style="position:absolute; top:2px; left:2px; background:rgba(0,0,0,0.8); color:#FFB300; border:none; border-radius:50%; width:18px; height:18px; font-size:9px; font-weight:bold; cursor:pointer;">★</button>
+          `}
+          <button type="button" onclick="removePhoto(${idx})" style="position:absolute; top:2px; right:2px; background:rgba(0,0,0,0.8); color:#fecdd3; border:none; border-radius:50%; width:18px; height:18px; font-size:10px; font-weight:bold; cursor:pointer;">✕</button>
+        `;
+        grid.appendChild(item);
+      });
+
+      if (currentPhotoUris.length < 5) {
+        const addBtn = document.createElement('label');
+        addBtn.style.aspectRatio = '1/1';
+        addBtn.style.borderRadius = '8px';
+        addBtn.style.border = '2px dashed #FFB300';
+        addBtn.style.background = '#111618';
+        addBtn.style.display = 'flex';
+        addBtn.style.flexDirection = 'column';
+        addBtn.style.alignItems = 'center';
+        addBtn.style.justifyContent = 'center';
+        addBtn.style.cursor = 'pointer';
+        addBtn.style.color = '#FFB300';
+        addBtn.style.fontSize = '10px';
+        addBtn.style.fontWeight = '900';
+
+        addBtn.innerHTML = `
+          <span style="font-size:18px;">+</span>
+          <span>PHOTO</span>
+          <input type="file" accept="image/*" multiple style="display:none;" onchange="handlePhotoSelect(event)" />
+        `;
+        grid.appendChild(addBtn);
+      } else {
+        const maxBtn = document.createElement('div');
+        maxBtn.style.aspectRatio = '1/1';
+        maxBtn.style.borderRadius = '8px';
+        maxBtn.style.border = '1px dashed #64748b';
+        maxBtn.style.background = '#0a0d0e';
+        maxBtn.style.display = 'flex';
+        maxBtn.style.flexDirection = 'column';
+        maxBtn.style.alignItems = 'center';
+        maxBtn.style.justifyContent = 'center';
+        maxBtn.style.color = '#64748b';
+        maxBtn.style.fontSize = '9px';
+        maxBtn.style.fontWeight = 'bold';
+        maxBtn.style.textAlign = 'center';
+        maxBtn.style.padding = '2px';
+        maxBtn.innerHTML = '<span>5/5 Max</span><span>Delete to Add</span>';
+        grid.appendChild(maxBtn);
+      }
+    }
+
+    function handlePhotoSelect(e) {
+      if (!e.target.files || e.target.files.length === 0) return;
+      const files = Array.from(e.target.files);
+
+      files.forEach(file => {
+        if (currentPhotoUris.length >= 5) return;
+        const reader = new FileReader();
+        reader.onloadend = function() {
+          if (reader.result) {
+            currentPhotoUris.push(reader.result);
+            renderPhotosGrid();
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+      reader.readAsDataURL(file);
+    }
+
+    function removePhoto(idx) {
+      currentPhotoUris.splice(idx, 1);
+      renderPhotosGrid();
+    }
+
+    function setPrimaryPhoto(idx) {
+      if (idx === 0 || idx >= currentPhotoUris.length) return;
+      const selected = currentPhotoUris.splice(idx, 1)[0];
+      currentPhotoUris.unshift(selected);
+      renderPhotosGrid();
+    }
+
+    function switchAuthMode(mode) {
+      authMode = mode;
+      document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+      document.getElementById('tab-register').classList.toggle('active', mode === 'register');
+      document.getElementById('field-name-box').style.display = mode === 'register' ? 'block' : 'none';
+      document.getElementById('btn-auth-submit').innerText = mode === 'login' ? 'LOG IN' : 'CREATE ACCOUNT';
+
+      clearErrorBanner();
+      document.getElementById('auth-email').value = '';
+      document.getElementById('auth-password').value = '';
+      document.getElementById('auth-name').value = '';
+    }
+
+    function onNativeGoogleAuthFallback() {
+      const googleEmail = prompt("Enter your Google Account email to continue:", "wcsurface@gmail.com");
+      if (googleEmail && googleEmail.includes('@')) {
+        onNativeGoogleAuthSuccess(googleEmail);
+      }
+    }
+
+    function handleGoogleSignIn() {
+      if (window.AndroidGoogleAuth && window.AndroidGoogleAuth.launchGoogleSignIn) {
+        try {
+          window.AndroidGoogleAuth.launchGoogleSignIn();
+        } catch (e) {
+          onNativeGoogleAuthFallback();
+        }
+      } else {
+        onNativeGoogleAuthFallback();
+      }
+    }
+
+    function onNativeGoogleAuthSuccess(googleEmail) {
+      if (!googleEmail || !googleEmail.includes('@')) return;
+      const cleanedEmail = googleEmail.toLowerCase().trim();
+
+      localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
+
+      loadSavedShows();
+      showScreen('diary');
+    }
+
+    function handleClearUserVault() {
+      userShows = [];
+
+      const rawUser = localStorage.getItem('livelore_active_user');
+      let activeEmail = null;
+      if (rawUser) {
+        try {
+          activeEmail = JSON.parse(rawUser).email;
+        } catch(e) {}
+      }
+
+      // WIPE ALL LOCAL CONCERT STORAGE KEYS
+      localStorage.removeItem('livelore_local_shows');
+      localStorage.removeItem('livelore_vault_v1');
+      localStorage.removeItem('livelore_backup_shows');
+
+      if (activeEmail) {
+        const userKey = `livelore_shows_${activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_')}`;
+        localStorage.removeItem(userKey);
+
+        // Push 0 shows directly to Railway PostgreSQL Cloud DB
+        fetch('/api/sync/push', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: `u_cloud_${activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_')}`,
+            concertsData: { concerts: [] }
+          })
+        }).catch(function(err) {});
+      }
+
+      renderShowsFeed();
+      updateStatsDisplay();
+    }
+
+    function showErrorBanner(msg) {
+      const el = document.getElementById('auth-error-banner');
+      if (el) {
+        el.innerText = msg;
+        el.style.display = 'block';
+      }
+      alert(msg);
+    }
+
+    function clearErrorBanner() {
+      const el = document.getElementById('auth-error-banner');
+      if (el) {
+        el.innerText = '';
+        el.style.display = 'none';
+      }
+    }
+
+    function handleLogout() {
+      clearErrorBanner();
+      localStorage.removeItem('livelore_active_user');
+      document.getElementById('auth-email').value = '';
+      document.getElementById('auth-password').value = '';
+      document.getElementById('auth-name').value = '';
+      showScreen('auth');
+    }
+
+    function handleLoginSubmit(e) {
+      if (e) e.preventDefault();
+      clearErrorBanner();
+
+      const emailInput = document.getElementById('auth-email').value || '';
+      const passInput = document.getElementById('auth-password').value || '';
+
+      const cleanedEmail = emailInput.toLowerCase().trim();
+
+      if (!cleanedEmail || cleanedEmail.length < 3 || !cleanedEmail.includes('@')) {
+        showErrorBanner('Incorrect Email Address or Password. Please try again.');
+        return;
+      }
+
+      if (!passInput || passInput.length < 4) {
+        showErrorBanner('Incorrect Email Address or Password. Please try again.');
+        return;
+      }
+
+      localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'email' }));
+
+      loadSavedShows();
+
+      document.getElementById('auth-email').value = '';
+      document.getElementById('auth-password').value = '';
+      document.getElementById('auth-name').value = '';
+
+      showScreen('diary');
+    }
+
+    function buyAppPremium() {
+      alert('Welcome to LiveLore VIP! You now have permanent ad-free access and photo features!');
+    }
+
+    function openPhotoModal(index) {
+      if (!modalPhotoUris || modalPhotoUris.length === 0) return;
+      modalActiveIdx = index;
+      updatePhotoModalView();
+      var modal = document.getElementById('photo-lightbox-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+      }
+    }
+    window.openPhotoModal = openPhotoModal;
+
+    function closePhotoModal() {
+      var modal = document.getElementById('photo-lightbox-modal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    }
+    window.closePhotoModal = closePhotoModal;
+
+    function updatePhotoModalView() {
+      if (!modalPhotoUris || modalPhotoUris.length === 0) return;
+      var img = document.getElementById('lightbox-img');
+      var counter = document.getElementById('lightbox-counter-label');
+      if (img) img.src = modalPhotoUris[modalActiveIdx];
+      if (counter) counter.innerText = 'Photo ' + (modalActiveIdx + 1) + ' of ' + modalPhotoUris.length;
+    }
+    window.updatePhotoModalView = updatePhotoModalView;
+
+    function prevModalPhoto(e) {
+      if (e) {
+        try { e.preventDefault(); e.stopPropagation(); } catch(ex) {}
+      }
+      if (!modalPhotoUris || modalPhotoUris.length === 0) return;
+      modalActiveIdx = (modalActiveIdx - 1 + modalPhotoUris.length) % modalPhotoUris.length;
+      updatePhotoModalView();
+    }
+    window.prevModalPhoto = prevModalPhoto;
+
+    function nextModalPhoto(e) {
+      if (e) {
+        try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
+      if (!modalPhotoUris || modalPhotoUris.length === 0) return;
+      modalActiveIdx = (modalActiveIdx + 1) % modalPhotoUris.length;
+      updatePhotoModalView();
+    }
+    window.nextModalPhoto = nextModalPhoto;
+
+    function openShowDetails(showId) {
+      activeDetailShowId = showId;
+      const show = userShows.find(s => s.id === showId);
+      if (!show) return;
+
+      document.getElementById('detail-headline').innerText = show.headline.toUpperCase();
+      document.getElementById('detail-date').innerText = show.date;
+      document.getElementById('detail-venue').innerText = show.venue;
+
+      const preset = VENUE_DB.find(v => v.v.toLowerCase() === (show.venue || '').toLowerCase() || v.v.toLowerCase().startsWith((show.venue || '').toLowerCase()));
+      const c = (show.city || (preset ? preset.c : 'Noblesville')).trim();
+      const rawState = show.state || (preset ? preset.s : 'IN');
+      const s = toStateAbbr(rawState);
+      const co = (show.country || (preset ? preset.co : 'USA')).trim();
+
+      document.getElementById('detail-location').innerText = `${c}, ${s}, ${co}`;
+
+      const openersBox = document.getElementById('detail-openers-box');
+      if (show.openersList && show.openersList.length > 0) {
+        openersBox.style.display = 'block';
+        document.getElementById('detail-openers').innerText = show.openersList.join(', ');
+      } else {
+        openersBox.style.display = 'none';
+      }
+
+      const notesBox = document.getElementById('detail-notes-box');
+      if (show.notes && show.notes.trim().length > 0) {
+        notesBox.style.display = 'block';
+        document.getElementById('detail-notes').innerText = show.notes;
+      } else {
+        notesBox.style.display = 'none';
+      }
+
+      // Photos Gallery on Details Page
+      const photosBox = document.getElementById('detail-photos-gallery-box');
+      const photosGrid = document.getElementById('detail-photos-grid');
+      if (show.photoUris && show.photoUris.length > 0) {
+        modalPhotoUris = [...show.photoUris];
+        photosBox.style.display = 'block';
+        photosGrid.innerHTML = show.photoUris.map((uri, idx) => `
+          <div onclick="openPhotoModal(${idx})" style="position:relative; aspect-ratio:1/1; border-radius:10px; overflow:hidden; border:${idx === 0 ? '2px solid #FFB300' : '1px solid #222B30'}; cursor:pointer;">
+            <img src="${uri}" style="width:100%; height:100%; object-fit:cover;" />
+            ${idx === 0 ? `<div style="position:absolute; top:2px; left:2px; background:#FFB300; color:#0a0a0a; font-size:7px; font-weight:900; padding:1px 4px; border-radius:3px;">PRIMARY</div>` : ''}
+          </div>
+        `).join('');
+      } else {
+        photosBox.style.display = 'none';
+      }
+
+      // Ticket preview with Persistent Color Continuity & Primary Photo
+      const ticketColor = getTicketColor(show.id);
+      let bandStackHtml = `<div class="ticket-artist-head">${show.headline.toUpperCase()}</div>`;
+      if (show.openersList && show.openersList.length > 0) {
+        bandStackHtml += `
+          <div class="ticket-artist-and">and</div>
+          <div class="ticket-artist-openers">${show.openersList.join(', ')}</div>
+        `;
+      }
+
+      const primaryPhoto = (show.photoUris && show.photoUris.length > 0) ? show.photoUris[0] : null;
+
+      document.getElementById('detail-ticket-preview').innerHTML = `
+        <div class="ticket-card" style="margin-bottom:0; background-color:${ticketColor};">
+          <div class="ticket-left">
+            <div class="ticket-artist-box">${bandStackHtml}</div>
+            <div class="ticket-footer">
+              <span class="ticket-venue">${show.venue}</span>
+              <span class="ticket-date">${show.date}</span>
+            </div>
+          </div>
+          <div class="ticket-stub">
+            ${primaryPhoto ? `
+              <div style="width:100%; height:100%; border-radius:6px; overflow:hidden; border:1px solid rgba(0,0,0,0.4); position:relative;">
+                <img src="${primaryPhoto}" style="width:100%; height:100%; object-fit:cover;" />
+                <div style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.7); color:#FFB300; font-size:6px; font-weight:900; text-align:center; padding:1px 0;">VIP MEMORY</div>
+              </div>
+            ` : `
+              <div>ADMIT ONE</div>
+              <div style="font-size:8px; color:#221508; margin-top:4px;">SEC 7</div>
+            `}
+          </div>
+        </div>
+      `;
+
+      showScreen('setlist');
+    }
+
+    function triggerEditShow() {
+      if (!activeDetailShowId) return;
+      const show = userShows.find(s => s.id === activeDetailShowId);
+      if (!show) return;
+
+      editingShowId = activeDetailShowId;
+
+      document.getElementById('input-headline').value = (show.headline || '').trim();
+      document.getElementById('input-venue').value = (show.venue || '').trim();
+      document.getElementById('input-city').value = (show.city || 'Noblesville').trim();
+      document.getElementById('input-state').value = toStateAbbr(show.state || 'IN');
+      document.getElementById('input-country').value = (show.country || 'USA').trim();
+      document.getElementById('input-date').value = show.date || '';
+      document.getElementById('input-notes').value = (show.notes || '').trim();
+
+      currentPhotoUris = show.photoUris ? [...show.photoUris] : [];
+      renderPhotosGrid();
+
+      if (show.openersList && show.openersList.length > 0) {
+        const openersContainer = document.getElementById('openers-container');
+        openersContainer.innerHTML = show.openersList.map(op => `
+          <input type="text" class="input-field input-opener" value="${op.trim()}" placeholder="Opener" />
+        `).join('');
+      }
+
+      const btnSave = document.getElementById('btn-save-show');
+      if (btnSave) btnSave.innerText = 'SAVE EDITS';
+
+      showScreen('log');
+    }
+
+    function triggerDeleteShow() {
+      if (!activeDetailShowId) return;
+      const indexToDelete = userShows.findIndex(s => s.id === activeDetailShowId);
+      if (indexToDelete < 0) return;
+
+      if (confirm('Are you sure you want to delete this concert from your vault?')) {
+        userShows.splice(indexToDelete, 1);
+        activeDetailShowId = null;
+        saveShowsToStorage();
+        renderShowsFeed();
+        updateStatsDisplay();
+        showScreen('diary');
+      }
+    }
+
+    function formatDateOnInput(elem) {
+      const raw = elem.value.replace(/\D/g, '');
+      if (raw.length <= 2) {
+        elem.value = raw;
+      } else if (raw.length <= 4) {
+        elem.value = raw.slice(0, 2) + '/' + raw.slice(2);
+      } else {
+        elem.value = raw.slice(0, 2) + '/' + raw.slice(2, 4) + '/' + raw.slice(4, 8);
+      }
+    }
+
+    function handleVenueInput(query) {
+      const dropdown = document.getElementById('venue-dropdown');
+      if (!query || query.trim().length === 0) {
+        dropdown.style.display = 'none';
+        document.getElementById('input-city').value = '';
+        document.getElementById('input-state').value = '';
+        document.getElementById('input-country').value = '';
+        return;
+      }
+      const q = query.toLowerCase().trim();
+      const matches = VENUE_DB.filter(item => item.v.toLowerCase().includes(q) || item.c.toLowerCase().includes(q));
+
+      if (matches.length > 0) {
+        const best = matches[0];
+        document.getElementById('input-city').value = best.c.trim();
+        document.getElementById('input-state').value = toStateAbbr(best.s);
+        document.getElementById('input-country').value = best.co.trim();
+
+        dropdown.style.display = 'block';
+        dropdown.innerHTML = matches.map(item => `
+          <div style="padding:8px 12px; border-bottom:1px solid #222B30; cursor:pointer;" onclick="selectVenue('${item.v.replace(/'/g, "\\'").trim()}', '${item.c.replace(/'/g, "\\'").trim()}', '${toStateAbbr(item.s).replace(/'/g, "\\'")}', '${item.co.replace(/'/g, "\\'").trim()}')">
+            <div style="font-weight:bold; color:#fff;">${item.v.trim()}</div>
+            <div style="color:#94a3b8; font-size:10px;">${item.c.trim()}, ${toStateAbbr(item.s)}, ${item.co.trim()}</div>
+          </div>
+        `).join('');
+      } else {
+        dropdown.style.display = 'none';
+      }
+    }
+
+    function selectVenue(v, c, s, co) {
+      document.getElementById('input-venue').value = v.trim();
+      document.getElementById('input-city').value = c.trim();
+      document.getElementById('input-state').value = toStateAbbr(s);
+      document.getElementById('input-country').value = co.trim();
+      document.getElementById('venue-dropdown').style.display = 'none';
+    }
+
+    function resetLogForm() {
+      document.getElementById('log-show-form').reset();
+      document.getElementById('venue-dropdown').style.display = 'none';
+      document.getElementById('openers-container').innerHTML = '<input type="text" class="input-field input-opener" placeholder="Opener" />';
+      currentPhotoUris = [];
+      renderPhotosGrid();
+      editingShowId = null;
+      const btnSave = document.getElementById('btn-save-show');
+      if (btnSave) btnSave.innerText = '+ ADD CONCERT';
+    }
+
+    function cancelShowLog() {
+      resetLogForm();
+      showScreen('diary');
+    }
+
+    function handleSortChange(val) {
+      currentSort = val;
+      renderShowsFeed();
+    }
+
+
+
+    function renderShowsFeed() {
+      const list = document.getElementById('ticket-list');
+      const sortBar = document.getElementById('sort-control-bar');
+      const countLabel = document.getElementById('shows-count-label');
+      if (!list) return;
+
+      if (!userShows || userShows.length === 0) {
+        if (sortBar) sortBar.style.display = 'none';
+        list.style.display = 'flex';
+        list.style.flexDirection = 'column';
+        list.style.justifyContent = 'center';
+        list.style.alignItems = 'center';
+        list.innerHTML = `
+          <div id="empty-state-box" style="text-align:center; padding: 30px 16px; margin: auto 0;">
+            <div style="font-size:24px; font-weight:900; color:#FFB300; margin-bottom:12px;">LIVELORE</div>
+            <div style="font-weight:900; font-size:24px; color:#ffffff; text-transform:uppercase; margin-bottom:16px;">YOUR CONCERT VAULT IS EMPTY!</div>
+            <div class="bounce-pointer" style="color:#FFB300; font-weight:900; font-size:16px; text-transform:uppercase; letter-spacing:1px; margin-top:12px;">
+              <div style="font-size:42px; color:#00E676; margin-bottom:8px; font-weight:900;">&uarr;</div>
+              START ADDING YOUR CONCERTS ABOVE!
+            </div>
+          </div>
+        `;
+      } else {
+        if (sortBar) sortBar.style.display = 'flex';
+        if (countLabel) countLabel.innerText = userShows.length + (userShows.length === 1 ? ' CONCERT LOGGED' : ' CONCERTS LOGGED');
+
+        let displayList = [...userShows];
+        if (currentSort === 'newest') {
+          displayList.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        } else if (currentSort === 'oldest') {
+          displayList.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        } else if (currentSort === 'band') {
+          displayList.sort((a, b) => (a.headline || '').localeCompare(b.headline || ''));
+        }
+
+        list.style.display = 'block';
+        list.innerHTML = '';
+        displayList.forEach((show) => {
+          if (!show.id) show.id = generateUniqueId();
+          const card = document.createElement('div');
+          const ticketColor = getTicketColor(show.id);
+
+          card.className = 'ticket-card';
+          card.style.backgroundColor = ticketColor;
+          card.onclick = () => openShowDetails(show.id);
+
+          let bandStackHtml = `<div class="ticket-artist-head">${(show.headline || '').trim().toUpperCase()}</div>`;
+          if (show.openersList && show.openersList.length > 0) {
+            const cleanOpeners = show.openersList.map(op => typeof op === 'string' ? op.trim() : op).filter(Boolean);
+            bandStackHtml += `
+              <div class="ticket-artist-and">and</div>
+              <div class="ticket-artist-openers">${cleanOpeners.join(', ')}</div>
+            `;
+          }
+
+          const primaryPhoto = (show.photoUris && show.photoUris.length > 0) ? show.photoUris[0] : null;
+
+          card.innerHTML = `
+            <div class="ticket-left">
+              <div class="ticket-artist-box">
+                ${bandStackHtml}
+              </div>
+              <div class="ticket-footer">
+                <span class="ticket-venue">${(show.venue || '').trim()}</span>
+                <span class="ticket-date">${show.date}</span>
+              </div>
+            </div>
+            <div class="ticket-stub">
+              ${primaryPhoto ? `
+                <div style="width:100%; height:100%; border-radius:6px; overflow:hidden; border:1px solid rgba(0,0,0,0.4); position:relative;">
+                  <img src="${primaryPhoto}" style="width:100%; height:100%; object-fit:cover;" />
+                  <div style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.7); color:#FFB300; font-size:6px; font-weight:900; text-align:center; padding:1px 0;">VIP MEMORY</div>
+                </div>
+              ` : `
+                <div>ADMIT ONE</div>
+                <div style="font-size:8px; color:#221508; margin-top:4px;">SEC 7</div>
+              `}
+            </div>
+          `;
+          list.appendChild(card);
+        });
+      }
+    }
+
+    // CASE-INSENSITIVE & TRIMMED STATS AGGREGATION ENGINE (ENLARGED HIGH-READABILITY TEXT)
+    function updateStatsDisplay() {
+      const count = userShows ? userShows.length : 0;
+      document.getElementById('stats-total-count').innerText = count + (count === 1 ? ' CONCERT' : ' CONCERTS');
+
+      if (count > 0) {
+        const artistNormalizedCounts = {};
+        const artistDisplayNames = {};
+
+        const venueNormalizedCounts = {};
+        const venueDisplayNames = {};
+
+        const cityNormalizedCounts = {};
+        const cityDisplayNames = {};
+
+        const stateNormalizedCounts = {};
+
+        const yearCounts = {};
+        const dayCounts = { 'Sunday':0, 'Monday':0, 'Tuesday':0, 'Wednesday':0, 'Thursday':0, 'Friday':0, 'Saturday':0 };
+        const daysArr = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+        const recordArtistName = (rawName) => {
+          if (!rawName || !rawName.trim()) return;
+          const cleanName = rawName.trim();
+          const normKey = cleanName.toLowerCase();
+
+          artistNormalizedCounts[normKey] = (artistNormalizedCounts[normKey] || 0) + 1;
+          if (!artistDisplayNames[normKey]) {
+            artistDisplayNames[normKey] = cleanName;
+          }
+        };
+
+        const recordVenueName = (rawVenue) => {
+          if (!rawVenue || !rawVenue.trim()) return;
+          const cleanVenue = rawVenue.trim();
+          const normKey = cleanVenue.toLowerCase();
+
+          venueNormalizedCounts[normKey] = (venueNormalizedCounts[normKey] || 0) + 1;
+          if (!venueDisplayNames[normKey]) {
+            venueDisplayNames[normKey] = cleanVenue;
+          }
+        };
+
+        const recordCityName = (rawCity, rawState) => {
+          if (!rawCity || !rawCity.trim()) return;
+          const cleanCity = rawCity.trim();
+          const cleanState = toStateAbbr(rawState || 'IN');
+          const normKey = `${cleanCity.toLowerCase()}_${cleanState.toLowerCase()}`;
+
+          cityNormalizedCounts[normKey] = (cityNormalizedCounts[normKey] || 0) + 1;
+          if (!cityDisplayNames[normKey]) {
+            cityDisplayNames[normKey] = `${cleanCity} (${cleanState})`;
+          }
+        };
+
+        const recordStateName = (rawState) => {
+          if (!rawState) return;
+          const cleanState = toStateAbbr(rawState);
+          stateNormalizedCounts[cleanState] = (stateNormalizedCounts[cleanState] || 0) + 1;
+        };
+
+        userShows.forEach(s => {
+          if (s.headline) recordArtistName(s.headline);
+          if (Array.isArray(s.openersList) && s.openersList.length > 0) {
+            s.openersList.forEach(op => {
+              if (typeof op === 'string') op.split(',').forEach(subOp => recordArtistName(subOp));
+            });
+          } else if (s.opener && typeof s.opener === 'string') {
+            s.opener.split(',').forEach(subOp => recordArtistName(subOp));
+          }
+
+          recordVenueName(s.venue);
+          recordCityName(s.city, s.state);
+          recordStateName(s.state);
+
+          let dObj = new Date(s.date);
+          if (isNaN(dObj.getTime()) && typeof s.date === 'string') {
+            const parts = s.date.split(/[\/\.-]/);
+            if (parts.length === 3) {
+              let m = parseInt(parts[0], 10) - 1;
+              let d = parseInt(parts[1], 10);
+              let y = parseInt(parts[2], 10);
+              if (y < 100) y = y > 30 ? 1900 + y : 2000 + y;
+              dObj = new Date(y, m, d);
+            }
+          }
+
+          if (!isNaN(dObj.getTime())) {
+            const yr = dObj.getFullYear();
+            yearCounts[yr] = (yearCounts[yr] || 0) + 1;
+
+            const dayName = daysArr[dObj.getDay()];
+            if (dayName) dayCounts[dayName] = (dayCounts[dayName] || 0) + 1;
+          }
+        });
+
+        const topA = Object.entries(artistNormalizedCounts)
+          .map(([normKey, cnt]) => [artistDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1])
+          .slice(0, 10);
+
+        const topV = Object.entries(venueNormalizedCounts)
+          .map(([normKey, cnt]) => [venueDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1])
+          .slice(0, 10);
+
+        const topC = Object.entries(cityNormalizedCounts)
+          .map(([normKey, cnt]) => [cityDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1])
+          .slice(0, 10);
+
+        const topS = Object.entries(stateNormalizedCounts)
+          .sort((a,b) => b[1] - a[1])
+          .slice(0, 10);
+
+        const topY = Object.entries(yearCounts).sort((a,b) => b[1] - a[1] || b[0] - a[0]).slice(0, 10);
+        const topD = Object.entries(dayCounts).filter(d => d[1] > 0).sort((a,b) => b[1] - a[1]).slice(0, 10);
+
+        document.getElementById('stats-artists-preview').innerHTML = topA.map((item, i) => `
+          <div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#FFB300; font-weight:900;">${item[1]}</span></div>
+        `).join('');
+
+        document.getElementById('stats-venues-preview').innerHTML = topV.map((item, i) => `
+          <div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#00E676; font-weight:900;">${item[1]}</span></div>
+        `).join('');
+
+        document.getElementById('stats-cities-preview').innerHTML = topC.map((item, i) => `
+          <div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#00B0FF; font-weight:900;">${item[1]}</span></div>
+        `).join('');
+
+        document.getElementById('stats-states-preview').innerHTML = topS.map((item, i) => `
+          <div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#E040FB; font-weight:900;">${item[1]}</span></div>
+        `).join('');
+
+        document.getElementById('stats-years-preview').innerHTML = topY.map((item, i) => `
+          <div style="margin-bottom:8px;" class="stats-item-text">${i+1}. Year ${item[0]} - <span style="color:#FF7A00; font-weight:900;">${item[1]} ${item[1] === 1 ? 'concert' : 'concerts'}</span></div>
+        `).join('');
+
+        document.getElementById('stats-days-preview').innerHTML = topD.map((item, i) => `
+          <div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#FF4081; font-weight:900;">${item[1]} concerts (${Math.round((item[1]/count)*100)}%)</span></div>
+        `).join('');
+      } else {
+        document.getElementById('stats-artists-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top artists!</div>';
+        document.getElementById('stats-venues-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top venues!</div>';
+        document.getElementById('stats-cities-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top cities!</div>';
+        document.getElementById('stats-states-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top states!</div>';
+        document.getElementById('stats-years-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view your top years!</div>';
+        document.getElementById('stats-days-preview').innerHTML = '<div style="color:#94a3b8; font-style:italic; font-size:14px;">Log concerts to view days of week breakdown!</div>';
+      }
+    }
+
+    function showSubStats(type) {
+      const container = document.getElementById('substats-container');
+
+      if (type === 'artists') {
+        const artistNormalizedCounts = {};
+        const artistDisplayNames = {};
+
+        const recordArtistName = (rawName) => {
+          if (!rawName || !rawName.trim()) return;
+          const cleanName = rawName.trim();
+          const normKey = cleanName.toLowerCase();
+          artistNormalizedCounts[normKey] = (artistNormalizedCounts[normKey] || 0) + 1;
+          if (!artistDisplayNames[normKey]) artistDisplayNames[normKey] = cleanName;
+        };
+
+        userShows.forEach(s => {
+          if (s.headline) recordArtistName(s.headline);
+          if (Array.isArray(s.openersList) && s.openersList.length > 0) {
+            s.openersList.forEach(op => {
+              if (typeof op === 'string') op.split(',').forEach(subOp => recordArtistName(subOp));
+            });
+          } else if (s.opener && typeof s.opener === 'string') {
+            s.opener.split(',').forEach(subOp => recordArtistName(subOp));
+          }
+        });
+
+        const topA = Object.entries(artistNormalizedCounts)
+          .map(([normKey, cnt]) => [artistDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1]);
+
+        container.innerHTML = `
+          <div style="color:#FFB300; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">ALL ARTISTS (${topA.length})</div>
+          ${topA.length > 0 ? topA.map((item, i) => `
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. ${item[0]} - <span style="color:#FFB300;">${item[1]} ${item[1] === 1 ? 'Time' : 'Times'}</span></div>
+          `).join('') : '<div style="color:#94a3b8; font-size:14px;">No artists logged yet.</div>'}
+        `;
+      } else if (type === 'venues') {
+        const venueNormalizedCounts = {};
+        const venueDisplayNames = {};
+
+        userShows.forEach(s => {
+          if (!s.venue || !s.venue.trim()) return;
+          const cleanVenue = s.venue.trim();
+          const normKey = cleanVenue.toLowerCase();
+          venueNormalizedCounts[normKey] = (venueNormalizedCounts[normKey] || 0) + 1;
+          if (!venueDisplayNames[normKey]) venueDisplayNames[normKey] = cleanVenue;
+        });
+
+        const topV = Object.entries(venueNormalizedCounts)
+          .map(([normKey, cnt]) => [venueDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1]);
+
+        container.innerHTML = `
+          <div style="color:#00E676; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">ALL VENUES (${topV.length})</div>
+          ${topV.length > 0 ? topV.map((item, i) => `
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. ${item[0]} - <span style="color:#00E676;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'}</span></div>
+          `).join('') : '<div style="color:#94a3b8; font-size:14px;">No venues logged yet.</div>'}
+        `;
+      } else if (type === 'cities') {
+        const cityNormalizedCounts = {};
+        const cityDisplayNames = {};
+
+        userShows.forEach(s => {
+          if (!s.city || !s.city.trim()) return;
+          const cleanCity = s.city.trim();
+          const cleanState = toStateAbbr(s.state || 'IN');
+          const normKey = `${cleanCity.toLowerCase()}_${cleanState.toLowerCase()}`;
+          cityNormalizedCounts[normKey] = (cityNormalizedCounts[normKey] || 0) + 1;
+          if (!cityDisplayNames[normKey]) cityDisplayNames[normKey] = `${cleanCity} (${cleanState})`;
+        });
+
+        const topC = Object.entries(cityNormalizedCounts)
+          .map(([normKey, cnt]) => [cityDisplayNames[normKey] || normKey, cnt])
+          .sort((a,b) => b[1] - a[1]);
+
+        container.innerHTML = `
+          <div style="color:#00B0FF; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">ALL CITIES (${topC.length})</div>
+          ${topC.length > 0 ? topC.map((item, i) => `
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. ${item[0]} - <span style="color:#00B0FF;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'}</span></div>
+          `).join('') : '<div style="color:#94a3b8; font-size:14px;">No cities logged yet.</div>'}
+        `;
+      } else if (type === 'states') {
+        const stateNormalizedCounts = {};
+
+        userShows.forEach(s => {
+          if (!s.state) return;
+          const cleanState = toStateAbbr(s.state);
+          stateNormalizedCounts[cleanState] = (stateNormalizedCounts[cleanState] || 0) + 1;
+        });
+
+        const topS = Object.entries(stateNormalizedCounts).sort((a,b) => b[1] - a[1]);
+
+        container.innerHTML = `
+          <div style="color:#E040FB; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">ALL STATES (${topS.length})</div>
+          ${topS.length > 0 ? topS.map((item, i) => `
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. ${item[0]} - <span style="color:#E040FB;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'}</span></div>
+          `).join('') : '<div style="color:#94a3b8; font-size:14px;">No states logged yet.</div>'}
+        `;
+      } else if (type === 'years') {
+        const yearCounts = {};
+        userShows.forEach(s => {
+          let dObj = new Date(s.date);
+          if (isNaN(dObj.getTime()) && typeof s.date === 'string') {
+            const parts = s.date.split(/[\/\.-]/);
+            if (parts.length === 3) {
+              let m = parseInt(parts[0], 10) - 1;
+              let d = parseInt(parts[1], 10);
+              let y = parseInt(parts[2], 10);
+              if (y < 100) y = y > 30 ? 1900 + y : 2000 + y;
+              dObj = new Date(y, m, d);
+            }
+          }
+          if (!isNaN(dObj.getTime())) {
+            const yr = dObj.getFullYear();
+            yearCounts[yr] = (yearCounts[yr] || 0) + 1;
+          }
+        });
+        const topY = Object.entries(yearCounts).sort((a,b) => b[1] - a[1] || b[0] - a[0]);
+
+        container.innerHTML = `
+          <div style="color:#FF7A00; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">ALL YEARS (${topY.length})</div>
+          ${topY.length > 0 ? topY.map((item, i) => `
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. Year ${item[0]} - <span style="color:#FF7A00;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'}</span></div>
+          `).join('') : '<div style="color:#94a3b8; font-size:14px;">No years logged yet.</div>'}
+        `;
+      } else {
+        const dayCounts = { 'Sunday':0, 'Monday':0, 'Tuesday':0, 'Wednesday':0, 'Thursday':0, 'Friday':0, 'Saturday':0 };
+        const daysArr = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        userShows.forEach(s => {
+          let dObj = new Date(s.date);
+          if (isNaN(dObj.getTime()) && typeof s.date === 'string') {
+            const parts = s.date.split(/[\/\.-]/);
+            if (parts.length === 3) {
+              let m = parseInt(parts[0], 10) - 1;
+              let d = parseInt(parts[1], 10);
+              let y = parseInt(parts[2], 10);
+              if (y < 100) y = y > 30 ? 1900 + y : 2000 + y;
+              dObj = new Date(y, m, d);
+            }
+          }
+          if (!isNaN(dObj.getTime())) {
+            const dayName = daysArr[dObj.getDay()];
+            if (dayName) dayCounts[dayName] = (dayCounts[dayName] || 0) + 1;
+          }
+        });
+        const topD = Object.entries(dayCounts).filter(d => d[1] > 0).sort((a,b) => b[1] - a[1]);
+
+        container.innerHTML = `
+          <div style="color:#FF4081; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">DAYS OF THE WEEK</div>
+          ${topD.length > 0 ? topD.map((item, i) => `
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${item[0]} - <span style="color:#FF4081;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'} (${Math.round((item[1]/userShows.length)*100)}%)</span></div>
+          `).join('') : '<div style="color:#94a3b8; font-size:14px;">No days logged yet.</div>'}
+        `;
+      }
+      showScreen('substats');
+    }
+
+    function addOpenerField() {
+      const container = document.getElementById('openers-container');
+      const count = container.querySelectorAll('.input-opener').length + 1;
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'input-field input-opener';
+      input.placeholder = 'Opener ' + count;
+      container.appendChild(input);
+    }
+
+    function saveNewShow(e) {
+      e.preventDefault();
+      const headline = document.getElementById('input-headline').value.trim();
+      const venue = document.getElementById('input-venue').value.trim();
+      const city = (document.getElementById('input-city').value || 'Noblesville').trim();
+      const state = toStateAbbr((document.getElementById('input-state').value || 'IN').trim());
+      const country = (document.getElementById('input-country').value || 'USA').trim();
+      const date = document.getElementById('input-date').value.trim() || '08/02/88';
+      const notes = (document.getElementById('input-notes').value || '').trim();
+
+      const openerInputs = document.querySelectorAll('.input-opener');
+      const openersList = Array.from(openerInputs).map(inp => inp.value.trim()).filter(Boolean);
+
+      if (headline && venue) {
+        if (editingShowId) {
+          const editIndex = userShows.findIndex(s => s.id === editingShowId);
+          if (editIndex >= 0) {
+            userShows[editIndex] = { id: editingShowId, headline, venue, city, state, country, date, openersList, notes, photoUris: currentPhotoUris };
+          }
+        } else {
+          const newShowObj = { id: generateUniqueId(), headline, venue, city, state, country, date, openersList, notes, photoUris: currentPhotoUris };
+          userShows.unshift(newShowObj);
+        }
+
+        saveShowsToStorage();
+        renderShowsFeed();
+        updateStatsDisplay();
+
+        resetLogForm();
+        showScreen('diary');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadSavedShows);
+    loadSavedShows();
+  </script>
+</body>
+</html>
+
