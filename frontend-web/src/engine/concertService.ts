@@ -44,6 +44,7 @@ export interface Concert {
   photoUris?: string[];
   audioMemoUri?: string;
   generalNotes?: string;
+  hasSetlist?: boolean;
   createdAt?: number;
   updatedAt?: number;
   syncStatus?: 'synced' | 'pending_insert' | 'pending_update' | 'pending_delete';
