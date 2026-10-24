@@ -61,7 +61,7 @@ export interface CreateConcertInput {
   ticketPrice?: number;
   notes?: string;
   photoUris?: string[];
-  setlist: { title: string; songTitle?: string; position: number; isEncore: boolean; originalArtist?: string; notes?: string }[];
+  setlist: { title?: string; songTitle?: string; position: number; isEncore: boolean; originalArtist?: string; notes?: string }[];
 }
 
 export interface ConcertStats {
