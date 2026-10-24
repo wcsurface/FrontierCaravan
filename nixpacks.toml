@@ -1,0 +1,14 @@
+[providers]
+providers = ["node"]
+
+[phases.setup]
+nixPkgs = ["nodejs_20", "openssl"]
+
+[phases.install]
+cmds = ["cd backend-api && npm install"]
+
+[phases.build]
+cmds = ["cd backend-api && npx prisma generate && npx prisma db push --skip-generate && npm run build"]
+
+[start]
+cmd = "cd backend-api && node dist/server.js"
