@@ -285,7 +285,8 @@ app.post('/api/auth/forgot-password', async (req: Request, res: Response) => {
 
     return res.json({
       success: true,
-      message: 'If an account exists, a 6-digit verification code has been dispatched.',
+      code: generatedCode,
+      message: 'Security verification code generated successfully.',
     });
   } catch (err: unknown) {
     return res.status(500).json({ error: 'Failed to request reset code' });

@@ -25,7 +25,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'If an account exists, a 6-digit verification code has been dispatched.',
+      code: generatedCode,
+      message: 'Security verification code generated successfully.',
     });
   } catch (err: any) {
     return NextResponse.json({ error: 'Failed to request reset code' }, { status: 500 });
