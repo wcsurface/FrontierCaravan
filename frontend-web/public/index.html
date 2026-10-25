@@ -130,6 +130,22 @@
     </div>
   </div>
 
+  <!-- MODERN GLASS PROMPT MODAL DIALOG (FORGOTTEN PASSWORD & INPUT PROMPTS) -->
+  <div id="custom-prompt-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%; background:rgba(0,0,0,0.88); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); z-index:999999; align-items:center; justify-content:center; padding:16px; box-sizing:border-box;">
+    <div style="background:#121619; border:1.5px solid #FFB300; border-radius:20px; padding:24px 20px; width:100%; max-width:360px; box-shadow:0 20px 40px rgba(0,0,0,0.8), 0 0 20px rgba(255,179,0,0.15); text-align:center;">
+      <div id="custom-prompt-icon" style="font-size:36px; margin-bottom:10px;">🔑</div>
+      <div id="custom-prompt-title" style="font-size:18px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">PASSWORD RECOVERY</div>
+      <div id="custom-prompt-msg" style="font-size:14px; font-weight:700; color:#cbd5e1; line-height:1.5; margin-bottom:16px;">Enter your registered email address to receive password reset instructions:</div>
+
+      <input type="text" id="custom-prompt-input" class="input-field" placeholder="you@example.com" style="margin-bottom:20px; text-align:center;" autocomplete="off" />
+
+      <div style="display:flex; gap:10px;">
+        <button id="custom-prompt-btn-cancel" type="button" style="flex:1; background:#1C2128; color:#94a3b8; font-weight:900; font-size:13px; padding:12px; border-radius:9999px; border:1px solid #222B30; text-transform:uppercase; cursor:pointer;">CANCEL</button>
+        <button id="custom-prompt-btn-submit" type="button" style="flex:1; background:#FFB300; color:#0a0a0a; font-weight:900; font-size:13px; padding:12px; border-radius:9999px; border:none; text-transform:uppercase; cursor:pointer; box-shadow:0 4px 12px rgba(255,179,0,0.3);">SEND RESET</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     function showCustomConfirm(options, onConfirm, onCancel) {
       var modal = document.getElementById('custom-dialog-modal');
@@ -221,6 +237,60 @@
       modal.style.display = 'flex';
     }
     window.showCustomAlert = showCustomAlert;
+
+    function showCustomPrompt(options, onSubmit) {
+      var modal = document.getElementById('custom-prompt-modal');
+      var iconEl = document.getElementById('custom-prompt-icon');
+      var titleEl = document.getElementById('custom-prompt-title');
+      var msgEl = document.getElementById('custom-prompt-msg');
+      var inputEl = document.getElementById('custom-prompt-input');
+      var btnCancel = document.getElementById('custom-prompt-btn-cancel');
+      var btnSubmit = document.getElementById('custom-prompt-btn-submit');
+
+      var title = (options && options.title) ? options.title : 'PASSWORD RECOVERY';
+      var message = (options && options.message) ? options.message : 'Enter your registered email address:';
+      var placeholder = (options && options.placeholder) ? options.placeholder : 'you@example.com';
+      var defaultValue = (options && options.defaultValue) ? options.defaultValue : '';
+      var icon = (options && options.icon) ? options.icon : '🔑';
+      var submitText = (options && options.submitText) ? options.submitText : 'SEND RESET';
+
+      if (!modal) {
+        var res = window.prompt(message, defaultValue);
+        if (res && onSubmit) onSubmit(res);
+        return;
+      }
+
+      if (iconEl) iconEl.innerText = icon;
+      if (titleEl) titleEl.innerText = title;
+      if (msgEl) msgEl.innerText = message;
+      if (inputEl) {
+        inputEl.placeholder = placeholder;
+        inputEl.value = defaultValue;
+      }
+      if (btnSubmit) btnSubmit.innerText = submitText;
+
+      if (btnCancel) {
+        btnCancel.onclick = function(e) {
+          if (e) { e.preventDefault(); e.stopPropagation(); }
+          modal.style.display = 'none';
+        };
+      }
+
+      if (btnSubmit) {
+        btnSubmit.onclick = function(e) {
+          if (e) { e.preventDefault(); e.stopPropagation(); }
+          var val = inputEl ? inputEl.value : '';
+          modal.style.display = 'none';
+          if (onSubmit) onSubmit(val);
+        };
+      }
+
+      modal.style.display = 'flex';
+      setTimeout(function() {
+        if (inputEl) inputEl.focus();
+      }, 100);
+    }
+    window.showCustomPrompt = showCustomPrompt;
 
     var authMode = 'login';
     var isVIPUser = true;
@@ -2278,34 +2348,40 @@
       var emailEl = document.getElementById('auth-email');
       var userEmail = (emailEl && emailEl.value) ? emailEl.value.trim() : '';
 
-      var targetEmail = prompt("Enter your registered email address for password recovery:", userEmail);
-      if (!targetEmail || !targetEmail.includes('@')) {
-        if (targetEmail !== null) {
+      showCustomPrompt({
+        title: 'PASSWORD RECOVERY',
+        message: 'Enter your registered email address to receive password reset instructions:',
+        placeholder: 'you@example.com',
+        defaultValue: userEmail,
+        icon: '🔑',
+        submitText: 'SEND RESET'
+      }, function(targetEmail) {
+        if (!targetEmail || !targetEmail.includes('@')) {
           showCustomAlert({ title: 'INVALID EMAIL', message: 'Please enter a valid email address.', icon: '⚠️' });
+          return;
         }
-        return;
-      }
 
-      var cleanEmail = targetEmail.toLowerCase().trim();
+        var cleanEmail = targetEmail.toLowerCase().trim();
 
-      fetch('https://frontiercaravan-production.up.railway.app/api/auth/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: cleanEmail })
-      })
-      .then(function(res) { return res.json(); })
-      .then(function(data) {
-        showCustomAlert({
-          title: 'RECOVERY INITIATED',
-          message: 'If an account exists for ' + cleanEmail + ', password reset instructions have been sent.',
-          icon: '🔑'
-        });
-      })
-      .catch(function(err) {
-        showCustomAlert({
-          title: 'RECOVERY INITIATED',
-          message: 'If an account exists for ' + cleanEmail + ', password reset instructions have been sent.',
-          icon: '🔑'
+        fetch('https://frontiercaravan-production.up.railway.app/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: cleanEmail })
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          showCustomAlert({
+            title: 'RECOVERY INITIATED',
+            message: 'If an account exists for ' + cleanEmail + ', password reset instructions have been sent.',
+            icon: '✉️'
+          });
+        })
+        .catch(function(err) {
+          showCustomAlert({
+            title: 'RECOVERY INITIATED',
+            message: 'If an account exists for ' + cleanEmail + ', password reset instructions have been sent.',
+            icon: '✉️'
+          });
         });
       });
     }
