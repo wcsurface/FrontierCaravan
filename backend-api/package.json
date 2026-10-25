@@ -1,6 +1,6 @@
 {
   "name": "livelore-backend",
-  "version": "5.9.0",
+  "version": "6.0.0",
   "description": "Backend API & Railway PostgreSQL Cloud Database Sync for LiveLore",
   "main": "dist/server.js",
   "scripts": {

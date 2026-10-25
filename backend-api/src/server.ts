@@ -436,24 +436,58 @@ app.post('/api/sync/push', async (req: Request, res: Response) => {
   }
 });
 
-// 5. GET /api/sync/pull - Pull Concert Vault Backup
+// 5. GET /api/sync/pull - Pull Concert Vault Backup from Railway PostgreSQL
 app.get('/api/sync/pull', async (req: Request, res: Response) => {
   try {
-    const { userId } = req.query;
-
-    if (!userId || typeof userId !== 'string') {
-      return res.status(400).json({ error: 'userId query parameter required' });
-    }
+    const { userId, email } = req.query;
 
     if (prisma) {
-      const vault = await prisma.concertVault.findUnique({
-        where: { userId },
+      const allVaults = await prisma.concertVault.findMany();
+
+      let mergedConcerts: any[] = [];
+      const seenIds = new Set<string>();
+
+      // Pull and merge all concerts from Railway PostgreSQL database
+      allVaults.forEach((vault: any) => {
+        if (vault.concertsData) {
+          const raw = vault.concertsData as any;
+          const concerts = Array.isArray(raw.concerts) ? raw.concerts : (Array.isArray(raw) ? raw : []);
+
+          concerts.forEach((c: any) => {
+            const key = c.id || `${c.headline}_${c.date}_${c.venue}`;
+            if (!seenIds.has(key)) {
+              seenIds.add(key);
+              mergedConcerts.push(c);
+            }
+          });
+        }
       });
 
-      return res.json({ success: true, concertsData: vault ? vault.concertsData : [] });
+      return res.json({
+        success: true,
+        concertsData: { concerts: mergedConcerts },
+        updatedAt: new Date().toISOString(),
+      });
     } else {
-      const concertsData = memoryVaults.get(userId) || [];
-      return res.json({ success: true, concertsData });
+      let mergedConcerts: any[] = [];
+      const seenIds = new Set<string>();
+
+      memoryVaults.forEach((val) => {
+        const concerts = Array.isArray(val.concerts) ? val.concerts : [];
+        concerts.forEach((c: any) => {
+          const key = c.id || `${c.headline}_${c.date}_${c.venue}`;
+          if (!seenIds.has(key)) {
+            seenIds.add(key);
+            mergedConcerts.push(c);
+          }
+        });
+      });
+
+      return res.json({
+        success: true,
+        concertsData: { concerts: mergedConcerts },
+        updatedAt: new Date().toISOString(),
+      });
     }
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Sync pull failed';
