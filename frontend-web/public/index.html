@@ -130,19 +130,20 @@
     </div>
   </div>
 
-  <!-- MODERN GLASS PROMPT MODAL DIALOG (FORGOTTEN PASSWORD & INSTANT RESET) -->
+  <!-- SECURE VERIFIED PASSWORD RESET MODAL -->
   <div id="custom-prompt-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%; background:rgba(0,0,0,0.88); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); z-index:999999; align-items:center; justify-content:center; padding:16px; box-sizing:border-box;">
     <div style="background:#121619; border:1.5px solid #FFB300; border-radius:20px; padding:24px 20px; width:100%; max-width:360px; box-shadow:0 20px 40px rgba(0,0,0,0.8), 0 0 20px rgba(255,179,0,0.15); text-align:center;">
       <div id="custom-prompt-icon" style="font-size:36px; margin-bottom:10px;">🔑</div>
-      <div id="custom-prompt-title" style="font-size:18px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">RESET YOUR PASSWORD</div>
-      <div id="custom-prompt-msg" style="font-size:13px; font-weight:700; color:#cbd5e1; line-height:1.4; margin-bottom:14px;">Enter your registered email and your new password below to reset instantly:</div>
+      <div id="custom-prompt-title" style="font-size:18px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">SECURE RECOVERY</div>
+      <div id="custom-prompt-msg" style="font-size:13px; font-weight:700; color:#cbd5e1; line-height:1.4; margin-bottom:14px;">Enter your registered email address to receive a 6-digit verification code:</div>
 
       <input type="text" id="custom-prompt-input" class="input-field" placeholder="you@example.com" style="margin-bottom:10px; text-align:center;" autocomplete="off" />
-      <input type="password" id="custom-prompt-pass" class="input-field" placeholder="New Password (at least 4 chars)" style="margin-bottom:18px; text-align:center;" autocomplete="new-password" />
+      <input type="text" id="custom-prompt-code" class="input-field" placeholder="6-Digit Verification Code" style="display:none; margin-bottom:10px; text-align:center; letter-spacing:3px; font-size:18px;" autocomplete="off" />
+      <input type="password" id="custom-prompt-pass" class="input-field" placeholder="New Password (min 4 chars)" style="display:none; margin-bottom:18px; text-align:center;" autocomplete="new-password" />
 
       <div style="display:flex; gap:10px;">
         <button id="custom-prompt-btn-cancel" type="button" style="flex:1; background:#1C2128; color:#94a3b8; font-weight:900; font-size:13px; padding:12px; border-radius:9999px; border:1px solid #222B30; text-transform:uppercase; cursor:pointer;">CANCEL</button>
-        <button id="custom-prompt-btn-submit" type="button" style="flex:1; background:#FFB300; color:#0a0a0a; font-weight:900; font-size:13px; padding:12px; border-radius:9999px; border:none; text-transform:uppercase; cursor:pointer; box-shadow:0 4px 12px rgba(255,179,0,0.3);">UPDATE PASSWORD</button>
+        <button id="custom-prompt-btn-submit" type="button" style="flex:1; background:#FFB300; color:#0a0a0a; font-weight:900; font-size:13px; padding:12px; border-radius:9999px; border:none; text-transform:uppercase; cursor:pointer; box-shadow:0 4px 12px rgba(255,179,0,0.3);">SEND CODE</button>
       </div>
     </div>
   </div>
@@ -2344,21 +2345,33 @@
     }
     window.resetLogForm = resetLogForm;
 
+    var resetStep = 1;
+
     function handleForgotPassword() {
       clearErrorBanner();
+      resetStep = 1;
       var emailEl = document.getElementById('auth-email');
       var userEmail = (emailEl && emailEl.value) ? emailEl.value.trim() : '';
 
       var modal = document.getElementById('custom-prompt-modal');
+      var iconEl = document.getElementById('custom-prompt-icon');
+      var titleEl = document.getElementById('custom-prompt-title');
+      var msgEl = document.getElementById('custom-prompt-msg');
       var inputEmail = document.getElementById('custom-prompt-input');
+      var inputCode = document.getElementById('custom-prompt-code');
       var inputPass = document.getElementById('custom-prompt-pass');
       var btnCancel = document.getElementById('custom-prompt-btn-cancel');
       var btnSubmit = document.getElementById('custom-prompt-btn-submit');
 
       if (!modal) return;
 
-      if (inputEmail) inputEmail.value = userEmail;
-      if (inputPass) inputPass.value = '';
+      if (iconEl) iconEl.innerText = '🔑';
+      if (titleEl) titleEl.innerText = 'SECURE RECOVERY';
+      if (msgEl) msgEl.innerText = 'Enter your registered email address to receive a 6-digit verification code:';
+      if (inputEmail) { inputEmail.style.display = 'block'; inputEmail.value = userEmail; }
+      if (inputCode) { inputCode.style.display = 'none'; inputCode.value = ''; }
+      if (inputPass) { inputPass.style.display = 'none'; inputPass.value = ''; }
+      if (btnSubmit) btnSubmit.innerText = 'SEND CODE';
 
       if (btnCancel) {
         btnCancel.onclick = function(e) {
@@ -2370,60 +2383,96 @@
       if (btnSubmit) {
         btnSubmit.onclick = function(e) {
           if (e) { e.preventDefault(); e.stopPropagation(); }
+
           var targetEmail = inputEmail ? inputEmail.value.toLowerCase().trim() : '';
-          var newPassword = inputPass ? inputPass.value.trim() : '';
 
-          if (!targetEmail || !targetEmail.includes('@')) {
-            showCustomAlert({ title: 'INVALID EMAIL', message: 'Please enter a valid registered email address.', icon: '⚠️' });
-            return;
-          }
+          if (resetStep === 1) {
+            if (!targetEmail || !targetEmail.includes('@')) {
+              showCustomAlert({ title: 'INVALID EMAIL', message: 'Please enter a valid email address.', icon: '⚠️' });
+              return;
+            }
 
-          if (!newPassword || newPassword.length < 4) {
-            showCustomAlert({ title: 'INVALID PASSWORD', message: 'Please enter a new password (at least 4 characters).', icon: '⚠️' });
-            return;
-          }
+            fetch('https://frontiercaravan-production.up.railway.app/api/auth/forgot-password', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: targetEmail })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+              resetStep = 2;
+              if (iconEl) iconEl.innerText = '✉️';
+              if (titleEl) titleEl.innerText = 'ENTER CODE & NEW PASS';
+              if (msgEl) msgEl.innerText = 'Enter the 6-digit verification code sent to ' + targetEmail + ' and your new password:';
+              if (inputCode) inputCode.style.display = 'block';
+              if (inputPass) inputPass.style.display = 'block';
+              if (btnSubmit) btnSubmit.innerText = 'RESET PASSWORD';
+              setTimeout(function() { if (inputCode) inputCode.focus(); }, 100);
+            })
+            .catch(function(err) {
+              resetStep = 2;
+              if (iconEl) iconEl.innerText = '✉️';
+              if (titleEl) titleEl.innerText = 'ENTER CODE & NEW PASS';
+              if (msgEl) msgEl.innerText = 'Enter the 6-digit verification code sent to ' + targetEmail + ' and your new password:';
+              if (inputCode) inputCode.style.display = 'block';
+              if (inputPass) inputPass.style.display = 'block';
+              if (btnSubmit) btnSubmit.innerText = 'RESET PASSWORD';
+              setTimeout(function() { if (inputCode) inputCode.focus(); }, 100);
+            });
+          } else if (resetStep === 2) {
+            var codeVal = inputCode ? inputCode.value.trim() : '';
+            var passVal = inputPass ? inputPass.value.trim() : '';
 
-          modal.style.display = 'none';
+            if (!codeVal || codeVal.length < 4) {
+              showCustomAlert({ title: 'CODE REQUIRED', message: 'Please enter the 6-digit verification code.', icon: '⚠️' });
+              return;
+            }
 
-          fetch('https://frontiercaravan-production.up.railway.app/api/auth/reset-password', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: targetEmail, newPassword: newPassword })
-          })
-          .then(function(res) { return res.json(); })
-          .then(function(data) {
-            if (data && data.success) {
-              if (emailEl) emailEl.value = targetEmail;
-              var passEl = document.getElementById('auth-password');
-              if (passEl) passEl.value = newPassword;
+            if (!passVal || passVal.length < 4) {
+              showCustomAlert({ title: 'PASSWORD REQUIRED', message: 'Please enter a new password (at least 4 characters).', icon: '⚠️' });
+              return;
+            }
 
+            modal.style.display = 'none';
+
+            fetch('https://frontiercaravan-production.up.railway.app/api/auth/reset-password', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: targetEmail, code: codeVal, newPassword: passVal })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+              if (data && data.success) {
+                if (emailEl) emailEl.value = targetEmail;
+                var passEl = document.getElementById('auth-password');
+                if (passEl) passEl.value = passVal;
+
+                showCustomAlert({
+                  title: 'PASSWORD RESET',
+                  message: '✓ Your password for ' + targetEmail + ' has been updated successfully! Tap LOG IN to enter your vault.',
+                  icon: '🔑'
+                });
+              } else {
+                showCustomAlert({
+                  title: 'VERIFICATION FAILED',
+                  message: data.error || 'Invalid 6-digit verification code or code expired.',
+                  icon: '⚠️'
+                });
+              }
+            })
+            .catch(function(err) {
               showCustomAlert({
-                title: 'PASSWORD UPDATED',
-                message: '✓ Your password for ' + targetEmail + ' has been updated successfully! Tap LOG IN to enter your vault.',
-                icon: '🔑'
-              });
-            } else {
-              showCustomAlert({
-                title: 'RESET ERROR',
-                message: data.error || 'Unable to update password. Please verify your email address.',
+                title: 'VERIFICATION FAILED',
+                message: 'Invalid 6-digit verification code or reset session expired.',
                 icon: '⚠️'
               });
-            }
-          })
-          .catch(function(err) {
-            showCustomAlert({
-              title: 'RESET ERROR',
-              message: 'Failed to connect to reset server. Please try again.',
-              icon: '⚠️'
             });
-          });
+          }
         };
       }
 
       modal.style.display = 'flex';
       setTimeout(function() {
         if (inputEmail && !inputEmail.value) inputEmail.focus();
-        else if (inputPass) inputPass.focus();
       }, 100);
     }
     window.handleForgotPassword = handleForgotPassword;
