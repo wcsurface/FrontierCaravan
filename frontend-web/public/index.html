@@ -2109,9 +2109,23 @@
       }
       if (!activeEmail) return;
 
-      localStorage.setItem('livelore_vip_' + activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_'), 'true');
+      var cleanEmail = activeEmail.toLowerCase().trim();
       isVIPUser = true;
       updateProfileVipCard();
+
+      // Persist $4.99 VIP Status directly in Railway PostgreSQL Database
+      fetch('https://frontiercaravan-production.up.railway.app/api/auth/upgrade-vip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail })
+      }).catch(function(err) {});
+
+      fetch('https://frontier-caravan.vercel.app/api/auth/upgrade-vip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail })
+      }).catch(function(err) {});
+
       showCustomAlert({ title: 'VIP UPGRADED', message: 'Welcome to LiveLore VIP! You now have permanent ad-free access and full photo memory features enabled.', icon: '🌟' });
     }
     window.handleUpgradeVip = handleUpgradeVip;
