@@ -44,6 +44,26 @@ async function initializeDatabaseSchema() {
     `);
 
     console.log('[LiveLore DB] Railway PostgreSQL schema initialized successfully.');
+
+    try {
+      const testEmail = 'test@testaccount.com';
+      const passHash = await bcrypt.hash('Tester0!', 10);
+      const testUser = await prisma.user.findUnique({ where: { email: testEmail } });
+      if (testUser) {
+        await prisma.user.update({
+          where: { email: testEmail },
+          data: { passwordHash: passHash }
+        });
+      } else {
+        await prisma.user.create({
+          data: {
+            email: testEmail,
+            passwordHash: passHash,
+            displayName: 'Test Account'
+          }
+        });
+      }
+    } catch(e) {}
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     console.warn('[LiveLore DB] Schema init notice:', msg);
@@ -59,7 +79,12 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || 'livelore_secret_jwt_key_2026_x89!';
 
-app.use(cors({ origin: '*' }));
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+app.options('*', cors());
 app.use(express.json({ limit: '10mb' }));
 
 // In-memory user & vault fallback if Railway DATABASE_URL is temporarily unconnected
