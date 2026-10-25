@@ -349,14 +349,6 @@ app.post('/api/auth/reset-password', async (req: Request, res: Response) => {
     return res.status(500).json({ error: message });
   }
 });
-    } else {
-      return res.json({ success: true, message: 'Password recovery email dispatched.' });
-    }
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Password reset failed';
-    return res.status(500).json({ error: message });
-  }
-});
 
 // 4. POST /api/sync/push - Push Concert Vault Backup
 app.post('/api/sync/push', async (req: Request, res: Response) => {
