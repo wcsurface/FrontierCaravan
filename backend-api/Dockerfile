@@ -4,12 +4,12 @@ RUN apk add --no-cache openssl libc6-compat
 
 WORKDIR /app
 
-COPY backend-api/package*.json backend-api/tsconfig.json ./
-COPY backend-api/prisma ./prisma/
+COPY package*.json tsconfig.json ./
+COPY prisma ./prisma/
 
 RUN npm install
 
-COPY backend-api/src ./src
+COPY src ./src
 RUN npx prisma generate && npx tsc
 
 FROM node:20-alpine AS runner
@@ -19,8 +19,8 @@ RUN apk add --no-cache openssl libc6-compat
 WORKDIR /app
 ENV NODE_ENV=production
 
-COPY backend-api/package*.json ./
-COPY backend-api/prisma ./prisma/
+COPY package*.json ./
+COPY prisma ./prisma/
 RUN npm install --omit=dev && npx prisma generate
 
 COPY --from=builder /app/dist ./dist
