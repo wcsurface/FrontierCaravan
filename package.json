@@ -1,11 +1,9 @@
 {
   "name": "frontier-caravan-root",
-  "version": "1.0.0",
-  "private": true,
+  "version": "6.5.0",
   "scripts": {
-    "dev": "npm run dev --prefix frontend-web",
-    "build": "npm --prefix backend-api install && npm --prefix backend-api run build",
-    "start": "node backend-api/dist/server.js",
-    "lint": "npm run lint --prefix frontend-web"
+    "postinstall": "cd backend-api && npm install && npx prisma generate",
+    "build": "cd backend-api && npm install && npx prisma db push --accept-data-loss && npm run build",
+    "start": "cd backend-api && npx prisma db push --accept-data-loss && node dist/server.js"
   }
 }
