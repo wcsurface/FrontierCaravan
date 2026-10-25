@@ -2396,36 +2396,29 @@
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ email: targetEmail })
-            })
-            .then(function(res) { return res.json(); })
-            .then(function(data) {
-              var code = (data && data.code) ? data.code : Math.floor(100000 + Math.random() * 900000).toString();
-              resetStep = 2;
-              if (iconEl) iconEl.innerText = '🔐';
-              if (titleEl) titleEl.innerText = 'SECURITY CODE & NEW PASS';
-              if (msgEl) msgEl.innerText = 'Your Security Verification Code: ' + code + '\n\nEnter code ' + code + ' and your new password below:';
-              if (inputCode) { inputCode.style.display = 'block'; inputCode.value = code; }
-              if (inputPass) { inputPass.style.display = 'block'; }
-              if (btnSubmit) btnSubmit.innerText = 'RESET PASSWORD';
-              setTimeout(function() { if (inputPass) inputPass.focus(); }, 100);
-            })
-            .catch(function(err) {
-              var code = Math.floor(100000 + Math.random() * 900000).toString();
-              resetStep = 2;
-              if (iconEl) iconEl.innerText = '🔐';
-              if (titleEl) titleEl.innerText = 'SECURITY CODE & NEW PASS';
-              if (msgEl) msgEl.innerText = 'Your Security Verification Code: ' + code + '\n\nEnter code ' + code + ' and your new password below:';
-              if (inputCode) { inputCode.style.display = 'block'; inputCode.value = code; }
-              if (inputPass) { inputPass.style.display = 'block'; }
-              if (btnSubmit) btnSubmit.innerText = 'RESET PASSWORD';
-              setTimeout(function() { if (inputPass) inputPass.focus(); }, 100);
-            });
+            }).catch(function(err) {});
+
+            fetch('https://frontier-caravan.vercel.app/api/auth/forgot-password', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: targetEmail })
+            }).catch(function(err) {});
+
+            resetStep = 2;
+            if (iconEl) iconEl.innerText = '✉️';
+            if (titleEl) titleEl.innerText = 'CHECK YOUR EMAIL';
+            if (msgEl) msgEl.innerText = 'A 6-digit security code has been sent to ' + targetEmail + '.\n\nPlease check your email inbox (or spam) and enter the code below:';
+            if (inputEmail) inputEmail.style.display = 'none';
+            if (inputCode) { inputCode.style.display = 'block'; inputCode.value = ''; inputCode.placeholder = '6-Digit Code from Email'; }
+            if (inputPass) { inputPass.style.display = 'block'; inputPass.value = ''; inputPass.placeholder = 'New Password (min 4 chars)'; }
+            if (btnSubmit) btnSubmit.innerText = 'VERIFY & RESET';
+            setTimeout(function() { if (inputCode) inputCode.focus(); }, 100);
           } else if (resetStep === 2) {
             var codeVal = inputCode ? inputCode.value.trim() : '';
             var passVal = inputPass ? inputPass.value.trim() : '';
 
             if (!codeVal || codeVal.length < 4) {
-              showCustomAlert({ title: 'CODE REQUIRED', message: 'Please enter the 6-digit verification code.', icon: '⚠️' });
+              showCustomAlert({ title: 'CODE REQUIRED', message: 'Please enter the 6-digit verification code sent to your email.', icon: '⚠️' });
               return;
             }
 
