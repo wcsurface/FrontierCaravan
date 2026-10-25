@@ -2277,6 +2277,15 @@
       showScreen('diary');
     }
 
+        function resetSubmitButton() {
+      var submitBtn = document.getElementById('btn-auth-submit');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerText = (authMode === 'register') ? 'CREATE ACCOUNT' : 'LOG IN';
+      }
+    }
+    window.resetSubmitButton = resetSubmitButton;
+
     function handleLoginSubmit(e) {
       if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
       clearErrorBanner();
@@ -2290,11 +2299,13 @@
       var passVal = (passEl ? passEl.value : '').trim();
 
       if (!emailVal || emailVal.length < 3 || !emailVal.includes('@')) {
+        resetSubmitButton();
         showErrorBanner('Please enter a valid email address.');
         return;
       }
 
       if (!passVal) {
+        resetSubmitButton();
         showErrorBanner('Please enter a password.');
         return;
       }
@@ -2302,7 +2313,6 @@
       var cleanEmail = emailVal.toLowerCase().trim();
       var displayNameVal = (nameEl && nameEl.value) ? nameEl.value.trim() : cleanEmail.split('@')[0];
 
-      var originalBtnText = submitBtn ? submitBtn.innerText : 'LOG IN';
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.innerText = 'VERIFYING...';
@@ -2321,10 +2331,7 @@
       var authEndpoint = (authMode === 'register') ? '/api/auth/register' : '/api/auth/login';
 
       function completeLogin(finalName) {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerText = originalBtnText;
-        }
+        resetSubmitButton();
 
         localStorage.setItem(storedCredsKey, computedHash);
 
@@ -2362,20 +2369,14 @@
           return;
         }
 
+        resetSubmitButton();
+
         if (result.status === 401 || (result.data && result.data.error === 'Invalid email or password.')) {
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerText = originalBtnText;
-          }
           showErrorBanner('Invalid email or password. Please try again.');
           return;
         }
 
         if (result.status === 400 && result.data && result.data.error) {
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerText = originalBtnText;
-          }
           showErrorBanner(result.data.error);
           return;
         }
@@ -2385,39 +2386,25 @@
           if (computedHash === existingHash) {
             completeLogin(displayNameVal);
           } else {
-            if (submitBtn) {
-              submitBtn.disabled = false;
-              submitBtn.innerText = originalBtnText;
-            }
             showErrorBanner('Invalid email or password.');
           }
         } else {
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerText = originalBtnText;
-          }
           showErrorBanner((result.data && result.data.error) || 'Invalid email or password.');
         }
       })
       .catch(function(err) {
+        resetSubmitButton();
+
         // Network error fallback
         if (existingHash) {
           if (computedHash === existingHash) {
             completeLogin(displayNameVal);
           } else {
-            if (submitBtn) {
-              submitBtn.disabled = false;
-              submitBtn.innerText = originalBtnText;
-            }
             showErrorBanner('Invalid email or password.');
           }
         } else if (authMode === 'register') {
           completeLogin(displayNameVal);
         } else {
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerText = originalBtnText;
-          }
           showErrorBanner('Invalid email or password.');
         }
       });
