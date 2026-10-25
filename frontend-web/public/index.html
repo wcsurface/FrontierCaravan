@@ -2284,9 +2284,10 @@
       var emailEl = document.getElementById('auth-email');
       var passEl = document.getElementById('auth-password');
       var nameEl = document.getElementById('auth-name');
+      var submitBtn = document.getElementById('btn-auth-submit');
 
       var emailVal = (emailEl ? emailEl.value : '').toLowerCase().trim();
-      var passVal = (passEl ? passEl.value : '').trim();
+      var passVal = (passEl ? passVal.value : '').trim();
 
       if (!emailVal || emailVal.length < 3 || !emailVal.includes('@')) {
         showErrorBanner('Please enter a valid email address.');
@@ -2298,23 +2299,50 @@
         return;
       }
 
-      try {
-        var cleanEmail = emailVal.toLowerCase().trim();
-        var displayNameVal = (nameEl && nameEl.value) ? nameEl.value.trim() : cleanEmail.split('@')[0];
+      var cleanEmail = emailVal.toLowerCase().trim();
+      var displayNameVal = (nameEl && nameEl.value) ? nameEl.value.trim() : cleanEmail.split('@')[0];
 
-        // Store active user session
+      var originalBtnText = submitBtn ? submitBtn.innerText : 'LOG IN';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'VERIFYING...';
+      }
+
+      var authEndpoint = (authMode === 'register') ? '/api/auth/register' : '/api/auth/login';
+
+      fetch('https://frontiercaravan-production.up.railway.app' + authEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: cleanEmail,
+          password: passVal,
+          displayName: displayNameVal
+        })
+      })
+      .then(function(res) {
+        return res.json().catch(function() { return {}; }).then(function(data) {
+          return { ok: res.ok, status: res.status, data: data };
+        });
+      })
+      .then(function(result) {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerText = originalBtnText;
+        }
+
+        if (!result.ok || !result.data.success) {
+          var errMsg = (result.data && result.data.error) ? result.data.error : 'Invalid email or password.';
+          showErrorBanner(errMsg);
+          return;
+        }
+
+        // Store active user session ONLY AFTER password verification succeeds in Railway PostgreSQL
         localStorage.setItem('livelore_active_user', JSON.stringify({
           email: cleanEmail,
           provider: 'email',
-          displayName: displayNameVal
+          displayName: (result.data.user && result.data.user.displayName) || displayNameVal,
+          isVIP: (result.data.user && result.data.user.isVIP) || false
         }));
-
-        // Authenticate/Register with Railway PostgreSQL DB in background
-        fetch('https://frontiercaravan-production.up.railway.app/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: cleanEmail, password: passVal })
-        }).catch(function(err) {});
 
         if (emailEl) emailEl.value = '';
         if (passEl) passEl.value = '';
@@ -2322,9 +2350,14 @@
 
         loadSavedShows();
         showScreen('diary');
-      } catch (err) {
-        showErrorBanner('Authentication error: ' + err.message);
-      }
+      })
+      .catch(function(err) {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerText = originalBtnText;
+        }
+        showErrorBanner('Authentication error. Please check your network connection.');
+      });
     }
     window.handleLoginSubmit = handleLoginSubmit;
     window.onNativeGoogleAuthSuccess = onNativeGoogleAuthSuccess;
@@ -2577,7 +2610,7 @@
       <input type="text" id="auth-email" class="input-field" placeholder="you@example.com" autocomplete="off" />
 
       <label class="input-label">Password *</label>
-      <input type="password" id="auth-password" class="input-field" placeholder="••••••••" autocomplete="new-password" />
+      <input type="password" id="auth-password" class="input-field" placeholder="********" autocomplete="new-password" />
 
       <div style="text-align:right; margin-top:-2px; margin-bottom:12px;">
         <a href="#" id="btn-forgot-password" style="color:#FFB300; font-size:12px; font-weight:800; text-decoration:none;">Forgot Password?</a>
@@ -2590,9 +2623,9 @@
     <footer style="text-align:center; padding: 20px 0 10px 0; width:100%; font-size:12px; font-weight:800; color:#94a3b8;">
       <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin-bottom:6px; color:#FFB300;">
         <a href="#" onclick="showScreen('terms'); return false;" style="color:#FFB300; text-decoration:none;">Terms of Service</a>
-        <span>•</span>
+        <span>&bull;</span>
         <a href="#" onclick="showScreen('faq'); return false;" style="color:#FFB300; text-decoration:none;">FAQ</a>
-        <span>•</span>
+        <span>&bull;</span>
         <a href="#" onclick="showScreen('privacy'); return false;" style="color:#FFB300; text-decoration:none;">Privacy Policy</a>
       </div>
       <div style="color:#64748b; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px;">
@@ -2811,9 +2844,9 @@
     <footer style="text-align:center; padding: 20px 0 10px 0; width:100%; font-size:12px; font-weight:800; color:#94a3b8;">
       <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin-bottom:6px; color:#FFB300;">
         <a href="#" onclick="showScreen('terms'); return false;" style="color:#FFB300; text-decoration:none;">Terms of Service</a>
-        <span>•</span>
+        <span>&bull;</span>
         <a href="#" onclick="showScreen('faq'); return false;" style="color:#FFB300; text-decoration:none;">FAQ</a>
-        <span>•</span>
+        <span>&bull;</span>
         <a href="#" onclick="showScreen('privacy'); return false;" style="color:#FFB300; text-decoration:none;">Privacy Policy</a>
       </div>
       <div style="color:#64748b; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px;">
