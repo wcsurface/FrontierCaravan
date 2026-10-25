@@ -1780,8 +1780,8 @@
         if (venPrev) venPrev.innerHTML = topV.map((item, i) => `<div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#00E676; font-weight:900;">${item[1]}</span></div>`).join('');
         if (citPrev) citPrev.innerHTML = topC.map((item, i) => `<div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#00B0FF; font-weight:900;">${item[1]}</span></div>`).join('');
         if (staPrev) staPrev.innerHTML = topS.map((item, i) => `<div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#E040FB; font-weight:900;">${item[1]}</span></div>`).join('');
-        if (yrPrev) yrPrev.innerHTML = topY.map((item, i) => `<div style="margin-bottom:8px;" class="stats-item-text">${i+1}. Year ${item[0]} - <span style="color:#FF7A00; font-weight:900;">${item[1]} ${item[1] === 1 ? 'concert' : 'concerts'}</span></div>`).join('');
-        if (dayPrev) dayPrev.innerHTML = topD.map((item, i) => `<div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#FF4081; font-weight:900;">${item[1]} concerts (${Math.round((item[1]/count)*100)}%)</span></div>`).join('');
+        if (yrPrev) yrPrev.innerHTML = topY.map((item, i) => `<div style="margin-bottom:8px;" class="stats-item-text">${i+1}. Year ${item[0]} - <span style="color:#FF7A00; font-weight:900;">${item[1]}</span></div>`).join('');
+        if (dayPrev) dayPrev.innerHTML = topD.map((item, i) => `<div style="margin-bottom:8px;" class="stats-item-text">${i+1}. ${item[0]} - <span style="color:#FF4081; font-weight:900;">${item[1]} (${Math.round((item[1]/count)*100)}%)</span></div>`).join('');
       } else {
         const artPrev = document.getElementById('stats-artists-preview');
         const venPrev = document.getElementById('stats-venues-preview');
@@ -1923,7 +1923,7 @@
         container.innerHTML = `
           <div style="color:#FF7A00; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">ALL YEARS (${topY.length})</div>
           ${topY.length > 0 ? topY.map((item, i) => `
-            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. Year ${item[0]} - <span style="color:#FF7A00;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'}</span></div>
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${i+1}. Year ${item[0]} - <span style="color:#FF7A00;">${item[1]}</span></div>
           `).join('') : '<div style="color:#94a3b8; font-size:14px;">No years logged yet.</div>'}
         `;
       } else {
@@ -1951,7 +1951,7 @@
         container.innerHTML = `
           <div style="color:#FF4081; font-size:18px; font-weight:900; text-transform:uppercase; margin-bottom:12px;">DAYS OF THE WEEK</div>
           ${topD.length > 0 ? topD.map((item, i) => `
-            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${item[0]} - <span style="color:#FF4081;">${item[1]} ${item[1] === 1 ? 'Concert' : 'Concerts'} (${Math.round((item[1]/userShows.length)*100)}%)</span></div>
+            <div style="margin-bottom:10px; padding:14px; background:#121619; border-radius:10px; border:1px solid #222B30; font-size:16px; font-weight:800;">${item[0]} - <span style="color:#FF4081;">${item[1]} (${Math.round((item[1]/userShows.length)*100)}%)</span></div>
           `).join('') : '<div style="color:#94a3b8; font-size:14px;">No days logged yet.</div>'}
         `;
       }
