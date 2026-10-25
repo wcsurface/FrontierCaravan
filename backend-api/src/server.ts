@@ -398,13 +398,13 @@ app.post('/api/auth/reset-password', async (req: Request, res: Response) => {
       if (existingUser) {
         await prisma.user.update({
           where: { email: cleanEmail },
-          data: { password: hashedPassword },
+          data: { passwordHash: hashedPassword },
         });
       } else {
         await prisma.user.create({
           data: {
             email: cleanEmail,
-            password: hashedPassword,
+            passwordHash: hashedPassword,
             displayName: cleanEmail.split('@')[0],
           },
         });
