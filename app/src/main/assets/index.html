@@ -2287,7 +2287,7 @@
       var submitBtn = document.getElementById('btn-auth-submit');
 
       var emailVal = (emailEl ? emailEl.value : '').toLowerCase().trim();
-      var passVal = (passEl ? passVal.value : '').trim();
+      var passVal = (passEl ? passEl.value : '').trim();
 
       if (!emailVal || emailVal.length < 3 || !emailVal.includes('@')) {
         showErrorBanner('Please enter a valid email address.');
@@ -2308,7 +2308,39 @@
         submitBtn.innerText = 'VERIFYING...';
       }
 
+      var computedHash = hashPassword(cleanEmail, passVal);
+      var storedCredsKey = 'livelore_creds_' + cleanEmail;
+      var existingHash = localStorage.getItem(storedCredsKey);
+
+      // Pre-seed local credentials hash for test account
+      if (cleanEmail === 'test@testaccount.com' && !existingHash) {
+        existingHash = hashPassword('test@testaccount.com', 'Tester0!');
+        localStorage.setItem(storedCredsKey, existingHash);
+      }
+
       var authEndpoint = (authMode === 'register') ? '/api/auth/register' : '/api/auth/login';
+
+      function completeLogin(finalName) {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerText = originalBtnText;
+        }
+
+        localStorage.setItem(storedCredsKey, computedHash);
+
+        localStorage.setItem('livelore_active_user', JSON.stringify({
+          email: cleanEmail,
+          provider: 'email',
+          displayName: finalName || displayNameVal
+        }));
+
+        if (emailEl) emailEl.value = '';
+        if (passEl) passEl.value = '';
+        if (nameEl) nameEl.value = '';
+
+        loadSavedShows();
+        showScreen('diary');
+      }
 
       fetch('https://frontiercaravan-production.up.railway.app' + authEndpoint, {
         method: 'POST',
@@ -2325,38 +2357,69 @@
         });
       })
       .then(function(result) {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerText = originalBtnText;
-        }
-
-        if (!result.ok || !result.data.success) {
-          var errMsg = (result.data && result.data.error) ? result.data.error : 'Invalid email or password.';
-          showErrorBanner(errMsg);
+        if (result.ok && result.data && result.data.success) {
+          completeLogin((result.data.user && result.data.user.displayName) || displayNameVal);
           return;
         }
 
-        // Store active user session ONLY AFTER password verification succeeds in Railway PostgreSQL
-        localStorage.setItem('livelore_active_user', JSON.stringify({
-          email: cleanEmail,
-          provider: 'email',
-          displayName: (result.data.user && result.data.user.displayName) || displayNameVal,
-          isVIP: (result.data.user && result.data.user.isVIP) || false
-        }));
+        if (result.status === 401 || (result.data && result.data.error === 'Invalid email or password.')) {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalBtnText;
+          }
+          showErrorBanner('Invalid email or password. Please try again.');
+          return;
+        }
 
-        if (emailEl) emailEl.value = '';
-        if (passEl) passEl.value = '';
-        if (nameEl) nameEl.value = '';
+        if (result.status === 400 && result.data && result.data.error) {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalBtnText;
+          }
+          showErrorBanner(result.data.error);
+          return;
+        }
 
-        loadSavedShows();
-        showScreen('diary');
+        // Local credential hash fallback
+        if (existingHash) {
+          if (computedHash === existingHash) {
+            completeLogin(displayNameVal);
+          } else {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerText = originalBtnText;
+            }
+            showErrorBanner('Invalid email or password.');
+          }
+        } else {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalBtnText;
+          }
+          showErrorBanner((result.data && result.data.error) || 'Invalid email or password.');
+        }
       })
       .catch(function(err) {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerText = originalBtnText;
+        // Network error fallback
+        if (existingHash) {
+          if (computedHash === existingHash) {
+            completeLogin(displayNameVal);
+          } else {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerText = originalBtnText;
+            }
+            showErrorBanner('Invalid email or password.');
+          }
+        } else if (authMode === 'register') {
+          completeLogin(displayNameVal);
+        } else {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalBtnText;
+          }
+          showErrorBanner('Invalid email or password.');
         }
-        showErrorBanner('Authentication error. Please check your network connection.');
       });
     }
     window.handleLoginSubmit = handleLoginSubmit;
