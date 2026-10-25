@@ -506,7 +506,7 @@ app.post('/api/sync/push', async (req: Request, res: Response) => {
   }
 });
 
-// 5. GET /api/sync/pull - Pull Concert Vault directly from Railway PostgreSQL Cloud Database
+// 5. GET /api/sync/pull - Pull & Merge Concert Vault directly from Railway PostgreSQL Cloud Database
 app.get('/api/sync/pull', async (req: Request, res: Response) => {
   try {
     const { userId, email } = req.query;
@@ -515,6 +515,8 @@ app.get('/api/sync/pull', async (req: Request, res: Response) => {
     const rawUserId = typeof userId === 'string' ? userId.trim() : '';
 
     if (prisma) {
+      const allVaults = await prisma.concertVault.findMany();
+
       let userRecord = null;
       if (targetEmail) {
         userRecord = await prisma.user.findUnique({ where: { email: targetEmail } });
@@ -523,44 +525,51 @@ app.get('/api/sync/pull', async (req: Request, res: Response) => {
         userRecord = await prisma.user.findUnique({ where: { id: rawUserId } }).catch(() => null);
       }
 
-      let vault = null;
-      if (userRecord) {
-        vault = await prisma.concertVault.findUnique({ where: { userId: userRecord.id } });
+      const matchKeys = new Set<string>();
+      if (rawUserId) matchKeys.add(rawUserId);
+      if (userRecord) matchKeys.add(userRecord.id);
+      if (targetEmail) {
+        matchKeys.add(targetEmail);
+        matchKeys.add(`u_cloud_${targetEmail.replace(/[^a-z0-9]/g, '_')}`);
       }
 
-      if (!vault && rawUserId) {
-        vault = await prisma.concertVault.findUnique({ where: { userId: rawUserId } }).catch(() => null);
-      }
+      let mergedConcerts: any[] = [];
+      const seenIds = new Set<string>();
 
-      // Fallback: If exact vault query missed, check all vaults matching user key
-      if (!vault) {
-        const allVaults = await prisma.concertVault.findMany();
-        let foundConcerts: any[] = [];
+      allVaults.forEach((v: any) => {
+        let isMatch = false;
+        const vId = v.userId;
 
-        allVaults.forEach((v: any) => {
-          if (v.concertsData) {
-            const raw = v.concertsData as any;
-            const concerts = Array.isArray(raw.concerts) ? raw.concerts : (Array.isArray(raw) ? raw : []);
-            if (concerts.length > foundConcerts.length) {
-              foundConcerts = concerts;
+        if (matchKeys.has(vId)) isMatch = true;
+        if (targetEmail && vId.includes(targetEmail.replace(/[^a-z0-9]/g, '_'))) isMatch = true;
+
+        if (isMatch && v.concertsData) {
+          const raw = v.concertsData as any;
+          const concerts = Array.isArray(raw.concerts) ? raw.concerts : (Array.isArray(raw) ? raw : []);
+
+          concerts.forEach((c: any) => {
+            const key = c.id || `${c.headline}_${c.date}_${c.venue}`;
+            if (!seenIds.has(key)) {
+              seenIds.add(key);
+              mergedConcerts.push(c);
             }
-          }
-        });
+          });
+        }
+      });
 
-        return res.json({
-          success: true,
-          concertsData: { concerts: foundConcerts },
-          updatedAt: new Date().toISOString(),
-        });
+      // If userRecord exists and we found concerts in old key rows, save merged list to user's primary vault row
+      if (userRecord && mergedConcerts.length > 0) {
+        await prisma.concertVault.upsert({
+          where: { userId: userRecord.id },
+          update: { concertsData: { concerts: mergedConcerts } },
+          create: { userId: userRecord.id, concertsData: { concerts: mergedConcerts } },
+        }).catch(() => null);
       }
-
-      const raw = vault ? (vault.concertsData as any) : { concerts: [] };
-      const concerts = Array.isArray(raw.concerts) ? raw.concerts : (Array.isArray(raw) ? raw : []);
 
       return res.json({
         success: true,
-        concertsData: { concerts },
-        updatedAt: vault ? vault.updatedAt : new Date().toISOString(),
+        concertsData: { concerts: mergedConcerts },
+        updatedAt: new Date().toISOString(),
       });
     } else {
       const val = memoryVaults.get(rawUserId) || memoryVaults.get(targetEmail) || { concerts: [] };
