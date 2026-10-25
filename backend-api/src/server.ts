@@ -264,10 +264,10 @@ app.get('/api/auth/me', async (req: Request, res: Response) => {
   }
 });
 
-// 4. POST /api/sync/push - Push Concert Vault Backup with Zero-Data-Loss Safeguard
+// 4. POST /api/sync/push - Push Concert Vault Backup
 app.post('/api/sync/push', async (req: Request, res: Response) => {
   try {
-    const { userId, concertsData, isExplicitAccountDelete } = req.body;
+    const { userId, concertsData } = req.body;
 
     if (!userId || !concertsData) {
       return res.status(400).json({ error: 'userId and concertsData required' });
@@ -277,9 +277,9 @@ app.post('/api/sync/push', async (req: Request, res: Response) => {
       ? concertsData.concerts
       : (Array.isArray(concertsData) ? concertsData : []);
 
-    if (prisma) {
-      const updatedData = { concerts: incomingConcerts };
+    const updatedData = { concerts: incomingConcerts };
 
+    if (prisma) {
       // Process and track venues logged by this user for community threshold promotion
       incomingConcerts.forEach((c: any) => {
         const vName = c.venue || c.venueName;
@@ -309,35 +309,9 @@ app.post('/api/sync/push', async (req: Request, res: Response) => {
         concertsCount: incomingConcerts.length,
         updatedAt: vault.updatedAt,
       });
-    }
-          trackUserVenue(userId, vName, vCity, vState, vCountry);
-        }
-      });
-
-      const vault = await prisma.concertVault.upsert({
-        where: { userId },
-        update: { concertsData: updatedData },
-        create: { userId, concertsData: updatedData },
-      });
-
-      return res.json({ success: true, vaultId: vault.id, concertsCount: finalConcerts.length, updatedAt: vault.updatedAt });
     } else {
-      const existing = memoryVaults.get(userId);
-      let finalConcerts = incomingConcerts;
-
-      if (existing && existing.concerts && existing.concerts.length > 0) {
-        if (incomingConcerts.length === 0 && !isExplicitAccountDelete) {
-          return res.json({ success: true, restored: true, concertsData: existing });
-        }
-        const mergedMap = new Map<string, any>();
-        existing.concerts.forEach((c: any) => { if (c && c.id) mergedMap.set(c.id, c); });
-        incomingConcerts.forEach((c: any) => { if (c && c.id) mergedMap.set(c.id, c); });
-        finalConcerts = Array.from(mergedMap.values());
-      }
-
-      const updatedData = { concerts: finalConcerts };
       memoryVaults.set(userId, updatedData);
-      return res.json({ success: true, concertsCount: finalConcerts.length, updatedAt: new Date() });
+      return res.json({ success: true, concertsCount: incomingConcerts.length, updatedAt: new Date() });
     }
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Sync push failed';
