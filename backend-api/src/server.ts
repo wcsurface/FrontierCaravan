@@ -103,10 +103,24 @@ function trackUserVenue(userId: string, venueName: string, city: string, state: 
 app.get('/health', async (_req: Request, res: Response) => {
   res.status(200).json({
     status: 'healthy',
-    service: 'LiveLore Backend API & Cloud Sync v5.0.0',
+    service: 'LiveLore Backend API & Cloud Sync v6.1.0',
     database: prisma ? 'Prisma Railway PostgreSQL' : 'In-Memory Vault Fallback',
     timestamp: new Date().toISOString(),
   });
+});
+
+// Debug Endpoint to inspect Railway PostgreSQL Vaults
+app.get('/api/debug/vaults', async (_req: Request, res: Response) => {
+  try {
+    if (prisma) {
+      const vaults = await prisma.concertVault.findMany();
+      const users = await prisma.user.findMany({ select: { id: true, email: true, displayName: true, createdAt: true } });
+      return res.json({ success: true, vaultCount: vaults.length, vaults, users });
+    }
+    return res.json({ success: true, memoryVaults: Array.from(memoryVaults.entries()) });
+  } catch (err: unknown) {
+    return res.status(500).json({ error: String(err) });
+  }
 });
 
 // Helper: Sign JWT Token
