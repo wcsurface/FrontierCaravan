@@ -26,6 +26,10 @@ async function initializeDatabaseSchema() {
     `);
 
     await prisma.$executeRawUnsafe(`
+      ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "isVIP" BOOLEAN NOT NULL DEFAULT false;
+    `);
+
+    await prisma.$executeRawUnsafe(`
       CREATE TABLE IF NOT EXISTS "ConcertVault" (
           "id" TEXT NOT NULL,
           "userId" TEXT NOT NULL,
