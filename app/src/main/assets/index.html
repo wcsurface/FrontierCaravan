@@ -1619,32 +1619,17 @@
           } catch(ex) {}
         }
 
-        var storageKey = 'livelore_vault_' + userEmail.replace(/[^a-z0-9]/g, '_');
-        var jsonStr = JSON.stringify(userShows || []);
-
-        // 1. Instant Local Storage Mirror
-        localStorage.setItem(storageKey, jsonStr);
-        localStorage.setItem('livelore_shows', jsonStr);
-
         var cloudUserId = 'u_cloud_' + userEmail.replace(/[^a-z0-9]/g, '_');
 
-        // 2. Cloud DB Push to Railway & Vercel
-        var pushPayload = JSON.stringify({
-          userId: cloudUserId,
-          email: userEmail,
-          concertsData: { concerts: userShows || [] }
-        });
-
+        // PUSH IMMEDIATELY TO RAILWAY POSTGRESQL DB
         fetch('https://frontiercaravan-production.up.railway.app/api/sync/push', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: pushPayload
-        }).catch(function(err) {});
-
-        fetch('https://frontier-caravan.vercel.app/api/sync/push', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: pushPayload
+          body: JSON.stringify({
+            userId: cloudUserId,
+            email: userEmail,
+            concertsData: { concerts: userShows || [] }
+          })
         }).catch(function(err) {});
       } catch (e) {}
     }
@@ -2152,6 +2137,8 @@
         return;
       }
 
+      userShows = [];
+
       isVIPUser = checkIsVIPUser(activeEmail);
       updateProfileVipCard();
 
@@ -2163,60 +2150,28 @@
       var emailDisp = document.getElementById('profile-email-display');
       if (emailDisp) emailDisp.innerText = activeEmail;
 
-      // 1. Instantly load from local storage mirror first so user sees concerts in 0ms!
-      var userKey = 'livelore_vault_' + activeEmail.replace(/[^a-z0-9]/g, '_');
-      var localRaw = localStorage.getItem(userKey) || localStorage.getItem('livelore_shows') || localStorage.getItem('livelore_backup_shows') || '[]';
-      try {
-        var parsedLocal = JSON.parse(localRaw);
-        if (Array.isArray(parsedLocal) && parsedLocal.length > 0) {
-          userShows = parsedLocal;
-        } else {
-          userShows = [];
-        }
-      } catch(ex) {
-        userShows = [];
-      }
-
-      finishLoadAndRender();
-
-      // 2. Asynchronously pull from Cloud Database & merge any missing shows
       var activeUserId = 'u_cloud_' + activeEmail.replace(/[^a-z0-9]/g, '_');
+
+      // Fetch user's concert vault directly from Railway PostgreSQL Cloud Database
       fetch('https://frontiercaravan-production.up.railway.app/api/sync/pull?userId=' + encodeURIComponent(activeUserId) + '&email=' + encodeURIComponent(activeEmail) + '&_t=' + Date.now())
         .then(function(res) { return res.json(); })
         .then(function(data) {
           if (data && data.concertsData) {
-            var cloudList = Array.isArray(data.concertsData.concerts)
-              ? data.concertsData.concerts
-              : (Array.isArray(data.concertsData) ? data.concertsData : []);
-
-            if (cloudList.length > 0) {
-              mergeCloudConcerts(cloudList);
+            if (Array.isArray(data.concertsData.concerts)) {
+              userShows = data.concertsData.concerts;
+            } else if (Array.isArray(data.concertsData)) {
+              userShows = data.concertsData;
+            } else {
+              userShows = [];
             }
+          } else {
+            userShows = [];
           }
-        }).catch(function(err) {});
-
-      function mergeCloudConcerts(cloudList) {
-        var seenKeys = new Set();
-        (userShows || []).forEach(function(s) {
-          var k = s.id || (s.headline + '_' + s.date + '_' + s.venue);
-          seenKeys.add(k);
-        });
-
-        var addedCount = 0;
-        cloudList.forEach(function(cs) {
-          var ck = cs.id || (cs.headline + '_' + cs.date + '_' + cs.venue);
-          if (!seenKeys.has(ck)) {
-            seenKeys.add(ck);
-            userShows.push(cs);
-            addedCount++;
-          }
-        });
-
-        if (addedCount > 0) {
           finishLoadAndRender();
-          saveShowsToStorage();
-        }
-      }
+        }).catch(function(err) {
+          userShows = [];
+          finishLoadAndRender();
+        });
 
       function finishLoadAndRender() {
         if (!Array.isArray(userShows)) userShows = [];

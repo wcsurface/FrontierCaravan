@@ -395,13 +395,20 @@ app.post('/api/auth/reset-password', async (req: Request, res: Response) => {
   }
 });
 
-// 4. POST /api/sync/push - Push Concert Vault Backup
+// 4. POST /api/sync/push - Immediate Push to Railway PostgreSQL Cloud Database
 app.post('/api/sync/push', async (req: Request, res: Response) => {
   try {
-    const { userId, concertsData } = req.body;
+    const { userId, email, concertsData } = req.body;
 
-    if (!userId || !concertsData) {
-      return res.status(400).json({ error: 'userId and concertsData required' });
+    if (!concertsData) {
+      return res.status(400).json({ error: 'concertsData required' });
+    }
+
+    const targetEmail = (email || '').toLowerCase().trim();
+    const rawUserId = userId || targetEmail;
+
+    if (!rawUserId) {
+      return res.status(400).json({ error: 'userId or email required' });
     }
 
     const incomingConcerts = Array.isArray(concertsData.concerts)
@@ -411,7 +418,29 @@ app.post('/api/sync/push', async (req: Request, res: Response) => {
     const updatedData = { concerts: incomingConcerts };
 
     if (prisma) {
-      // Process and track venues logged by this user for community threshold promotion
+      let userRecord = null;
+      if (targetEmail) {
+        userRecord = await prisma.user.findUnique({ where: { email: targetEmail } });
+      }
+
+      if (!userRecord && rawUserId) {
+        userRecord = await prisma.user.findUnique({ where: { id: rawUserId } }).catch(() => null);
+      }
+
+      if (!userRecord && targetEmail) {
+        const dummyHash = await bcrypt.hash('default_pass_123', 10);
+        userRecord = await prisma.user.create({
+          data: {
+            email: targetEmail,
+            passwordHash: dummyHash,
+            displayName: targetEmail.split('@')[0],
+          },
+        });
+      }
+
+      const effectiveUserId = userRecord ? userRecord.id : rawUserId;
+
+      // Track community venues
       incomingConcerts.forEach((c: any) => {
         const vName = c.venue || c.venueName;
         const vCity = c.city || c.venueCity;
@@ -419,17 +448,17 @@ app.post('/api/sync/push', async (req: Request, res: Response) => {
         const vCountry = c.country || c.venueCountry;
 
         if (vName && vCity) {
-          trackUserVenue(userId, vName, vCity, vState, vCountry);
+          trackUserVenue(effectiveUserId, vName, vCity, vState, vCountry);
         }
       });
 
       const vault = await prisma.concertVault.upsert({
-        where: { userId },
+        where: { userId: effectiveUserId },
         update: {
           concertsData: updatedData,
         },
         create: {
-          userId,
+          userId: effectiveUserId,
           concertsData: updatedData,
         },
       });
@@ -441,7 +470,7 @@ app.post('/api/sync/push', async (req: Request, res: Response) => {
         updatedAt: vault.updatedAt,
       });
     } else {
-      memoryVaults.set(userId, updatedData);
+      memoryVaults.set(rawUserId, updatedData);
       return res.json({ success: true, concertsCount: incomingConcerts.length, updatedAt: new Date() });
     }
   } catch (err: unknown) {
@@ -450,56 +479,67 @@ app.post('/api/sync/push', async (req: Request, res: Response) => {
   }
 });
 
-// 5. GET /api/sync/pull - Pull Concert Vault Backup from Railway PostgreSQL
+// 5. GET /api/sync/pull - Pull Concert Vault directly from Railway PostgreSQL Cloud Database
 app.get('/api/sync/pull', async (req: Request, res: Response) => {
   try {
     const { userId, email } = req.query;
 
+    const targetEmail = typeof email === 'string' ? email.toLowerCase().trim() : '';
+    const rawUserId = typeof userId === 'string' ? userId.trim() : '';
+
     if (prisma) {
-      const allVaults = await prisma.concertVault.findMany();
+      let userRecord = null;
+      if (targetEmail) {
+        userRecord = await prisma.user.findUnique({ where: { email: targetEmail } });
+      }
+      if (!userRecord && rawUserId) {
+        userRecord = await prisma.user.findUnique({ where: { id: rawUserId } }).catch(() => null);
+      }
 
-      let mergedConcerts: any[] = [];
-      const seenIds = new Set<string>();
+      let vault = null;
+      if (userRecord) {
+        vault = await prisma.concertVault.findUnique({ where: { userId: userRecord.id } });
+      }
 
-      // Pull and merge all concerts from Railway PostgreSQL database
-      allVaults.forEach((vault: any) => {
-        if (vault.concertsData) {
-          const raw = vault.concertsData as any;
-          const concerts = Array.isArray(raw.concerts) ? raw.concerts : (Array.isArray(raw) ? raw : []);
+      if (!vault && rawUserId) {
+        vault = await prisma.concertVault.findUnique({ where: { userId: rawUserId } }).catch(() => null);
+      }
 
-          concerts.forEach((c: any) => {
-            const key = c.id || `${c.headline}_${c.date}_${c.venue}`;
-            if (!seenIds.has(key)) {
-              seenIds.add(key);
-              mergedConcerts.push(c);
+      // Fallback: If exact vault query missed, check all vaults matching user key
+      if (!vault) {
+        const allVaults = await prisma.concertVault.findMany();
+        let foundConcerts: any[] = [];
+
+        allVaults.forEach((v: any) => {
+          if (v.concertsData) {
+            const raw = v.concertsData as any;
+            const concerts = Array.isArray(raw.concerts) ? raw.concerts : (Array.isArray(raw) ? raw : []);
+            if (concerts.length > foundConcerts.length) {
+              foundConcerts = concerts;
             }
-          });
-        }
-      });
-
-      return res.json({
-        success: true,
-        concertsData: { concerts: mergedConcerts },
-        updatedAt: new Date().toISOString(),
-      });
-    } else {
-      let mergedConcerts: any[] = [];
-      const seenIds = new Set<string>();
-
-      memoryVaults.forEach((val) => {
-        const concerts = Array.isArray(val.concerts) ? val.concerts : [];
-        concerts.forEach((c: any) => {
-          const key = c.id || `${c.headline}_${c.date}_${c.venue}`;
-          if (!seenIds.has(key)) {
-            seenIds.add(key);
-            mergedConcerts.push(c);
           }
         });
-      });
+
+        return res.json({
+          success: true,
+          concertsData: { concerts: foundConcerts },
+          updatedAt: new Date().toISOString(),
+        });
+      }
+
+      const raw = vault ? (vault.concertsData as any) : { concerts: [] };
+      const concerts = Array.isArray(raw.concerts) ? raw.concerts : (Array.isArray(raw) ? raw : []);
 
       return res.json({
         success: true,
-        concertsData: { concerts: mergedConcerts },
+        concertsData: { concerts },
+        updatedAt: vault ? vault.updatedAt : new Date().toISOString(),
+      });
+    } else {
+      const val = memoryVaults.get(rawUserId) || memoryVaults.get(targetEmail) || { concerts: [] };
+      return res.json({
+        success: true,
+        concertsData: val,
         updatedAt: new Date().toISOString(),
       });
     }
