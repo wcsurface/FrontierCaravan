@@ -511,7 +511,7 @@ app.get('/api/sync/pull', async (req: Request, res: Response) => {
   try {
     const { userId, email } = req.query;
 
-    const targetEmail = typeof email === 'string' ? email.toLowerCase().trim() : '';
+    let targetEmail = typeof email === 'string' ? email.toLowerCase().trim() : '';
     const rawUserId = typeof userId === 'string' ? userId.trim() : '';
 
     if (prisma) {
@@ -523,6 +523,10 @@ app.get('/api/sync/pull', async (req: Request, res: Response) => {
       }
       if (!userRecord && rawUserId) {
         userRecord = await prisma.user.findUnique({ where: { id: rawUserId } }).catch(() => null);
+      }
+
+      if (userRecord && !targetEmail) {
+        targetEmail = userRecord.email.toLowerCase().trim();
       }
 
       const matchKeys = new Set<string>();
