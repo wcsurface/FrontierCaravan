@@ -1,11 +1,11 @@
 {
   "name": "livelore-backend",
-  "version": "6.4.0",
+  "version": "6.5.0",
   "description": "Backend API & Railway PostgreSQL Cloud Database Sync for LiveLore",
   "main": "dist/server.js",
   "scripts": {
     "postinstall": "prisma generate",
-    "build": "prisma generate && tsc",
+    "build": "prisma generate && prisma db push --accept-data-loss && tsc",
     "db:push": "prisma db push --accept-data-loss",
     "start": "npx prisma db push --accept-data-loss && node dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts"
