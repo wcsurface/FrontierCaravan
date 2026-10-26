@@ -2720,31 +2720,15 @@
       var emailDisp = document.getElementById('profile-email-display');
       if (emailDisp) emailDisp.innerText = activeEmail;
 
-      // Universal Device Storage Scan: Collect all shows & photos across all local vault keys
-      var allLocalMap = {};
-      try {
-        for (var i = 0; i < localStorage.length; i++) {
-          var k = localStorage.key(i);
-          if (k && k.indexOf('livelore_vault_') === 0) {
-            var raw = localStorage.getItem(k);
-            if (raw) {
-              try {
-                var parsed = JSON.parse(raw);
-                var arr = Array.isArray(parsed) ? parsed : (parsed && Array.isArray(parsed.concerts) ? parsed.concerts : []);
-                arr.forEach(function(s) {
-                  if (s) {
-                    var key = s.id || (s.date + '_' + (s.headline || '') + '_' + (s.venue || ''));
-                    allLocalMap[key] = s;
-                  }
-                });
-              } catch(ex) {}
-            }
-          }
-        }
-      } catch(e) {}
+      // Strictly isolate local vault storage by active email address
+      var localKey = 'livelore_vault_' + activeEmail.replace(/[^a-z0-9]/g, '_');
+      var localShowsRaw = localStorage.getItem(localKey);
+      var localShows = [];
+      if (localShowsRaw) {
+        try { localShows = JSON.parse(localShowsRaw); } catch(e) {}
+      }
 
-      var localShows = Object.values(allLocalMap);
-      userShows = localShows;
+      userShows = Array.isArray(localShows) ? localShows : [];
       finishLoadAndRender();
 
       var activeUserId = 'u_cloud_' + activeEmail.replace(/[^a-z0-9]/g, '_');
