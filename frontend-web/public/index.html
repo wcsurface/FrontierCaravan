@@ -917,17 +917,20 @@
     var currentActiveScreen = 'auth';
     var lastScreenBeforeLegal = 'auth';
 
+    function getActiveUserEmail() {
+      try {
+        var rawUser = localStorage.getItem('livelore_active_user');
+        if (!rawUser) return null;
+        var uObj = JSON.parse(rawUser);
+        if (uObj && typeof uObj.email === 'string' && uObj.email.trim().length > 0) {
+          return uObj.email.toLowerCase().trim();
+        }
+      } catch(e) {}
+      return null;
+    }
+
     function showScreen(screenId) {
-      var rawUser = localStorage.getItem('livelore_active_user');
-      var activeEmail = null;
-      if (rawUser) {
-        try {
-          var uObj = JSON.parse(rawUser);
-          if (uObj && uObj.email && uObj.email.trim().length > 0) {
-            activeEmail = uObj.email.toLowerCase().trim();
-          }
-        } catch(e) {}
-      }
+      var activeEmail = getActiveUserEmail();
 
       // Record origin screen before opening legal pages
       if (screenId === 'terms' || screenId === 'privacy' || screenId === 'faq') {
@@ -974,22 +977,18 @@
     window.showScreen = showScreen;
 
     function handleLegalBack() {
-      var rawUser = localStorage.getItem('livelore_active_user');
-      var activeEmail = null;
-      if (rawUser) {
-        try {
-          var uObj = JSON.parse(rawUser);
-          if (uObj && uObj.email && uObj.email.trim().length > 0) {
-            activeEmail = uObj.email.toLowerCase().trim();
-          }
-        } catch(e) {}
-      }
+      var activeEmail = getActiveUserEmail();
 
-      // If user is logged out OR opened legal docs from the login screen, ALWAYS go back to login screen!
+      // ABSOLUTE RULE: If not logged in (!activeEmail) or came from auth screen, ALWAYS go directly to 'auth' (the Login page)!
       if (!activeEmail || lastScreenBeforeLegal === 'auth') {
         showScreen('auth');
+        return;
+      }
+
+      if (lastScreenBeforeLegal && lastScreenBeforeLegal !== 'terms' && lastScreenBeforeLegal !== 'privacy' && lastScreenBeforeLegal !== 'faq') {
+        showScreen(lastScreenBeforeLegal);
       } else {
-        showScreen(lastScreenBeforeLegal || 'profile');
+        showScreen('profile');
       }
     }
     window.handleLegalBack = handleLegalBack;
