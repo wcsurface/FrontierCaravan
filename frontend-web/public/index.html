@@ -105,6 +105,14 @@
         target.classList.add('active');
         target.style.display = 'flex';
       }
+
+      if (screenId === 'profile') {
+        if (typeof updateProfileVipCard === 'function') updateProfileVipCard();
+      } else if (screenId === 'diary') {
+        if (typeof renderShowsFeed === 'function') renderShowsFeed();
+      } else if (screenId === 'stats') {
+        if (typeof updateStatsDisplay === 'function') updateStatsDisplay();
+      }
     }
     window.showScreen = showScreen;
 
@@ -2768,10 +2776,12 @@
             userShows = localShows;
             saveShowsToStorage(true);
             finishLoadAndRender();
-          }
+          } else {
             finishLoadAndRender();
           }
-        }).catch(function(err) {});
+        }).catch(function(err) {
+          finishLoadAndRender();
+        });
 
       function finishLoadAndRender() {
         if (!Array.isArray(userShows)) userShows = [];
@@ -3031,6 +3041,7 @@
     function handleLogout() {
       userShows = [];
       isVIPUser = false;
+      isVaultLoaded = false;
       clearErrorBanner();
       localStorage.removeItem('livelore_active_user');
       localStorage.removeItem('livelore_active_email');
@@ -3047,6 +3058,7 @@
 
       renderShowsFeed();
       updateStatsDisplay();
+      updateProfileVipCard();
       showScreen('auth');
     }
     window.handleLogout = handleLogout;
@@ -3829,17 +3841,6 @@
       if (btnClassic) btnClassic.classList.toggle('active', theme === 'classic');
 
       renderShowsFeed();
-    }
-
-    function getTicketColor(id) {
-      if (currentTicketTheme === 'classic') return '#f4e4bc';
-      if (!id) return TICKET_COLOR_PALETTE[0];
-      let hash = 0;
-      for (let i = 0; i < id.length; i++) {
-        hash = (hash << 5) - hash + id.charCodeAt(i);
-        hash |= 0;
-      }
-      return TICKET_COLOR_PALETTE[Math.abs(hash) % TICKET_COLOR_PALETTE.length];
     }
 
     
