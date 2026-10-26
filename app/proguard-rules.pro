@@ -3,7 +3,7 @@
     @android.webkit.JavascriptInterface <methods>;
 }
 
--keepclassmembers class app.vercel.frontiercaravan.AndroidNativeBridge {
+-keepclassmembers class app.vercel.livelore.AndroidNativeBridge {
     *;
 }
 

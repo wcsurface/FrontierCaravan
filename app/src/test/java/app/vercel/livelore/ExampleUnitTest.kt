@@ -1,4 +1,4 @@
-package app.vercel.frontiercaravan
+package app.vercel.livelore
 
 import org.junit.Test
 

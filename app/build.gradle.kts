@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "app.vercel.frontiercaravan"
+    namespace = "app.vercel.livelore"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "app.vercel.frontiercaravan"
+        applicationId = "app.vercel.livelore"
         minSdk = 26
         targetSdk = 35
         versionCode = 1

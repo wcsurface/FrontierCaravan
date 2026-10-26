@@ -1,7 +1,7 @@
 # PROJECT_MEMORY.md - LiveLore: Concert Diary & Setlist Vault
 
 ## 1. Application Purpose & Intended Users
-**LiveLore** (package ID: `app.vercel.frontiercaravan`, brand name: **LiveLore: Concert Diary & Setlist Vault**) is a cross-platform concert tracking application built for live music enthusiasts, concertgoers, and music archivists.
+**LiveLore** (package ID: `app.vercel.livelore`, brand name: **LiveLore: Concert Diary & Setlist Vault**) is a cross-platform concert tracking application built for live music enthusiasts, concertgoers, and music archivists.
 
 Key capabilities:
 - Log live concert experiences (Headline artist, opener(s), date, venue, city, state, country, general notes, ticket prices, and setlists).

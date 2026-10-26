@@ -1,4 +1,4 @@
-package app.vercel.frontiercaravan.ui.theme
+package app.vercel.livelore.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
