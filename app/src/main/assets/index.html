@@ -40,6 +40,105 @@
       return str;
     }
     window.cleanAndValidateDateString = cleanAndValidateDateString;
+
+    function showErrorBanner(msg) {
+      var el = document.getElementById('auth-error-banner');
+      if (el) {
+        el.innerText = msg;
+        el.style.display = 'block';
+      }
+    }
+    window.showErrorBanner = showErrorBanner;
+
+    function clearErrorBanner() {
+      var el = document.getElementById('auth-error-banner');
+      if (el) {
+        el.innerText = '';
+        el.style.display = 'none';
+      }
+    }
+    window.clearErrorBanner = clearErrorBanner;
+
+    function openShowDetails(showId) {
+      if (!showId || !Array.isArray(userShows)) return;
+      activeDetailShowId = showId;
+      var show = userShows.find(function(s) { return s.id === showId; });
+      if (!show) return;
+
+      var ticketPreviewBox = document.getElementById('detail-ticket-preview');
+      if (ticketPreviewBox) {
+        var ticketColor = (typeof getTicketColor === 'function') ? getTicketColor(show.id) : '#FFD54F';
+        var openersTextPreview = '';
+        if (Array.isArray(show.openersList) && show.openersList.length > 0) {
+          openersTextPreview = show.openersList.join(', ');
+        } else if (show.opener) {
+          openersTextPreview = show.opener;
+        }
+
+        var bandStackHtmlPreview = '<div class="ticket-artist-head">' + (show.headline || '').toUpperCase() + '</div>';
+        if (openersTextPreview) {
+          bandStackHtmlPreview += '<div class="ticket-artist-and">and</div><div class="ticket-artist-openers">' + openersTextPreview + '</div>';
+        }
+
+        var stubInnerHtmlPreview = '<div>ADMIT ONE</div><div style="font-size:8px; color:#221508; margin-top:4px;">SEC 7</div>';
+        var stubExtraStylePreview = '';
+
+        if (Array.isArray(show.photoUris) && show.photoUris.length > 0 && show.photoUris[0]) {
+          var primaryPhotoPreview = show.photoUris[0];
+          stubExtraStylePreview = "background-image: url('" + primaryPhotoPreview + "'); background-size: cover; background-position: center; border-radius: 0 10px 10px 0; overflow: hidden; position: relative;";
+          stubInnerHtmlPreview = '';
+        }
+
+        ticketPreviewBox.innerHTML = '<div class="ticket-card" style="background-color:' + ticketColor + '; margin-bottom:0;">' +
+          '<div class="ticket-left">' +
+            '<div class="ticket-artist-box">' + bandStackHtmlPreview + '</div>' +
+            '<div class="ticket-footer">' +
+              '<span class="ticket-venue">' + (show.venue || '').trim() + '</span>' +
+              '<span class="ticket-date">' + (show.date || '') + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="ticket-stub" style="' + stubExtraStylePreview + '">' + stubInnerHtmlPreview + '</div>' +
+        '</div>';
+      }
+
+      var headlineEl = document.getElementById('detail-headline');
+      var openersBoxEl = document.getElementById('detail-openers-box');
+      var openersEl = document.getElementById('detail-openers');
+      var dateEl = document.getElementById('detail-date');
+      var venueEl = document.getElementById('detail-venue');
+      var locationEl = document.getElementById('detail-location');
+      var notesBoxEl = document.getElementById('detail-notes-box');
+      var notesEl = document.getElementById('detail-notes');
+
+      if (headlineEl) headlineEl.innerText = (show.headline || '').toUpperCase();
+      if (dateEl) dateEl.innerText = show.date || '';
+      if (venueEl) venueEl.innerText = (show.venue || '').trim();
+
+      var locStr = [show.city, show.state, show.country].filter(Boolean).join(', ');
+      if (locationEl) locationEl.innerText = locStr;
+
+      var openersText = Array.isArray(show.openersList) ? show.openersList.join(', ') : (show.opener || '');
+      if (openersBoxEl) {
+        if (openersText) {
+          openersBoxEl.style.display = 'block';
+          if (openersEl) openersEl.innerText = openersText;
+        } else {
+          openersBoxEl.style.display = 'none';
+        }
+      }
+
+      if (notesBoxEl) {
+        if (show.notes && show.notes.trim()) {
+          notesBoxEl.style.display = 'block';
+          if (notesEl) notesEl.innerText = show.notes.trim();
+        } else {
+          notesBoxEl.style.display = 'none';
+        }
+      }
+
+      if (typeof showScreen === 'function') showScreen('setlist');
+    }
+    window.openShowDetails = openShowDetails;
     function showCustomPrompt(options, onSubmit) {
       var modal = document.getElementById('custom-prompt-modal');
       var iconEl = document.getElementById('custom-prompt-icon');
