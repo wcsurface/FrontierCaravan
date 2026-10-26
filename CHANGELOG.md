@@ -1,6 +1,11 @@
 ## [Unreleased] - 2026-10-26
 
 ### Added
+- **Google Play Billing Library Integration (`AndroidBilling`)**:
+  - Integrated `com.android.billingclient:billing-ktx:7.0.0` into native Android app (`MainActivity.kt`).
+  - Registered Product ID `vip_pass_499` ($4.99 Non-Consumable In-App Product).
+  - Wired `handleUpgradeVip()` to launch Google Play's official purchase sheet (supporting License Testing always-approved test payments).
+  - Automatically acknowledges purchases and persists `$4.99` VIP Pass status to Railway PostgreSQL database (`/api/auth/upgrade-vip`).
 - **Hidden Scrollbars Across Web & App**:
   - Global CSS rules (`*::-webkit-scrollbar { display: none !important; }` and `scrollbar-width: none !important;`) applied across `app/src/main/assets/index.html`, `frontend-web/public/index.html`, and `frontend-web/src/app/globals.css`.
   - Removes all visible scrollbars on Web browsers (Chrome, Safari, Firefox, Edge, iOS, Android) while preserving 100% full touch and wheel scrolling.

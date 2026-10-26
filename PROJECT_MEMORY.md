@@ -47,13 +47,14 @@ The application uses a hybrid client-server architecture with dual frontend targ
    - **Language**: Kotlin 1.9+
    - **Target SDK**: 35 (Android 15) / Compile SDK: 37
    - **Min SDK**: 26 (Android 8.0)
-   - **Key Libraries**: AndroidX WebKit (`1.12.1`), AppCompat (`1.7.0`), Gson (`2.11.0`), Google Play Services Ads / AdMob (`23.6.0`).
+   - **Key Libraries**: AndroidX WebKit (`1.12.1`), AppCompat (`1.7.0`), Gson (`2.11.0`), Google Play Services Ads / AdMob (`23.6.0`), Google Play Billing Library (`com.android.billingclient:billing-ktx:7.0.0`).
    - **Native Bridges exposed to JavaScript**:
      - `AndroidHaptics` (Haptic vibration feedback)
      - `AndroidGoogleAuth` (Native Android AccountManager Google Sign-In)
      - `AndroidAdMob` (Toggles native AdMob banner ads)
      - `AndroidCSV` (Saves CSV files to device Downloads via `MediaStore`)
-     - `AndroidShare` (Invokes Android OS native system share sheet with image & text support)
+     - `AndroidShare` (Invokes Android OS native system share sheet)
+     - `AndroidBilling` (Google Play Billing Library / Google Pay $4.99 In-App Product `vip_pass_499`)
 
 2. **Web Client (`frontend-web`)**:
    - **Framework**: Next.js 14 (`^14.2.15`) + React 18

@@ -2460,7 +2460,7 @@
     }
     window.navigateToProfileVip = navigateToProfileVip;
 
-    function handleUpgradeVip() {
+    function executeVipUpgradeSuccess() {
       var rawUser = localStorage.getItem('livelore_active_user');
       var activeEmail = null;
       if (rawUser) {
@@ -2485,7 +2485,17 @@
         body: JSON.stringify({ email: cleanEmail })
       }).catch(function(err) {});
 
-      showCustomAlert({ title: 'VIP UPGRADED', message: 'Welcome to LiveLore VIP! You now have permanent ad-free access and full photo memory features enabled.', icon: '🌟' });
+      showCustomAlert({ title: 'VIP UPGRADED', message: 'Welcome to LiveLore VIP! You now have permanent ad-free access, full photo memories, and CSV export enabled.', icon: '🌟' });
+    }
+    window.onNativeVipPurchaseSuccess = executeVipUpgradeSuccess;
+    window.onNativeVipPurchaseFallback = executeVipUpgradeSuccess;
+
+    function handleUpgradeVip() {
+      if (window.AndroidBilling && window.AndroidBilling.launchVipPurchase) {
+        window.AndroidBilling.launchVipPurchase();
+      } else {
+        executeVipUpgradeSuccess();
+      }
     }
     window.handleUpgradeVip = handleUpgradeVip;
 
