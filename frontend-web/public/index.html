@@ -914,6 +914,9 @@
       document.querySelectorAll('.current-year-span').forEach(el => el.innerText = year);
     }
 
+    var currentActiveScreen = 'auth';
+    var lastScreenBeforeLegal = 'auth';
+
     function showScreen(screenId) {
       var rawUser = localStorage.getItem('livelore_active_user');
       var activeEmail = null;
@@ -926,10 +929,19 @@
         } catch(e) {}
       }
 
+      // Record origin screen before opening legal pages
+      if (screenId === 'terms' || screenId === 'privacy' || screenId === 'faq') {
+        if (currentActiveScreen !== 'terms' && currentActiveScreen !== 'privacy' && currentActiveScreen !== 'faq') {
+          lastScreenBeforeLegal = currentActiveScreen;
+        }
+      }
+
       // STRICT AUTH GUARD: When logged out, force auth screen for any protected view!
       if (!activeEmail && screenId !== 'auth' && screenId !== 'terms' && screenId !== 'privacy' && screenId !== 'faq') {
         screenId = 'auth';
       }
+
+      currentActiveScreen = screenId;
 
       document.querySelectorAll('.screen-view').forEach(function(el) {
         el.classList.remove('active');
@@ -972,10 +984,12 @@
           }
         } catch(e) {}
       }
-      if (!activeEmail) {
+
+      // If user is logged out OR opened legal docs from the login screen, ALWAYS go back to login screen!
+      if (!activeEmail || lastScreenBeforeLegal === 'auth') {
         showScreen('auth');
       } else {
-        showScreen('profile');
+        showScreen(lastScreenBeforeLegal || 'profile');
       }
     }
     window.handleLegalBack = handleLegalBack;
