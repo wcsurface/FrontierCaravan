@@ -572,6 +572,30 @@ class MainActivity : ComponentActivity() {
         fun launchGoogleSignIn() {
             runOnUiThread {
                 try {
+                    val am = AccountManager.get(context)
+                    val googleAccounts = am.getAccountsByType("com.google")
+                    if (!googleAccounts.isNullOrEmpty()) {
+                        if (googleAccounts.size == 1) {
+                            val safeEmail = googleAccounts[0].name.lowercase().trim()
+                            webView.post {
+                                webView.evaluateJavascript("onNativeGoogleAuthSuccess('$safeEmail')", null)
+                            }
+                            return@runOnUiThread
+                        } else {
+                            val options = AccountPicker.AccountChooserOptions.Builder()
+                                .setAllowableAccountsTypes(listOf("com.google"))
+                                .setAlwaysShowAccountPicker(true)
+                                .build()
+                            val intent = AccountPicker.newChooseAccountIntent(options)
+                            startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
+                            return@runOnUiThread
+                        }
+                    }
+                } catch (e: Exception) {
+                    // Ignore security exception and fallback
+                }
+
+                try {
                     val options = AccountPicker.AccountChooserOptions.Builder()
                         .setAllowableAccountsTypes(listOf("com.google"))
                         .setAlwaysShowAccountPicker(true)
@@ -579,16 +603,8 @@ class MainActivity : ComponentActivity() {
                     val intent = AccountPicker.newChooseAccountIntent(options)
                     startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
                 } catch (e: Exception) {
-                    try {
-                        @Suppress("DEPRECATION")
-                        val intent = AccountManager.newChooseAccountIntent(
-                            null, null, arrayOf("com.google"), true, null, null, null, null
-                        )
-                        startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
-                    } catch (ex: Exception) {
-                        webView.post {
-                            webView.evaluateJavascript("onNativeGoogleAuthFallback()", null)
-                        }
+                    webView.post {
+                        webView.evaluateJavascript("onNativeGoogleAuthFallback()", null)
                     }
                 }
             }

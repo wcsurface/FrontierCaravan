@@ -55,7 +55,7 @@ The application uses a hybrid client-server architecture with dual frontend targ
    - **Key Libraries**: AndroidX WebKit (`1.12.1`), AppCompat (`1.7.0`), Gson (`2.11.0`), Google Play Services Ads / AdMob (`23.6.0`), Google Play Billing Library (`com.android.billingclient:billing-ktx:7.0.0`).
    - **Native Bridges exposed to JavaScript**:
      - `AndroidHaptics` (Haptic vibration feedback)
-     - `AndroidGoogleAuth` (Native Android AccountManager Google Sign-In)
+     - `AndroidGoogleAuth` (Native Android AccountManager + Google AccountPicker 1-tap Google Sign-In)
      - `AndroidAdMob` (Toggles native AdMob banner ads)
      - `AndroidCSV` (Saves CSV files to device Downloads via `MediaStore`)
      - `AndroidShare` (Invokes Android OS native system share sheet)
