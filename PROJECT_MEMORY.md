@@ -229,6 +229,7 @@ The UI uses a single-page application (SPA) screen switcher pattern (`showScreen
   - Text Secondary: `#94a3b8` / `#64748b`
 - **Ticket Stub Color Palette**: Assortment of multi-color vintage ticket stub styles (`#F7C252` Warm Gold, `#F7A993` Vintage Peach, etc.) and classic ticket theme (`#f4e4bc`).
 - **Glassmorphic Navigation Bar**: Fixed glassmorphic navigation bar with blurred background and glowing borders (`#F6B756` Home/Profile, `#2DE38E` Add/Stats) positioned directly under the header logo.
+- **Hidden Scrollbars Rule**: All scrollbars are hidden across Web, Chrome, Safari, Firefox, Edge, and iOS/Android using `*::-webkit-scrollbar { display: none !important; }` and `scrollbar-width: none !important;` while maintaining 100% full touch/mouse scrolling functionality.
 - **Character Encoding Rule**: All special characters and bullet points MUST use explicit HTML entities (e.g., `&bull;`, `&#169;`, `&uarr;`) rather than raw UTF-8 symbols to prevent Windows/PowerShell encoding corruption (`â€¢`).
 
 ---

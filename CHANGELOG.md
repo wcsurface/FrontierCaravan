@@ -1,10 +1,9 @@
-# CHANGELOG.md - LiveLore: Concert Diary & Setlist Vault
-
-All notable changes to this project will be documented in this file.
-
 ## [Unreleased] - 2026-10-26
 
 ### Added
+- **Hidden Scrollbars Across Web & App**:
+  - Global CSS rules (`*::-webkit-scrollbar { display: none !important; }` and `scrollbar-width: none !important;`) applied across `app/src/main/assets/index.html`, `frontend-web/public/index.html`, and `frontend-web/src/app/globals.css`.
+  - Removes all visible scrollbars on Web browsers (Chrome, Safari, Firefox, Edge, iOS, Android) while preserving 100% full touch and wheel scrolling.
 - **Multi-Platform Concert Sharing**:
   - Added prominent `🚀 SHARE CONCERT` CTA button on the Concert Details screen.
   - Implemented custom glassmorphic share modal with 6 target choices:
