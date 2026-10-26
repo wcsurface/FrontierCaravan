@@ -2,38 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-const resetCodesStore = (globalThis as any).__RESET_CODES__ || new Map<string, { code: string; expires: number }>();
-(globalThis as any).__RESET_CODES__ = resetCodesStore;
+const RAILWAY_BACKEND_URL = 'https://frontiercaravan-production.up.railway.app';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, code, newPassword } = body;
 
-    if (!email || typeof email !== 'string' || !email.includes('@')) {
-      return NextResponse.json({ error: 'Valid email address required' }, { status: 400 });
-    }
+    const res = await fetch(`${RAILWAY_BACKEND_URL}/api/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      cache: 'no-store',
+    });
 
-    if (!code || typeof code !== 'string') {
-      return NextResponse.json({ error: '6-digit verification code required' }, { status: 400 });
-    }
-
-    if (!newPassword || typeof newPassword !== 'string' || newPassword.length < 4) {
-      return NextResponse.json({ error: 'New password must be at least 4 characters long' }, { status: 400 });
-    }
-
-    const cleanEmail = email.toLowerCase().trim();
-    const cleanCode = code.trim();
-
-    const record = resetCodesStore.get(cleanEmail);
-
-    if (!record || record.code !== cleanCode || Date.now() > record.expires) {
-      return NextResponse.json({ error: 'Invalid or expired 6-digit verification code' }, { status: 400 });
-    }
-
-    resetCodesStore.delete(cleanEmail);
-    return NextResponse.json({ success: true, message: 'Password updated successfully.' });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'Password reset failed' }, { status: 500 });
+    const data = await res.json();
+    return NextResponse.json(data, { status: res.status });
+  } catch (e: any) {
+    return NextResponse.json({ success: false, error: e.message || 'Reset password failed' }, { status: 500 });
   }
 }
