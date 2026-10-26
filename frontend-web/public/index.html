@@ -920,25 +920,16 @@
       if (rawUser) {
         try {
           var uObj = JSON.parse(rawUser);
-          if (uObj && uObj.email) {
+          if (uObj && uObj.email && uObj.email.trim().length > 0) {
             activeEmail = uObj.email.toLowerCase().trim();
           }
         } catch(e) {}
       }
 
-      // STRICT AUTH GUARD: If not logged in, force auth screen for any protected view
+      // STRICT AUTH GUARD: When logged out, force auth screen for any protected view!
       if (!activeEmail && screenId !== 'auth' && screenId !== 'terms' && screenId !== 'privacy' && screenId !== 'faq') {
         screenId = 'auth';
       }
-
-      // Hide bottom glass nav bar on legal pages or auth screen when logged out
-      document.querySelectorAll('.glass-nav-bar').forEach(function(nav) {
-        if (!activeEmail && (screenId === 'terms' || screenId === 'privacy' || screenId === 'faq' || screenId === 'auth')) {
-          nav.style.display = 'none';
-        } else {
-          nav.style.display = 'flex';
-        }
-      });
 
       document.querySelectorAll('.screen-view').forEach(function(el) {
         el.classList.remove('active');
@@ -976,7 +967,7 @@
       if (rawUser) {
         try {
           var uObj = JSON.parse(rawUser);
-          if (uObj && uObj.email) {
+          if (uObj && uObj.email && uObj.email.trim().length > 0) {
             activeEmail = uObj.email.toLowerCase().trim();
           }
         } catch(e) {}
@@ -2839,14 +2830,21 @@
 
     function handleLogout() {
       userShows = [];
+      isVIPUser = false;
       clearErrorBanner();
       localStorage.removeItem('livelore_active_user');
+      localStorage.removeItem('livelore_active_email');
+
+      var emailDisp = document.getElementById('profile-email-display');
+      if (emailDisp) emailDisp.innerText = '';
+
       var emailEl = document.getElementById('auth-email');
       var passEl = document.getElementById('auth-password');
       var nameEl = document.getElementById('auth-name');
       if (emailEl) emailEl.value = '';
       if (passEl) passEl.value = '';
       if (nameEl) nameEl.value = '';
+
       renderShowsFeed();
       updateStatsDisplay();
       showScreen('auth');
@@ -3429,12 +3427,6 @@
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
       </div>
-      <div class="glass-nav-bar">
-        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
-      </div>
     </div>
 
     <div class="detail-card">
@@ -3460,12 +3452,6 @@
       </button>
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
-      </div>
-      <div class="glass-nav-bar">
-        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
 
@@ -3493,12 +3479,6 @@
       </button>
       <div class="header-logo-box">
         <img src="livelore_logo.png" alt="LiveLore Logo" class="header-logo-img" />
-      </div>
-      <div class="glass-nav-bar">
-        <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
 
