@@ -16,7 +16,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
-        buildConfigField("String", "VERCEL_LIVE_URL", "\"https://frontiercaravan.vercel.app\"")
+        buildConfigField("String", "VERCEL_LIVE_URL", "\"https://frontier-caravan.vercel.app\"")
         buildConfigField("String", "OFFLINE_ASSET_URL", "\"file:///android_asset/index.html\"")
     }
 

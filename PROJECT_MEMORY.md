@@ -59,7 +59,7 @@ The application uses a hybrid client-server architecture with dual frontend targ
    - **Framework**: Next.js 14 (`^14.2.15`) + React 18
    - **Styling**: Tailwind CSS + PostCSS + Lucide Icons
    - **State Management**: Zustand
-   - **Deployment**: Vercel (`frontiercaravan.vercel.app`)
+   - **Deployment**: Vercel (`frontier-caravan.vercel.app`)
 
 3. **Backend API (`backend-api`)**:
    - **Runtime**: Node.js (TypeScript `^5.6.3`, Express `^4.21.1`)
