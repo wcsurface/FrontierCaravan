@@ -178,6 +178,148 @@
     }
     window.handleLoginSubmit = handleLoginSubmit;
 
+    function resetLogForm() {
+      var form = document.getElementById('log-show-form');
+      if (form) form.reset();
+      var dropdown = document.getElementById('venue-dropdown');
+      if (dropdown) dropdown.style.display = 'none';
+      var openers = document.getElementById('openers-container');
+      if (openers) openers.innerHTML = '<input type="text" class="input-field input-opener" placeholder="Opener" />';
+      currentPhotoUris = [];
+      if (typeof renderPhotosGrid === 'function') renderPhotosGrid();
+      editingShowId = null;
+      var btnSave = document.getElementById('btn-save-show');
+      if (btnSave) btnSave.innerText = '+ ADD CONCERT';
+    }
+    window.resetLogForm = resetLogForm;
+
+    function triggerEditShow() {
+      if (!activeDetailShowId || !Array.isArray(userShows)) return;
+      var show = userShows.find(function(s) { return s.id === activeDetailShowId; });
+      if (!show) return;
+
+      editingShowId = activeDetailShowId;
+
+      var headlineEl = document.getElementById('input-headline');
+      var venueEl = document.getElementById('input-venue');
+      var cityEl = document.getElementById('input-city');
+      var stateEl = document.getElementById('input-state');
+      var countryEl = document.getElementById('input-country');
+      var dateEl = document.getElementById('input-date');
+      var notesEl = document.getElementById('input-notes');
+
+      if (headlineEl) headlineEl.value = (show.headline || '').trim();
+      if (venueEl) venueEl.value = (show.venue || '').trim();
+
+      var preset = (typeof VENUE_DB !== 'undefined' && Array.isArray(VENUE_DB)) ? VENUE_DB.find(function(v) { return v.v.toLowerCase() === (show.venue || '').toLowerCase() || v.v.toLowerCase().startsWith((show.venue || '').toLowerCase()); }) : null;
+      var c = (show.city || (preset ? preset.c : 'Noblesville')).trim();
+      var rawState = show.state || (preset ? preset.s : 'IN');
+      var s = (typeof toStateAbbr === 'function') ? toStateAbbr(rawState) : rawState;
+      var co = (show.country || (preset ? preset.co : 'USA')).trim();
+
+      if (cityEl) cityEl.value = c;
+      if (stateEl) stateEl.value = s;
+      if (countryEl) countryEl.value = co;
+      if (dateEl) dateEl.value = show.date || '';
+      if (notesEl) notesEl.value = (show.notes || '').trim();
+
+      currentPhotoUris = show.photoUris ? [...show.photoUris] : [];
+      if (typeof renderPhotosGrid === 'function') renderPhotosGrid();
+
+      var openersContainer = document.getElementById('openers-container');
+      if (openersContainer) {
+        var openers = Array.isArray(show.openersList) && show.openersList.length > 0 ? show.openersList : (show.opener ? [show.opener] : []);
+        if (openers.length > 0) {
+          openersContainer.innerHTML = openers.map(function(op) {
+            return '<input type="text" class="input-field input-opener" value="' + op.trim() + '" placeholder="Opener" />';
+          }).join('');
+        }
+      }
+
+      var btnSave = document.getElementById('btn-save-show');
+      if (btnSave) btnSave.innerText = 'SAVE EDITS';
+
+      if (typeof showScreen === 'function') showScreen('log');
+    }
+    window.triggerEditShow = triggerEditShow;
+
+    function selectVenue(v, c, s, co) {
+      var venueEl = document.getElementById('input-venue');
+      var cityEl = document.getElementById('input-city');
+      var stateEl = document.getElementById('input-state');
+      var countryEl = document.getElementById('input-country');
+      var dropdown = document.getElementById('venue-dropdown');
+
+      if (venueEl) venueEl.value = (v || '').trim();
+      if (cityEl) cityEl.value = (c || '').trim();
+      if (stateEl) stateEl.value = (typeof toStateAbbr === 'function') ? toStateAbbr(s) : (s || '').trim();
+      if (countryEl) countryEl.value = (co || '').trim();
+      if (dropdown) dropdown.style.display = 'none';
+    }
+    window.selectVenue = selectVenue;
+
+    function selectVenueFromElem(elem) {
+      if (!elem) return;
+      var v = elem.getAttribute('data-v') || '';
+      var c = elem.getAttribute('data-c') || '';
+      var s = elem.getAttribute('data-s') || '';
+      var co = elem.getAttribute('data-co') || '';
+      selectVenue(v, c, s, co);
+    }
+    window.selectVenueFromElem = selectVenueFromElem;
+
+    function handleVenueInput(query) {
+      var dropdown = document.getElementById('venue-dropdown');
+      if (!dropdown) return;
+      if (!query || query.trim().length === 0) {
+        dropdown.style.display = 'none';
+        return;
+      }
+      var q = query.toLowerCase().trim();
+      var db = (typeof VENUE_DB !== 'undefined' && Array.isArray(VENUE_DB)) ? VENUE_DB : [];
+      var matches = db.filter(function(item) {
+        return (item.v && item.v.toLowerCase().includes(q)) || (item.c && item.c.toLowerCase().includes(q));
+      });
+
+      if (matches.length > 0) {
+        var best = matches[0];
+        var cityEl = document.getElementById('input-city');
+        var stateEl = document.getElementById('input-state');
+        var countryEl = document.getElementById('input-country');
+        if (cityEl) cityEl.value = (best.c || '').trim();
+        if (stateEl) stateEl.value = (typeof toStateAbbr === 'function') ? toStateAbbr(best.s) : (best.s || '').trim();
+        if (countryEl) countryEl.value = (best.co || '').trim();
+
+        dropdown.style.display = 'block';
+        dropdown.innerHTML = matches.slice(0, 10).map(function(item) {
+          var cleanV = (item.v || '').trim();
+          var cleanC = (item.c || '').trim();
+          var cleanS = (typeof toStateAbbr === 'function') ? toStateAbbr(item.s) : (item.s || '').trim();
+          var cleanCo = (item.co || '').trim();
+          return '<div style="padding:12px 14px; border-bottom:1px solid #222B30; cursor:pointer;" data-v="' + cleanV + '" data-c="' + cleanC + '" data-s="' + cleanS + '" data-co="' + cleanCo + '" onclick="selectVenueFromElem(this)" ontouchstart="selectVenueFromElem(this)">' +
+            '<div style="font-weight:bold; color:#FFB300; font-size:14px;">' + cleanV + '</div>' +
+            '<div style="color:#94a3b8; font-size:11px;">' + cleanC + ', ' + cleanS + ', ' + cleanCo + '</div>' +
+          '</div>';
+        }).join('');
+      } else {
+        dropdown.style.display = 'none';
+      }
+    }
+    window.handleVenueInput = handleVenueInput;
+
+    function formatDateOnInput(el) {
+      if (!el || !el.value) return;
+      var val = el.value.replace(/\D/g, '');
+      if (val.length >= 2 && val.length < 4) {
+        el.value = val.slice(0, 2) + '/' + val.slice(2);
+      } else if (val.length >= 4) {
+        el.value = val.slice(0, 2) + '/' + val.slice(2, 4) + '/' + val.slice(4, 8);
+      } else {
+        el.value = val;
+      }
+    }
+    window.formatDateOnInput = formatDateOnInput;
+
     function openShowDetails(showId) {
       if (!showId || !Array.isArray(userShows)) return;
       activeDetailShowId = showId;
@@ -2681,75 +2823,6 @@
       });
     }
     window.triggerDeleteShow = triggerDeleteShow;
-
-    function handleVenueInput(query) {
-      var dropdown = document.getElementById('venue-dropdown');
-      if (!dropdown) return;
-      if (!query || query.trim().length === 0) {
-        dropdown.style.display = 'none';
-        var cityEl = document.getElementById('input-city');
-        var stateEl = document.getElementById('input-state');
-        var countryEl = document.getElementById('input-country');
-        if (cityEl) cityEl.value = '';
-        if (stateEl) stateEl.value = '';
-        if (countryEl) countryEl.value = '';
-        return;
-      }
-      var q = query.toLowerCase().trim();
-      var matches = VENUE_DB.filter(function(item) {
-        return (item.v && item.v.toLowerCase().includes(q)) || (item.c && item.c.toLowerCase().includes(q));
-      });
-
-      if (matches.length > 0) {
-        var best = matches[0];
-        var cityEl = document.getElementById('input-city');
-        var stateEl = document.getElementById('input-state');
-        var countryEl = document.getElementById('input-country');
-        if (cityEl) cityEl.value = best.c.trim();
-        if (stateEl) stateEl.value = toStateAbbr(best.s);
-        if (countryEl) countryEl.value = best.co.trim();
-
-        dropdown.style.display = 'block';
-        dropdown.innerHTML = matches.map(function(item) {
-          var cleanV = item.v.trim();
-          var cleanC = item.c.trim();
-          var cleanS = toStateAbbr(item.s);
-          var cleanCo = item.co.trim();
-          return '<div style="padding:10px 14px; border-bottom:1px solid #222B30; cursor:pointer;" data-v="' + cleanV + '" data-c="' + cleanC + '" data-s="' + cleanS + '" data-co="' + cleanCo + '" onclick="selectVenueFromElem(this)">' +
-            '<div style="font-weight:bold; color:#FFB300; font-size:14px;">' + cleanV + '</div>' +
-            '<div style="color:#94a3b8; font-size:11px;">' + cleanC + ', ' + cleanS + ', ' + cleanCo + '</div>' +
-          '</div>';
-        }).join('');
-      } else {
-        dropdown.style.display = 'none';
-      }
-    }
-    window.handleVenueInput = handleVenueInput;
-
-    function selectVenueFromElem(elem) {
-      if (!elem) return;
-      var v = elem.getAttribute('data-v') || '';
-      var c = elem.getAttribute('data-c') || '';
-      var s = elem.getAttribute('data-s') || '';
-      var co = elem.getAttribute('data-co') || '';
-      selectVenue(v, c, s, co);
-    }
-    window.selectVenueFromElem = selectVenueFromElem;
-
-    function selectVenue(v, c, s, co) {
-      var venueEl = document.getElementById('input-venue');
-      var cityEl = document.getElementById('input-city');
-      var stateEl = document.getElementById('input-state');
-      var countryEl = document.getElementById('input-country');
-      var dropdown = document.getElementById('venue-dropdown');
-
-      if (venueEl) venueEl.value = v.trim();
-      if (cityEl) cityEl.value = c.trim();
-      if (stateEl) stateEl.value = toStateAbbr(s);
-      if (countryEl) countryEl.value = co.trim();
-      if (dropdown) dropdown.style.display = 'none';
-    }
-    window.selectVenue = selectVenue;
 
     function mergeConcerts(listA, listB) {
       var merged = [];
