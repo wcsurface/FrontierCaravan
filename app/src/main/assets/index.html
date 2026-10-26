@@ -1991,7 +1991,9 @@
     }
     window.mergeConcerts = mergeConcerts;
 
-    function saveShowsToStorage() {
+    var isVaultLoaded = false;
+
+    function saveShowsToStorage(forcePush) {
       try {
         var rawUser = localStorage.getItem('livelore_active_user');
         var userEmail = 'default_user';
@@ -2013,6 +2015,11 @@
         saveToIndexedDB(localKey, { concerts: userShows || [] });
 
         var cloudUserId = 'u_cloud_' + userEmail.replace(/[^a-z0-9]/g, '_');
+
+        // SAFEGUARD: Never overwrite a cloud database with [] unless user explicitly deleted all shows or vault is loaded
+        if (!isVaultLoaded && (!userShows || userShows.length === 0) && !forcePush) {
+          return;
+        }
 
         // 3. PUSH IMMEDIATELY TO RAILWAY POSTGRESQL DB
         fetch('https://livelore-app.vercel.app/api/sync/push', {
@@ -2605,6 +2612,9 @@
             }
           }
 
+          // Mark vault as loaded so subsequent user changes (add/edit/delete) sync safely
+          isVaultLoaded = true;
+
           // ALWAYS MERGE cloudShows and localShows so cloud backup is never ignored or overwritten with empty array
           if (cloudShows.length > 0) {
             var mergedMap = {};
@@ -2626,11 +2636,13 @@
             });
 
             userShows = Object.values(mergedMap);
-            saveShowsToStorage();
+            saveShowsToStorage(true);
             finishLoadAndRender();
           } else if (localShows && localShows.length > 0) {
             userShows = localShows;
-            saveShowsToStorage();
+            saveShowsToStorage(true);
+            finishLoadAndRender();
+          }
             finishLoadAndRender();
           }
         }).catch(function(err) {});
@@ -3148,7 +3160,7 @@
       <div class="glass-nav-bar">
         <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Settings</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
@@ -3178,7 +3190,7 @@
       <div class="glass-nav-bar">
         <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Settings</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
@@ -3245,7 +3257,7 @@
       <div class="glass-nav-bar">
         <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Settings</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
@@ -3303,7 +3315,7 @@
       <div class="glass-nav-bar">
         <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Settings</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
@@ -3370,7 +3382,7 @@
       <div class="glass-nav-bar">
         <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Settings</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
@@ -3442,7 +3454,7 @@
       <div class="glass-nav-bar">
         <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Settings</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
