@@ -36,6 +36,7 @@ import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
@@ -427,7 +428,7 @@ class MainActivity : ComponentActivity() {
     inner class AndroidBillingInterface(private val context: Context) : PurchasesUpdatedListener {
         private var billingClient: BillingClient = BillingClient.newBuilder(context)
             .setListener(this)
-            .enablePendingPurchases()
+            .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
             .build()
 
         private val VIP_PRODUCT_ID = "vip_pass_499"
@@ -488,8 +489,10 @@ class MainActivity : ComponentActivity() {
                     .build()
 
                 billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsList ->
-                    if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && productDetailsList.isNotEmpty()) {
-                        val productDetails = productDetailsList[0]
+                    @Suppress("UNCHECKED_CAST")
+                    val list = productDetailsList as? List<com.android.billingclient.api.ProductDetails>
+                    if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && !list.isNullOrEmpty()) {
+                        val productDetails = list[0]
                         val flowParams = BillingFlowParams.newBuilder()
                             .setProductDetailsParamsList(
                                 listOf(

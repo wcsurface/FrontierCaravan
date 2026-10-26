@@ -1,4 +1,12 @@
-## [Unreleased] - 2026-10-26
+## [1.0.1] - 2026-10-26
+
+### Upgraded & Compliance
+- **Target SDK Upgrade to API Level 36 (Android 16)**:
+  - Upgraded `targetSdk` from `35` to `36` in `app/build.gradle.kts` to meet Google Play Store requirements.
+  - Bumped `versionCode` to `2` and `versionName` to `"1.0.1"`.
+- **Play Billing Library Upgrade to Version 8.0.0**:
+  - Upgraded `com.android.billingclient:billing-ktx` from `7.0.0` to `8.0.0`.
+  - Updated `MainActivity.kt` with `PendingPurchasesParams` (`enableOneTimeProducts()`) and updated `queryProductDetailsAsync` callback handling.
 
 ### Fixed
 - **Strict Legal Page Back Navigation & Unauthenticated Access Guard**:
