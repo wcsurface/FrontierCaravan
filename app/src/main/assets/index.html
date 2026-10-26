@@ -243,6 +243,35 @@
     }
     window.showScreen = showScreen;
 
+    function handleLogout() {
+      userShows = [];
+      isVIPUser = false;
+      isVaultLoaded = false;
+      try {
+        localStorage.removeItem('livelore_active_user');
+        localStorage.removeItem('livelore_active_email');
+        sessionStorage.clear();
+      } catch(e) {}
+
+      var emailDisp = document.getElementById('profile-email-display');
+      if (emailDisp) emailDisp.innerText = '';
+
+      var emailEl = document.getElementById('auth-email');
+      var passEl = document.getElementById('auth-password');
+      var nameEl = document.getElementById('auth-name');
+      if (emailEl) emailEl.value = '';
+      if (passEl) passEl.value = '';
+      if (nameEl) nameEl.value = '';
+
+      if (typeof clearErrorBanner === 'function') { try { clearErrorBanner(); } catch(e) {} }
+      if (typeof renderShowsFeed === 'function') { try { renderShowsFeed(); } catch(e) {} }
+      if (typeof updateStatsDisplay === 'function') { try { updateStatsDisplay(); } catch(e) {} }
+      if (typeof updateProfileVipCard === 'function') { try { updateProfileVipCard(); } catch(e) {} }
+
+      showScreen('auth');
+    }
+    window.handleLogout = handleLogout;
+
     function parseConcertTimestamp(dateStr) {
       if (!dateStr || typeof dateStr !== 'string') return 0;
       var str = dateStr.trim();
@@ -3363,31 +3392,6 @@
     window.handleLoginSubmit = handleLoginSubmit;
     window.onNativeGoogleAuthSuccess = onNativeGoogleAuthSuccess;
     window.onNativeGoogleAuthFallback = onNativeGoogleAuthFallback;
-
-    function handleLogout() {
-      userShows = [];
-      isVIPUser = false;
-      isVaultLoaded = false;
-      clearErrorBanner();
-      localStorage.removeItem('livelore_active_user');
-      localStorage.removeItem('livelore_active_email');
-
-      var emailDisp = document.getElementById('profile-email-display');
-      if (emailDisp) emailDisp.innerText = '';
-
-      var emailEl = document.getElementById('auth-email');
-      var passEl = document.getElementById('auth-password');
-      var nameEl = document.getElementById('auth-name');
-      if (emailEl) emailEl.value = '';
-      if (passEl) passEl.value = '';
-      if (nameEl) nameEl.value = '';
-
-      renderShowsFeed();
-      updateStatsDisplay();
-      updateProfileVipCard();
-      showScreen('auth');
-    }
-    window.handleLogout = handleLogout;
 
     function resetLogForm() {
       var form = document.getElementById('log-show-form');
