@@ -1641,6 +1641,43 @@
     }
     window.selectVenue = selectVenue;
 
+    function mergeConcerts(listA, listB) {
+      var merged = [];
+      var map = {};
+
+      function addShow(show) {
+        if (!show || !show.headline) return;
+        var headlineNorm = (show.headline || '').toLowerCase().trim();
+        var dateNorm = (show.date || '').trim();
+        var venueNorm = (show.venue || '').toLowerCase().trim();
+
+        var key = show.id || (headlineNorm + '_' + dateNorm + '_' + venueNorm).replace(/[^a-z0-9]/g, '_');
+
+        if (!map[key]) {
+          var copy = JSON.parse(JSON.stringify(show));
+          if (!copy.id) copy.id = key;
+          map[key] = copy;
+          merged.push(copy);
+        } else {
+          if ((!map[key].photoUris || map[key].photoUris.length === 0) && show.photoUris && show.photoUris.length > 0) {
+            map[key].photoUris = JSON.parse(JSON.stringify(show.photoUris));
+          }
+          if (!map[key].notes && show.notes) {
+            map[key].notes = show.notes;
+          }
+          if ((!map[key].openersList || map[key].openersList.length === 0) && show.openersList && show.openersList.length > 0) {
+            map[key].openersList = JSON.parse(JSON.stringify(show.openersList));
+          }
+        }
+      }
+
+      if (Array.isArray(listA)) listA.forEach(addShow);
+      if (Array.isArray(listB)) listB.forEach(addShow);
+
+      return merged;
+    }
+    window.mergeConcerts = mergeConcerts;
+
     function saveShowsToStorage() {
       try {
         var rawUser = localStorage.getItem('livelore_active_user');
@@ -1654,9 +1691,17 @@
           } catch(ex) {}
         }
 
+        var localKey = 'livelore_vault_' + userEmail.replace(/[^a-z0-9]/g, '_');
+
+        // 1. Save to LocalStorage IMMEDIATELY (Fail-Safe Local Persistence)
+        localStorage.setItem(localKey, JSON.stringify(userShows || []));
+
+        // 2. Save to IndexedDB
+        saveToIndexedDB(localKey, { concerts: userShows || [] });
+
         var cloudUserId = 'u_cloud_' + userEmail.replace(/[^a-z0-9]/g, '_');
 
-        // PUSH IMMEDIATELY TO RAILWAY POSTGRESQL DB
+        // 3. PUSH IMMEDIATELY TO RAILWAY POSTGRESQL DB
         fetch('https://frontiercaravan-production.up.railway.app/api/sync/push', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -2200,8 +2245,6 @@
         return;
       }
 
-      userShows = [];
-
       isVIPUser = checkIsVIPUser(activeEmail);
       updateProfileVipCard();
 
@@ -2213,28 +2256,40 @@
       var emailDisp = document.getElementById('profile-email-display');
       if (emailDisp) emailDisp.innerText = activeEmail;
 
+      var localKey = 'livelore_vault_' + activeEmail.replace(/[^a-z0-9]/g, '_');
+      var localShowsRaw = localStorage.getItem(localKey);
+      var localShows = [];
+      if (localShowsRaw) {
+        try { localShows = JSON.parse(localShowsRaw); } catch(e) {}
+      }
+
+      // Render local shows instantly on screen
+      userShows = Array.isArray(localShows) ? localShows : [];
+      finishLoadAndRender();
+
       var activeUserId = 'u_cloud_' + activeEmail.replace(/[^a-z0-9]/g, '_');
 
       // Fetch user's concert vault directly from Railway PostgreSQL Cloud Database
       fetch('https://frontiercaravan-production.up.railway.app/api/sync/pull?userId=' + encodeURIComponent(activeUserId) + '&email=' + encodeURIComponent(activeEmail) + '&_t=' + Date.now())
         .then(function(res) { return res.json(); })
         .then(function(data) {
+          var cloudShows = [];
           if (data && data.concertsData) {
             if (Array.isArray(data.concertsData.concerts)) {
-              userShows = data.concertsData.concerts;
+              cloudShows = data.concertsData.concerts;
             } else if (Array.isArray(data.concertsData)) {
-              userShows = data.concertsData;
-            } else {
-              userShows = [];
+              cloudShows = data.concertsData;
             }
-          } else {
-            userShows = [];
           }
-          finishLoadAndRender();
-        }).catch(function(err) {
-          userShows = [];
-          finishLoadAndRender();
-        });
+
+          // Merge local & cloud shows seamlessly
+          var mergedList = mergeConcerts(localShows, cloudShows);
+          if (mergedList.length > userShows.length) {
+            userShows = mergedList;
+            saveShowsToStorage();
+            finishLoadAndRender();
+          }
+        }).catch(function(err) {});
 
       function finishLoadAndRender() {
         if (!Array.isArray(userShows)) userShows = [];
@@ -2256,7 +2311,6 @@
         renderPhotosGrid();
         renderShowsFeed();
         updateStatsDisplay();
-        showScreen('diary');
       }
     }
     window.loadSavedShows = loadSavedShows;
