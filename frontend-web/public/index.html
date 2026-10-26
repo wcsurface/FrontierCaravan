@@ -2547,12 +2547,14 @@
             }
           }
 
-          // Merge local & cloud shows seamlessly
-          var mergedList = mergeConcerts(localShows, cloudShows);
-          if (mergedList.length > userShows.length) {
-            userShows = mergedList;
+          // If local phone storage was empty (fresh install/new device), load cloud shows
+          if ((!localShows || localShows.length === 0) && cloudShows.length > 0) {
+            userShows = cloudShows;
             saveShowsToStorage();
             finishLoadAndRender();
+          } else if (localShows && localShows.length > 0) {
+            // Local vault is primary: push local shows to cloud to keep cloud up to date
+            saveShowsToStorage();
           }
         }).catch(function(err) {});
 
