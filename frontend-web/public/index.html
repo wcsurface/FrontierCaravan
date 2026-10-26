@@ -2592,14 +2592,33 @@
             }
           }
 
-          // If local phone storage was empty (fresh install/new device), load cloud shows
-          if ((!localShows || localShows.length === 0) && cloudShows.length > 0) {
-            userShows = cloudShows;
+          // ALWAYS MERGE cloudShows and localShows so cloud backup is never ignored or overwritten with empty array
+          if (cloudShows.length > 0) {
+            var mergedMap = {};
+            // 1. Populate from cloud backup
+            cloudShows.forEach(function(s) {
+              if (s) {
+                var key = s.id || (s.date + '_' + (s.headline || '') + '_' + (s.venue || ''));
+                mergedMap[key] = s;
+              }
+            });
+            // 2. Layer any local shows on top
+            (localShows || []).forEach(function(s) {
+              if (s) {
+                var key = s.id || (s.date + '_' + (s.headline || '') + '_' + (s.venue || ''));
+                if (!mergedMap[key]) {
+                  mergedMap[key] = s;
+                }
+              }
+            });
+
+            userShows = Object.values(mergedMap);
             saveShowsToStorage();
             finishLoadAndRender();
           } else if (localShows && localShows.length > 0) {
-            // Local vault is primary: push local shows to cloud to keep cloud up to date
+            userShows = localShows;
             saveShowsToStorage();
+            finishLoadAndRender();
           }
         }).catch(function(err) {});
 
