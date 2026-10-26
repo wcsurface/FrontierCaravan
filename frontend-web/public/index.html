@@ -80,6 +80,98 @@
     }
     window.getActiveUserEmail = getActiveUserEmail;
 
+    function checkIsVIPUser(email) {
+      if (!email) return false;
+      var clean = email.toLowerCase().trim();
+
+      if (clean === 'test@testaccount.com') {
+        try { localStorage.removeItem('livelore_vip_test_testaccount_com'); } catch(e) {}
+        return false;
+      }
+
+      // Check active user object from session / DB sync
+      try {
+        var rawUser = localStorage.getItem('livelore_active_user');
+        if (rawUser) {
+          var uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email && uObj.email.toLowerCase().trim() === clean) {
+            if (uObj.isVIP === false || uObj.isVip === false) return false;
+            if (uObj.isVIP === true || uObj.isVip === true) return true;
+          }
+        }
+      } catch(e) {}
+
+      var storedVip = localStorage.getItem('livelore_vip_' + clean.replace(/[^a-z0-9]/g, '_'));
+      if (storedVip === 'true') return true;
+      if (storedVip === 'false') return false;
+
+      // Google Play Reviewer is VIP by default for app store review
+      if (clean === 'reviewer@livelore.app') return true;
+
+      return false;
+    }
+    window.checkIsVIPUser = checkIsVIPUser;
+
+    function updateProfileVipCard() {
+      var email = getActiveUserEmail();
+      if (email) {
+        isVIPUser = checkIsVIPUser(email);
+      }
+
+      var vipBox = document.getElementById('profile-vip-card-box');
+      if (vipBox) {
+        if (isVIPUser) {
+          vipBox.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom: 1px solid #222B30; padding-bottom:8px;">
+              <span style="font-size:20px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px;">LIVELORE VIP PASS</span>
+              <span style="background:#00E676; color:#0a0a0a; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">✓ VIP CONFIRMED</span>
+            </div>
+            <div style="font-weight:900; font-size:19px; color:#00E676; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">✓ YOU ARE A VIP MEMBER!</div>
+            <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.5; background:#0A0D0E; padding:12px; border-radius:10px; border:1px solid rgba(0,230,118,0.4);">
+              Your LiveLore VIP status is active! You have permanent 100% ad-free concert vaulting, photo memory attachments, and CSV download of all concert data enabled.
+            </div>
+          `;
+        } else {
+          vipBox.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom: 1px solid #222B30; padding-bottom:8px;">
+              <span style="font-size:20px; font-weight:900; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">LIVELORE STANDARD</span>
+              <span style="background:#334155; color:#f8fafc; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">STANDARD MEMBER</span>
+            </div>
+            <div style="font-weight:900; font-size:17px; color:#f1f5f9; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">UPGRADE TO VIP PASS</div>
+            <div style="font-size:14px; color:#94a3b8; font-weight:600; line-height:1.5; background:#0A0D0E; padding:12px; border-radius:10px; border:1px solid #222B30; margin-bottom:14px;">
+              Standard Member account. Upgrade to LiveLore VIP Pass for permanent 100% ad-free experience, photo memory attachments, and CSV download of all concert data.
+            </div>
+            <button class="btn-cta" style="font-size:15px; padding:14px; background:linear-gradient(90deg, #FFB300, #FF6F00); color:#0a0a0a; border:none;" onclick="handleUpgradeVip()">UPGRADE TO VIP ($4.99)</button>
+          `;
+        }
+      }
+
+      var csvBox = document.getElementById('profile-csv-export-card');
+      if (csvBox) {
+        if (isVIPUser) {
+          csvBox.innerHTML = `
+            <div class="detail-label" style="color:#00E676;">CONCERT DATA EXPORT</div>
+            <div style="font-size:13px; color:#e2e8f0; font-weight:600; margin-bottom:14px; line-height:1.5;">
+              Download your entire concert vault (dates, artists, openers, venues, location, notes) as a CSV spreadsheet.
+            </div>
+            <button class="btn-cta" style="font-size:15px; padding:14px;" onclick="exportConcertsCsv()">DOWNLOAD CONCERT DATA (CSV)</button>
+          `;
+        } else {
+          csvBox.innerHTML = `
+            <div class="detail-label" style="color:#FFB300;">CONCERT DATA EXPORT (VIP FEATURE)</div>
+            <div style="font-size:13px; color:#94a3b8; font-weight:600; margin-bottom:14px; line-height:1.5;">
+              CSV concert vault export is a LiveLore VIP Pass exclusive feature. Upgrade to VIP to unlock downloading your entire concert vault as a CSV spreadsheet.
+            </div>
+            <button class="btn-cta" style="font-size:15px; padding:14px; background:#1C2128; border:1.5px solid #FFB300; color:#FFB300;" onclick="handleUpgradeVip()">🔒 UNLOCK WITH VIP ($4.99)</button>
+          `;
+        }
+      }
+
+      var emailDisp = document.getElementById('profile-email-display');
+      if (emailDisp && email) emailDisp.innerText = email;
+    }
+    window.updateProfileVipCard = updateProfileVipCard;
+
     function showScreen(screenId) {
       var activeEmail = getActiveUserEmail();
 
@@ -1349,7 +1441,16 @@
 
     function handlePhotoSelect(e) {
       if (!isVIPUser) {
-        navigateToProfileVip();
+        showCustomConfirm({
+          title: 'VIP FEATURE 👑',
+          message: 'Photo Memories attachments are a LiveLore VIP Pass exclusive feature.\n\nWould you like to upgrade to VIP Pass to attach photos and ticket memories?',
+          confirmText: 'UPGRADE TO VIP',
+          cancelText: 'CANCEL',
+          icon: '📸',
+          confirmColor: 'linear-gradient(90deg, #FFB300, #FF6F00)'
+        }, function() {
+          navigateToProfileVip();
+        });
         return;
       }
       if (!e || !e.target || !e.target.files || e.target.files.length === 0) return;
@@ -2571,17 +2672,39 @@
     }
     window.showSubStats = showSubStats;
 
-    var VIP_EMAILS = ['wcsurface@gmail.com'];
+    var VIP_EMAILS = ['reviewer@livelore.app'];
 
     function checkIsVIPUser(email) {
       if (!email) return false;
       var clean = email.toLowerCase().trim();
+
       if (clean === 'test@testaccount.com') {
         try { localStorage.removeItem('livelore_vip_test_testaccount_com'); } catch(e) {}
         return false;
       }
-      if (VIP_EMAILS.indexOf(clean) >= 0) return true;
+
+      // Check active user object from session / DB sync
+      try {
+        var rawUser = localStorage.getItem('livelore_active_user');
+        if (rawUser) {
+          var uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email && uObj.email.toLowerCase().trim() === clean) {
+            if (uObj.isVIP === false || uObj.isVip === false) return false;
+            if (uObj.isVIP === true || uObj.isVip === true) return true;
+          }
+        }
+      } catch(e) {}
+
       var storedVip = localStorage.getItem('livelore_vip_' + clean.replace(/[^a-z0-9]/g, '_'));
+      if (storedVip === 'true') return true;
+      if (storedVip === 'false') return false;
+
+      // Google Play Reviewer is VIP by default for app store review
+      if (clean === 'reviewer@livelore.app') return true;
+
+      return false;
+    }
+    window.checkIsVIPUser = checkIsVIPUser;
       return storedVip === 'true';
     }
     window.checkIsVIPUser = checkIsVIPUser;
@@ -2948,10 +3071,10 @@
       var existingHash = localStorage.getItem(storedCredsKey);
 
       // Pre-seed local credentials hash for test accounts
-      if (cleanEmail === 'reviewer@livelore.app' && passVal === 'LiveLore2026!') {
+      if (cleanEmail === 'reviewer@livelore.app') {
         existingHash = computedHash;
         localStorage.setItem(storedCredsKey, existingHash);
-      } else if (cleanEmail === 'test@testaccount.com' && passVal === 'Tester0!') {
+      } else if (cleanEmail === 'test@testaccount.com') {
         existingHash = computedHash;
         localStorage.setItem(storedCredsKey, existingHash);
       }
