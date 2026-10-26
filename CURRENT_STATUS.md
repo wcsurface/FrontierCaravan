@@ -1,7 +1,7 @@
 # CURRENT_STATUS.md - LiveLore: Concert Diary & Setlist Vault
 
 ## Current Development Status
-**Active Version**: 1.0.2 (Target SDK 36, Version Code 3, Play Billing Library v8.0.0)
+**Active Version**: 1.0.3 (Target SDK 36, Version Code 4, Play Billing Library v8.0.0)
 **Build Status**: ✅ Passing (`:app:assembleDebug`, `:app:assembleRelease`, and `:app:bundleRelease` build cleanly)
 
 ---
