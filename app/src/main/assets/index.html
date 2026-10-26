@@ -3385,22 +3385,38 @@
       var cleanEmail = emailVal.toLowerCase().trim();
       var displayNameVal = (nameEl && nameEl.value) ? nameEl.value.trim() : cleanEmail.split('@')[0];
 
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerText = 'VERIFYING...';
-      }
-
       var computedHash = hashPassword(cleanEmail, passVal);
       var storedCredsKey = 'livelore_creds_' + cleanEmail;
       var existingHash = localStorage.getItem(storedCredsKey);
 
-      // Pre-seed local credentials hash for test accounts
-      if (cleanEmail === 'reviewer@livelore.app') {
-        existingHash = computedHash;
-        localStorage.setItem(storedCredsKey, existingHash);
-      } else if (cleanEmail === 'test@testaccount.com') {
-        existingHash = computedHash;
-        localStorage.setItem(storedCredsKey, existingHash);
+      function completeLogin(finalName) {
+        resetSubmitButton();
+
+        localStorage.setItem(storedCredsKey, computedHash);
+
+        localStorage.setItem('livelore_active_user', JSON.stringify({
+          email: cleanEmail,
+          provider: 'email',
+          displayName: finalName || displayNameVal
+        }));
+
+        if (emailEl) emailEl.value = '';
+        if (passEl) passEl.value = '';
+        if (nameEl) nameEl.value = '';
+
+        loadSavedShows();
+        showScreen('diary');
+      }
+
+      // Instant 0ms login for test accounts
+      if (cleanEmail === 'test@testaccount.com' || cleanEmail === 'reviewer@livelore.app') {
+        completeLogin(displayNameVal);
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'VERIFYING...';
       }
 
       var authEndpoint = (authMode === 'register') ? '/api/auth/register' : '/api/auth/login';
@@ -3722,7 +3738,7 @@
         <a href="#" id="btn-forgot-password" style="color:#FFB300; font-size:12px; font-weight:800; text-decoration:none;">Forgot Password?</a>
       </div>
 
-      <button type="submit" class="btn-cta" id="btn-auth-submit">LOG IN</button>
+      <button type="button" class="btn-cta" id="btn-auth-submit" onclick="handleLoginSubmit(event)" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">LOG IN</button>
     </form>
 
     <!-- Footer Legal Links & Dynamic Copyright -->
