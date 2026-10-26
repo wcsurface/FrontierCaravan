@@ -1,5 +1,14 @@
 ## [Unreleased] - 2026-10-26
 
+### Fixed
+- **Strict Legal Page Back Navigation & Unauthenticated Access Guard**:
+  - Refactored `getActiveUserEmail()` helper and `handleLegalBack()` navigation function.
+  - When unauthenticated (`!activeEmail`), tapping `< BACK` on Privacy Policy, Terms of Service, or FAQ screens now **always returns directly to the Login page (`auth`)**.
+  - Completely removed bottom navigation buttons (`HOME`, `ADD`, `PROFILE`, `STATS`) from legal screens to prevent accidental navigation while logged out.
+  - Enforced strict `showScreen()` guard: any attempt to access protected screens (`diary`, `log`, `profile`, `stats`) while unauthenticated immediately redirects to the Login screen (`auth`).
+- **Fail-Safe Cloud Backup Merge on Login**:
+  - Enhanced `loadSavedShows()` in `index.html` to always pull and non-destructively merge cloud backup records from Railway PostgreSQL on login, ensuring user concert vaults are never rendered as empty.
+
 ### Added
 - **Project Rebranding & Clean Name Alignment**:
   - Renamed display titles, strings (`<string name="app_name">LiveLore</string>`), themes (`Theme.LiveLore`), Gradle root project (`rootProject.name = "LiveLore"`), shared preferences (`LiveLorePrefs`), and CI/CD pipelines to **LiveLore**.
