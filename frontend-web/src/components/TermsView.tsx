@@ -12,12 +12,28 @@ interface TermsViewProps {
 export const TermsView: React.FC<TermsViewProps> = ({ onBack, onNavigate }) => {
   const currentYear = new Date().getFullYear();
 
+  const handleBack = () => {
+    const rawUser = typeof window !== 'undefined' ? localStorage.getItem('livelore_active_user') : null;
+    let hasUser = false;
+    if (rawUser) {
+      try {
+        const uObj = JSON.parse(rawUser);
+        if (uObj && uObj.email) hasUser = true;
+      } catch (e) {}
+    }
+    if (!hasUser) {
+      onNavigate('auth');
+    } else {
+      onBack();
+    }
+  };
+
   return (
     <div className="flex flex-col w-full h-full bg-[#0A0D0E] text-slate-100 p-4 select-none overflow-y-auto bg-grid-lines justify-between min-h-screen">
       {/* Header */}
       <header className="relative flex flex-col items-center justify-center w-full pt-4 sm:pt-6 pb-2 shrink-0">
         <button
-          onClick={onBack}
+          onClick={handleBack}
           className="absolute left-2 top-4 p-2 text-slate-200 hover:text-white transition rounded-full z-10 flex items-center gap-1 text-sm font-extrabold text-[#FFB300]"
         >
           <ArrowLeft size={24} /> BACK

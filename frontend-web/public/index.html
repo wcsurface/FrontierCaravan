@@ -945,6 +945,25 @@
     }
     window.showScreen = showScreen;
 
+    function handleLegalBack() {
+      var rawUser = localStorage.getItem('livelore_active_user');
+      var activeEmail = null;
+      if (rawUser) {
+        try {
+          var uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email) {
+            activeEmail = uObj.email.toLowerCase().trim();
+          }
+        } catch(e) {}
+      }
+      if (!activeEmail) {
+        showScreen('auth');
+      } else {
+        showScreen('profile');
+      }
+    }
+    window.handleLegalBack = handleLegalBack;
+
     function getTicketColor(id) {
       if (currentTicketTheme === 'classic') return '#f4e4bc';
       if (!id) return TICKET_COLOR_PALETTE[0];
@@ -3379,7 +3398,7 @@
   <!-- SCREEN 7: TERMS OF SERVICE -->
   <div id="view-terms" class="screen-view">
     <div class="header">
-      <button type="button" onclick="showScreen('profile')" style="position:absolute; left:12px; top:50px; background:none; border:none; color:#FFB300; font-weight:900; font-size:14px; cursor:pointer; z-index:10;">
+      <button type="button" onclick="handleLegalBack()" style="position:absolute; left:12px; top:50px; background:none; border:none; color:#FFB300; font-weight:900; font-size:14px; cursor:pointer; z-index:10;">
         &lt; BACK
       </button>
       <div class="header-logo-box">
@@ -3411,7 +3430,7 @@
   <!-- SCREEN 8: PRIVACY POLICY -->
   <div id="view-privacy" class="screen-view">
     <div class="header">
-      <button type="button" onclick="showScreen('profile')" style="position:absolute; left:12px; top:50px; background:none; border:none; color:#FFB300; font-weight:900; font-size:14px; cursor:pointer; z-index:10;">
+      <button type="button" onclick="handleLegalBack()" style="position:absolute; left:12px; top:50px; background:none; border:none; color:#FFB300; font-weight:900; font-size:14px; cursor:pointer; z-index:10;">
         &lt; BACK
       </button>
       <div class="header-logo-box">
@@ -3444,7 +3463,7 @@
   <!-- SCREEN 9: FAQ -->
   <div id="view-faq" class="screen-view">
     <div class="header">
-      <button type="button" onclick="showScreen('profile')" style="position:absolute; left:12px; top:50px; background:none; border:none; color:#FFB300; font-weight:900; font-size:14px; cursor:pointer; z-index:10;">
+      <button type="button" onclick="handleLegalBack()" style="position:absolute; left:12px; top:50px; background:none; border:none; color:#FFB300; font-weight:900; font-size:14px; cursor:pointer; z-index:10;">
         &lt; BACK
       </button>
       <div class="header-logo-box">
