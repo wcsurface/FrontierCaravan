@@ -515,6 +515,16 @@ app.post('/api/sync/push', async (req: Request, res: Response) => {
         },
       });
 
+      // Purge legacy duplicate rows for this user (e.g. u_cloud_...) so deleted concerts don't resurrect
+      if (targetEmail) {
+        const legacyKey = `u_cloud_${targetEmail.replace(/[^a-z0-9]/g, '_')}`;
+        if (legacyKey !== effectiveUserId) {
+          await prisma.concertVault.deleteMany({
+            where: { userId: legacyKey }
+          }).catch(() => null);
+        }
+      }
+
       return res.json({
         success: true,
         vaultId: vault.id,
@@ -540,8 +550,6 @@ app.get('/api/sync/pull', async (req: Request, res: Response) => {
     const rawUserId = typeof userId === 'string' ? userId.trim() : '';
 
     if (prisma) {
-      const allVaults = await prisma.concertVault.findMany();
-
       let userRecord = null;
       if (targetEmail) {
         userRecord = await prisma.user.findUnique({ where: { email: targetEmail } });
@@ -550,55 +558,31 @@ app.get('/api/sync/pull', async (req: Request, res: Response) => {
         userRecord = await prisma.user.findUnique({ where: { id: rawUserId } }).catch(() => null);
       }
 
-      if (userRecord && !targetEmail) {
-        targetEmail = userRecord.email.toLowerCase().trim();
-      }
+      const effectiveUserId = userRecord ? userRecord.id : rawUserId;
 
-      const matchKeys = new Set<string>();
-      if (rawUserId) matchKeys.add(rawUserId);
-      if (userRecord) matchKeys.add(userRecord.id);
       if (targetEmail) {
-        matchKeys.add(targetEmail);
-        matchKeys.add(`u_cloud_${targetEmail.replace(/[^a-z0-9]/g, '_')}`);
+        const legacyKey = `u_cloud_${targetEmail.replace(/[^a-z0-9]/g, '_')}`;
+        if (legacyKey !== effectiveUserId) {
+          await prisma.concertVault.deleteMany({
+            where: { userId: legacyKey }
+          }).catch(() => null);
+        }
       }
 
-      let mergedConcerts: any[] = [];
-      const seenIds = new Set<string>();
-
-      allVaults.forEach((v: any) => {
-        let isMatch = false;
-        const vId = v.userId;
-
-        if (matchKeys.has(vId)) isMatch = true;
-        if (targetEmail && vId.includes(targetEmail.replace(/[^a-z0-9]/g, '_'))) isMatch = true;
-
-        if (isMatch && v.concertsData) {
-          const raw = v.concertsData as any;
-          const concerts = Array.isArray(raw.concerts) ? raw.concerts : (Array.isArray(raw) ? raw : []);
-
-          concerts.forEach((c: any) => {
-            const key = c.id || `${c.headline}_${c.date}_${c.venue}`;
-            if (!seenIds.has(key)) {
-              seenIds.add(key);
-              mergedConcerts.push(c);
-            }
-          });
-        }
+      let vault = await prisma.concertVault.findUnique({
+        where: { userId: effectiveUserId },
       });
 
-      // If userRecord exists and we found concerts in old key rows, save merged list to user's primary vault row
-      if (userRecord && mergedConcerts.length > 0) {
-        await prisma.concertVault.upsert({
-          where: { userId: userRecord.id },
-          update: { concertsData: { concerts: mergedConcerts } },
-          create: { userId: userRecord.id, concertsData: { concerts: mergedConcerts } },
-        }).catch(() => null);
+      let concerts: any[] = [];
+      if (vault && vault.concertsData) {
+        const raw = vault.concertsData as any;
+        concerts = Array.isArray(raw.concerts) ? raw.concerts : (Array.isArray(raw) ? raw : []);
       }
 
       return res.json({
         success: true,
-        concertsData: { concerts: mergedConcerts },
-        updatedAt: new Date().toISOString(),
+        concertsData: { concerts },
+        updatedAt: vault ? vault.updatedAt.toISOString() : new Date().toISOString(),
       });
     } else {
       const val = memoryVaults.get(rawUserId) || memoryVaults.get(targetEmail) || { concerts: [] };
