@@ -22,6 +22,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Frontier Caravan"
+rootProject.name = "LiveLore"
 include(":app")
  

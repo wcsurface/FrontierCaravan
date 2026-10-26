@@ -1,4 +1,4 @@
-name: Frontier Caravan CI/CD Pipeline
+name: LiveLore CI/CD Pipeline
 
 on:
   push:
@@ -30,7 +30,7 @@ jobs:
       - name: Upload Android APK Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: frontier-caravan-apks
+          name: livelore-apks
           path: app/build/outputs/apk/
 
   verify-frontend:

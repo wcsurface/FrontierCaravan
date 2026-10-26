@@ -22,7 +22,7 @@ class AndroidNativeBridge(
     private val webView: WebView
 ) {
     private val prefs: SharedPreferences =
-        activity.getSharedPreferences("FrontierCaravanPrefs", Context.MODE_PRIVATE)
+        activity.getSharedPreferences("LiveLorePrefs", Context.MODE_PRIVATE)
 
     @JavascriptInterface
     fun vibrate(milliseconds: Long) {

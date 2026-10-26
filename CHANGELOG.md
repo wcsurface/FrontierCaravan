@@ -1,6 +1,9 @@
 ## [Unreleased] - 2026-10-26
 
 ### Added
+- **Project Rebranding & Clean Name Alignment**:
+  - Renamed display titles, strings (`<string name="app_name">LiveLore</string>`), themes (`Theme.LiveLore`), Gradle root project (`rootProject.name = "LiveLore"`), shared preferences (`LiveLorePrefs`), and CI/CD pipelines to **LiveLore**.
+  - Retained live infrastructure endpoint URLs (`frontier-caravan.vercel.app` & `frontiercaravan-production.up.railway.app`) and package namespace (`app.vercel.frontiercaravan`) to guarantee zero network or database disruptions.
 - **Google Play Billing Library Integration (`AndroidBilling`)**:
   - Integrated `com.android.billingclient:billing-ktx:7.0.0` into native Android app (`MainActivity.kt`).
   - Registered Product ID `vip_pass_499` ($4.99 Non-Consumable In-App Product).

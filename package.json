@@ -1,5 +1,5 @@
 {
-  "name": "frontier-caravan-root",
+  "name": "livelore-root",
   "version": "6.5.0",
   "scripts": {
     "postinstall": "cd backend-api && npm install && npx prisma generate",
