@@ -295,7 +295,7 @@
     window.showCustomPrompt = showCustomPrompt;
 
     var authMode = 'login';
-    var isVIPUser = true;
+    var isVIPUser = false;
     var editingShowId = null;
     var activeDetailShowId = null;
     var currentSort = 'newest';
@@ -930,6 +930,30 @@
       if (countLabel) countLabel.innerText = currentPhotoUris.length;
 
       grid.innerHTML = '';
+
+      if (!isVIPUser) {
+        const vipTile = document.createElement('div');
+        vipTile.style.aspectRatio = '1/1';
+        vipTile.style.borderRadius = '8px';
+        vipTile.style.border = '1.5px solid #FFB300';
+        vipTile.style.background = 'rgba(255,179,0,0.1)';
+        vipTile.style.display = 'flex';
+        vipTile.style.flexDirection = 'column';
+        vipTile.style.alignItems = 'center';
+        vipTile.style.justifyContent = 'center';
+        vipTile.style.cursor = 'pointer';
+        vipTile.style.color = '#FFB300';
+        vipTile.style.fontSize = '9px';
+        vipTile.style.fontWeight = '900';
+        vipTile.onclick = function() { handleUpgradeVip(); };
+        vipTile.innerHTML = `
+          <span style="font-size:18px; font-weight:900;">👑</span>
+          <span style="margin-top:2px;">VIP ONLY</span>
+        `;
+        grid.appendChild(vipTile);
+        return;
+      }
+
       currentPhotoUris.forEach((uri, idx) => {
         const item = document.createElement('div');
         item.style.position = 'relative';
@@ -1096,7 +1120,11 @@
     }
 
     function handlePhotoSelect(e) {
-      if (!e.target.files || e.target.files.length === 0) return;
+      if (!isVIPUser) {
+        handleUpgradeVip();
+        return;
+      }
+      if (!e || !e.target || !e.target.files || e.target.files.length === 0) return;
       var files = Array.from(e.target.files);
 
       files.forEach(function(file) {
