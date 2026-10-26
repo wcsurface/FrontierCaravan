@@ -945,7 +945,7 @@
         vipTile.style.color = '#FFB300';
         vipTile.style.fontSize = '9px';
         vipTile.style.fontWeight = '900';
-        vipTile.onclick = function() { handleUpgradeVip(); };
+        vipTile.onclick = function() { navigateToProfileVip(); };
         vipTile.innerHTML = `
           <span style="font-size:18px; font-weight:900;">👑</span>
           <span style="margin-top:2px;">VIP ONLY</span>
@@ -1121,7 +1121,7 @@
 
     function handlePhotoSelect(e) {
       if (!isVIPUser) {
-        handleUpgradeVip();
+        navigateToProfileVip();
         return;
       }
       if (!e || !e.target || !e.target.files || e.target.files.length === 0) return;
@@ -1344,13 +1344,13 @@
       if (!isVIPUser) {
         showCustomConfirm({
           title: 'VIP FEATURE',
-          message: 'CSV Concert Vault Export is an exclusive LiveLore VIP Pass feature.\n\nWould you like to upgrade to VIP to unlock CSV downloads?',
-          confirmText: 'UPGRADE TO VIP',
+          message: 'CSV Concert Vault Export is an exclusive LiveLore VIP Pass feature.\n\nWould you like to view the VIP Pass upgrade on your Profile page?',
+          confirmText: 'VIEW VIP PASS',
           cancelText: 'CANCEL',
           icon: '🔒',
           confirmColor: 'linear-gradient(90deg, #FFB300, #FF6F00)'
         }, function() {
-          handleUpgradeVip();
+          navigateToProfileVip();
         });
         return;
       }
@@ -2128,6 +2128,17 @@
       }
     }
     window.updateProfileVipCard = updateProfileVipCard;
+
+    function navigateToProfileVip() {
+      showScreen('profile');
+      setTimeout(function() {
+        var vipCard = document.getElementById('profile-vip-card-box');
+        if (vipCard) {
+          try { vipCard.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
+        }
+      }, 150);
+    }
+    window.navigateToProfileVip = navigateToProfileVip;
 
     function handleUpgradeVip() {
       var rawUser = localStorage.getItem('livelore_active_user');
