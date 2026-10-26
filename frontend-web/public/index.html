@@ -915,6 +915,31 @@
     }
 
     function showScreen(screenId) {
+      var rawUser = localStorage.getItem('livelore_active_user');
+      var activeEmail = null;
+      if (rawUser) {
+        try {
+          var uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email) {
+            activeEmail = uObj.email.toLowerCase().trim();
+          }
+        } catch(e) {}
+      }
+
+      // STRICT AUTH GUARD: If not logged in, force auth screen for any protected view
+      if (!activeEmail && screenId !== 'auth' && screenId !== 'terms' && screenId !== 'privacy' && screenId !== 'faq') {
+        screenId = 'auth';
+      }
+
+      // Hide bottom glass nav bar on legal pages or auth screen when logged out
+      document.querySelectorAll('.glass-nav-bar').forEach(function(nav) {
+        if (!activeEmail && (screenId === 'terms' || screenId === 'privacy' || screenId === 'faq' || screenId === 'auth')) {
+          nav.style.display = 'none';
+        } else {
+          nav.style.display = 'flex';
+        }
+      });
+
       document.querySelectorAll('.screen-view').forEach(function(el) {
         el.classList.remove('active');
         el.style.display = 'none';
