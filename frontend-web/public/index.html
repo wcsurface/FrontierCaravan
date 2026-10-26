@@ -1226,6 +1226,13 @@
     }
     window.parseConcertTimestamp = parseConcertTimestamp;
 
+    function handleSortChange(val) {
+      if (!val) return;
+      currentSort = val;
+      renderShowsFeed();
+    }
+    window.handleSortChange = handleSortChange;
+
     function formatDateOnInput(elem) {
       if (!elem) return;
       var raw = elem.value.replace(/\D/g, '');
@@ -1690,13 +1697,16 @@
         if (sortBar) sortBar.style.display = 'flex';
         if (countLabel) countLabel.innerText = userShows.length + (userShows.length === 1 ? ' CONCERT LOGGED' : ' CONCERTS LOGGED');
 
+        const selectEl = document.getElementById('sort-dropdown-select');
+        if (selectEl) selectEl.value = currentSort;
+
         let displayList = [...userShows];
         if (currentSort === 'newest') {
           displayList.sort((a, b) => parseConcertTimestamp(b.date) - parseConcertTimestamp(a.date));
         } else if (currentSort === 'oldest') {
           displayList.sort((a, b) => parseConcertTimestamp(a.date) - parseConcertTimestamp(b.date));
         } else if (currentSort === 'band') {
-          displayList.sort((a, b) => (a.headline || '').localeCompare(b.headline || ''));
+          displayList.sort((a, b) => (a.headline || '').trim().localeCompare((b.headline || '').trim(), undefined, { sensitivity: 'base' }));
         }
 
         list.style.display = 'block';
