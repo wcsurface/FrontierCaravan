@@ -148,6 +148,51 @@
     </div>
   </div>
 
+  <!-- CUSTOM SHARE CONCERT MODAL / ACTION SHEET -->
+  <div id="custom-share-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%; background:rgba(0,0,0,0.88); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); z-index:999999; align-items:center; justify-content:center; padding:16px; box-sizing:border-box;">
+    <div style="background:#121619; border:1.5px solid #FFB300; border-radius:24px; padding:24px 20px; width:100%; max-width:380px; box-shadow:0 20px 50px rgba(0,0,0,0.9), 0 0 25px rgba(255,179,0,0.15); text-align:center;">
+      <div style="font-size:32px; margin-bottom:8px;">🚀</div>
+      <div style="font-size:18px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">SHARE CONCERT MEMORY</div>
+      <div id="share-modal-subtitle" style="font-size:13px; font-weight:700; color:#94a3b8; margin-bottom:16px;"></div>
+
+      <!-- VIP Photo Attachment Toggle/Badge -->
+      <div id="share-vip-attachment-box" style="margin-bottom:18px; padding:12px 14px; background:#0A0D0E; border:1px solid #222B30; border-radius:12px; display:flex; align-items:center; justify-content:space-between; cursor:pointer;" onclick="toggleShareVipAttachment()">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:18px;">📸</span>
+          <div style="text-align:left;">
+            <div style="font-size:12px; font-weight:900; color:#FFB300;" id="share-vip-toggle-title">ATTACH PHOTOS & TICKET CARD</div>
+            <div style="font-size:10px; font-weight:700; color:#64748b;" id="share-vip-toggle-subtitle">VIP Vault Feature 👑</div>
+          </div>
+        </div>
+        <div id="share-vip-toggle-switch" style="width:22px; height:22px; border-radius:50%; border:2px solid #FFB300; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; color:#0a0a0a; background:#FFB300;">✓</div>
+      </div>
+
+      <!-- Social & App Share Target Options -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px;">
+        <button type="button" onclick="executeShareTarget('instagram')" style="background:#1C2128; border:1px solid #222B30; border-radius:14px; padding:12px 10px; color:#f1f5f9; font-weight:800; font-size:12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <span style="font-size:18px;">📸</span> Instagram
+        </button>
+        <button type="button" onclick="executeShareTarget('messages')" style="background:#1C2128; border:1px solid #222B30; border-radius:14px; padding:12px 10px; color:#f1f5f9; font-weight:800; font-size:12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <span style="font-size:18px;">💬</span> Messages/WhatsApp
+        </button>
+        <button type="button" onclick="executeShareTarget('facebook')" style="background:#1C2128; border:1px solid #222B30; border-radius:14px; padding:12px 10px; color:#f1f5f9; font-weight:800; font-size:12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <span style="font-size:18px;">📘</span> Facebook
+        </button>
+        <button type="button" onclick="executeShareTarget('reddit')" style="background:#1C2128; border:1px solid #222B30; border-radius:14px; padding:12px 10px; color:#f1f5f9; font-weight:800; font-size:12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <span style="font-size:18px;">🤖</span> Reddit
+        </button>
+        <button type="button" onclick="executeShareTarget('twitter')" style="background:#1C2128; border:1px solid #222B30; border-radius:14px; padding:12px 10px; color:#f1f5f9; font-weight:800; font-size:12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <span style="font-size:18px;">🐦</span> X (Twitter)
+        </button>
+        <button type="button" onclick="executeShareTarget('native')" style="background:#1C2128; border:1.5px solid #FFB300; border-radius:14px; padding:12px 10px; color:#FFB300; font-weight:900; font-size:12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <span style="font-size:18px;">📲</span> More / OS Share
+        </button>
+      </div>
+
+      <button type="button" onclick="closeShareModal()" style="width:100%; background:#1C2128; color:#94a3b8; font-weight:900; font-size:13px; padding:12px; border-radius:9999px; border:1px solid #222B30; text-transform:uppercase; cursor:pointer;">CANCEL</button>
+    </div>
+  </div>
+
   <script>
     function showCustomConfirm(options, onConfirm, onCancel) {
       var modal = document.getElementById('custom-dialog-modal');
@@ -1420,11 +1465,230 @@
     }
     window.exportConcertsCsv = exportConcertsCsv;
 
+    // MULTI-PLATFORM CONCERT SHARING ENGINE
+    var shareIncludePhotos = false;
+
+    function buildShareText(show) {
+      if (!show) return 'Logged in LiveLore: Concert Diary & Setlist Vault';
+      var artist = (show.headline || 'Artist').trim();
+      var venue = (show.venue || 'Venue').trim();
+      var date = (show.date || '').trim();
+      var notes = (show.notes || '').trim();
+
+      var text = '🎸 ' + artist + ' live at ' + venue;
+      if (date) text += ' (' + date + ')';
+      text += '!';
+
+      if (notes) {
+        text += '\nNotes: ' + notes;
+      }
+      text += '\nLogged in LiveLore: Concert Diary & Setlist Vault';
+      return text;
+    }
+
+    function openShareModal() {
+      if (!activeDetailShowId) return;
+      var show = userShows.find(function(s) { return s.id === activeDetailShowId; });
+      if (!show) return;
+
+      var modal = document.getElementById('custom-share-modal');
+      var subtitleEl = document.getElementById('share-modal-subtitle');
+
+      if (subtitleEl) {
+        subtitleEl.innerText = (show.headline || '').toUpperCase() + ' @ ' + (show.venue || '');
+      }
+
+      shareIncludePhotos = isVIPUser && Array.isArray(show.photoUris) && show.photoUris.length > 0;
+      updateShareVipToggleUi();
+
+      if (modal) modal.style.display = 'flex';
+    }
+    window.openShareModal = openShareModal;
+
+    function closeShareModal() {
+      var modal = document.getElementById('custom-share-modal');
+      if (modal) modal.style.display = 'none';
+    }
+    window.closeShareModal = closeShareModal;
+
+    function updateShareVipToggleUi() {
+      var titleEl = document.getElementById('share-vip-toggle-title');
+      var subEl = document.getElementById('share-vip-toggle-subtitle');
+      var switchEl = document.getElementById('share-vip-toggle-switch');
+
+      if (!isVIPUser) {
+        if (titleEl) titleEl.innerText = 'ATTACH PHOTOS & TICKET CARD';
+        if (subEl) subEl.innerText = 'VIP Vault Feature 👑 (Tap to unlock)';
+        if (switchEl) {
+          switchEl.innerText = '🔒';
+          switchEl.style.background = '#121619';
+          switchEl.style.borderColor = '#222B30';
+          switchEl.style.color = '#FFB300';
+        }
+      } else {
+        if (titleEl) titleEl.innerText = 'ATTACH PHOTOS & TICKET CARD';
+        if (subEl) subEl.innerText = shareIncludePhotos ? 'VIP Feature Active 👑' : 'Tap to attach photo/ticket card';
+        if (switchEl) {
+          switchEl.innerText = shareIncludePhotos ? '✓' : '';
+          switchEl.style.background = shareIncludePhotos ? '#FFB300' : 'transparent';
+          switchEl.style.borderColor = '#FFB300';
+          switchEl.style.color = '#0a0a0a';
+        }
+      }
+    }
+
+    function toggleShareVipAttachment() {
+      if (!isVIPUser) {
+        promptVipPhotoShare();
+        return;
+      }
+      shareIncludePhotos = !shareIncludePhotos;
+      updateShareVipToggleUi();
+    }
+    window.toggleShareVipAttachment = toggleShareVipAttachment;
+
+    function promptVipPhotoShare() {
+      showCustomConfirm({
+        title: 'VIP VAULT FEATURE',
+        message: 'Sharing concert photos and generated ticket cards is a VIP Vault feature. Upgrade to include photos with your shares!',
+        confirmText: 'VIEW VIP PASS',
+        cancelText: 'CANCEL',
+        icon: '👑',
+        confirmColor: 'linear-gradient(90deg, #FFB300, #FF6F00)'
+      }, function() {
+        closeShareModal();
+        navigateToProfileVip();
+      });
+    }
+    window.promptVipPhotoShare = promptVipPhotoShare;
+
+    function copyTextToClipboard(text, successMessage) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function() {
+          showCustomAlert({ title: 'COPIED TO CLIPBOARD', message: successMessage || '✓ Concert details copied to clipboard!', icon: '📋' });
+        }).catch(function() {
+          fallbackCopyText(text, successMessage);
+        });
+      } else {
+        fallbackCopyText(text, successMessage);
+      }
+    }
+
+    function fallbackCopyText(text, successMessage) {
+      try {
+        var textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showCustomAlert({ title: 'COPIED TO CLIPBOARD', message: successMessage || '✓ Concert details copied to clipboard!', icon: '📋' });
+      } catch (e) {
+        showCustomAlert({ title: 'SHARE DETAILS', message: text, icon: '🎸' });
+      }
+    }
+
+    function executeShareTarget(target) {
+      if (!activeDetailShowId) return;
+      var show = userShows.find(function(s) { return s.id === activeDetailShowId; });
+      if (!show) return;
+
+      var shareText = buildShareText(show);
+      var primaryPhoto = (isVIPUser && show && Array.isArray(show.photoUris) && show.photoUris.length > 0) ? show.photoUris[0] : null;
+
+      if (shareIncludePhotos && !isVIPUser) {
+        promptVipPhotoShare();
+        return;
+      }
+
+      closeShareModal();
+
+      if (target === 'instagram') {
+        if (isVIPUser && primaryPhoto && window.AndroidShare && window.AndroidShare.shareImageAndText) {
+          window.AndroidShare.shareImageAndText(primaryPhoto, shareText, "Share Concert to Instagram");
+          return;
+        }
+        copyTextToClipboard(shareText, '✓ Concert summary copied! Open Instagram to paste into your Story or Post.');
+        setTimeout(function() {
+          window.open('https://www.instagram.com/', '_blank');
+        }, 800);
+      } else if (target === 'messages') {
+        if (window.AndroidShare) {
+          if (isVIPUser && primaryPhoto) {
+            window.AndroidShare.shareImageAndText(primaryPhoto, shareText, "Share Concert");
+          } else {
+            window.AndroidShare.shareText(shareText, "Share Concert");
+          }
+        } else if (navigator.share) {
+          navigator.share({ title: show.headline, text: shareText }).catch(function() {});
+        } else {
+          window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(shareText), '_blank');
+        }
+      } else if (target === 'facebook') {
+        window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent('https://frontiercaravan.vercel.app') + '&quote=' + encodeURIComponent(shareText), '_blank');
+      } else if (target === 'reddit') {
+        var redditTitle = '🎸 ' + (show.headline || 'Concert') + ' live at ' + (show.venue || 'Venue');
+        window.open('https://www.reddit.com/submit?title=' + encodeURIComponent(redditTitle) + '&text=' + encodeURIComponent(shareText), '_blank');
+      } else if (target === 'twitter') {
+        window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareText), '_blank');
+      } else if (target === 'native') {
+        if (window.AndroidShare) {
+          if (isVIPUser && primaryPhoto) {
+            window.AndroidShare.shareImageAndText(primaryPhoto, shareText, "Share Concert");
+          } else {
+            window.AndroidShare.shareText(shareText, "Share Concert");
+          }
+        } else if (navigator.share) {
+          navigator.share({ title: show.headline, text: shareText }).catch(function() {});
+        } else {
+          copyTextToClipboard(shareText);
+        }
+      }
+    }
+    window.executeShareTarget = executeShareTarget;
+
     function openShowDetails(showId) {
       if (!showId) return;
       activeDetailShowId = showId;
       var show = userShows.find(function(s) { return s.id === showId; });
       if (!show) return;
+
+      // Render Featured Ticket Stub Preview
+      var ticketPreviewBox = document.getElementById('detail-ticket-preview');
+      if (ticketPreviewBox) {
+        var ticketColor = getTicketColor(show.id);
+        var openersTextPreview = '';
+        if (Array.isArray(show.openersList) && show.openersList.length > 0) {
+          openersTextPreview = show.openersList.join(', ');
+        } else if (show.opener) {
+          openersTextPreview = show.opener;
+        }
+
+        var bandStackHtmlPreview = '<div class="ticket-artist-head">' + (show.headline || '').toUpperCase() + '</div>';
+        if (openersTextPreview) {
+          bandStackHtmlPreview += '<div class="ticket-artist-and">and</div><div class="ticket-artist-openers">' + openersTextPreview + '</div>';
+        }
+
+        var stubInnerHtmlPreview = '<div>ADMIT ONE</div><div style="font-size:8px; color:#221508; margin-top:4px;">SEC 7</div>';
+        var stubExtraStylePreview = '';
+
+        if (Array.isArray(show.photoUris) && show.photoUris.length > 0 && show.photoUris[0]) {
+          var primaryPhotoPreview = show.photoUris[0];
+          stubExtraStylePreview = 'background-image: url(\'' + primaryPhotoPreview + '\'); background-size: cover; background-position: center; border-radius: 0 10px 10px 0; overflow: hidden; position: relative;';
+          stubInnerHtmlPreview = '';
+        }
+
+        ticketPreviewBox.innerHTML = '<div class="ticket-card" style="background-color:' + ticketColor + '; margin-bottom:0;">' +
+          '<div class="ticket-left">' +
+            '<div class="ticket-artist-box">' + bandStackHtmlPreview + '</div>' +
+            '<div class="ticket-footer">' +
+              '<span class="ticket-venue">' + (show.venue || '').trim() + '</span>' +
+              '<span class="ticket-date">' + (show.date || '') + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="ticket-stub" style="' + stubExtraStylePreview + '">' + stubInnerHtmlPreview + '</div>' +
+        '</div>';
+      }
 
       var headlineEl = document.getElementById('detail-headline');
       var dateEl = document.getElementById('detail-date');
@@ -2936,7 +3200,8 @@
       </div>
     </div>
 
-    <!-- Action Buttons: EDIT CONCERT & DELETE CONCERT -->
+    <!-- Action Buttons: SHARE CONCERT, EDIT CONCERT & DELETE CONCERT -->
+    <button class="btn-cta" id="btn-share-show" style="font-size:17px; padding:15px; margin-bottom:10px; background:linear-gradient(90deg, #00E676, #00C853); box-shadow: 0 0 18px rgba(0,230,118,0.4);" onclick="openShareModal()">🚀 SHARE CONCERT</button>
     <button class="btn-edit" id="btn-edit-show" style="font-size:16px; padding:14px;" onclick="triggerEditShow()" ontouchstart="triggerEditShow()">EDIT CONCERT</button>
     <button class="btn-delete" id="btn-delete-show" style="font-size:15px; padding:14px;" onclick="triggerDeleteShow()" ontouchstart="triggerDeleteShow()">DELETE CONCERT</button>
   </div>

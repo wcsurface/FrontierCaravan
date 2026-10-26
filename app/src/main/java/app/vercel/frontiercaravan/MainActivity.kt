@@ -197,6 +197,7 @@ class MainActivity : ComponentActivity() {
         webView.addJavascriptInterface(AndroidGoogleAuthInterface(this), "AndroidGoogleAuth")
         webView.addJavascriptInterface(AndroidAdMobInterface(), "AndroidAdMob")
         webView.addJavascriptInterface(AndroidCSVInterface(this), "AndroidCSV")
+        webView.addJavascriptInterface(AndroidShareInterface(this), "AndroidShare")
 
         val targetUrl = "file:///android_asset/index.html"
         webView.loadUrl(targetUrl)
@@ -345,6 +346,60 @@ class MainActivity : ComponentActivity() {
                 } catch (e: Exception) {
                     e.printStackTrace()
                     Toast.makeText(context, "Error saving CSV: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    inner class AndroidShareInterface(private val context: Context) {
+        @JavascriptInterface
+        fun shareText(text: String, title: String) {
+            runOnUiThread {
+                try {
+                    val sendIntent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, text)
+                        type = "text/plain"
+                    }
+                    val shareIntent = Intent.createChooser(sendIntent, if (title.isNotEmpty()) title else "Share Concert")
+                    context.startActivity(shareIntent)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+
+        @JavascriptInterface
+        fun shareImageAndText(dataUrl: String, text: String, title: String) {
+            runOnUiThread {
+                try {
+                    var imageUri: Uri? = null
+                    if (dataUrl.startsWith("data:image")) {
+                        val base64Data = dataUrl.substring(dataUrl.indexOf(",") + 1)
+                        val decodedBytes = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT)
+                        val imagesDir = File(context.cacheDir, "shared_images")
+                        if (!imagesDir.exists()) imagesDir.mkdirs()
+                        val imageFile = File(imagesDir, "concert_share_${System.currentTimeMillis()}.jpg")
+                        imageFile.writeBytes(decodedBytes)
+                        imageUri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", imageFile)
+                    }
+
+                    val sendIntent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, text)
+                        if (imageUri != null) {
+                            putExtra(Intent.EXTRA_STREAM, imageUri)
+                            type = "image/jpeg"
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        } else {
+                            type = "text/plain"
+                        }
+                    }
+                    val shareIntent = Intent.createChooser(sendIntent, if (title.isNotEmpty()) title else "Share Concert")
+                    context.startActivity(shareIntent)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    shareText(text, title)
                 }
             }
         }
