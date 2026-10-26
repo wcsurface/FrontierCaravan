@@ -209,6 +209,15 @@ class MainActivity : ComponentActivity() {
         webView.addJavascriptInterface(AndroidShareInterface(this), "AndroidShare")
         webView.addJavascriptInterface(AndroidBillingInterface(this), "AndroidBilling")
 
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                webView.evaluateJavascript(
+                    "if (typeof handleLegalBack === 'function') { handleLegalBack(); } else if (window.history.length > 1) { window.history.back(); }",
+                    null
+                )
+            }
+        })
+
         val targetUrl = "file:///android_asset/index.html"
         webView.loadUrl(targetUrl)
     }
