@@ -31,6 +31,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.common.AccountPicker
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
@@ -571,17 +572,18 @@ class MainActivity : ComponentActivity() {
         fun launchGoogleSignIn() {
             runOnUiThread {
                 try {
-                    @Suppress("DEPRECATION")
-                    val intent = AccountManager.newChooseAccountIntent(
-                        null, null, arrayOf("com.google"), true, null, null, null, null
-                    )
+                    val options = AccountPicker.AccountChooserOptions.Builder()
+                        .setAllowableAccountsTypes(listOf("com.google"))
+                        .setAlwaysShowAccountPicker(true)
+                        .build()
+                    val intent = AccountPicker.newChooseAccountIntent(options)
                     startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
                 } catch (e: Exception) {
                     try {
-                        val intent = Intent("com.google.android.gms.common.account.CHOOSE_ACCOUNT").apply {
-                            putExtra("allowableAccountTypes", arrayOf("com.google"))
-                            putExtra("alwaysPromptForAccount", true)
-                        }
+                        @Suppress("DEPRECATION")
+                        val intent = AccountManager.newChooseAccountIntent(
+                            null, null, arrayOf("com.google"), true, null, null, null, null
+                        )
                         startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
                     } catch (ex: Exception) {
                         webView.post {

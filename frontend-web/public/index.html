@@ -2720,10 +2720,17 @@
     window.handleGoogleSignIn = handleGoogleSignIn;
 
     function onNativeGoogleAuthFallback() {
-      var inputEmail = prompt("Enter your Google Account email to continue:", "you@gmail.com");
-      if (inputEmail && inputEmail.includes('@')) {
-        onNativeGoogleAuthSuccess(inputEmail);
-      }
+      showCustomPrompt({
+        title: 'GOOGLE SIGN-IN',
+        message: 'Enter your Google Account email address to continue:',
+        placeholder: 'you@gmail.com',
+        icon: '🌐',
+        submitText: 'SIGN IN'
+      }, function(inputEmail) {
+        if (inputEmail && inputEmail.includes('@')) {
+          onNativeGoogleAuthSuccess(inputEmail);
+        }
+      });
     }
 
     function onNativeGoogleAuthSuccess(googleEmail) {
