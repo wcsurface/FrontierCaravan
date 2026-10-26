@@ -2732,6 +2732,13 @@
 
       localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
 
+      // Auto-register/sync account with PostgreSQL backend database
+      fetch('https://livelore-app.vercel.app/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanedEmail, displayName: cleanedEmail.split('@')[0] })
+      }).catch(function(err) {});
+
       loadSavedShows();
       showScreen('diary');
     }

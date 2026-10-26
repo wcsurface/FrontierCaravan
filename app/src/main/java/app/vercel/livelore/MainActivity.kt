@@ -284,9 +284,20 @@ class MainActivity : ComponentActivity() {
             filePathCallback = null
         } else if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
             if (resultCode == RESULT_OK && data != null) {
-                val accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
+                var accountName: String? = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
                     ?: data.getStringExtra("authAccount")
                     ?: data.getStringExtra("accountName")
+
+                if (accountName.isNullOrEmpty() && data.extras != null) {
+                    for (key in data.extras!!.keySet()) {
+                        val valStr = data.extras!!.get(key)?.toString()
+                        if (valStr != null && valStr.contains("@")) {
+                            accountName = valStr
+                            break
+                        }
+                    }
+                }
+
                 if (!accountName.isNullOrEmpty()) {
                     val safeEmail = accountName.lowercase().trim()
                     webView.post {
@@ -562,13 +573,14 @@ class MainActivity : ComponentActivity() {
                 try {
                     @Suppress("DEPRECATION")
                     val intent = AccountManager.newChooseAccountIntent(
-                        null, null, arrayOf("com.google"), false, null, null, null, null
+                        null, null, arrayOf("com.google"), true, null, null, null, null
                     )
                     startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
                 } catch (e: Exception) {
                     try {
                         val intent = Intent("com.google.android.gms.common.account.CHOOSE_ACCOUNT").apply {
                             putExtra("allowableAccountTypes", arrayOf("com.google"))
+                            putExtra("alwaysPromptForAccount", true)
                         }
                         startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
                     } catch (ex: Exception) {
