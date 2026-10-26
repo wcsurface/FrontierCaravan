@@ -14,7 +14,9 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.provider.MediaStore
+import android.util.Log
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
@@ -104,12 +106,27 @@ class MainActivity : ComponentActivity() {
         settings.builtInZoomControls = false
         settings.displayZoomControls = false
         settings.cacheMode = WebSettings.LOAD_NO_CACHE
+        settings.mediaPlaybackRequiresUserGesture = false
 
+        webView.isClickable = true
+        webView.isFocusable = true
+        webView.isFocusableInTouchMode = true
         webView.clearCache(true)
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
 
         // WebChromeClient with onShowFileChooser for Camera vs Camera Roll Photo Selection
         webView.webChromeClient = object : WebChromeClient() {
+            override fun onConsoleMessage(consoleMessage: android.webkit.ConsoleMessage?): Boolean {
+                Log.d("LiveLoreJS", "${consoleMessage?.message()} -- line ${consoleMessage?.lineNumber()} of ${consoleMessage?.sourceId()}")
+                return true
+            }
+
+            override fun onJsAlert(view: WebView?, url: String?, message: String?, result: android.webkit.JsResult?): Boolean {
+                Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
+                result?.confirm()
+                return true
+            }
+
             override fun onShowFileChooser(
                 view: WebView?,
                 filePathCallback: ValueCallback<Array<Uri>>?,
@@ -169,6 +186,26 @@ class MainActivity : ComponentActivity() {
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
+                webView.post {
+                    val js = """
+                        (function() {
+                            var btn = document.getElementById('btn-google-auth') || document.querySelector('.btn-google');
+                            if (btn) {
+                                btn.onclick = function(e) {
+                                    if (typeof window.handleGoogleSignIn === 'function') {
+                                        window.handleGoogleSignIn(e);
+                                    }
+                                };
+                                btn.ontouchstart = function(e) {
+                                    if (typeof window.handleGoogleSignIn === 'function') {
+                                        window.handleGoogleSignIn(e);
+                                    }
+                                };
+                            }
+                        })();
+                    """.trimIndent()
+                    webView.evaluateJavascript(js, null)
+                }
                 webView.postDelayed({
                     webView.evaluateJavascript("if (window.saveShowsToStorage) { window.saveShowsToStorage(); }", null)
                 }, 1000)
@@ -219,6 +256,21 @@ class MainActivity : ComponentActivity() {
                 )
             }
         })
+
+        @SuppressLint("ClickableViewAccessibility")
+        webView.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                val density = resources.displayMetrics.density
+                val touchY = event.y / density
+                if (touchY in 150.0..320.0) {
+                    webView.evaluateJavascript(
+                        "(function() { var auth = document.getElementById('view-auth'); if (auth && (auth.classList.contains('active') || auth.style.display !== 'none')) { if (typeof handleGoogleSignIn === 'function') { handleGoogleSignIn(); } } })()",
+                        null
+                    )
+                }
+            }
+            false
+        }
 
         val targetUrl = "file:///android_asset/index.html"
         webView.loadUrl(targetUrl)
@@ -570,42 +622,25 @@ class MainActivity : ComponentActivity() {
     inner class AndroidGoogleAuthInterface(private val context: Context) {
         @JavascriptInterface
         fun launchGoogleSignIn() {
+            Log.d("LiveLore", "launchGoogleSignIn() invoked from JavaScript!")
             runOnUiThread {
                 try {
                     val am = AccountManager.get(context)
                     val googleAccounts = am.getAccountsByType("com.google")
                     if (!googleAccounts.isNullOrEmpty()) {
-                        if (googleAccounts.size == 1) {
-                            val safeEmail = googleAccounts[0].name.lowercase().trim()
-                            webView.post {
-                                webView.evaluateJavascript("onNativeGoogleAuthSuccess('$safeEmail')", null)
-                            }
-                            return@runOnUiThread
-                        } else {
-                            val options = AccountPicker.AccountChooserOptions.Builder()
-                                .setAllowableAccountsTypes(listOf("com.google"))
-                                .setAlwaysShowAccountPicker(true)
-                                .build()
-                            val intent = AccountPicker.newChooseAccountIntent(options)
-                            startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
-                            return@runOnUiThread
+                        val safeEmail = googleAccounts[0].name.lowercase().trim()
+                        Log.d("LiveLore", "Found google account: $safeEmail")
+                        webView.post {
+                            webView.evaluateJavascript("onNativeGoogleAuthSuccess('$safeEmail')", null)
                         }
+                        return@runOnUiThread
                     }
                 } catch (e: Exception) {
-                    // Ignore security exception and fallback
+                    Log.e("LiveLore", "AccountManager failed: ${e.message}")
                 }
 
-                try {
-                    val options = AccountPicker.AccountChooserOptions.Builder()
-                        .setAllowableAccountsTypes(listOf("com.google"))
-                        .setAlwaysShowAccountPicker(true)
-                        .build()
-                    val intent = AccountPicker.newChooseAccountIntent(options)
-                    startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
-                } catch (e: Exception) {
-                    webView.post {
-                        webView.evaluateJavascript("onNativeGoogleAuthFallback()", null)
-                    }
+                webView.post {
+                    webView.evaluateJavascript("onNativeGoogleAuthFallback()", null)
                 }
             }
         }
