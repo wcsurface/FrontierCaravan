@@ -375,6 +375,10 @@ class MainActivity : ComponentActivity() {
         fun showBannerAd() {
             runOnUiThread {
                 adContainerLayout.visibility = View.VISIBLE
+                try {
+                    val adRequest = AdRequest.Builder().build()
+                    adView.loadAd(adRequest)
+                } catch(e: Exception) {}
             }
         }
 
