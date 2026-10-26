@@ -2016,7 +2016,7 @@
         var cloudUserId = 'u_cloud_' + userEmail.replace(/[^a-z0-9]/g, '_');
 
         // 3. PUSH IMMEDIATELY TO RAILWAY POSTGRESQL DB
-        fetch('https://frontiercaravan-production.up.railway.app/api/sync/push', {
+        fetch('https://livelore-production.up.railway.app/api/sync/push', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -2522,7 +2522,7 @@
       updateProfileVipCard();
 
       // Persist $4.99 VIP Status directly in Railway PostgreSQL Database
-      fetch('https://frontiercaravan-production.up.railway.app/api/auth/upgrade-vip', {
+      fetch('https://livelore-production.up.railway.app/api/auth/upgrade-vip', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: cleanEmail })
@@ -2594,7 +2594,7 @@
       var activeUserId = 'u_cloud_' + activeEmail.replace(/[^a-z0-9]/g, '_');
 
       // Fetch user's concert vault directly from Railway PostgreSQL Cloud Database
-      fetch('https://frontiercaravan-production.up.railway.app/api/sync/pull?userId=' + encodeURIComponent(activeUserId) + '&email=' + encodeURIComponent(activeEmail) + '&_t=' + Date.now())
+      fetch('https://livelore-production.up.railway.app/api/sync/pull?userId=' + encodeURIComponent(activeUserId) + '&email=' + encodeURIComponent(activeEmail) + '&_t=' + Date.now())
         .then(function(res) { return res.json(); })
         .then(function(data) {
           var cloudShows = [];
@@ -2797,7 +2797,7 @@
         showScreen('diary');
       }
 
-      fetch('https://frontiercaravan-production.up.railway.app' + authEndpoint, {
+      fetch('https://livelore-production.up.railway.app' + authEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -2946,7 +2946,7 @@
               return;
             }
 
-            fetch('https://frontiercaravan-production.up.railway.app/api/auth/forgot-password', {
+            fetch('https://livelore-production.up.railway.app/api/auth/forgot-password', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ email: targetEmail })
@@ -2983,7 +2983,7 @@
 
             modal.style.display = 'none';
 
-            fetch('https://frontiercaravan-production.up.railway.app/api/auth/reset-password', {
+            fetch('https://livelore-production.up.railway.app/api/auth/reset-password', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ email: targetEmail, code: codeVal, newPassword: passVal })
@@ -3631,7 +3631,7 @@
 
           var cloudUserId = 'u_cloud_' + activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_');
 
-          fetch('https://frontiercaravan-production.up.railway.app/api/sync/push', {
+          fetch('https://livelore-production.up.railway.app/api/sync/push', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
