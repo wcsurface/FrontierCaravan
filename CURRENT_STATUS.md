@@ -1,8 +1,8 @@
 # CURRENT_STATUS.md - LiveLore: Concert Diary & Setlist Vault
 
 ## Current Development Status
-**Active Version**: 1.0.0 (API Backend v6.1.0)
-**Build Status**: ✅ Passing (`:app:assembleDebug` builds cleanly)
+**Active Version**: 1.0.4 (versionCode: 5, API Backend v6.1.0)
+**Build Status**: ✅ Passing (`:app:assembleDebug` & `:app:bundleRelease` build cleanly)
 
 ---
 
