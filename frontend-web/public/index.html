@@ -317,6 +317,141 @@
     }
     window.onNativeGoogleAuthFallback = onNativeGoogleAuthFallback;
 
+    function parseConcertTimestamp(dateStr) {
+      if (!dateStr || typeof dateStr !== 'string') return 0;
+      var str = dateStr.trim();
+      var parts = str.split(/[\/\.-]/);
+      if (parts.length === 3) {
+        var m = parseInt(parts[0], 10);
+        var d = parseInt(parts[1], 10);
+        var y = parseInt(parts[2], 10);
+
+        if (isNaN(m) || m < 1) m = 1;
+        if (m > 12) m = 12;
+
+        if (isNaN(y)) y = 2000;
+        if (y < 100) {
+          y = y <= 35 ? 2000 + y : 1900 + y;
+        }
+
+        var maxDays = new Date(y, m, 0).getDate();
+        if (isNaN(d) || d < 1) d = 1;
+        if (d > maxDays) d = maxDays;
+
+        var dObj = new Date(y, m - 1, d);
+        if (!isNaN(dObj.getTime())) {
+          return dObj.getTime();
+        }
+      }
+
+      var nativeDate = new Date(str);
+      return isNaN(nativeDate.getTime()) ? 0 : nativeDate.getTime();
+    }
+    window.parseConcertTimestamp = parseConcertTimestamp;
+
+    function getTicketColor(id) {
+      if (typeof currentTicketTheme !== 'undefined' && currentTicketTheme === 'classic') return '#f4e4bc';
+      if (!id) return (typeof TICKET_COLOR_PALETTE !== 'undefined' && TICKET_COLOR_PALETTE.length > 0) ? TICKET_COLOR_PALETTE[0] : '#FFD54F';
+      var hash = 0;
+      for (var i = 0; i < id.length; i++) {
+        hash = (hash << 5) - hash + id.charCodeAt(i);
+        hash |= 0;
+      }
+      var palette = (typeof TICKET_COLOR_PALETTE !== 'undefined' && TICKET_COLOR_PALETTE.length > 0) ? TICKET_COLOR_PALETTE : ['#FFD54F', '#FF8A65', '#81C784', '#64B5F6', '#BA68C8'];
+      return palette[Math.abs(hash) % palette.length];
+    }
+    window.getTicketColor = getTicketColor;
+
+    function renderShowsFeed() {
+      var list = document.getElementById('ticket-list');
+      var sortBar = document.getElementById('sort-control-bar');
+      var countLabel = document.getElementById('shows-count-label');
+      if (!list) return;
+
+      if (!userShows || userShows.length === 0) {
+        if (sortBar) sortBar.style.display = 'none';
+        list.style.display = 'flex';
+        list.style.flexDirection = 'column';
+        list.style.justifyContent = 'center';
+        list.style.alignItems = 'center';
+        list.innerHTML = `
+          <div id="empty-state-box" style="text-align:center; padding: 40px 16px; margin: auto 0;">
+            <div style="font-size:52px; margin-bottom:12px;">🎸</div>
+            <div style="font-size:24px; font-weight:900; color:#FFB300; margin-bottom:10px; letter-spacing:1px;">LIVELORE</div>
+            <div style="font-weight:900; font-size:22px; color:#ffffff; text-transform:uppercase; margin-bottom:16px; letter-spacing:0.5px;">YOUR CONCERT VAULT IS EMPTY!</div>
+            <div class="bounce-pointer" style="color:#FFB300; font-weight:900; font-size:16px; text-transform:uppercase; letter-spacing:1px; margin-top:12px;">
+              <div style="font-size:42px; color:#00E676; margin-bottom:8px; font-weight:900;">&uarr;</div>
+              TAP "ADD" ABOVE TO LOG YOUR FIRST CONCERT!
+            </div>
+          </div>
+        `;
+      } else {
+        if (sortBar) sortBar.style.display = 'flex';
+        if (countLabel) countLabel.innerText = userShows.length + (userShows.length === 1 ? ' CONCERT LOGGED' : ' CONCERTS LOGGED');
+
+        var selectEl = document.getElementById('sort-dropdown-select');
+        if (selectEl && typeof currentSort !== 'undefined') selectEl.value = currentSort;
+
+        var displayList = userShows.slice();
+        var sortMode = (typeof currentSort !== 'undefined') ? currentSort : 'newest';
+        if (sortMode === 'newest') {
+          displayList.sort(function(a, b) { return parseConcertTimestamp(b.date) - parseConcertTimestamp(a.date); });
+        } else if (sortMode === 'oldest') {
+          displayList.sort(function(a, b) { return parseConcertTimestamp(a.date) - parseConcertTimestamp(b.date); });
+        } else if (sortMode === 'band') {
+          displayList.sort(function(a, b) { return (a.headline || '').trim().localeCompare((b.headline || '').trim(), undefined, { sensitivity: 'base' }); });
+        }
+
+        list.style.display = 'block';
+        list.innerHTML = '';
+        displayList.forEach(function(show) {
+          var ticketColor = getTicketColor(show.id);
+          var card = document.createElement('div');
+          card.className = 'ticket-card';
+          card.style.backgroundColor = ticketColor;
+          card.onclick = function() { openShowDetails(show.id); };
+
+          var openersText = '';
+          if (Array.isArray(show.openersList) && show.openersList.length > 0) {
+            openersText = show.openersList.join(', ');
+          } else if (show.opener) {
+            openersText = show.opener;
+          }
+
+          var bandStackHtml = '<div class="ticket-artist-head">' + (show.headline || '').toUpperCase() + '</div>';
+          if (openersText) {
+            bandStackHtml += '<div class="ticket-artist-and">and</div><div class="ticket-artist-openers">' + openersText + '</div>';
+          }
+
+          var stubInnerHtml = '<div>ADMIT ONE</div><div style="font-size:8px; color:#221508; margin-top:4px;">SEC 7</div>';
+          var stubExtraStyle = '';
+
+          if (Array.isArray(show.photoUris) && show.photoUris.length > 0 && show.photoUris[0]) {
+            var primaryPhoto = show.photoUris[0];
+            stubExtraStyle = "background-image: url('" + primaryPhoto + "'); background-size: cover; background-position: center; border-radius: 0 10px 10px 0; overflow: hidden; position: relative;";
+            stubInnerHtml = '';
+          }
+
+          card.innerHTML = `
+            <div class="ticket-left">
+              <div class="ticket-artist-box">
+                ${bandStackHtml}
+              </div>
+              <div class="ticket-footer">
+                <span class="ticket-venue">${(show.venue || '').trim()}</span>
+                <span class="ticket-date">${show.date || ''}</span>
+              </div>
+            </div>
+            <div class="ticket-stub" style="${stubExtraStyle}">
+              ${stubInnerHtml}
+            </div>
+          `;
+          list.appendChild(card);
+        });
+      }
+    }
+    window.renderShowsFeed = renderShowsFeed;
+
     function finishLoadAndRender() {
       if (!Array.isArray(userShows)) userShows = [];
 
@@ -2181,7 +2316,7 @@
     }
     window.mergeConcerts = mergeConcerts;
 
-    function saveShowsToStorage() {
+    function saveShowsToStorage(isExplicitUserSave) {
       try {
         var rawUser = localStorage.getItem('livelore_active_user');
         var userEmail = 'default_user';
@@ -2201,6 +2336,11 @@
 
         // 2. Save to IndexedDB
         saveToIndexedDB(localKey, { concerts: userShows || [] });
+
+        // PROTECT USER DATA: Never push empty [] to cloud on startup unless user explicitly deleted all or vault loaded
+        if ((!userShows || userShows.length === 0) && !isExplicitUserSave && !isVaultLoaded) {
+          return;
+        }
 
         var cloudUserId = 'u_cloud_' + userEmail.replace(/[^a-z0-9]/g, '_');
 
