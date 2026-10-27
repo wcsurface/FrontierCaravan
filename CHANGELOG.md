@@ -1,4 +1,5 @@
 ## [1.0.4] - 2026-10-26 (versionCode: 5)
+- **Target SDK Upgrade**: Updated `targetSdk` from `35` to `36` (Android 16) in `app/build.gradle.kts` to meet Google Play Store requirements.
 - **Google Play Billing Library Upgrade**: Upgraded `com.android.billingclient:billing-ktx` to version `8.0.0` (from `7.0.0`) in `app/build.gradle.kts` and refactored `enablePendingPurchases` with `PendingPurchasesParams` and `queryProductDetailsAsync` in `MainActivity.kt` to satisfy Google Play Store monetization requirements.
 - **Google Play Release Prep**: Bumped `versionCode` to `5` and `versionName` to `"1.0.4"` in `app/build.gradle.kts`.
 - **Direct Railway API Endpoint Routing**: Standardized all API sync (`/api/sync/pull`, `/api/sync/push`) and authentication requests to point directly to production Railway PostgreSQL (`https://frontiercaravan-production.up.railway.app`).
