@@ -11,8 +11,8 @@ android {
         applicationId = "app.vercel.livelore"
         minSdk = 26
         targetSdk = 36
-        versionCode = 9
-        versionName = "1.0.8"
+        versionCode = 10
+        versionName = "1.0.9"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
@@ -27,13 +27,16 @@ android {
             buildConfigField("Boolean", "ENABLE_DEBUG_LOGS", "true")
         }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
             buildConfigField("Boolean", "ENABLE_DEBUG_LOGS", "false")
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
         }
     }
     
