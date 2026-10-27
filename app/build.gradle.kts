@@ -67,7 +67,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-ads:23.6.0")
     
     // Google Play Billing Library (Google Pay / In-App Purchases)
-    implementation("com.android.billingclient:billing-ktx:7.0.0")
+    implementation("com.android.billingclient:billing-ktx:8.0.0")
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
