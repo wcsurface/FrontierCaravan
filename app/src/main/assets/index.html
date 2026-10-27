@@ -482,6 +482,18 @@
       var emailDisp = document.getElementById('profile-email-display');
       if (emailDisp) emailDisp.innerText = activeEmail;
 
+      var changePassBox = document.getElementById('profile-change-pass-box');
+      if (changePassBox) {
+        var provider = 'email';
+        if (rawUser) {
+          try {
+            var uObj = JSON.parse(rawUser);
+            if (uObj && uObj.provider) provider = uObj.provider;
+          } catch(ex) {}
+        }
+        changePassBox.style.display = (provider === 'google') ? 'none' : 'block';
+      }
+
       var localKey = 'livelore_vault_' + activeEmail.replace(/[^a-z0-9]/g, '_');
       var localShowsRaw = localStorage.getItem(localKey);
       var localShows = [];
@@ -3525,7 +3537,7 @@
       <div class="detail-label">ACCOUNT EMAIL</div>
       <div style="font-size:18px; font-weight:900; color:#ffffff; margin-bottom:20px;" id="profile-email-display">wcsurface@gmail.com</div>
 
-      <div style="border-top: 1px solid #222B30; padding-top: 16px;">
+      <div id="profile-change-pass-box" style="border-top: 1px solid #222B30; padding-top: 16px;">
         <div class="detail-label">CHANGE PASSWORD</div>
         <input type="password" id="profile-new-pass" class="input-field" placeholder="New Password (min 6 chars)" style="margin-top:6px; margin-bottom:12px;" />
         <button type="button" class="btn-update-pass" onclick="handlePasswordUpdate()">Update Password</button>
