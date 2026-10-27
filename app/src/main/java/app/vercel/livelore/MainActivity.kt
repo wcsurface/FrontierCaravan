@@ -104,8 +104,7 @@ class MainActivity : ComponentActivity() {
         settings.displayZoomControls = false
         settings.cacheMode = WebSettings.LOAD_NO_CACHE
 
-        webView.clearCache(true)
-        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
+        try { webView.clearCache(true) } catch (e: Exception) {}
 
         // WebChromeClient with onShowFileChooser for Camera vs Camera Roll Photo Selection
         webView.webChromeClient = object : WebChromeClient() {
@@ -193,22 +192,30 @@ class MainActivity : ComponentActivity() {
 
         adContainerLayout.addView(adView)
 
-        // Load Official AdMob Test Banner Ad
-        val adRequest = AdRequest.Builder().build()
-        adView.loadAd(adRequest)
+        // Load Official AdMob Test Banner Ad safely
+        try {
+            val adRequest = AdRequest.Builder().build()
+            adView.loadAd(adRequest)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
         // Assemble Layout
         rootLayout.addView(webView)
         rootLayout.addView(adContainerLayout)
         setContentView(rootLayout)
 
-        // Expose Native Interfaces to JavaScript
-        webView.addJavascriptInterface(AndroidHapticsInterface(this), "AndroidHaptics")
-        webView.addJavascriptInterface(AndroidGoogleAuthInterface(this), "AndroidGoogleAuth")
-        webView.addJavascriptInterface(AndroidAdMobInterface(), "AndroidAdMob")
-        webView.addJavascriptInterface(AndroidCSVInterface(this), "AndroidCSV")
-        webView.addJavascriptInterface(AndroidShareInterface(this), "AndroidShare")
-        webView.addJavascriptInterface(AndroidBillingInterface(this), "AndroidBilling")
+        // Expose Native Interfaces to JavaScript safely
+        try {
+            webView.addJavascriptInterface(AndroidHapticsInterface(this), "AndroidHaptics")
+            webView.addJavascriptInterface(AndroidGoogleAuthInterface(this), "AndroidGoogleAuth")
+            webView.addJavascriptInterface(AndroidAdMobInterface(), "AndroidAdMob")
+            webView.addJavascriptInterface(AndroidCSVInterface(this), "AndroidCSV")
+            webView.addJavascriptInterface(AndroidShareInterface(this), "AndroidShare")
+            webView.addJavascriptInterface(AndroidBillingInterface(this), "AndroidBilling")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
         val targetUrl = "file:///android_asset/index.html"
         webView.loadUrl(targetUrl)

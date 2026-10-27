@@ -1,14 +1,15 @@
 # CURRENT_STATUS.md - LiveLore: Concert Diary & Setlist Vault
 
 ## Current Development Status
-**Active Version**: 1.0.6 (versionCode: 7, API Backend v6.1.0)
+**Active Version**: 1.0.7 (versionCode: 8, API Backend v6.1.0)
 **Build Status**: ✅ Passing (`:app:assembleDebug` & `:app:bundleRelease` build cleanly)
 
 ---
 
 ## Completed Features
-- [x] **Release Crash Prevention (R8/Proguard)**: Configured comprehensive Proguard rules in `app/proguard-rules.pro` keeping `MainActivity`, inner `@JavascriptInterface` bridge classes (`AndroidGoogleAuthInterface`, `AndroidBillingInterface`, `AndroidAdMobInterface`, `AndroidCSVInterface`, `AndroidShareInterface`, `AndroidHapticsInterface`), WebKit, AdMob SDK, and Play Billing Library from being obfuscated or stripped during release minification (`isMinifyEnabled = true`).
-- [x] **Release Versioning**: Version bumped to **`1.0.6`** (`versionCode = 7`) for Google Play Store closed testing submission.
+- [x] **Release Resource & Asset Preservation**: Set `isShrinkResources = false` in `app/build.gradle.kts` to prevent the Gradle resource shrinker from stripping assets (`index.html`, `livelore_logo.png`, SVGs, and AdMob layout resources) needed by the WebView and AdMob banner.
+- [x] **AdMob & WebView Lifecycle Handlers**: Added `onPause()`, `onResume()`, and `onDestroy()` lifecycle handlers to `MainActivity.kt` for `AdView` and `BillingClient`.
+- [x] **Release Versioning**: Version bumped to **`1.0.7`** (`versionCode = 8`) for Google Play Store release.
 
 ---
 
