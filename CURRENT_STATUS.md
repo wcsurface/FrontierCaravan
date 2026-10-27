@@ -1,15 +1,15 @@
 # CURRENT_STATUS.md - LiveLore: Concert Diary & Setlist Vault
 
 ## Current Development Status
-**Active Version**: 1.0.8 (versionCode: 9, API Backend v6.1.0)
+**Active Version**: 1.0.9 (versionCode: 10, API Backend v6.1.0)
 **Build Status**: ✅ Passing (`:app:assembleDebug` & `:app:bundleRelease` build cleanly)
 
 ---
 
 ## Completed Features
-- [x] **Release Bytecode Parity**: Disabled `isMinifyEnabled` for the release build in `app/build.gradle.kts` to guarantee 100% code and class parity with debug builds.
-- [x] **Native AdMob & Bridge Shields**: Added try-catch exception handling around AdMob ad loading and JavascriptInterface bridge registrations in `MainActivity.kt`.
-- [x] **Release Versioning**: Version bumped to **`1.0.8`** (`versionCode = 9`) for Google Play Store release.
+- [x] **Native NDK Debug Symbols**: Configured `ndk { debugSymbolLevel = "SYMBOL_TABLE" }` in `app/build.gradle.kts` to package native debug symbol tables directly inside release App Bundles (`.aab`) for Google Play crash & ANR symbolication.
+- [x] **R8 Code Shrinking & Deobfuscation**: Re-enabled R8 minification (`isMinifyEnabled = true`) with full Proguard keep rules and `mapping.txt` generation, optimizing APK/AAB size for faster user downloads.
+- [x] **Release Versioning**: Version bumped to **`1.0.9`** (`versionCode = 10`) for Google Play Store release.
 
 ---
 
