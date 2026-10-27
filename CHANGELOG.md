@@ -1,21 +1,4 @@
-## [1.0.1] - 2026-10-26
-
-### Upgraded & Compliance
-- **Target SDK Upgrade to API Level 36 (Android 16)**:
-  - Upgraded `targetSdk` from `35` to `36` in `app/build.gradle.kts` to meet Google Play Store requirements.
-  - Bumped `versionCode` to `2` and `versionName` to `"1.0.1"`.
-- **Play Billing Library Upgrade to Version 8.0.0**:
-  - Upgraded `com.android.billingclient:billing-ktx` from `7.0.0` to `8.0.0`.
-  - Updated `MainActivity.kt` with `PendingPurchasesParams` (`enableOneTimeProducts()`) and updated `queryProductDetailsAsync` callback handling.
-
-### Fixed
-- **Strict Legal Page Back Navigation & Unauthenticated Access Guard**:
-  - Refactored `getActiveUserEmail()` helper and `handleLegalBack()` navigation function.
-  - When unauthenticated (`!activeEmail`), tapping `< BACK` on Privacy Policy, Terms of Service, or FAQ screens now **always returns directly to the Login page (`auth`)**.
-  - Completely removed bottom navigation buttons (`HOME`, `ADD`, `PROFILE`, `STATS`) from legal screens to prevent accidental navigation while logged out.
-  - Enforced strict `showScreen()` guard: any attempt to access protected screens (`diary`, `log`, `profile`, `stats`) while unauthenticated immediately redirects to the Login screen (`auth`).
-- **Fail-Safe Cloud Backup Merge on Login**:
-  - Enhanced `loadSavedShows()` in `index.html` to always pull and non-destructively merge cloud backup records from Railway PostgreSQL on login, ensuring user concert vaults are never rendered as empty.
+## [Unreleased] - 2026-10-26
 
 ### Added
 - **Project Rebranding & Clean Name Alignment**:

@@ -1,8 +1,8 @@
 # CURRENT_STATUS.md - LiveLore: Concert Diary & Setlist Vault
 
 ## Current Development Status
-**Active Version**: 1.0.3 (Target SDK 36, Version Code 4, Play Billing Library v8.0.0)
-**Build Status**: ✅ Passing (`:app:assembleDebug`, `:app:assembleRelease`, and `:app:bundleRelease` build cleanly)
+**Active Version**: 1.0.0 (API Backend v6.1.0)
+**Build Status**: ✅ Passing (`:app:assembleDebug` builds cleanly)
 
 ---
 
@@ -10,10 +10,8 @@
 - [x] **Concert Logging & Vault**: Log headline artist, openers, date, venue, city, state, country, general notes, ticket price, and setlists.
 - [x] **Multi-Color Vintage Ticket Stubs**: Automatic ticket color selection with classic or multi-color theme toggle.
 - [x] **Fail-Safe Offline/Cloud Vault Sync**: Immediate local persistence to `localStorage` + `IndexedDB` with non-destructive cloud merge (`POST /api/sync/push` & `GET /api/sync/pull`).
-- [x] **Multi-Tier Account Authentication**: Login and registration with bcrypt hashing, JWT authentication, 6-digit OTP email password resets (Resend API), and Google Sign-In via native bridge (`AndroidGoogleAuth` with direct device Google account detection + `AccountPicker` + glassmorphic modal fallback).
-- [x] **Settings & VIP Pass ($4.99 One-Time)**:
-  - Settings screen (renamed from Profile).
-  - Vault initialization safeguard (`isVaultLoaded`) preventing empty array cloud overwrites.
+- [x] **Multi-Tier Account Authentication**: Login and registration with bcrypt hashing, JWT authentication, 6-digit OTP email password resets (Resend API), and Google Sign-In via native bridge.
+- [x] **VIP Pass ($4.99 One-Time)**:
   - 100% Ad-Free experience across all screens.
   - Multi-photo attachments (up to 5 compressed memories per entry).
   - CSV Concert Vault Export (`AndroidCSV` MediaStore integration).

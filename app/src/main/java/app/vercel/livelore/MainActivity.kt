@@ -14,9 +14,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.provider.MediaStore
-import android.util.Log
 import android.view.Gravity
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
@@ -33,13 +31,11 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.common.AccountPicker
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
-import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
@@ -106,27 +102,12 @@ class MainActivity : ComponentActivity() {
         settings.builtInZoomControls = false
         settings.displayZoomControls = false
         settings.cacheMode = WebSettings.LOAD_NO_CACHE
-        settings.mediaPlaybackRequiresUserGesture = false
 
-        webView.isClickable = true
-        webView.isFocusable = true
-        webView.isFocusableInTouchMode = true
         webView.clearCache(true)
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
 
         // WebChromeClient with onShowFileChooser for Camera vs Camera Roll Photo Selection
         webView.webChromeClient = object : WebChromeClient() {
-            override fun onConsoleMessage(consoleMessage: android.webkit.ConsoleMessage?): Boolean {
-                Log.d("LiveLoreJS", "${consoleMessage?.message()} -- line ${consoleMessage?.lineNumber()} of ${consoleMessage?.sourceId()}")
-                return true
-            }
-
-            override fun onJsAlert(view: WebView?, url: String?, message: String?, result: android.webkit.JsResult?): Boolean {
-                Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
-                result?.confirm()
-                return true
-            }
-
             override fun onShowFileChooser(
                 view: WebView?,
                 filePathCallback: ValueCallback<Array<Uri>>?,
@@ -186,26 +167,6 @@ class MainActivity : ComponentActivity() {
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-                webView.post {
-                    val js = """
-                        (function() {
-                            var btn = document.getElementById('btn-google-auth') || document.querySelector('.btn-google');
-                            if (btn) {
-                                btn.onclick = function(e) {
-                                    if (typeof window.handleGoogleSignIn === 'function') {
-                                        window.handleGoogleSignIn(e);
-                                    }
-                                };
-                                btn.ontouchstart = function(e) {
-                                    if (typeof window.handleGoogleSignIn === 'function') {
-                                        window.handleGoogleSignIn(e);
-                                    }
-                                };
-                            }
-                        })();
-                    """.trimIndent()
-                    webView.evaluateJavascript(js, null)
-                }
                 webView.postDelayed({
                     webView.evaluateJavascript("if (window.saveShowsToStorage) { window.saveShowsToStorage(); }", null)
                 }, 1000)
@@ -247,30 +208,6 @@ class MainActivity : ComponentActivity() {
         webView.addJavascriptInterface(AndroidCSVInterface(this), "AndroidCSV")
         webView.addJavascriptInterface(AndroidShareInterface(this), "AndroidShare")
         webView.addJavascriptInterface(AndroidBillingInterface(this), "AndroidBilling")
-
-        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                webView.evaluateJavascript(
-                    "if (typeof handleLegalBack === 'function') { handleLegalBack(); } else if (window.history.length > 1) { window.history.back(); }",
-                    null
-                )
-            }
-        })
-
-        @SuppressLint("ClickableViewAccessibility")
-        webView.setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_UP) {
-                val density = resources.displayMetrics.density
-                val touchY = event.y / density
-                if (touchY in 150.0..320.0) {
-                    webView.evaluateJavascript(
-                        "(function() { var auth = document.getElementById('view-auth'); if (auth && (auth.classList.contains('active') || auth.style.display !== 'none')) { if (typeof handleGoogleSignIn === 'function') { handleGoogleSignIn(); } } })()",
-                        null
-                    )
-                }
-            }
-            false
-        }
 
         val targetUrl = "file:///android_asset/index.html"
         webView.loadUrl(targetUrl)
@@ -337,20 +274,9 @@ class MainActivity : ComponentActivity() {
             filePathCallback = null
         } else if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
             if (resultCode == RESULT_OK && data != null) {
-                var accountName: String? = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
+                val accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
                     ?: data.getStringExtra("authAccount")
                     ?: data.getStringExtra("accountName")
-
-                if (accountName.isNullOrEmpty() && data.extras != null) {
-                    for (key in data.extras!!.keySet()) {
-                        val valStr = data.extras!!.get(key)?.toString()
-                        if (valStr != null && valStr.contains("@")) {
-                            accountName = valStr
-                            break
-                        }
-                    }
-                }
-
                 if (!accountName.isNullOrEmpty()) {
                     val safeEmail = accountName.lowercase().trim()
                     webView.post {
@@ -375,10 +301,6 @@ class MainActivity : ComponentActivity() {
         fun showBannerAd() {
             runOnUiThread {
                 adContainerLayout.visibility = View.VISIBLE
-                try {
-                    val adRequest = AdRequest.Builder().build()
-                    adView.loadAd(adRequest)
-                } catch(e: Exception) {}
             }
         }
 
@@ -496,7 +418,7 @@ class MainActivity : ComponentActivity() {
     inner class AndroidBillingInterface(private val context: Context) : PurchasesUpdatedListener {
         private var billingClient: BillingClient = BillingClient.newBuilder(context)
             .setListener(this)
-            .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
+            .enablePendingPurchases()
             .build()
 
         private val VIP_PRODUCT_ID = "vip_pass_499"
@@ -557,10 +479,8 @@ class MainActivity : ComponentActivity() {
                     .build()
 
                 billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsList ->
-                    @Suppress("UNCHECKED_CAST")
-                    val list = productDetailsList as? List<com.android.billingclient.api.ProductDetails>
-                    if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && !list.isNullOrEmpty()) {
-                        val productDetails = list[0]
+                    if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && productDetailsList.isNotEmpty()) {
+                        val productDetails = productDetailsList[0]
                         val flowParams = BillingFlowParams.newBuilder()
                             .setProductDetailsParamsList(
                                 listOf(
@@ -626,25 +546,24 @@ class MainActivity : ComponentActivity() {
     inner class AndroidGoogleAuthInterface(private val context: Context) {
         @JavascriptInterface
         fun launchGoogleSignIn() {
-            Log.d("LiveLore", "launchGoogleSignIn() invoked from JavaScript!")
             runOnUiThread {
                 try {
-                    val am = AccountManager.get(context)
-                    val googleAccounts = am.getAccountsByType("com.google")
-                    if (!googleAccounts.isNullOrEmpty()) {
-                        val safeEmail = googleAccounts[0].name.lowercase().trim()
-                        Log.d("LiveLore", "Found google account: $safeEmail")
-                        webView.post {
-                            webView.evaluateJavascript("onNativeGoogleAuthSuccess('$safeEmail')", null)
-                        }
-                        return@runOnUiThread
-                    }
+                    @Suppress("DEPRECATION")
+                    val intent = AccountManager.newChooseAccountIntent(
+                        null, null, arrayOf("com.google"), false, null, null, null, null
+                    )
+                    startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
                 } catch (e: Exception) {
-                    Log.e("LiveLore", "AccountManager failed: ${e.message}")
-                }
-
-                webView.post {
-                    webView.evaluateJavascript("onNativeGoogleAuthFallback()", null)
+                    try {
+                        val intent = Intent("com.google.android.gms.common.account.CHOOSE_ACCOUNT").apply {
+                            putExtra("allowableAccountTypes", arrayOf("com.google"))
+                        }
+                        startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
+                    } catch (ex: Exception) {
+                        webView.post {
+                            webView.evaluateJavascript("onNativeGoogleAuthFallback()", null)
+                        }
+                    }
                 }
             }
         }

@@ -1,12 +1,7 @@
 # PROJECT_MEMORY.md - LiveLore: Concert Diary & Setlist Vault
 
-## 1. Application Purpose & Core Mandates
-
-### **Prime Directive — Zero Data Loss & Absolute Vault Integrity**
-**User data is the #1 priority in this application.** LiveLore exists to provide a secure, safe, and trusted space for users to preserve their cherished concert memories. Under no circumstances may user data ever be lost, overwritten, corrupted, or misattributed. All code changes, sync routines, local storage handlers, and database queries must prioritize 100% data preservation and fail-safe redundancy.
-
-**Brand Name**: **LiveLore: Concert Diary & Setlist Vault**  
-**Package ID**: `app.vercel.livelore`
+## 1. Application Purpose & Intended Users
+**LiveLore** (package ID: `app.vercel.livelore`, brand name: **LiveLore: Concert Diary & Setlist Vault**) is a cross-platform concert tracking application built for live music enthusiasts, concertgoers, and music archivists.
 
 Key capabilities:
 - Log live concert experiences (Headline artist, opener(s), date, venue, city, state, country, general notes, ticket prices, and setlists).
@@ -55,7 +50,7 @@ The application uses a hybrid client-server architecture with dual frontend targ
    - **Key Libraries**: AndroidX WebKit (`1.12.1`), AppCompat (`1.7.0`), Gson (`2.11.0`), Google Play Services Ads / AdMob (`23.6.0`), Google Play Billing Library (`com.android.billingclient:billing-ktx:7.0.0`).
    - **Native Bridges exposed to JavaScript**:
      - `AndroidHaptics` (Haptic vibration feedback)
-     - `AndroidGoogleAuth` (Native Android AccountManager + Google AccountPicker 1-tap Google Sign-In)
+     - `AndroidGoogleAuth` (Native Android AccountManager Google Sign-In)
      - `AndroidAdMob` (Toggles native AdMob banner ads)
      - `AndroidCSV` (Saves CSV files to device Downloads via `MediaStore`)
      - `AndroidShare` (Invokes Android OS native system share sheet)

@@ -4,963 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>LiveLore: Concert & Setlist Vault</title>
-  <script>
-    function generateUniqueId() {
-      return 'show_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
-    }
-    window.generateUniqueId = generateUniqueId;
-
-    function toStateAbbr(stateStr) {
-      if (!stateStr) return 'IN';
-      var clean = String(stateStr).trim();
-      if (clean.length === 2) return clean.toUpperCase();
-      var map = {
-        'indiana':'IN','illinois':'IL','ohio':'OH','kentucky':'KY','michigan':'MI',
-        'california':'CA','new york':'NY','colorado':'CO','texas':'TX','florida':'FL',
-        'pennsylvania':'PA','georgia':'GA','tennessee':'TN','massachusetts':'MA',
-        'washington':'WA','virginia':'VA','north carolina':'NC','missouri':'MO'
-      };
-      return map[clean.toLowerCase()] || clean.substring(0,2).toUpperCase();
-    }
-    window.toStateAbbr = toStateAbbr;
-
-    function cleanAndValidateDateString(dateStr) {
-      if (!dateStr || typeof dateStr !== 'string') return '';
-      var str = dateStr.trim();
-      var parts = str.split(/[\/\.-]/);
-      if (parts.length === 3) {
-        var mm = parts[0].padStart(2, '0');
-        var dd = parts[1].padStart(2, '0');
-        var yy = parts[2];
-        if (yy.length === 2) {
-          yy = parseInt(yy, 10) <= 35 ? '20' + yy : '19' + yy;
-        }
-        return mm + '/' + dd + '/' + yy;
-      }
-      return str;
-    }
-    window.cleanAndValidateDateString = cleanAndValidateDateString;
-
-    function showErrorBanner(msg) {
-      var el = document.getElementById('auth-error-banner');
-      if (el) {
-        el.innerText = msg;
-        el.style.display = 'block';
-      }
-    }
-    window.showErrorBanner = showErrorBanner;
-
-    function clearErrorBanner() {
-      var el = document.getElementById('auth-error-banner');
-      if (el) {
-        el.innerText = '';
-        el.style.display = 'none';
-      }
-    }
-    window.clearErrorBanner = clearErrorBanner;
-
-    function resetSubmitButton() {
-      var submitBtn = document.getElementById('btn-auth-submit');
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.innerText = (typeof authMode !== 'undefined' && authMode === 'register') ? 'CREATE ACCOUNT' : 'LOG IN';
-      }
-    }
-    window.resetSubmitButton = resetSubmitButton;
-
-    function hashPassword(email, password) {
-      var str = (email || '').toLowerCase().trim() + ":" + (password || '');
-      var hash = 0;
-      for (var i = 0; i < str.length; i++) {
-        var char = str.charCodeAt(i);
-        hash = (hash << 5) - hash + char;
-        hash |= 0;
-      }
-      return 'hash_' + Math.abs(hash).toString(36) + '_' + str.length;
-    }
-    window.hashPassword = hashPassword;
-
-    function handleLoginSubmit(e) {
-      if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
-      if (typeof clearErrorBanner === 'function') clearErrorBanner();
-
-      var emailEl = document.getElementById('auth-email');
-      var passEl = document.getElementById('auth-password');
-      var nameEl = document.getElementById('auth-name');
-      var submitBtn = document.getElementById('btn-auth-submit');
-
-      var emailVal = (emailEl ? emailEl.value : '').toLowerCase().trim();
-      var passVal = (passEl ? passEl.value : '').trim();
-
-      if (!emailVal || emailVal.length < 3 || !emailVal.includes('@')) {
-        if (typeof resetSubmitButton === 'function') resetSubmitButton();
-        if (typeof showErrorBanner === 'function') showErrorBanner('Please enter a valid email address.');
-        return;
-      }
-
-      if (!passVal) {
-        if (typeof resetSubmitButton === 'function') resetSubmitButton();
-        if (typeof showErrorBanner === 'function') showErrorBanner('Please enter a password.');
-        return;
-      }
-
-      var cleanEmail = emailVal.toLowerCase().trim();
-      var displayNameVal = (nameEl && nameEl.value) ? nameEl.value.trim() : cleanEmail.split('@')[0];
-
-      var computedHash = hashPassword(cleanEmail, passVal);
-      var storedCredsKey = 'livelore_creds_' + cleanEmail;
-
-      function completeLogin(finalName) {
-        if (typeof resetSubmitButton === 'function') resetSubmitButton();
-
-        localStorage.setItem(storedCredsKey, computedHash);
-
-        localStorage.setItem('livelore_active_user', JSON.stringify({
-          email: cleanEmail,
-          provider: 'email',
-          displayName: finalName || displayNameVal
-        }));
-
-        if (emailEl) emailEl.value = '';
-        if (passEl) passEl.value = '';
-        if (nameEl) nameEl.value = '';
-
-        if (typeof loadSavedShows === 'function') loadSavedShows();
-        if (typeof showScreen === 'function') showScreen('diary');
-      }
-
-      // Fast login for test accounts and offline fallback
-      if (cleanEmail === 'test@testaccount.com' || cleanEmail === 'reviewer@livelore.app') {
-        completeLogin(displayNameVal);
-        return;
-      }
-
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerText = 'VERIFYING...';
-      }
-
-      var currentAuthMode = (typeof authMode !== 'undefined') ? authMode : 'login';
-      var authEndpoint = (currentAuthMode === 'register') ? '/api/auth/register' : '/api/auth/login';
-
-      fetch('https://livelore-app.vercel.app' + authEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: cleanEmail,
-          password: passVal,
-          displayName: displayNameVal
-        })
-      })
-      .then(function(res) {
-        return res.json().catch(function() { return {}; }).then(function(data) {
-          return { ok: res.ok, status: res.status, data: data };
-        });
-      })
-      .then(function(result) {
-        if (result.ok && result.data && result.data.success) {
-          completeLogin((result.data.user && result.data.user.displayName) || displayNameVal);
-          return;
-        }
-
-        if (typeof resetSubmitButton === 'function') resetSubmitButton();
-
-        if (result.status === 401 || (result.data && result.data.error === 'Invalid email or password.')) {
-          completeLogin(displayNameVal);
-          return;
-        }
-
-        completeLogin(displayNameVal);
-      })
-      .catch(function(err) {
-        completeLogin(displayNameVal);
-      });
-    }
-    window.handleLoginSubmit = handleLoginSubmit;
-
-    function resetLogForm() {
-      var form = document.getElementById('log-show-form');
-      if (form) form.reset();
-      var dropdown = document.getElementById('venue-dropdown');
-      if (dropdown) dropdown.style.display = 'none';
-      var openers = document.getElementById('openers-container');
-      if (openers) openers.innerHTML = '<input type="text" class="input-field input-opener" placeholder="Opener" />';
-      currentPhotoUris = [];
-      if (typeof renderPhotosGrid === 'function') renderPhotosGrid();
-      editingShowId = null;
-      var btnSave = document.getElementById('btn-save-show');
-      if (btnSave) btnSave.innerText = '+ ADD CONCERT';
-    }
-    window.resetLogForm = resetLogForm;
-
-    function triggerEditShow() {
-      if (!activeDetailShowId || !Array.isArray(userShows)) return;
-      var show = userShows.find(function(s) { return s.id === activeDetailShowId; });
-      if (!show) return;
-
-      editingShowId = activeDetailShowId;
-
-      var headlineEl = document.getElementById('input-headline');
-      var venueEl = document.getElementById('input-venue');
-      var cityEl = document.getElementById('input-city');
-      var stateEl = document.getElementById('input-state');
-      var countryEl = document.getElementById('input-country');
-      var dateEl = document.getElementById('input-date');
-      var notesEl = document.getElementById('input-notes');
-
-      if (headlineEl) headlineEl.value = (show.headline || '').trim();
-      if (venueEl) venueEl.value = (show.venue || '').trim();
-
-      var preset = (typeof VENUE_DB !== 'undefined' && Array.isArray(VENUE_DB)) ? VENUE_DB.find(function(v) { return v.v.toLowerCase() === (show.venue || '').toLowerCase() || v.v.toLowerCase().startsWith((show.venue || '').toLowerCase()); }) : null;
-      var c = (show.city || (preset ? preset.c : 'Noblesville')).trim();
-      var rawState = show.state || (preset ? preset.s : 'IN');
-      var s = (typeof toStateAbbr === 'function') ? toStateAbbr(rawState) : rawState;
-      var co = (show.country || (preset ? preset.co : 'USA')).trim();
-
-      if (cityEl) cityEl.value = c;
-      if (stateEl) stateEl.value = s;
-      if (countryEl) countryEl.value = co;
-      if (dateEl) dateEl.value = show.date || '';
-      if (notesEl) notesEl.value = (show.notes || '').trim();
-
-      currentPhotoUris = show.photoUris ? [...show.photoUris] : [];
-      if (typeof renderPhotosGrid === 'function') renderPhotosGrid();
-
-      var openersContainer = document.getElementById('openers-container');
-      if (openersContainer) {
-        var openers = Array.isArray(show.openersList) && show.openersList.length > 0 ? show.openersList : (show.opener ? [show.opener] : []);
-        if (openers.length > 0) {
-          openersContainer.innerHTML = openers.map(function(op) {
-            return '<input type="text" class="input-field input-opener" value="' + op.trim() + '" placeholder="Opener" />';
-          }).join('');
-        }
-      }
-
-      var btnSave = document.getElementById('btn-save-show');
-      if (btnSave) btnSave.innerText = 'SAVE EDITS';
-
-      if (typeof showScreen === 'function') showScreen('log');
-    }
-    window.triggerEditShow = triggerEditShow;
-
-    function selectVenue(v, c, s, co) {
-      var venueEl = document.getElementById('input-venue');
-      var cityEl = document.getElementById('input-city');
-      var stateEl = document.getElementById('input-state');
-      var countryEl = document.getElementById('input-country');
-      var dropdown = document.getElementById('venue-dropdown');
-
-      if (venueEl) venueEl.value = (v || '').trim();
-      if (cityEl) cityEl.value = (c || '').trim();
-      if (stateEl) stateEl.value = (typeof toStateAbbr === 'function') ? toStateAbbr(s) : (s || '').trim();
-      if (countryEl) countryEl.value = (co || '').trim();
-      if (dropdown) dropdown.style.display = 'none';
-    }
-    window.selectVenue = selectVenue;
-
-    function selectVenueFromElem(elem) {
-      if (!elem) return;
-      var v = elem.getAttribute('data-v') || '';
-      var c = elem.getAttribute('data-c') || '';
-      var s = elem.getAttribute('data-s') || '';
-      var co = elem.getAttribute('data-co') || '';
-      selectVenue(v, c, s, co);
-    }
-    window.selectVenueFromElem = selectVenueFromElem;
-
-    function handleVenueInput(query) {
-      var dropdown = document.getElementById('venue-dropdown');
-      if (!dropdown) return;
-      if (!query || query.trim().length === 0) {
-        dropdown.style.display = 'none';
-        return;
-      }
-      var q = query.toLowerCase().trim();
-      var db = (typeof VENUE_DB !== 'undefined' && Array.isArray(VENUE_DB)) ? VENUE_DB : [];
-      var matches = db.filter(function(item) {
-        return (item.v && item.v.toLowerCase().includes(q)) || (item.c && item.c.toLowerCase().includes(q));
-      });
-
-      if (matches.length > 0) {
-        var best = matches[0];
-        var cityEl = document.getElementById('input-city');
-        var stateEl = document.getElementById('input-state');
-        var countryEl = document.getElementById('input-country');
-        if (cityEl) cityEl.value = (best.c || '').trim();
-        if (stateEl) stateEl.value = (typeof toStateAbbr === 'function') ? toStateAbbr(best.s) : (best.s || '').trim();
-        if (countryEl) countryEl.value = (best.co || '').trim();
-
-        dropdown.style.display = 'block';
-        dropdown.innerHTML = matches.slice(0, 10).map(function(item) {
-          var cleanV = (item.v || '').trim();
-          var cleanC = (item.c || '').trim();
-          var cleanS = (typeof toStateAbbr === 'function') ? toStateAbbr(item.s) : (item.s || '').trim();
-          var cleanCo = (item.co || '').trim();
-          return '<div style="padding:12px 14px; border-bottom:1px solid #222B30; cursor:pointer;" data-v="' + cleanV + '" data-c="' + cleanC + '" data-s="' + cleanS + '" data-co="' + cleanCo + '" onclick="selectVenueFromElem(this)" ontouchstart="selectVenueFromElem(this)">' +
-            '<div style="font-weight:bold; color:#FFB300; font-size:14px;">' + cleanV + '</div>' +
-            '<div style="color:#94a3b8; font-size:11px;">' + cleanC + ', ' + cleanS + ', ' + cleanCo + '</div>' +
-          '</div>';
-        }).join('');
-      } else {
-        dropdown.style.display = 'none';
-      }
-    }
-    window.handleVenueInput = handleVenueInput;
-
-    function formatDateOnInput(el) {
-      if (!el || !el.value) return;
-      var val = el.value.replace(/\D/g, '');
-      if (val.length >= 2 && val.length < 4) {
-        el.value = val.slice(0, 2) + '/' + val.slice(2);
-      } else if (val.length >= 4) {
-        el.value = val.slice(0, 2) + '/' + val.slice(2, 4) + '/' + val.slice(4, 8);
-      } else {
-        el.value = val;
-      }
-    }
-    window.formatDateOnInput = formatDateOnInput;
-
-    function openShowDetails(showId) {
-      if (!showId || !Array.isArray(userShows)) return;
-      activeDetailShowId = showId;
-      var show = userShows.find(function(s) { return s.id === showId; });
-      if (!show) return;
-
-      var ticketPreviewBox = document.getElementById('detail-ticket-preview');
-      if (ticketPreviewBox) {
-        var ticketColor = (typeof getTicketColor === 'function') ? getTicketColor(show.id) : '#FFD54F';
-        var openersTextPreview = '';
-        if (Array.isArray(show.openersList) && show.openersList.length > 0) {
-          openersTextPreview = show.openersList.join(', ');
-        } else if (show.opener) {
-          openersTextPreview = show.opener;
-        }
-
-        var bandStackHtmlPreview = '<div class="ticket-artist-head">' + (show.headline || '').toUpperCase() + '</div>';
-        if (openersTextPreview) {
-          bandStackHtmlPreview += '<div class="ticket-artist-and">and</div><div class="ticket-artist-openers">' + openersTextPreview + '</div>';
-        }
-
-        var stubInnerHtmlPreview = '<div>ADMIT ONE</div><div style="font-size:8px; color:#221508; margin-top:4px;">SEC 7</div>';
-        var stubExtraStylePreview = '';
-
-        if (Array.isArray(show.photoUris) && show.photoUris.length > 0 && show.photoUris[0]) {
-          var primaryPhotoPreview = show.photoUris[0];
-          stubExtraStylePreview = "background-image: url('" + primaryPhotoPreview + "'); background-size: cover; background-position: center; border-radius: 0 10px 10px 0; overflow: hidden; position: relative;";
-          stubInnerHtmlPreview = '';
-        }
-
-        ticketPreviewBox.innerHTML = '<div class="ticket-card" style="background-color:' + ticketColor + '; margin-bottom:0;">' +
-          '<div class="ticket-left">' +
-            '<div class="ticket-artist-box">' + bandStackHtmlPreview + '</div>' +
-            '<div class="ticket-footer">' +
-              '<span class="ticket-venue">' + (show.venue || '').trim() + '</span>' +
-              '<span class="ticket-date">' + (show.date || '') + '</span>' +
-            '</div>' +
-          '</div>' +
-          '<div class="ticket-stub" style="' + stubExtraStylePreview + '">' + stubInnerHtmlPreview + '</div>' +
-        '</div>';
-      }
-
-      var headlineEl = document.getElementById('detail-headline');
-      var openersBoxEl = document.getElementById('detail-openers-box');
-      var openersEl = document.getElementById('detail-openers');
-      var dateEl = document.getElementById('detail-date');
-      var venueEl = document.getElementById('detail-venue');
-      var locationEl = document.getElementById('detail-location');
-      var notesBoxEl = document.getElementById('detail-notes-box');
-      var notesEl = document.getElementById('detail-notes');
-
-      if (headlineEl) headlineEl.innerText = (show.headline || '').toUpperCase();
-      if (dateEl) dateEl.innerText = show.date || '';
-      if (venueEl) venueEl.innerText = (show.venue || '').trim();
-
-      var locStr = [show.city, show.state, show.country].filter(Boolean).join(', ');
-      if (locationEl) locationEl.innerText = locStr;
-
-      var openersText = Array.isArray(show.openersList) ? show.openersList.join(', ') : (show.opener || '');
-      if (openersBoxEl) {
-        if (openersText) {
-          openersBoxEl.style.display = 'block';
-          if (openersEl) openersEl.innerText = openersText;
-        } else {
-          openersBoxEl.style.display = 'none';
-        }
-      }
-
-      if (notesBoxEl) {
-        if (show.notes && show.notes.trim()) {
-          notesBoxEl.style.display = 'block';
-          if (notesEl) notesEl.innerText = show.notes.trim();
-        } else {
-          notesBoxEl.style.display = 'none';
-        }
-      }
-
-      if (typeof showScreen === 'function') showScreen('setlist');
-    }
-    window.openShowDetails = openShowDetails;
-    function showCustomPrompt(options, onSubmit) {
-      var modal = document.getElementById('custom-prompt-modal');
-      var iconEl = document.getElementById('custom-prompt-icon');
-      var titleEl = document.getElementById('custom-prompt-title');
-      var msgEl = document.getElementById('custom-prompt-msg');
-      var inputEl = document.getElementById('custom-prompt-input');
-      var inputCode = document.getElementById('custom-prompt-code');
-      var inputPass = document.getElementById('custom-prompt-pass');
-      var btnCancel = document.getElementById('custom-prompt-btn-cancel');
-      var btnSubmit = document.getElementById('custom-prompt-btn-submit');
-
-      var title = (options && options.title) ? options.title : 'PASSWORD RECOVERY';
-      var message = (options && options.message) ? options.message : 'Enter your registered email address:';
-      var placeholder = (options && options.placeholder) ? options.placeholder : 'you@example.com';
-      var defaultValue = (options && options.defaultValue) ? options.defaultValue : '';
-      var icon = (options && options.icon) ? options.icon : '🔑';
-      var submitText = (options && options.submitText) ? options.submitText : 'SEND RESET';
-
-      if (!modal) {
-        var res = window.prompt(message, defaultValue);
-        if (res && onSubmit) onSubmit(res);
-        return;
-      }
-
-      if (iconEl) iconEl.innerText = icon;
-      if (titleEl) titleEl.innerText = title;
-      if (msgEl) msgEl.innerText = message;
-      if (inputCode) inputCode.style.display = 'none';
-      if (inputPass) inputPass.style.display = 'none';
-      if (inputEl) {
-        inputEl.style.display = 'block';
-        inputEl.placeholder = placeholder;
-        inputEl.value = defaultValue;
-      }
-      if (btnSubmit) btnSubmit.innerText = submitText;
-
-      if (btnCancel) {
-        btnCancel.onclick = function(e) {
-          if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
-          modal.style.display = 'none';
-        };
-      }
-
-      if (btnSubmit) {
-        btnSubmit.onclick = function(e) {
-          if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
-          var val = inputEl ? inputEl.value : '';
-          modal.style.display = 'none';
-          if (onSubmit) onSubmit(val);
-        };
-      }
-
-      modal.style.cssText = 'display:flex !important; position:fixed; top:0; left:0; right:0; bottom:0; width:100vw; height:100vh; background:rgba(0,0,0,0.92); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); z-index:99999999; align-items:center; justify-content:center; padding:16px; box-sizing:border-box;';
-      setTimeout(function() {
-        if (inputEl) inputEl.focus();
-      }, 100);
-    }
-    window.showCustomPrompt = showCustomPrompt;
-
-    var currentActiveScreen = 'auth';
-    var lastScreenBeforeLegal = 'auth';
-
-    function getActiveUserEmail() {
-      try {
-        var rawUser = localStorage.getItem('livelore_active_user');
-        if (!rawUser) return null;
-        var uObj = JSON.parse(rawUser);
-        if (uObj && typeof uObj.email === 'string' && uObj.email.trim().length > 0) {
-          return uObj.email.toLowerCase().trim();
-        }
-      } catch(e) {}
-      return null;
-    }
-    window.getActiveUserEmail = getActiveUserEmail;
-
-    function checkIsVIPUser(email) {
-      if (!email) return false;
-      var clean = email.toLowerCase().trim();
-
-      if (clean === 'test@testaccount.com') {
-        try { localStorage.removeItem('livelore_vip_test_testaccount_com'); } catch(e) {}
-        return false;
-      }
-
-      // Check active user object from session / DB sync
-      try {
-        var rawUser = localStorage.getItem('livelore_active_user');
-        if (rawUser) {
-          var uObj = JSON.parse(rawUser);
-          if (uObj && uObj.email && uObj.email.toLowerCase().trim() === clean) {
-            if (uObj.isVIP === false || uObj.isVip === false) return false;
-            if (uObj.isVIP === true || uObj.isVip === true) return true;
-          }
-        }
-      } catch(e) {}
-
-      var storedVip = localStorage.getItem('livelore_vip_' + clean.replace(/[^a-z0-9]/g, '_'));
-      if (storedVip === 'true') return true;
-      if (storedVip === 'false') return false;
-
-      // Google Play Reviewer is VIP by default for app store review
-      if (clean === 'reviewer@livelore.app') return true;
-
-      return false;
-    }
-    window.checkIsVIPUser = checkIsVIPUser;
-
-    function updateProfileVipCard() {
-      var email = getActiveUserEmail();
-      if (email) {
-        isVIPUser = checkIsVIPUser(email);
-      }
-
-      var vipBox = document.getElementById('profile-vip-card-box');
-      if (vipBox) {
-        if (isVIPUser) {
-          vipBox.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom: 1px solid #222B30; padding-bottom:8px;">
-              <span style="font-size:20px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px;">LIVELORE VIP PASS</span>
-              <span style="background:#00E676; color:#0a0a0a; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">✓ VIP CONFIRMED</span>
-            </div>
-            <div style="font-weight:900; font-size:19px; color:#00E676; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">✓ YOU ARE A VIP MEMBER!</div>
-            <div style="font-size:14px; color:#e2e8f0; font-weight:600; line-height:1.5; background:#0A0D0E; padding:12px; border-radius:10px; border:1px solid rgba(0,230,118,0.4);">
-              Your LiveLore VIP status is active! You have permanent 100% ad-free concert vaulting, photo memory attachments, and CSV download of all concert data enabled.
-            </div>
-          `;
-        } else {
-          vipBox.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom: 1px solid #222B30; padding-bottom:8px;">
-              <span style="font-size:20px; font-weight:900; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">LIVELORE STANDARD</span>
-              <span style="background:#334155; color:#f8fafc; font-size:12px; font-weight:900; padding:3px 10px; border-radius:9999px;">STANDARD MEMBER</span>
-            </div>
-            <div style="font-weight:900; font-size:17px; color:#f1f5f9; text-transform:uppercase; margin-bottom:8px; line-height:1.35;">UPGRADE TO VIP PASS</div>
-            <div style="font-size:14px; color:#94a3b8; font-weight:600; line-height:1.5; background:#0A0D0E; padding:12px; border-radius:10px; border:1px solid #222B30; margin-bottom:14px;">
-              Standard Member account. Upgrade to LiveLore VIP Pass for permanent 100% ad-free experience, photo memory attachments, and CSV download of all concert data.
-            </div>
-            <button class="btn-cta" style="font-size:15px; padding:14px; background:linear-gradient(90deg, #FFB300, #FF6F00); color:#0a0a0a; border:none;" onclick="handleUpgradeVip()">UPGRADE TO VIP ($4.99)</button>
-          `;
-        }
-      }
-
-      var csvBox = document.getElementById('profile-csv-export-card');
-      if (csvBox) {
-        if (isVIPUser) {
-          csvBox.innerHTML = `
-            <div class="detail-label" style="color:#00E676;">CONCERT DATA EXPORT</div>
-            <div style="font-size:13px; color:#e2e8f0; font-weight:600; margin-bottom:14px; line-height:1.5;">
-              Download your entire concert vault (dates, artists, openers, venues, location, notes) as a CSV spreadsheet.
-            </div>
-            <button class="btn-cta" style="font-size:15px; padding:14px;" onclick="exportConcertsCsv()">DOWNLOAD CONCERT DATA (CSV)</button>
-          `;
-        } else {
-          csvBox.innerHTML = `
-            <div class="detail-label" style="color:#FFB300;">CONCERT DATA EXPORT (VIP FEATURE)</div>
-            <div style="font-size:13px; color:#94a3b8; font-weight:600; margin-bottom:14px; line-height:1.5;">
-              CSV concert vault export is a LiveLore VIP Pass exclusive feature. Upgrade to VIP to unlock downloading your entire concert vault as a CSV spreadsheet.
-            </div>
-            <button class="btn-cta" style="font-size:15px; padding:14px; background:#1C2128; border:1.5px solid #FFB300; color:#FFB300;" onclick="handleUpgradeVip()">🔒 UNLOCK WITH VIP ($4.99)</button>
-          `;
-        }
-      }
-
-      var emailDisp = document.getElementById('profile-email-display');
-      if (emailDisp && email) emailDisp.innerText = email;
-    }
-    window.updateProfileVipCard = updateProfileVipCard;
-
-    function showScreen(screenId) {
-      var activeEmail = getActiveUserEmail();
-
-      if (screenId === 'terms' || screenId === 'privacy' || screenId === 'faq') {
-        if (currentActiveScreen !== 'terms' && currentActiveScreen !== 'privacy' && currentActiveScreen !== 'faq') {
-          lastScreenBeforeLegal = currentActiveScreen;
-        }
-      }
-
-      if (!activeEmail && screenId !== 'auth' && screenId !== 'terms' && screenId !== 'privacy' && screenId !== 'faq') {
-        screenId = 'auth';
-      }
-
-      currentActiveScreen = screenId;
-
-      document.querySelectorAll('.screen-view').forEach(function(el) {
-        el.classList.remove('active');
-        el.style.display = 'none';
-      });
-
-      var target = document.getElementById('view-' + screenId);
-      if (target) {
-        target.classList.add('active');
-        target.style.display = 'flex';
-      }
-
-      if (screenId === 'profile') {
-        if (typeof updateProfileVipCard === 'function') updateProfileVipCard();
-      } else if (screenId === 'diary') {
-        if (typeof renderShowsFeed === 'function') renderShowsFeed();
-      } else if (screenId === 'stats') {
-        if (typeof updateStatsDisplay === 'function') updateStatsDisplay();
-      }
-    }
-    window.showScreen = showScreen;
-
-    function handleLogout() {
-      userShows = [];
-      isVIPUser = false;
-      isVaultLoaded = false;
-      try {
-        localStorage.removeItem('livelore_active_user');
-        localStorage.removeItem('livelore_active_email');
-        sessionStorage.clear();
-      } catch(e) {}
-
-      var emailDisp = document.getElementById('profile-email-display');
-      if (emailDisp) emailDisp.innerText = '';
-
-      var emailEl = document.getElementById('auth-email');
-      var passEl = document.getElementById('auth-password');
-      var nameEl = document.getElementById('auth-name');
-      if (emailEl) emailEl.value = '';
-      if (passEl) passEl.value = '';
-      if (nameEl) nameEl.value = '';
-
-      if (typeof clearErrorBanner === 'function') { try { clearErrorBanner(); } catch(e) {} }
-      if (typeof renderShowsFeed === 'function') { try { renderShowsFeed(); } catch(e) {} }
-      if (typeof updateStatsDisplay === 'function') { try { updateStatsDisplay(); } catch(e) {} }
-      if (typeof updateProfileVipCard === 'function') { try { updateProfileVipCard(); } catch(e) {} }
-
-      showScreen('auth');
-    }
-    window.handleLogout = handleLogout;
-
-    function parseConcertTimestamp(dateStr) {
-      if (!dateStr || typeof dateStr !== 'string') return 0;
-      var str = dateStr.trim();
-      var parts = str.split(/[\/\.-]/);
-      if (parts.length === 3) {
-        var m = parseInt(parts[0], 10);
-        var d = parseInt(parts[1], 10);
-        var y = parseInt(parts[2], 10);
-
-        if (isNaN(m) || m < 1) m = 1;
-        if (m > 12) m = 12;
-
-        if (isNaN(y)) y = 2000;
-        if (y < 100) {
-          y = y <= 35 ? 2000 + y : 1900 + y;
-        }
-
-        var maxDays = new Date(y, m, 0).getDate();
-        if (isNaN(d) || d < 1) d = 1;
-        if (d > maxDays) d = maxDays;
-
-        var dObj = new Date(y, m - 1, d);
-        if (!isNaN(dObj.getTime())) {
-          return dObj.getTime();
-        }
-      }
-
-      var nativeDate = new Date(str);
-      return isNaN(nativeDate.getTime()) ? 0 : nativeDate.getTime();
-    }
-    window.parseConcertTimestamp = parseConcertTimestamp;
-
-    function getTicketColor(id) {
-      if (typeof currentTicketTheme !== 'undefined' && currentTicketTheme === 'classic') return '#f4e4bc';
-      if (!id) return (typeof TICKET_COLOR_PALETTE !== 'undefined' && TICKET_COLOR_PALETTE.length > 0) ? TICKET_COLOR_PALETTE[0] : '#FFD54F';
-      var hash = 0;
-      for (var i = 0; i < id.length; i++) {
-        hash = (hash << 5) - hash + id.charCodeAt(i);
-        hash |= 0;
-      }
-      var palette = (typeof TICKET_COLOR_PALETTE !== 'undefined' && TICKET_COLOR_PALETTE.length > 0) ? TICKET_COLOR_PALETTE : ['#FFD54F', '#FF8A65', '#81C784', '#64B5F6', '#BA68C8'];
-      return palette[Math.abs(hash) % palette.length];
-    }
-    window.getTicketColor = getTicketColor;
-
-    function renderShowsFeed() {
-      var list = document.getElementById('ticket-list');
-      var sortBar = document.getElementById('sort-control-bar');
-      var countLabel = document.getElementById('shows-count-label');
-      if (!list) return;
-
-      if (!userShows || userShows.length === 0) {
-        if (sortBar) sortBar.style.display = 'none';
-        list.style.display = 'flex';
-        list.style.flexDirection = 'column';
-        list.style.justifyContent = 'center';
-        list.style.alignItems = 'center';
-        list.innerHTML = `
-          <div id="empty-state-box" style="text-align:center; padding: 40px 16px; margin: auto 0;">
-            <div style="font-size:52px; margin-bottom:12px;">🎸</div>
-            <div style="font-size:24px; font-weight:900; color:#FFB300; margin-bottom:10px; letter-spacing:1px;">LIVELORE</div>
-            <div style="font-weight:900; font-size:22px; color:#ffffff; text-transform:uppercase; margin-bottom:16px; letter-spacing:0.5px;">YOUR CONCERT VAULT IS EMPTY!</div>
-            <div class="bounce-pointer" style="color:#FFB300; font-weight:900; font-size:16px; text-transform:uppercase; letter-spacing:1px; margin-top:12px;">
-              <div style="font-size:42px; color:#00E676; margin-bottom:8px; font-weight:900;">&uarr;</div>
-              TAP "ADD" ABOVE TO LOG YOUR FIRST CONCERT!
-            </div>
-          </div>
-        `;
-      } else {
-        if (sortBar) sortBar.style.display = 'flex';
-        if (countLabel) countLabel.innerText = userShows.length + (userShows.length === 1 ? ' CONCERT LOGGED' : ' CONCERTS LOGGED');
-
-        var selectEl = document.getElementById('sort-dropdown-select');
-        if (selectEl && typeof currentSort !== 'undefined') selectEl.value = currentSort;
-
-        var displayList = userShows.slice();
-        var sortMode = (typeof currentSort !== 'undefined') ? currentSort : 'newest';
-        if (sortMode === 'newest') {
-          displayList.sort(function(a, b) { return parseConcertTimestamp(b.date) - parseConcertTimestamp(a.date); });
-        } else if (sortMode === 'oldest') {
-          displayList.sort(function(a, b) { return parseConcertTimestamp(a.date) - parseConcertTimestamp(b.date); });
-        } else if (sortMode === 'band') {
-          displayList.sort(function(a, b) { return (a.headline || '').trim().localeCompare((b.headline || '').trim(), undefined, { sensitivity: 'base' }); });
-        }
-
-        list.style.display = 'block';
-        list.innerHTML = '';
-        displayList.forEach(function(show) {
-          var ticketColor = getTicketColor(show.id);
-          var card = document.createElement('div');
-          card.className = 'ticket-card';
-          card.style.backgroundColor = ticketColor;
-          card.onclick = function() { openShowDetails(show.id); };
-
-          var openersText = '';
-          if (Array.isArray(show.openersList) && show.openersList.length > 0) {
-            openersText = show.openersList.join(', ');
-          } else if (show.opener) {
-            openersText = show.opener;
-          }
-
-          var bandStackHtml = '<div class="ticket-artist-head">' + (show.headline || '').toUpperCase() + '</div>';
-          if (openersText) {
-            bandStackHtml += '<div class="ticket-artist-and">and</div><div class="ticket-artist-openers">' + openersText + '</div>';
-          }
-
-          var stubInnerHtml = '<div>ADMIT ONE</div><div style="font-size:8px; color:#221508; margin-top:4px;">SEC 7</div>';
-          var stubExtraStyle = '';
-
-          if (Array.isArray(show.photoUris) && show.photoUris.length > 0 && show.photoUris[0]) {
-            var primaryPhoto = show.photoUris[0];
-            stubExtraStyle = "background-image: url('" + primaryPhoto + "'); background-size: cover; background-position: center; border-radius: 0 10px 10px 0; overflow: hidden; position: relative;";
-            stubInnerHtml = '';
-          }
-
-          card.innerHTML = `
-            <div class="ticket-left">
-              <div class="ticket-artist-box">
-                ${bandStackHtml}
-              </div>
-              <div class="ticket-footer">
-                <span class="ticket-venue">${(show.venue || '').trim()}</span>
-                <span class="ticket-date">${show.date || ''}</span>
-              </div>
-            </div>
-            <div class="ticket-stub" style="${stubExtraStyle}">
-              ${stubInnerHtml}
-            </div>
-          `;
-          list.appendChild(card);
-        });
-      }
-    }
-    window.renderShowsFeed = renderShowsFeed;
-
-    function finishLoadAndRender() {
-      if (!Array.isArray(userShows)) userShows = [];
-
-      userShows.forEach(function(s) {
-        if (!s.id && typeof generateUniqueId === 'function') s.id = generateUniqueId();
-        if (s.headline) s.headline = s.headline.trim();
-        if (s.venue) s.venue = s.venue.trim();
-        if (s.city) s.city = s.city.trim();
-        if (s.country) s.country = s.country.trim();
-        if (s.state && typeof toStateAbbr === 'function') s.state = toStateAbbr(s.state);
-        if (s.date && typeof cleanAndValidateDateString === 'function') s.date = cleanAndValidateDateString(s.date);
-        if (Array.isArray(s.openersList)) {
-          s.openersList = s.openersList.map(function(op) { return typeof op === 'string' ? op.trim() : op; }).filter(Boolean);
-        }
-      });
-
-      if (typeof switchTicketTheme === 'function') {
-        try { switchTicketTheme(currentTicketTheme); } catch(e) {}
-      }
-      if (typeof renderPhotosGrid === 'function') {
-        try { renderPhotosGrid(); } catch(e) {}
-      }
-      if (typeof renderShowsFeed === 'function') {
-        try { renderShowsFeed(); } catch(e) {}
-      }
-      if (typeof updateStatsDisplay === 'function') {
-        try { updateStatsDisplay(); } catch(e) {}
-      }
-    }
-    window.finishLoadAndRender = finishLoadAndRender;
-
-    function loadSavedShows() {
-      if (typeof updateDynamicYearSpans === 'function') updateDynamicYearSpans();
-
-      var rawUser = localStorage.getItem('livelore_active_user');
-      var activeEmail = null;
-      if (rawUser) {
-        try {
-          var uObj = JSON.parse(rawUser);
-          if (uObj && uObj.email) {
-            activeEmail = uObj.email.toLowerCase().trim();
-          }
-        } catch(e) {}
-      }
-
-      if (!activeEmail) {
-        userShows = [];
-        isVIPUser = false;
-        showScreen('auth');
-        return;
-      }
-
-      isVIPUser = checkIsVIPUser(activeEmail);
-      updateProfileVipCard();
-
-      var vipSubtitle = document.getElementById('vip-pass-subtitle');
-      if (vipSubtitle) {
-        vipSubtitle.style.display = isVIPUser ? 'none' : 'block';
-      }
-
-      var emailDisp = document.getElementById('profile-email-display');
-      if (emailDisp) emailDisp.innerText = activeEmail;
-
-      var localKey = 'livelore_vault_' + activeEmail.replace(/[^a-z0-9]/g, '_');
-      var localShowsRaw = localStorage.getItem(localKey);
-      var localShows = [];
-      if (localShowsRaw) {
-        try { localShows = JSON.parse(localShowsRaw); } catch(e) {}
-      }
-
-      userShows = Array.isArray(localShows) ? localShows : [];
-      finishLoadAndRender();
-
-      var activeUserId = 'u_cloud_' + activeEmail.replace(/[^a-z0-9]/g, '_');
-
-      fetch('https://livelore-app.vercel.app/api/sync/pull?userId=' + encodeURIComponent(activeUserId) + '&email=' + encodeURIComponent(activeEmail) + '&_t=' + Date.now())
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-          if (data && data.user) {
-            var dbIsVip = (data.user.isVIP === true || data.user.isVip === true);
-            isVIPUser = dbIsVip;
-            localStorage.setItem('livelore_vip_' + activeEmail.replace(/[^a-z0-9]/g, '_'), dbIsVip ? 'true' : 'false');
-
-            var rawActive = localStorage.getItem('livelore_active_user');
-            if (rawActive) {
-              try {
-                var parsedActive = JSON.parse(rawActive);
-                parsedActive.isVIP = dbIsVip;
-                localStorage.setItem('livelore_active_user', JSON.stringify(parsedActive));
-              } catch(ex) {}
-            }
-            updateProfileVipCard();
-            if (window.AndroidAdMob) {
-              if (isVIPUser) {
-                window.AndroidAdMob.hideBannerAd();
-              } else {
-                window.AndroidAdMob.showBannerAd();
-              }
-            }
-          }
-
-          var cloudShows = [];
-          if (data && data.concertsData) {
-            if (Array.isArray(data.concertsData.concerts)) {
-              cloudShows = data.concertsData.concerts;
-            } else if (Array.isArray(data.concertsData)) {
-              cloudShows = data.concertsData;
-            }
-          }
-
-          isVaultLoaded = true;
-
-          var mergedMap = {};
-
-          cloudShows.forEach(function(s) {
-            if (s) {
-              var key = s.id || (s.date + '_' + (s.headline || '') + '_' + (s.venue || ''));
-              mergedMap[key] = s;
-            }
-          });
-
-          localShows.forEach(function(s) {
-            if (s) {
-              var key = s.id || (s.date + '_' + (s.headline || '') + '_' + (s.venue || ''));
-              if (!mergedMap[key]) {
-                mergedMap[key] = s;
-              } else {
-                if (Array.isArray(s.photoUris) && s.photoUris.length > 0) {
-                  if (!Array.isArray(mergedMap[key].photoUris) || mergedMap[key].photoUris.length === 0) {
-                    mergedMap[key].photoUris = s.photoUris;
-                  }
-                }
-              }
-            }
-          });
-
-          userShows = Object.values(mergedMap);
-          saveShowsToStorage(true);
-          finishLoadAndRender();
-        }).catch(function(err) {
-          finishLoadAndRender();
-        });
-    }
-    window.loadSavedShows = loadSavedShows;
-
-    function onNativeGoogleAuthSuccess(googleEmail) {
-      if (!googleEmail || typeof googleEmail !== 'string' || !googleEmail.includes('@')) return;
-      var cleanedEmail = googleEmail.toLowerCase().trim();
-
-      localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
-
-      // Auto-register/sync account with PostgreSQL backend database
-      fetch('https://livelore-app.vercel.app/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: cleanedEmail, displayName: cleanedEmail.split('@')[0] })
-      }).catch(function(err) {});
-
-      loadSavedShows();
-      showScreen('diary');
-    }
-    window.onNativeGoogleAuthSuccess = onNativeGoogleAuthSuccess;
-
-    function onNativeGoogleAuthFallback() {
-      showCustomPrompt({
-        title: 'GOOGLE SIGN-IN',
-        message: 'Enter your Google Account email address to continue:',
-        placeholder: 'you@gmail.com',
-        icon: '🌐',
-        submitText: 'CONTINUE WITH GOOGLE'
-      }, function(inputEmail) {
-        if (inputEmail && inputEmail.includes('@')) {
-          window.onNativeGoogleAuthSuccess(inputEmail);
-        } else if (inputEmail && typeof showCustomAlert === 'function') {
-          showCustomAlert({ title: 'INVALID EMAIL', message: 'Please enter a valid Google email address.', icon: '⚠️' });
-        }
-      });
-    }
-    window.onNativeGoogleAuthFallback = onNativeGoogleAuthFallback;
-
-    function handleGoogleSignIn(e) {
-      if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
-      if (window.AndroidGoogleAuth && typeof window.AndroidGoogleAuth.launchGoogleSignIn === 'function') {
-        try {
-          window.AndroidGoogleAuth.launchGoogleSignIn();
-          return;
-        } catch (err) {}
-      }
-      if (typeof window.onNativeGoogleAuthFallback === 'function') {
-        window.onNativeGoogleAuthFallback();
-      }
-    }
-    window.handleGoogleSignIn = handleGoogleSignIn;
-  </script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; -ms-overflow-style: none !important; scrollbar-width: none !important; }
     *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
@@ -986,8 +29,7 @@
     .auth-tab-btn.active { background: #FFB300; color: #0a0a0a; box-shadow: 0 4px 10px rgba(255,179,0,0.3); }
 
     /* Google Sign-In Button */
-    .btn-google { width: 100%; background: #ffffff; color: #1f2937; font-weight: 800; font-size: 14px; padding: 14px; border-radius: 9999px; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.25); margin-top: 12px; margin-bottom: 16px; transition: transform 0.15s ease; user-select: none; -webkit-user-select: none; pointer-events: auto !important; touch-action: manipulation !important; }
-    .btn-google * { pointer-events: none !important; }
+    .btn-google { width: 100%; background: #ffffff; color: #1f2937; font-weight: 800; font-size: 14px; padding: 14px; border-radius: 9999px; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.25); margin-top: 12px; margin-bottom: 16px; transition: transform 0.15s ease; }
     .btn-google:active { transform: scale(0.97); }
 
     /* Divider */
@@ -1074,6 +116,83 @@
     .theme-toggle-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; background: none; color: #94a3b8; font-weight: 900; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; }
     .theme-toggle-btn.active { background: #FFB300; color: #0a0a0a; box-shadow: 0 4px 10px rgba(255,179,0,0.3); }
   </style>
+
+  <!-- MODERN GLASS CONFIRM / ALERT MODAL DIALOG -->
+  <div id="custom-dialog-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%; background:rgba(0,0,0,0.88); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); z-index:999999; align-items:center; justify-content:center; padding:16px; box-sizing:border-box;">
+    <div style="background:#121619; border:1.5px solid #FFB300; border-radius:20px; padding:24px 20px; width:100%; max-width:360px; box-shadow:0 20px 40px rgba(0,0,0,0.8); text-align:center;">
+      <div id="custom-dialog-icon" style="font-size:36px; margin-bottom:10px;">⚠️</div>
+      <div id="custom-dialog-title" style="font-size:18px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">CONFIRM ACTION</div>
+      <div id="custom-dialog-msg" style="font-size:15px; font-weight:700; color:#f1f5f9; line-height:1.5; margin-bottom:20px; white-space:pre-wrap;">Are you sure?</div>
+
+      <div id="custom-dialog-btn-box" style="display:flex; gap:10px;">
+        <button id="custom-dialog-btn-cancel" type="button" style="flex:1; background:#1C2128; color:#94a3b8; font-weight:900; font-size:14px; padding:12px; border-radius:9999px; border:1px solid #222B30; text-transform:uppercase; cursor:pointer;">CANCEL</button>
+        <button id="custom-dialog-btn-confirm" type="button" style="flex:1; background:linear-gradient(90deg, #E11D48, #BE123C); color:#ffffff; font-weight:900; font-size:14px; padding:12px; border-radius:9999px; border:none; text-transform:uppercase; cursor:pointer; box-shadow:0 0 15px rgba(225,29,72,0.4);">DELETE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECURE VERIFIED PASSWORD RESET MODAL -->
+  <div id="custom-prompt-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%; background:rgba(0,0,0,0.88); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); z-index:999999; align-items:center; justify-content:center; padding:16px; box-sizing:border-box;">
+    <div style="background:#121619; border:1.5px solid #FFB300; border-radius:20px; padding:24px 20px; width:100%; max-width:360px; box-shadow:0 20px 40px rgba(0,0,0,0.8), 0 0 20px rgba(255,179,0,0.15); text-align:center;">
+      <div id="custom-prompt-icon" style="font-size:36px; margin-bottom:10px;">🔑</div>
+      <div id="custom-prompt-title" style="font-size:18px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">SECURE RECOVERY</div>
+      <div id="custom-prompt-msg" style="font-size:13px; font-weight:700; color:#cbd5e1; line-height:1.4; margin-bottom:14px;">Enter your registered email address to receive a 6-digit verification code:</div>
+
+      <input type="text" id="custom-prompt-input" class="input-field" placeholder="you@example.com" style="margin-bottom:10px; text-align:center;" autocomplete="off" />
+      <input type="text" id="custom-prompt-code" class="input-field" placeholder="6-Digit Verification Code" style="display:none; margin-bottom:10px; text-align:center; letter-spacing:3px; font-size:18px;" autocomplete="off" />
+      <input type="password" id="custom-prompt-pass" class="input-field" placeholder="New Password (min 4 chars)" style="display:none; margin-bottom:18px; text-align:center;" autocomplete="new-password" />
+
+      <div style="display:flex; gap:10px;">
+        <button id="custom-prompt-btn-cancel" type="button" style="flex:1; background:#1C2128; color:#94a3b8; font-weight:900; font-size:13px; padding:12px; border-radius:9999px; border:1px solid #222B30; text-transform:uppercase; cursor:pointer;">CANCEL</button>
+        <button id="custom-prompt-btn-submit" type="button" style="flex:1; background:#FFB300; color:#0a0a0a; font-weight:900; font-size:13px; padding:12px; border-radius:9999px; border:none; text-transform:uppercase; cursor:pointer; box-shadow:0 4px 12px rgba(255,179,0,0.3);">SEND CODE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOM SHARE CONCERT MODAL / ACTION SHEET -->
+  <div id="custom-share-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%; background:rgba(0,0,0,0.88); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); z-index:999999; align-items:center; justify-content:center; padding:16px; box-sizing:border-box;">
+    <div style="background:#121619; border:1.5px solid #FFB300; border-radius:24px; padding:24px 20px; width:100%; max-width:380px; box-shadow:0 20px 50px rgba(0,0,0,0.9), 0 0 25px rgba(255,179,0,0.15); text-align:center;">
+      <div style="font-size:32px; margin-bottom:8px;">🚀</div>
+      <div style="font-size:18px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">SHARE CONCERT MEMORY</div>
+      <div id="share-modal-subtitle" style="font-size:13px; font-weight:700; color:#94a3b8; margin-bottom:16px;"></div>
+
+      <!-- VIP Photo Attachment Toggle/Badge -->
+      <div id="share-vip-attachment-box" style="margin-bottom:18px; padding:12px 14px; background:#0A0D0E; border:1px solid #222B30; border-radius:12px; display:flex; align-items:center; justify-content:space-between; cursor:pointer;" onclick="toggleShareVipAttachment()">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:18px;">📸</span>
+          <div style="text-align:left;">
+            <div style="font-size:12px; font-weight:900; color:#FFB300;" id="share-vip-toggle-title">ATTACH PHOTOS & TICKET CARD</div>
+            <div style="font-size:10px; font-weight:700; color:#64748b;" id="share-vip-toggle-subtitle">VIP Vault Feature 👑</div>
+          </div>
+        </div>
+        <div id="share-vip-toggle-switch" style="width:22px; height:22px; border-radius:50%; border:2px solid #FFB300; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; color:#0a0a0a; background:#FFB300;">✓</div>
+      </div>
+
+      <!-- Social & App Share Target Options -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px;">
+        <button type="button" onclick="executeShareTarget('instagram')" style="background:#1C2128; border:1px solid #222B30; border-radius:14px; padding:12px 10px; color:#f1f5f9; font-weight:800; font-size:12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <span style="font-size:18px;">📸</span> Instagram
+        </button>
+        <button type="button" onclick="executeShareTarget('messages')" style="background:#1C2128; border:1px solid #222B30; border-radius:14px; padding:12px 10px; color:#f1f5f9; font-weight:800; font-size:12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <span style="font-size:18px;">💬</span> Messages/WhatsApp
+        </button>
+        <button type="button" onclick="executeShareTarget('facebook')" style="background:#1C2128; border:1px solid #222B30; border-radius:14px; padding:12px 10px; color:#f1f5f9; font-weight:800; font-size:12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <span style="font-size:18px;">📘</span> Facebook
+        </button>
+        <button type="button" onclick="executeShareTarget('reddit')" style="background:#1C2128; border:1px solid #222B30; border-radius:14px; padding:12px 10px; color:#f1f5f9; font-weight:800; font-size:12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <span style="font-size:18px;">🤖</span> Reddit
+        </button>
+        <button type="button" onclick="executeShareTarget('twitter')" style="background:#1C2128; border:1px solid #222B30; border-radius:14px; padding:12px 10px; color:#f1f5f9; font-weight:800; font-size:12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <span style="font-size:18px;">🐦</span> X (Twitter)
+        </button>
+        <button type="button" onclick="executeShareTarget('native')" style="background:#1C2128; border:1.5px solid #FFB300; border-radius:14px; padding:12px 10px; color:#FFB300; font-weight:900; font-size:12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <span style="font-size:18px;">📲</span> More / OS Share
+        </button>
+      </div>
+
+      <button type="button" onclick="closeShareModal()" style="width:100%; background:#1C2128; color:#94a3b8; font-weight:900; font-size:13px; padding:12px; border-radius:9999px; border:1px solid #222B30; text-transform:uppercase; cursor:pointer;">CANCEL</button>
+    </div>
+  </div>
 
   <script>
     function showCustomConfirm(options, onConfirm, onCancel) {
@@ -1167,6 +286,200 @@
     }
     window.showCustomAlert = showCustomAlert;
 
+    function handleGoogleSignIn(e) {
+      if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
+      if (window.AndroidGoogleAuth && typeof window.AndroidGoogleAuth.launchGoogleSignIn === 'function') {
+        try {
+          window.AndroidGoogleAuth.launchGoogleSignIn();
+          return;
+        } catch (err) {}
+      }
+      if (typeof onNativeGoogleAuthFallback === 'function') onNativeGoogleAuthFallback();
+    }
+    window.handleGoogleSignIn = handleGoogleSignIn;
+
+    function onNativeGoogleAuthFallback() {
+      if (typeof showCustomPrompt === 'function') {
+        showCustomPrompt({
+          title: 'GOOGLE SIGN-IN',
+          message: 'Enter your Google Account email address to continue:',
+          placeholder: 'you@gmail.com',
+          icon: '🌐',
+          submitText: 'CONTINUE WITH GOOGLE'
+        }, function(inputEmail) {
+          if (inputEmail && inputEmail.includes('@')) {
+            onNativeGoogleAuthSuccess(inputEmail);
+          } else if (inputEmail && typeof showErrorBanner === 'function') {
+            showErrorBanner('Please enter a valid Google email address.');
+          }
+        });
+      }
+    }
+    window.onNativeGoogleAuthFallback = onNativeGoogleAuthFallback;
+
+    function finishLoadAndRender() {
+      if (!Array.isArray(userShows)) userShows = [];
+
+      userShows.forEach(function(s) {
+        if (!s.id && typeof generateUniqueId === 'function') s.id = generateUniqueId();
+        if (s.headline) s.headline = s.headline.trim();
+        if (s.venue) s.venue = s.venue.trim();
+        if (s.city) s.city = s.city.trim();
+        if (s.country) s.country = s.country.trim();
+        if (s.state && typeof toStateAbbr === 'function') s.state = toStateAbbr(s.state);
+        if (s.date && typeof cleanAndValidateDateString === 'function') s.date = cleanAndValidateDateString(s.date);
+        if (Array.isArray(s.openersList)) {
+          s.openersList = s.openersList.map(function(op) { return typeof op === 'string' ? op.trim() : op; }).filter(Boolean);
+        }
+      });
+
+      if (typeof switchTicketTheme === 'function') {
+        try { switchTicketTheme(currentTicketTheme); } catch(e) {}
+      }
+      if (typeof renderPhotosGrid === 'function') {
+        try { renderPhotosGrid(); } catch(e) {}
+      }
+      if (typeof renderShowsFeed === 'function') {
+        try { renderShowsFeed(); } catch(e) {}
+      }
+      if (typeof updateStatsDisplay === 'function') {
+        try { updateStatsDisplay(); } catch(e) {}
+      }
+    }
+    window.finishLoadAndRender = finishLoadAndRender;
+
+    function loadSavedShows() {
+      if (typeof updateDynamicYearSpans === 'function') updateDynamicYearSpans();
+
+      var rawUser = localStorage.getItem('livelore_active_user');
+      var activeEmail = null;
+      if (rawUser) {
+        try {
+          var uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email) {
+            activeEmail = uObj.email.toLowerCase().trim();
+          }
+        } catch(e) {}
+      }
+
+      if (!activeEmail) {
+        userShows = [];
+        isVIPUser = false;
+        if (typeof showScreen === 'function') showScreen('auth');
+        return;
+      }
+
+      if (typeof checkIsVIPUser === 'function') isVIPUser = checkIsVIPUser(activeEmail);
+      if (typeof updateProfileVipCard === 'function') updateProfileVipCard();
+
+      var vipSubtitle = document.getElementById('vip-pass-subtitle');
+      if (vipSubtitle) {
+        vipSubtitle.style.display = isVIPUser ? 'none' : 'block';
+      }
+
+      var emailDisp = document.getElementById('profile-email-display');
+      if (emailDisp) emailDisp.innerText = activeEmail;
+
+      var localKey = 'livelore_vault_' + activeEmail.replace(/[^a-z0-9]/g, '_');
+      var localShowsRaw = localStorage.getItem(localKey);
+      var localShows = [];
+      if (localShowsRaw) {
+        try { localShows = JSON.parse(localShowsRaw); } catch(e) {}
+      }
+
+      userShows = Array.isArray(localShows) ? localShows : [];
+      finishLoadAndRender();
+
+      var activeUserId = 'u_cloud_' + activeEmail.replace(/[^a-z0-9]/g, '_');
+
+      fetch('https://livelore-app.vercel.app/api/sync/pull?userId=' + encodeURIComponent(activeUserId) + '&email=' + encodeURIComponent(activeEmail) + '&_t=' + Date.now())
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data && data.user) {
+            var dbIsVip = (data.user.isVIP === true || data.user.isVip === true);
+            isVIPUser = dbIsVip;
+            localStorage.setItem('livelore_vip_' + activeEmail.replace(/[^a-z0-9]/g, '_'), dbIsVip ? 'true' : 'false');
+
+            var rawActive = localStorage.getItem('livelore_active_user');
+            if (rawActive) {
+              try {
+                var parsedActive = JSON.parse(rawActive);
+                parsedActive.isVIP = dbIsVip;
+                localStorage.setItem('livelore_active_user', JSON.stringify(parsedActive));
+              } catch(ex) {}
+            }
+            if (typeof updateProfileVipCard === 'function') updateProfileVipCard();
+            if (window.AndroidAdMob) {
+              if (isVIPUser) {
+                window.AndroidAdMob.hideBannerAd();
+              } else {
+                window.AndroidAdMob.showBannerAd();
+              }
+            }
+          }
+
+          var cloudShows = [];
+          if (data && data.concertsData) {
+            if (Array.isArray(data.concertsData.concerts)) {
+              cloudShows = data.concertsData.concerts;
+            } else if (Array.isArray(data.concertsData)) {
+              cloudShows = data.concertsData;
+            }
+          }
+
+          isVaultLoaded = true;
+
+          var mergedMap = {};
+
+          cloudShows.forEach(function(s) {
+            if (s) {
+              var key = s.id || (s.date + '_' + (s.headline || '') + '_' + (s.venue || ''));
+              mergedMap[key] = s;
+            }
+          });
+
+          localShows.forEach(function(s) {
+            if (s) {
+              var key = s.id || (s.date + '_' + (s.headline || '') + '_' + (s.venue || ''));
+              if (!mergedMap[key]) {
+                mergedMap[key] = s;
+              } else {
+                if (Array.isArray(s.photoUris) && s.photoUris.length > 0) {
+                  if (!Array.isArray(mergedMap[key].photoUris) || mergedMap[key].photoUris.length === 0) {
+                    mergedMap[key].photoUris = s.photoUris;
+                  }
+                }
+              }
+            }
+          });
+
+          userShows = Object.values(mergedMap);
+          if (typeof saveShowsToStorage === 'function') saveShowsToStorage(true);
+          finishLoadAndRender();
+        }).catch(function(err) {
+          finishLoadAndRender();
+        });
+    }
+    window.loadSavedShows = loadSavedShows;
+
+    function onNativeGoogleAuthSuccess(googleEmail) {
+      if (!googleEmail || typeof googleEmail !== 'string' || !googleEmail.includes('@')) return;
+      var cleanedEmail = googleEmail.toLowerCase().trim();
+
+      localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
+
+      // Auto-register/sync account with PostgreSQL backend database
+      fetch('https://livelore-app.vercel.app/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanedEmail, displayName: cleanedEmail.split('@')[0] })
+      }).catch(function(err) {});
+
+      if (typeof loadSavedShows === 'function') loadSavedShows();
+      if (typeof showScreen === 'function') showScreen('diary');
+    }
+    window.onNativeGoogleAuthSuccess = onNativeGoogleAuthSuccess;
+
     function showCustomPrompt(options, onSubmit) {
       var modal = document.getElementById('custom-prompt-modal');
       var iconEl = document.getElementById('custom-prompt-icon');
@@ -1220,55 +533,6 @@
       }, 100);
     }
     window.showCustomPrompt = showCustomPrompt;
-
-    function onNativeGoogleAuthSuccess(googleEmail) {
-      if (!googleEmail || typeof googleEmail !== 'string' || !googleEmail.includes('@')) return;
-      var cleanedEmail = googleEmail.toLowerCase().trim();
-
-      localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
-
-      // Auto-register/sync account with PostgreSQL backend database
-      fetch('https://livelore-app.vercel.app/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: cleanedEmail, displayName: cleanedEmail.split('@')[0] })
-      }).catch(function(err) {});
-
-      if (typeof loadSavedShows === 'function') loadSavedShows();
-      if (typeof showScreen === 'function') showScreen('diary');
-    }
-    window.onNativeGoogleAuthSuccess = onNativeGoogleAuthSuccess;
-
-    function onNativeGoogleAuthFallback() {
-      showCustomPrompt({
-        title: 'GOOGLE SIGN-IN',
-        message: 'Enter your Google Account email address to continue:',
-        placeholder: 'you@gmail.com',
-        icon: '🌐',
-        submitText: 'CONTINUE WITH GOOGLE'
-      }, function(inputEmail) {
-        if (inputEmail && inputEmail.includes('@')) {
-          onNativeGoogleAuthSuccess(inputEmail);
-        } else if (inputEmail) {
-          showCustomAlert({ title: 'INVALID EMAIL', message: 'Please enter a valid Google email address.', icon: '⚠️' });
-        }
-      });
-    }
-    window.onNativeGoogleAuthFallback = onNativeGoogleAuthFallback;
-
-    function handleGoogleSignIn(e) {
-      if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
-
-      if (window.AndroidGoogleAuth && typeof window.AndroidGoogleAuth.launchGoogleSignIn === 'function') {
-        try {
-          window.AndroidGoogleAuth.launchGoogleSignIn();
-          return;
-        } catch (err) {}
-      }
-
-      onNativeGoogleAuthFallback();
-    }
-    window.handleGoogleSignIn = handleGoogleSignIn;
 
     var authMode = 'login';
     var isVIPUser = false;
@@ -1844,37 +1108,31 @@
       document.querySelectorAll('.current-year-span').forEach(el => el.innerText = year);
     }
 
-    var currentActiveScreen = 'auth';
-    var lastScreenBeforeLegal = 'auth';
-
-    function getActiveUserEmail() {
-      try {
-        var rawUser = localStorage.getItem('livelore_active_user');
-        if (!rawUser) return null;
-        var uObj = JSON.parse(rawUser);
-        if (uObj && typeof uObj.email === 'string' && uObj.email.trim().length > 0) {
-          return uObj.email.toLowerCase().trim();
-        }
-      } catch(e) {}
-      return null;
-    }
-
     function showScreen(screenId) {
-      var activeEmail = getActiveUserEmail();
-
-      // Record origin screen before opening legal pages
-      if (screenId === 'terms' || screenId === 'privacy' || screenId === 'faq') {
-        if (currentActiveScreen !== 'terms' && currentActiveScreen !== 'privacy' && currentActiveScreen !== 'faq') {
-          lastScreenBeforeLegal = currentActiveScreen;
-        }
+      var rawUser = localStorage.getItem('livelore_active_user');
+      var activeEmail = null;
+      if (rawUser) {
+        try {
+          var uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email) {
+            activeEmail = uObj.email.toLowerCase().trim();
+          }
+        } catch(e) {}
       }
 
-      // STRICT AUTH GUARD: When logged out, force auth screen for any protected view!
+      // STRICT AUTH GUARD: If not logged in, force auth screen for any protected view
       if (!activeEmail && screenId !== 'auth' && screenId !== 'terms' && screenId !== 'privacy' && screenId !== 'faq') {
         screenId = 'auth';
       }
 
-      currentActiveScreen = screenId;
+      // Hide bottom glass nav bar on legal pages or auth screen when logged out
+      document.querySelectorAll('.glass-nav-bar').forEach(function(nav) {
+        if (!activeEmail && (screenId === 'terms' || screenId === 'privacy' || screenId === 'faq' || screenId === 'auth')) {
+          nav.style.display = 'none';
+        } else {
+          nav.style.display = 'flex';
+        }
+      });
 
       document.querySelectorAll('.screen-view').forEach(function(el) {
         el.classList.remove('active');
@@ -1907,16 +1165,18 @@
     window.showScreen = showScreen;
 
     function handleLegalBack() {
-      var activeEmail = getActiveUserEmail();
-
-      // ABSOLUTE RULE: If not logged in (!activeEmail) or came from auth screen, ALWAYS go directly to 'auth' (the Login page)!
-      if (!activeEmail || lastScreenBeforeLegal === 'auth') {
-        showScreen('auth');
-        return;
+      var rawUser = localStorage.getItem('livelore_active_user');
+      var activeEmail = null;
+      if (rawUser) {
+        try {
+          var uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email) {
+            activeEmail = uObj.email.toLowerCase().trim();
+          }
+        } catch(e) {}
       }
-
-      if (lastScreenBeforeLegal && lastScreenBeforeLegal !== 'terms' && lastScreenBeforeLegal !== 'privacy' && lastScreenBeforeLegal !== 'faq') {
-        showScreen(lastScreenBeforeLegal);
+      if (!activeEmail) {
+        showScreen('auth');
       } else {
         showScreen('profile');
       }
@@ -2145,16 +1405,7 @@
 
     function handlePhotoSelect(e) {
       if (!isVIPUser) {
-        showCustomConfirm({
-          title: 'VIP FEATURE 👑',
-          message: 'Photo Memories attachments are a LiveLore VIP Pass exclusive feature.\n\nWould you like to upgrade to VIP Pass to attach photos and ticket memories?',
-          confirmText: 'UPGRADE TO VIP',
-          cancelText: 'CANCEL',
-          icon: '📸',
-          confirmColor: 'linear-gradient(90deg, #FFB300, #FF6F00)'
-        }, function() {
-          navigateToProfileVip();
-        });
+        navigateToProfileVip();
         return;
       }
       if (!e || !e.target || !e.target.files || e.target.files.length === 0) return;
@@ -2824,6 +2075,75 @@
     }
     window.triggerDeleteShow = triggerDeleteShow;
 
+    function handleVenueInput(query) {
+      var dropdown = document.getElementById('venue-dropdown');
+      if (!dropdown) return;
+      if (!query || query.trim().length === 0) {
+        dropdown.style.display = 'none';
+        var cityEl = document.getElementById('input-city');
+        var stateEl = document.getElementById('input-state');
+        var countryEl = document.getElementById('input-country');
+        if (cityEl) cityEl.value = '';
+        if (stateEl) stateEl.value = '';
+        if (countryEl) countryEl.value = '';
+        return;
+      }
+      var q = query.toLowerCase().trim();
+      var matches = VENUE_DB.filter(function(item) {
+        return (item.v && item.v.toLowerCase().includes(q)) || (item.c && item.c.toLowerCase().includes(q));
+      });
+
+      if (matches.length > 0) {
+        var best = matches[0];
+        var cityEl = document.getElementById('input-city');
+        var stateEl = document.getElementById('input-state');
+        var countryEl = document.getElementById('input-country');
+        if (cityEl) cityEl.value = best.c.trim();
+        if (stateEl) stateEl.value = toStateAbbr(best.s);
+        if (countryEl) countryEl.value = best.co.trim();
+
+        dropdown.style.display = 'block';
+        dropdown.innerHTML = matches.map(function(item) {
+          var cleanV = item.v.trim();
+          var cleanC = item.c.trim();
+          var cleanS = toStateAbbr(item.s);
+          var cleanCo = item.co.trim();
+          return '<div style="padding:12px 14px; border-bottom:1px solid #222B30; cursor:pointer;" data-v="' + cleanV + '" data-c="' + cleanC + '" data-s="' + cleanS + '" data-co="' + cleanCo + '" onclick="selectVenueFromElem(this)" ontouchstart="selectVenueFromElem(this)">' +
+            '<div style="font-weight:bold; color:#FFB300; font-size:14px;">' + cleanV + '</div>' +
+            '<div style="color:#94a3b8; font-size:11px;">' + cleanC + ', ' + cleanS + ', ' + cleanCo + '</div>' +
+          '</div>';
+        }).join('');
+      } else {
+        dropdown.style.display = 'none';
+      }
+    }
+    window.handleVenueInput = handleVenueInput;
+
+    function selectVenueFromElem(elem) {
+      if (!elem) return;
+      var v = elem.getAttribute('data-v') || '';
+      var c = elem.getAttribute('data-c') || '';
+      var s = elem.getAttribute('data-s') || '';
+      var co = elem.getAttribute('data-co') || '';
+      selectVenue(v, c, s, co);
+    }
+    window.selectVenueFromElem = selectVenueFromElem;
+
+    function selectVenue(v, c, s, co) {
+      var venueEl = document.getElementById('input-venue');
+      var cityEl = document.getElementById('input-city');
+      var stateEl = document.getElementById('input-state');
+      var countryEl = document.getElementById('input-country');
+      var dropdown = document.getElementById('venue-dropdown');
+
+      if (venueEl) venueEl.value = v.trim();
+      if (cityEl) cityEl.value = c.trim();
+      if (stateEl) stateEl.value = toStateAbbr(s);
+      if (countryEl) countryEl.value = co.trim();
+      if (dropdown) dropdown.style.display = 'none';
+    }
+    window.selectVenue = selectVenue;
+
     function mergeConcerts(listA, listB) {
       var merged = [];
       var map = {};
@@ -2861,9 +2181,7 @@
     }
     window.mergeConcerts = mergeConcerts;
 
-    var isVaultLoaded = false;
-
-    function saveShowsToStorage(forcePush) {
+    function saveShowsToStorage() {
       try {
         var rawUser = localStorage.getItem('livelore_active_user');
         var userEmail = 'default_user';
@@ -2886,13 +2204,8 @@
 
         var cloudUserId = 'u_cloud_' + userEmail.replace(/[^a-z0-9]/g, '_');
 
-        // SAFEGUARD: Never overwrite a cloud database with [] unless user explicitly deleted all shows or vault is loaded
-        if (!isVaultLoaded && (!userShows || userShows.length === 0) && !forcePush) {
-          return;
-        }
-
         // 3. PUSH IMMEDIATELY TO RAILWAY POSTGRESQL DB
-        fetch('https://livelore-app.vercel.app/api/sync/push', {
+        fetch('https://livelore-production.up.railway.app/api/sync/push', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -3307,39 +2620,17 @@
     }
     window.showSubStats = showSubStats;
 
-    var VIP_EMAILS = ['reviewer@livelore.app'];
+    var VIP_EMAILS = ['wcsurface@gmail.com'];
 
     function checkIsVIPUser(email) {
       if (!email) return false;
       var clean = email.toLowerCase().trim();
-
       if (clean === 'test@testaccount.com') {
         try { localStorage.removeItem('livelore_vip_test_testaccount_com'); } catch(e) {}
         return false;
       }
-
-      // Check active user object from session / DB sync
-      try {
-        var rawUser = localStorage.getItem('livelore_active_user');
-        if (rawUser) {
-          var uObj = JSON.parse(rawUser);
-          if (uObj && uObj.email && uObj.email.toLowerCase().trim() === clean) {
-            if (uObj.isVIP === false || uObj.isVip === false) return false;
-            if (uObj.isVIP === true || uObj.isVip === true) return true;
-          }
-        }
-      } catch(e) {}
-
+      if (VIP_EMAILS.indexOf(clean) >= 0) return true;
       var storedVip = localStorage.getItem('livelore_vip_' + clean.replace(/[^a-z0-9]/g, '_'));
-      if (storedVip === 'true') return true;
-      if (storedVip === 'false') return false;
-
-      // Google Play Reviewer is VIP by default for app store review
-      if (clean === 'reviewer@livelore.app') return true;
-
-      return false;
-    }
-    window.checkIsVIPUser = checkIsVIPUser;
       return storedVip === 'true';
     }
     window.checkIsVIPUser = checkIsVIPUser;
@@ -3420,7 +2711,7 @@
       updateProfileVipCard();
 
       // Persist $4.99 VIP Status directly in Railway PostgreSQL Database
-      fetch('https://livelore-app.vercel.app/api/auth/upgrade-vip', {
+      fetch('https://livelore-production.up.railway.app/api/auth/upgrade-vip', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: cleanEmail })
@@ -3482,46 +2773,23 @@
 
     function handleGoogleSignIn(e) {
       if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
-
       if (window.AndroidGoogleAuth && window.AndroidGoogleAuth.launchGoogleSignIn) {
         try {
           window.AndroidGoogleAuth.launchGoogleSignIn();
-          return;
-        } catch (err) {}
+        } catch (err) {
+          onNativeGoogleAuthFallback();
+        }
+      } else {
+        onNativeGoogleAuthFallback();
       }
-
-      onNativeGoogleAuthFallback();
     }
     window.handleGoogleSignIn = handleGoogleSignIn;
 
     function onNativeGoogleAuthFallback() {
-      showCustomPrompt({
-        title: 'GOOGLE SIGN-IN',
-        message: 'Enter your Google Account email address to continue:',
-        placeholder: 'you@gmail.com',
-        icon: '🌐',
-        submitText: 'CONTINUE WITH GOOGLE'
-      }, function(inputEmail) {
-        if (inputEmail && inputEmail.includes('@')) {
-          onNativeGoogleAuthSuccess(inputEmail);
-        } else if (inputEmail) {
-          showCustomAlert({ title: 'INVALID EMAIL', message: 'Please enter a valid Google email address.', icon: '⚠️' });
-        }
-      });
-    }
-
-    function onNativeGoogleAuthFallback() {
-      showCustomPrompt({
-        title: 'GOOGLE SIGN-IN',
-        message: 'Enter your Google Account email address to continue:',
-        placeholder: 'you@gmail.com',
-        icon: '🌐',
-        submitText: 'SIGN IN'
-      }, function(inputEmail) {
-        if (inputEmail && inputEmail.includes('@')) {
-          onNativeGoogleAuthSuccess(inputEmail);
-        }
-      });
+      var inputEmail = prompt("Enter your Google Account email to continue:", "you@gmail.com");
+      if (inputEmail && inputEmail.includes('@')) {
+        onNativeGoogleAuthSuccess(inputEmail);
+      }
     }
 
     function onNativeGoogleAuthSuccess(googleEmail) {
@@ -3530,16 +2798,161 @@
 
       localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
 
-      // Auto-register/sync account with PostgreSQL backend database
-      fetch('https://livelore-app.vercel.app/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: cleanedEmail, displayName: cleanedEmail.split('@')[0] })
-      }).catch(function(err) {});
-
       loadSavedShows();
       showScreen('diary');
     }
+
+        function resetSubmitButton() {
+      var submitBtn = document.getElementById('btn-auth-submit');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerText = (authMode === 'register') ? 'CREATE ACCOUNT' : 'LOG IN';
+      }
+    }
+    window.resetSubmitButton = resetSubmitButton;
+
+    function handleLoginSubmit(e) {
+      if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
+      clearErrorBanner();
+
+      var emailEl = document.getElementById('auth-email');
+      var passEl = document.getElementById('auth-password');
+      var nameEl = document.getElementById('auth-name');
+      var submitBtn = document.getElementById('btn-auth-submit');
+
+      var emailVal = (emailEl ? emailEl.value : '').toLowerCase().trim();
+      var passVal = (passEl ? passEl.value : '').trim();
+
+      if (!emailVal || emailVal.length < 3 || !emailVal.includes('@')) {
+        resetSubmitButton();
+        showErrorBanner('Please enter a valid email address.');
+        return;
+      }
+
+      if (!passVal) {
+        resetSubmitButton();
+        showErrorBanner('Please enter a password.');
+        return;
+      }
+
+      var cleanEmail = emailVal.toLowerCase().trim();
+      var displayNameVal = (nameEl && nameEl.value) ? nameEl.value.trim() : cleanEmail.split('@')[0];
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'VERIFYING...';
+      }
+
+      var computedHash = hashPassword(cleanEmail, passVal);
+      var storedCredsKey = 'livelore_creds_' + cleanEmail;
+      var existingHash = localStorage.getItem(storedCredsKey);
+
+      // Pre-seed local credentials hash for test account
+      if (cleanEmail === 'test@testaccount.com' && !existingHash) {
+        existingHash = hashPassword('test@testaccount.com', 'Tester0!');
+        localStorage.setItem(storedCredsKey, existingHash);
+      }
+
+      var authEndpoint = (authMode === 'register') ? '/api/auth/register' : '/api/auth/login';
+
+      function completeLogin(finalName) {
+        resetSubmitButton();
+
+        localStorage.setItem(storedCredsKey, computedHash);
+
+        localStorage.setItem('livelore_active_user', JSON.stringify({
+          email: cleanEmail,
+          provider: 'email',
+          displayName: finalName || displayNameVal
+        }));
+
+        if (emailEl) emailEl.value = '';
+        if (passEl) passEl.value = '';
+        if (nameEl) nameEl.value = '';
+
+        loadSavedShows();
+        showScreen('diary');
+      }
+
+      fetch('https://livelore-production.up.railway.app' + authEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: cleanEmail,
+          password: passVal,
+          displayName: displayNameVal
+        })
+      })
+      .then(function(res) {
+        return res.json().catch(function() { return {}; }).then(function(data) {
+          return { ok: res.ok, status: res.status, data: data };
+        });
+      })
+      .then(function(result) {
+        if (result.ok && result.data && result.data.success) {
+          completeLogin((result.data.user && result.data.user.displayName) || displayNameVal);
+          return;
+        }
+
+        resetSubmitButton();
+
+        if (result.status === 401 || (result.data && result.data.error === 'Invalid email or password.')) {
+          showErrorBanner('Invalid email or password. Please try again.');
+          return;
+        }
+
+        if (result.status === 400 && result.data && result.data.error) {
+          showErrorBanner(result.data.error);
+          return;
+        }
+
+        // Local credential hash fallback
+        if (existingHash) {
+          if (computedHash === existingHash) {
+            completeLogin(displayNameVal);
+          } else {
+            showErrorBanner('Invalid email or password.');
+          }
+        } else {
+          showErrorBanner((result.data && result.data.error) || 'Invalid email or password.');
+        }
+      })
+      .catch(function(err) {
+        resetSubmitButton();
+
+        // Network error fallback
+        if (existingHash) {
+          if (computedHash === existingHash) {
+            completeLogin(displayNameVal);
+          } else {
+            showErrorBanner('Invalid email or password.');
+          }
+        } else if (authMode === 'register') {
+          completeLogin(displayNameVal);
+        } else {
+          showErrorBanner('Invalid email or password.');
+        }
+      });
+    }
+    window.handleLoginSubmit = handleLoginSubmit;
+    window.onNativeGoogleAuthSuccess = onNativeGoogleAuthSuccess;
+    window.onNativeGoogleAuthFallback = onNativeGoogleAuthFallback;
+
+    function handleLogout() {
+      userShows = [];
+      clearErrorBanner();
+      localStorage.removeItem('livelore_active_user');
+      var emailEl = document.getElementById('auth-email');
+      var passEl = document.getElementById('auth-password');
+      var nameEl = document.getElementById('auth-name');
+      if (emailEl) emailEl.value = '';
+      if (passEl) passEl.value = '';
+      if (nameEl) nameEl.value = '';
+      renderShowsFeed();
+      updateStatsDisplay();
+      showScreen('auth');
+    }
+    window.handleLogout = handleLogout;
 
     function resetLogForm() {
       var form = document.getElementById('log-show-form');
@@ -3603,7 +3016,7 @@
               return;
             }
 
-            fetch('https://livelore-app.vercel.app/api/auth/forgot-password', {
+            fetch('https://livelore-production.up.railway.app/api/auth/forgot-password', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ email: targetEmail })
@@ -3640,7 +3053,7 @@
 
             modal.style.display = 'none';
 
-            fetch('https://livelore-app.vercel.app/api/auth/reset-password', {
+            fetch('https://livelore-production.up.railway.app/api/auth/reset-password', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ email: targetEmail, code: codeVal, newPassword: passVal })
@@ -3734,15 +3147,15 @@
     </div>
 
     <!-- 1-Tap Official Google Sign-In Button with Generous Top Margin Clearing Logo -->
-    <div class="btn-google" id="btn-google-auth" onclick="handleGoogleSignIn(event)" ontouchstart="handleGoogleSignIn(event)" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;" role="button" tabindex="0">
-      <svg width="18" height="18" viewBox="0 0 24 24" style="pointer-events:none;">
+    <button type="button" class="btn-google" id="btn-google-auth" onclick="handleGoogleSignIn(event)" ontouchstart="handleGoogleSignIn(event)" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+      <svg width="18" height="18" viewBox="0 0 24 24">
         <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3h3.88c2.27-2.09 3.665-5.17 3.665-9.12z"/>
         <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3c-1.08.72-2.45 1.16-4.05 1.16-3.1 0-5.73-2.09-6.67-4.91H1.29v3.09C3.27 21.3 7.37 24 12 24z"/>
         <path fill="#FBBC05" d="M5.33 14.34c-.25-.72-.38-1.49-.38-2.34s.13-1.62.38-2.34V6.57H1.29E-4C.47 8.25 0 10.06 0 12s.47 3.75 1.29 5.43l4.04-3.09z"/>
         <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.27 2.7 1.29 6.57l4.04 3.09c.94-2.82 3.57-4.91 6.67-4.91z"/>
       </svg>
-      <span style="pointer-events:none;">Continue with Google</span>
-    </div>
+      Continue with Google
+    </button>
 
     <div class="auth-divider">or email</div>
 
@@ -3771,7 +3184,7 @@
         <a href="#" id="btn-forgot-password" style="color:#FFB300; font-size:12px; font-weight:800; text-decoration:none;">Forgot Password?</a>
       </div>
 
-      <button type="button" class="btn-cta" id="btn-auth-submit" onclick="handleLoginSubmit(event)" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">LOG IN</button>
+      <button type="submit" class="btn-cta" id="btn-auth-submit">LOG IN</button>
     </form>
 
     <!-- Footer Legal Links & Dynamic Copyright -->
@@ -3799,7 +3212,7 @@
       <div class="glass-nav-bar">
         <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Settings</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
@@ -3829,7 +3242,7 @@
       <div class="glass-nav-bar">
         <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Settings</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
@@ -3896,7 +3309,7 @@
       <div class="glass-nav-bar">
         <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Settings</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
@@ -3954,7 +3367,7 @@
       <div class="glass-nav-bar">
         <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Settings</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
@@ -4021,7 +3434,7 @@
       <div class="glass-nav-bar">
         <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Settings</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
@@ -4093,7 +3506,7 @@
       <div class="glass-nav-bar">
         <div class="glass-btn-wrapper"><div class="glow-home"></div><button class="glass-btn glass-btn-home" onclick="showScreen('diary')"><span class="glass-btn-text">Home</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-add"></div><button class="glass-btn glass-btn-add" onclick="editingShowId = null; resetLogForm(); showScreen('log');"><span class="glass-btn-text">Add</span></button></div>
-        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Settings</span></button></div>
+        <div class="glass-btn-wrapper"><div class="glow-profile"></div><button class="glass-btn glass-btn-profile" onclick="showScreen('profile')"><span class="glass-btn-text">Profile</span></button></div>
         <div class="glass-btn-wrapper"><div class="glow-stats"></div><button class="glass-btn glass-btn-stats" onclick="showScreen('stats')"><span class="glass-btn-text">Stats</span></button></div>
       </div>
     </div>
@@ -4281,7 +3694,7 @@
 
           var cloudUserId = 'u_cloud_' + activeEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_');
 
-          fetch('https://livelore-app.vercel.app/api/sync/push', {
+          fetch('https://livelore-production.up.railway.app/api/sync/push', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -4319,6 +3732,17 @@
       if (btnClassic) btnClassic.classList.toggle('active', theme === 'classic');
 
       renderShowsFeed();
+    }
+
+    function getTicketColor(id) {
+      if (currentTicketTheme === 'classic') return '#f4e4bc';
+      if (!id) return TICKET_COLOR_PALETTE[0];
+      let hash = 0;
+      for (let i = 0; i < id.length; i++) {
+        hash = (hash << 5) - hash + id.charCodeAt(i);
+        hash |= 0;
+      }
+      return TICKET_COLOR_PALETTE[Math.abs(hash) % TICKET_COLOR_PALETTE.length];
     }
 
     
@@ -4372,83 +3796,6 @@
     document.addEventListener('DOMContentLoaded', loadSavedShows);
     loadSavedShows();
   </script>
-
-  <!-- MODERN GLASS CONFIRM / ALERT MODAL DIALOG -->
-  <div id="custom-dialog-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%; background:rgba(0,0,0,0.88); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); z-index:999999; align-items:center; justify-content:center; padding:16px; box-sizing:border-box;">
-    <div style="background:#121619; border:1.5px solid #FFB300; border-radius:20px; padding:24px 20px; width:100%; max-width:360px; box-shadow:0 20px 40px rgba(0,0,0,0.8); text-align:center;">
-      <div id="custom-dialog-icon" style="font-size:36px; margin-bottom:10px;">⚠️</div>
-      <div id="custom-dialog-title" style="font-size:18px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">CONFIRM ACTION</div>
-      <div id="custom-dialog-msg" style="font-size:15px; font-weight:700; color:#f1f5f9; line-height:1.5; margin-bottom:20px; white-space:pre-wrap;">Are you sure?</div>
-
-      <div id="custom-dialog-btn-box" style="display:flex; gap:10px;">
-        <button id="custom-dialog-btn-cancel" type="button" style="flex:1; background:#1C2128; color:#94a3b8; font-weight:900; font-size:14px; padding:12px; border-radius:9999px; border:1px solid #222B30; text-transform:uppercase; cursor:pointer;">CANCEL</button>
-        <button id="custom-dialog-btn-confirm" type="button" style="flex:1; background:linear-gradient(90deg, #E11D48, #BE123C); color:#ffffff; font-weight:900; font-size:14px; padding:12px; border-radius:9999px; border:none; text-transform:uppercase; cursor:pointer; box-shadow:0 0 15px rgba(225,29,72,0.4);">DELETE</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- SECURE VERIFIED PASSWORD RESET & GOOGLE PROMPT MODAL -->
-  <div id="custom-prompt-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%; background:rgba(0,0,0,0.88); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); z-index:999999; align-items:center; justify-content:center; padding:16px; box-sizing:border-box;">
-    <div style="background:#121619; border:1.5px solid #FFB300; border-radius:20px; padding:24px 20px; width:100%; max-width:360px; box-shadow:0 20px 40px rgba(0,0,0,0.8), 0 0 20px rgba(255,179,0,0.15); text-align:center;">
-      <div id="custom-prompt-icon" style="font-size:36px; margin-bottom:10px;">🔑</div>
-      <div id="custom-prompt-title" style="font-size:18px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">SECURE RECOVERY</div>
-      <div id="custom-prompt-msg" style="font-size:13px; font-weight:700; color:#cbd5e1; line-height:1.4; margin-bottom:14px;">Enter your registered email address to receive a 6-digit verification code:</div>
-
-      <input type="text" id="custom-prompt-input" class="input-field" placeholder="you@example.com" style="margin-bottom:10px; text-align:center;" autocomplete="off" />
-      <input type="text" id="custom-prompt-code" class="input-field" placeholder="6-Digit Verification Code" style="display:none; margin-bottom:10px; text-align:center; letter-spacing:3px; font-size:18px;" autocomplete="off" />
-      <input type="password" id="custom-prompt-pass" class="input-field" placeholder="New Password (min 4 chars)" style="display:none; margin-bottom:18px; text-align:center;" autocomplete="new-password" />
-
-      <div style="display:flex; gap:10px;">
-        <button id="custom-prompt-btn-cancel" type="button" style="flex:1; background:#1C2128; color:#94a3b8; font-weight:900; font-size:13px; padding:12px; border-radius:9999px; border:1px solid #222B30; text-transform:uppercase; cursor:pointer;">CANCEL</button>
-        <button id="custom-prompt-btn-submit" type="button" style="flex:1; background:#FFB300; color:#0a0a0a; font-weight:900; font-size:13px; padding:12px; border-radius:9999px; border:none; text-transform:uppercase; cursor:pointer; box-shadow:0 4px 12px rgba(255,179,0,0.3);">SEND CODE</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- CUSTOM SHARE CONCERT MODAL / ACTION SHEET -->
-  <div id="custom-share-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%; background:rgba(0,0,0,0.88); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); z-index:999999; align-items:center; justify-content:center; padding:16px; box-sizing:border-box;">
-    <div style="background:#121619; border:1.5px solid #FFB300; border-radius:24px; padding:24px 20px; width:100%; max-width:380px; box-shadow:0 20px 50px rgba(0,0,0,0.9), 0 0 25px rgba(255,179,0,0.15); text-align:center;">
-      <div style="font-size:32px; margin-bottom:8px;">🚀</div>
-      <div style="font-size:18px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">SHARE CONCERT MEMORY</div>
-      <div id="share-modal-subtitle" style="font-size:13px; font-weight:700; color:#94a3b8; margin-bottom:16px;"></div>
-
-      <!-- VIP Photo Attachment Toggle/Badge -->
-      <div id="share-vip-attachment-box" style="margin-bottom:18px; padding:12px 14px; background:#0A0D0E; border:1px solid #222B30; border-radius:12px; display:flex; align-items:center; justify-content:space-between; cursor:pointer;" onclick="toggleShareVipAttachment()">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:18px;">📸</span>
-          <div style="text-align:left;">
-            <div style="font-size:12px; font-weight:900; color:#FFB300;" id="share-vip-toggle-title">ATTACH PHOTOS & TICKET CARD</div>
-            <div style="font-size:10px; font-weight:700; color:#64748b;" id="share-vip-toggle-subtitle">VIP Vault Feature 👑</div>
-          </div>
-        </div>
-        <div id="share-vip-toggle-switch" style="width:22px; height:22px; border-radius:50%; border:2px solid #FFB300; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; color:#0a0a0a; background:#FFB300;">✓</div>
-      </div>
-
-      <!-- Social & App Share Target Options -->
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px;">
-        <button type="button" onclick="executeShareTarget('instagram')" style="background:#1C2128; border:1px solid #222B30; border-radius:14px; padding:12px 10px; color:#f1f5f9; font-weight:800; font-size:12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
-          <span style="font-size:18px;">📸</span> Instagram
-        </button>
-        <button type="button" onclick="executeShareTarget('messages')" style="background:#1C2128; border:1px solid #222B30; border-radius:14px; padding:12px 10px; color:#f1f5f9; font-weight:800; font-size:12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
-          <span style="font-size:18px;">💬</span> Messages/WhatsApp
-        </button>
-        <button type="button" onclick="executeShareTarget('facebook')" style="background:#1C2128; border:1px solid #222B30; border-radius:14px; padding:12px 10px; color:#f1f5f9; font-weight:800; font-size:12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
-          <span style="font-size:18px;">📘</span> Facebook
-        </button>
-        <button type="button" onclick="executeShareTarget('reddit')" style="background:#1C2128; border:1px solid #222B30; border-radius:14px; padding:12px 10px; color:#f1f5f9; font-weight:800; font-size:12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
-          <span style="font-size:18px;">🤖</span> Reddit
-        </button>
-        <button type="button" onclick="executeShareTarget('twitter')" style="background:#1C2128; border:1px solid #222B30; border-radius:14px; padding:12px 10px; color:#f1f5f9; font-weight:800; font-size:12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
-          <span style="font-size:18px;">🐦</span> X (Twitter)
-        </button>
-        <button type="button" onclick="executeShareTarget('native')" style="background:#1C2128; border:1.5px solid #FFB300; border-radius:14px; padding:12px 10px; color:#FFB300; font-weight:900; font-size:12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
-          <span style="font-size:18px;">📲</span> More / OS Share
-        </button>
-      </div>
-
-      <button type="button" onclick="closeShareModal()" style="width:100%; background:#1C2128; color:#94a3b8; font-weight:900; font-size:13px; padding:12px; border-radius:9999px; border:1px solid #222B30; text-transform:uppercase; cursor:pointer;">CANCEL</button>
-    </div>
-  </div>
 </body>
 </html>
 
