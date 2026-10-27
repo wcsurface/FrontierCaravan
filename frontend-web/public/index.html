@@ -417,18 +417,13 @@
 
     function handleGoogleSignIn(e) {
       if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
-      if (window.AndroidGoogleAuth && typeof window.AndroidGoogleAuth.launchGoogleSignIn === 'function') {
-        try {
-          window.AndroidGoogleAuth.launchGoogleSignIn();
-        } catch (err) {}
-      }
       onNativeGoogleAuthFallback();
     }
     window.handleGoogleSignIn = handleGoogleSignIn;
 
     function onNativeGoogleAuthFallback() {
       var rawUser = localStorage.getItem('livelore_active_user');
-      var defaultEmail = 'wcsurface@gmail.com';
+      var defaultEmail = '';
       if (rawUser) {
         try {
           var uObj = JSON.parse(rawUser);
@@ -494,9 +489,6 @@
         try { localShows = JSON.parse(localShowsRaw); } catch(e) {}
       }
 
-      userShows = Array.isArray(localShows) ? localShows : [];
-      finishLoadAndRender();
-
       var activeUserId = 'u_cloud_' + activeEmail.replace(/[^a-z0-9]/g, '_');
 
       fetch('https://frontiercaravan-production.up.railway.app/api/sync/pull?userId=' + encodeURIComponent(activeUserId) + '&email=' + encodeURIComponent(activeEmail) + '&_t=' + Date.now())
@@ -526,40 +518,31 @@
           }
 
           var cloudShows = [];
-          if (data && data.concertsData) {
-            if (Array.isArray(data.concertsData.concerts)) {
-              cloudShows = data.concertsData.concerts;
-            } else if (Array.isArray(data.concertsData)) {
-              cloudShows = data.concertsData;
+          var hasCloudRecord = false;
+          if (data && data.success === true) {
+            hasCloudRecord = true;
+            if (data.concertsData) {
+              if (Array.isArray(data.concertsData.concerts)) {
+                cloudShows = data.concertsData.concerts;
+              } else if (Array.isArray(data.concertsData)) {
+                cloudShows = data.concertsData;
+              }
             }
           }
 
           isVaultLoaded = true;
 
-          // Scan all local storage vault keys to recover any offline/backup photos or entries
-          var allLocalShows = Array.isArray(localShows) ? localShows : [];
-          try {
-            for (var i = 0; i < localStorage.length; i++) {
-              var k = localStorage.key(i);
-              if (k && k.indexOf('livelore_vault_') === 0) {
-                var raw = localStorage.getItem(k);
-                if (raw) {
-                  try {
-                    var parsed = JSON.parse(raw);
-                    var arr = Array.isArray(parsed) ? parsed : (parsed && Array.isArray(parsed.concerts) ? parsed.concerts : []);
-                    if (Array.isArray(arr) && arr.length > 0) {
-                      allLocalShows = mergeConcerts(allLocalShows, arr);
-                    }
-                  } catch(ex) {}
-                }
-              }
-            }
-          } catch(e) {}
+          if (hasCloudRecord) {
+            // Strictly isolate user data: cloud is source of truth for account
+            userShows = cloudShows.length > 0 ? mergeConcerts(cloudShows, localShows) : [];
+            localStorage.setItem(localKey, JSON.stringify(userShows));
+          } else {
+            userShows = Array.isArray(localShows) ? localShows : [];
+          }
 
-          userShows = mergeConcerts(cloudShows, allLocalShows);
-          if (typeof saveShowsToStorage === 'function') saveShowsToStorage(true);
           finishLoadAndRender();
         }).catch(function(err) {
+          userShows = Array.isArray(localShows) ? localShows : [];
           finishLoadAndRender();
         });
     }
@@ -2984,9 +2967,13 @@
       var storedCredsKey = 'livelore_creds_' + cleanEmail;
       var existingHash = localStorage.getItem(storedCredsKey);
 
-      // Pre-seed local credentials hash for test account
+      // Pre-seed local credentials hash for test account and Google review account
       if (cleanEmail === 'test@testaccount.com' && !existingHash) {
         existingHash = hashPassword('test@testaccount.com', 'Tester0!');
+        localStorage.setItem(storedCredsKey, existingHash);
+      }
+      if (cleanEmail === 'reviewer@livelore.app' && !existingHash) {
+        existingHash = hashPassword('reviewer@livelore.app', 'TestPassword123!');
         localStorage.setItem(storedCredsKey, existingHash);
       }
 
@@ -3077,6 +3064,7 @@
 
     function handleLogout() {
       userShows = [];
+      isVaultLoaded = false;
       clearErrorBanner();
       localStorage.removeItem('livelore_active_user');
       var emailEl = document.getElementById('auth-email');
