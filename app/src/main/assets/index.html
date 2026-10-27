@@ -287,6 +287,11 @@
     window.showCustomAlert = showCustomAlert;
 
     function showScreen(screenId) {
+      // Remove focus from active elements to prevent scroll jumps
+      if (document.activeElement && typeof document.activeElement.blur === 'function') {
+        try { document.activeElement.blur(); } catch(e) {}
+      }
+
       var rawUser = localStorage.getItem('livelore_active_user');
       var activeEmail = null;
       if (rawUser) {
@@ -315,13 +320,27 @@
       document.querySelectorAll('.screen-view').forEach(function(el) {
         el.classList.remove('active');
         el.style.display = 'none';
+        el.scrollTop = 0;
       });
 
       var target = document.getElementById('view-' + screenId);
       if (target) {
         target.classList.add('active');
         target.style.display = 'flex';
+        target.scrollTop = 0;
       }
+
+      // Always force scroll position to top (0, 0) on screen transition
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+
+      setTimeout(function() {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        if (target) target.scrollTop = 0;
+      }, 50);
 
       if (screenId === 'stats' && typeof updateStatsDisplay === 'function') {
         updateStatsDisplay();
