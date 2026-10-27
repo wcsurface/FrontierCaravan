@@ -1,8 +1,14 @@
 # CURRENT_STATUS.md - LiveLore: Concert Diary & Setlist Vault
 
 ## Current Development Status
-**Active Version**: 1.0.5 (versionCode: 6, API Backend v6.1.0)
+**Active Version**: 1.0.6 (versionCode: 7, API Backend v6.1.0)
 **Build Status**: ✅ Passing (`:app:assembleDebug` & `:app:bundleRelease` build cleanly)
+
+---
+
+## Completed Features
+- [x] **Release Crash Prevention (R8/Proguard)**: Configured comprehensive Proguard rules in `app/proguard-rules.pro` keeping `MainActivity`, inner `@JavascriptInterface` bridge classes (`AndroidGoogleAuthInterface`, `AndroidBillingInterface`, `AndroidAdMobInterface`, `AndroidCSVInterface`, `AndroidShareInterface`, `AndroidHapticsInterface`), WebKit, AdMob SDK, and Play Billing Library from being obfuscated or stripped during release minification (`isMinifyEnabled = true`).
+- [x] **Release Versioning**: Version bumped to **`1.0.6`** (`versionCode = 7`) for Google Play Store closed testing submission.
 
 ---
 

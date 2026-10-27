@@ -244,6 +244,21 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        try { adView.resume() } catch (e: Exception) {}
+    }
+
+    override fun onPause() {
+        try { adView.pause() } catch (e: Exception) {}
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        try { adView.destroy() } catch (e: Exception) {}
+        super.onDestroy()
+    }
+
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

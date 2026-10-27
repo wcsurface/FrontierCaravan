@@ -1,12 +1,10 @@
 # Keep MainActivity and all inner classes
 -keep class app.vercel.livelore.MainActivity { *; }
 -keep class app.vercel.livelore.MainActivity$* { *; }
-
-# Keep all classes in app.vercel.livelore package
 -keep class app.vercel.livelore.** { *; }
 
 # Keep all @JavascriptInterface annotated methods and their containing classes
--keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
+-keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod,Exceptions
 
 -keepclasseswithmembers class * {
     @android.webkit.JavascriptInterface <methods>;
@@ -23,6 +21,7 @@
 # Keep Google Mobile Ads / AdMob SDK
 -keep class com.google.android.gms.ads.** { *; }
 -keep class com.google.android.gms.internal.ads.** { *; }
+-keep class com.google.android.gms.common.** { *; }
 
 # Keep Google Play Billing Library
 -keep class com.android.billingclient.** { *; }
@@ -34,5 +33,11 @@
     @com.google.gson.annotations.SerializedName <fields>;
 }
 
-# Keep FileProvider
+# Keep FileProvider and AndroidX Core
 -keep class androidx.core.content.FileProvider { *; }
+-keep class androidx.core.** { *; }
+
+# Don't warn on missing optional third-party references
+-dontwarn com.google.android.gms.**
+-dontwarn com.android.billingclient.**
+-dontwarn androidx.webkit.**
