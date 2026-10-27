@@ -286,24 +286,143 @@
     }
     window.showCustomAlert = showCustomAlert;
 
+    function showScreen(screenId) {
+      var rawUser = localStorage.getItem('livelore_active_user');
+      var activeEmail = null;
+      if (rawUser) {
+        try {
+          var uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email) {
+            activeEmail = uObj.email.toLowerCase().trim();
+          }
+        } catch(e) {}
+      }
+
+      // STRICT AUTH GUARD: If not logged in, force auth screen for any protected view
+      if (!activeEmail && screenId !== 'auth' && screenId !== 'terms' && screenId !== 'privacy' && screenId !== 'faq') {
+        screenId = 'auth';
+      }
+
+      // Hide bottom glass nav bar on legal pages or auth screen when logged out
+      document.querySelectorAll('.glass-nav-bar').forEach(function(nav) {
+        if (!activeEmail && (screenId === 'terms' || screenId === 'privacy' || screenId === 'faq' || screenId === 'auth')) {
+          nav.style.display = 'none';
+        } else {
+          nav.style.display = 'flex';
+        }
+      });
+
+      document.querySelectorAll('.screen-view').forEach(function(el) {
+        el.classList.remove('active');
+        el.style.display = 'none';
+      });
+
+      var target = document.getElementById('view-' + screenId);
+      if (target) {
+        target.classList.add('active');
+        target.style.display = 'flex';
+      }
+
+      if (screenId === 'stats' && typeof updateStatsDisplay === 'function') {
+        updateStatsDisplay();
+      }
+
+      if (window.AndroidAdMob) {
+        if (isVIPUser || screenId === 'auth' || screenId === 'terms' || screenId === 'privacy' || screenId === 'faq') {
+          window.AndroidAdMob.hideBannerAd();
+        } else {
+          window.AndroidAdMob.showBannerAd();
+        }
+      }
+
+      var vipSubtitle = document.getElementById('vip-pass-subtitle');
+      if (vipSubtitle) {
+        vipSubtitle.style.display = isVIPUser ? 'none' : 'block';
+      }
+    }
+    window.showScreen = showScreen;
+
+    function showCustomPrompt(options, onSubmit) {
+      var modal = document.getElementById('custom-prompt-modal');
+      var iconEl = document.getElementById('custom-prompt-icon');
+      var titleEl = document.getElementById('custom-prompt-title');
+      var msgEl = document.getElementById('custom-prompt-msg');
+      var inputEl = document.getElementById('custom-prompt-input');
+      var btnCancel = document.getElementById('custom-prompt-btn-cancel');
+      var btnSubmit = document.getElementById('custom-prompt-btn-submit');
+
+      var title = (options && options.title) ? options.title : 'PASSWORD RECOVERY';
+      var message = (options && options.message) ? options.message : 'Enter your registered email address:';
+      var placeholder = (options && options.placeholder) ? options.placeholder : 'you@example.com';
+      var defaultValue = (options && options.defaultValue) ? options.defaultValue : '';
+      var icon = (options && options.icon) ? options.icon : '🔑';
+      var submitText = (options && options.submitText) ? options.submitText : 'SEND RESET';
+
+      if (!modal) {
+        var res = window.prompt(message, defaultValue);
+        if (res && onSubmit) onSubmit(res);
+        return;
+      }
+
+      if (iconEl) iconEl.innerText = icon;
+      if (titleEl) titleEl.innerText = title;
+      if (msgEl) msgEl.innerText = message;
+      if (inputEl) {
+        inputEl.placeholder = placeholder;
+        inputEl.value = defaultValue;
+      }
+      if (btnSubmit) btnSubmit.innerText = submitText;
+
+      if (btnCancel) {
+        btnCancel.onclick = function(e) {
+          if (e) { e.preventDefault(); e.stopPropagation(); }
+          modal.style.display = 'none';
+        };
+      }
+
+      if (btnSubmit) {
+        btnSubmit.onclick = function(e) {
+          if (e) { e.preventDefault(); e.stopPropagation(); }
+          var val = inputEl ? inputEl.value : '';
+          modal.style.display = 'none';
+          if (onSubmit) onSubmit(val);
+        };
+      }
+
+      modal.style.display = 'flex';
+      setTimeout(function() {
+        if (inputEl) inputEl.focus();
+      }, 100);
+    }
+    window.showCustomPrompt = showCustomPrompt;
+
     function handleGoogleSignIn(e) {
       if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
       if (window.AndroidGoogleAuth && typeof window.AndroidGoogleAuth.launchGoogleSignIn === 'function') {
         try {
           window.AndroidGoogleAuth.launchGoogleSignIn();
-          return;
         } catch (err) {}
       }
-      if (typeof onNativeGoogleAuthFallback === 'function') onNativeGoogleAuthFallback();
+      onNativeGoogleAuthFallback();
     }
     window.handleGoogleSignIn = handleGoogleSignIn;
 
     function onNativeGoogleAuthFallback() {
+      var rawUser = localStorage.getItem('livelore_active_user');
+      var defaultEmail = 'wcsurface@gmail.com';
+      if (rawUser) {
+        try {
+          var uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email) defaultEmail = uObj.email;
+        } catch(ex) {}
+      }
+
       if (typeof showCustomPrompt === 'function') {
         showCustomPrompt({
           title: 'GOOGLE SIGN-IN',
-          message: 'Enter your Google Account email address to continue:',
+          message: 'Enter or confirm your Google Account email address:',
           placeholder: 'you@gmail.com',
+          defaultValue: defaultEmail,
           icon: '🌐',
           submitText: 'CONTINUE WITH GOOGLE'
         }, function(inputEmail) {
@@ -316,6 +435,134 @@
       }
     }
     window.onNativeGoogleAuthFallback = onNativeGoogleAuthFallback;
+
+    function loadSavedShows() {
+      if (typeof updateDynamicYearSpans === 'function') updateDynamicYearSpans();
+
+      var rawUser = localStorage.getItem('livelore_active_user');
+      var activeEmail = null;
+      if (rawUser) {
+        try {
+          var uObj = JSON.parse(rawUser);
+          if (uObj && uObj.email) {
+            activeEmail = uObj.email.toLowerCase().trim();
+          }
+        } catch(e) {}
+      }
+
+      if (!activeEmail) {
+        userShows = [];
+        isVIPUser = false;
+        if (typeof showScreen === 'function') showScreen('auth');
+        return;
+      }
+
+      if (typeof checkIsVIPUser === 'function') isVIPUser = checkIsVIPUser(activeEmail);
+      if (typeof updateProfileVipCard === 'function') updateProfileVipCard();
+
+      var vipSubtitle = document.getElementById('vip-pass-subtitle');
+      if (vipSubtitle) {
+        vipSubtitle.style.display = isVIPUser ? 'none' : 'block';
+      }
+
+      var emailDisp = document.getElementById('profile-email-display');
+      if (emailDisp) emailDisp.innerText = activeEmail;
+
+      var localKey = 'livelore_vault_' + activeEmail.replace(/[^a-z0-9]/g, '_');
+      var localShowsRaw = localStorage.getItem(localKey);
+      var localShows = [];
+      if (localShowsRaw) {
+        try { localShows = JSON.parse(localShowsRaw); } catch(e) {}
+      }
+
+      userShows = Array.isArray(localShows) ? localShows : [];
+      finishLoadAndRender();
+
+      var activeUserId = 'u_cloud_' + activeEmail.replace(/[^a-z0-9]/g, '_');
+
+      fetch('https://frontiercaravan-production.up.railway.app/api/sync/pull?userId=' + encodeURIComponent(activeUserId) + '&email=' + encodeURIComponent(activeEmail) + '&_t=' + Date.now())
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data && data.user) {
+            var dbIsVip = (data.user.isVIP === true || data.user.isVip === true);
+            isVIPUser = dbIsVip;
+            localStorage.setItem('livelore_vip_' + activeEmail.replace(/[^a-z0-9]/g, '_'), dbIsVip ? 'true' : 'false');
+
+            var rawActive = localStorage.getItem('livelore_active_user');
+            if (rawActive) {
+              try {
+                var parsedActive = JSON.parse(rawActive);
+                parsedActive.isVIP = dbIsVip;
+                localStorage.setItem('livelore_active_user', JSON.stringify(parsedActive));
+              } catch(ex) {}
+            }
+            if (typeof updateProfileVipCard === 'function') updateProfileVipCard();
+            if (window.AndroidAdMob) {
+              if (isVIPUser) {
+                window.AndroidAdMob.hideBannerAd();
+              } else {
+                window.AndroidAdMob.showBannerAd();
+              }
+            }
+          }
+
+          var cloudShows = [];
+          if (data && data.concertsData) {
+            if (Array.isArray(data.concertsData.concerts)) {
+              cloudShows = data.concertsData.concerts;
+            } else if (Array.isArray(data.concertsData)) {
+              cloudShows = data.concertsData;
+            }
+          }
+
+          isVaultLoaded = true;
+
+          // Scan all local storage vault keys to recover any offline/backup photos or entries
+          var allLocalShows = Array.isArray(localShows) ? localShows : [];
+          try {
+            for (var i = 0; i < localStorage.length; i++) {
+              var k = localStorage.key(i);
+              if (k && k.indexOf('livelore_vault_') === 0) {
+                var raw = localStorage.getItem(k);
+                if (raw) {
+                  try {
+                    var parsed = JSON.parse(raw);
+                    var arr = Array.isArray(parsed) ? parsed : (parsed && Array.isArray(parsed.concerts) ? parsed.concerts : []);
+                    if (Array.isArray(arr) && arr.length > 0) {
+                      allLocalShows = mergeConcerts(allLocalShows, arr);
+                    }
+                  } catch(ex) {}
+                }
+              }
+            }
+          } catch(e) {}
+
+          userShows = mergeConcerts(cloudShows, allLocalShows);
+          if (typeof saveShowsToStorage === 'function') saveShowsToStorage(true);
+          finishLoadAndRender();
+        }).catch(function(err) {
+          finishLoadAndRender();
+        });
+    }
+    window.loadSavedShows = loadSavedShows;
+
+    function onNativeGoogleAuthSuccess(googleEmail) {
+      if (!googleEmail || typeof googleEmail !== 'string' || !googleEmail.includes('@')) return;
+      var cleanedEmail = googleEmail.toLowerCase().trim();
+
+      localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
+
+      // Auto-register/sync account with PostgreSQL backend database
+      fetch('https://frontiercaravan-production.up.railway.app/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanedEmail, displayName: cleanedEmail.split('@')[0] })
+      }).catch(function(err) {});
+
+      if (typeof loadSavedShows === 'function') loadSavedShows();
+      if (typeof showScreen === 'function') showScreen('diary');
+    }
+    window.onNativeGoogleAuthSuccess = onNativeGoogleAuthSuccess;
 
     function parseConcertTimestamp(dateStr) {
       if (!dateStr || typeof dateStr !== 'string') return 0;
@@ -482,192 +729,6 @@
       }
     }
     window.finishLoadAndRender = finishLoadAndRender;
-
-    function loadSavedShows() {
-      if (typeof updateDynamicYearSpans === 'function') updateDynamicYearSpans();
-
-      var rawUser = localStorage.getItem('livelore_active_user');
-      var activeEmail = null;
-      if (rawUser) {
-        try {
-          var uObj = JSON.parse(rawUser);
-          if (uObj && uObj.email) {
-            activeEmail = uObj.email.toLowerCase().trim();
-          }
-        } catch(e) {}
-      }
-
-      if (!activeEmail) {
-        userShows = [];
-        isVIPUser = false;
-        if (typeof showScreen === 'function') showScreen('auth');
-        return;
-      }
-
-      if (typeof checkIsVIPUser === 'function') isVIPUser = checkIsVIPUser(activeEmail);
-      if (typeof updateProfileVipCard === 'function') updateProfileVipCard();
-
-      var vipSubtitle = document.getElementById('vip-pass-subtitle');
-      if (vipSubtitle) {
-        vipSubtitle.style.display = isVIPUser ? 'none' : 'block';
-      }
-
-      var emailDisp = document.getElementById('profile-email-display');
-      if (emailDisp) emailDisp.innerText = activeEmail;
-
-      var localKey = 'livelore_vault_' + activeEmail.replace(/[^a-z0-9]/g, '_');
-      var localShowsRaw = localStorage.getItem(localKey);
-      var localShows = [];
-      if (localShowsRaw) {
-        try { localShows = JSON.parse(localShowsRaw); } catch(e) {}
-      }
-
-      userShows = Array.isArray(localShows) ? localShows : [];
-      finishLoadAndRender();
-
-      var activeUserId = 'u_cloud_' + activeEmail.replace(/[^a-z0-9]/g, '_');
-
-      fetch('https://frontiercaravan-production.up.railway.app/api/sync/pull?userId=' + encodeURIComponent(activeUserId) + '&email=' + encodeURIComponent(activeEmail) + '&_t=' + Date.now())
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-          if (data && data.user) {
-            var dbIsVip = (data.user.isVIP === true || data.user.isVip === true);
-            isVIPUser = dbIsVip;
-            localStorage.setItem('livelore_vip_' + activeEmail.replace(/[^a-z0-9]/g, '_'), dbIsVip ? 'true' : 'false');
-
-            var rawActive = localStorage.getItem('livelore_active_user');
-            if (rawActive) {
-              try {
-                var parsedActive = JSON.parse(rawActive);
-                parsedActive.isVIP = dbIsVip;
-                localStorage.setItem('livelore_active_user', JSON.stringify(parsedActive));
-              } catch(ex) {}
-            }
-            if (typeof updateProfileVipCard === 'function') updateProfileVipCard();
-            if (window.AndroidAdMob) {
-              if (isVIPUser) {
-                window.AndroidAdMob.hideBannerAd();
-              } else {
-                window.AndroidAdMob.showBannerAd();
-              }
-            }
-          }
-
-          var cloudShows = [];
-          if (data && data.concertsData) {
-            if (Array.isArray(data.concertsData.concerts)) {
-              cloudShows = data.concertsData.concerts;
-            } else if (Array.isArray(data.concertsData)) {
-              cloudShows = data.concertsData;
-            }
-          }
-
-          isVaultLoaded = true;
-
-          var mergedMap = {};
-
-          cloudShows.forEach(function(s) {
-            if (s) {
-              var key = s.id || (s.date + '_' + (s.headline || '') + '_' + (s.venue || ''));
-              mergedMap[key] = s;
-            }
-          });
-
-          localShows.forEach(function(s) {
-            if (s) {
-              var key = s.id || (s.date + '_' + (s.headline || '') + '_' + (s.venue || ''));
-              if (!mergedMap[key]) {
-                mergedMap[key] = s;
-              } else {
-                if (Array.isArray(s.photoUris) && s.photoUris.length > 0) {
-                  if (!Array.isArray(mergedMap[key].photoUris) || mergedMap[key].photoUris.length === 0) {
-                    mergedMap[key].photoUris = s.photoUris;
-                  }
-                }
-              }
-            }
-          });
-
-          userShows = Object.values(mergedMap);
-          if (typeof saveShowsToStorage === 'function') saveShowsToStorage(true);
-          finishLoadAndRender();
-        }).catch(function(err) {
-          finishLoadAndRender();
-        });
-    }
-    window.loadSavedShows = loadSavedShows;
-
-    function onNativeGoogleAuthSuccess(googleEmail) {
-      if (!googleEmail || typeof googleEmail !== 'string' || !googleEmail.includes('@')) return;
-      var cleanedEmail = googleEmail.toLowerCase().trim();
-
-      localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
-
-      // Auto-register/sync account with PostgreSQL backend database
-      fetch('https://frontiercaravan-production.up.railway.app/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: cleanedEmail, displayName: cleanedEmail.split('@')[0] })
-      }).catch(function(err) {});
-
-      if (typeof loadSavedShows === 'function') loadSavedShows();
-      if (typeof showScreen === 'function') showScreen('diary');
-    }
-    window.onNativeGoogleAuthSuccess = onNativeGoogleAuthSuccess;
-
-    function showCustomPrompt(options, onSubmit) {
-      var modal = document.getElementById('custom-prompt-modal');
-      var iconEl = document.getElementById('custom-prompt-icon');
-      var titleEl = document.getElementById('custom-prompt-title');
-      var msgEl = document.getElementById('custom-prompt-msg');
-      var inputEl = document.getElementById('custom-prompt-input');
-      var btnCancel = document.getElementById('custom-prompt-btn-cancel');
-      var btnSubmit = document.getElementById('custom-prompt-btn-submit');
-
-      var title = (options && options.title) ? options.title : 'PASSWORD RECOVERY';
-      var message = (options && options.message) ? options.message : 'Enter your registered email address:';
-      var placeholder = (options && options.placeholder) ? options.placeholder : 'you@example.com';
-      var defaultValue = (options && options.defaultValue) ? options.defaultValue : '';
-      var icon = (options && options.icon) ? options.icon : '🔑';
-      var submitText = (options && options.submitText) ? options.submitText : 'SEND RESET';
-
-      if (!modal) {
-        var res = window.prompt(message, defaultValue);
-        if (res && onSubmit) onSubmit(res);
-        return;
-      }
-
-      if (iconEl) iconEl.innerText = icon;
-      if (titleEl) titleEl.innerText = title;
-      if (msgEl) msgEl.innerText = message;
-      if (inputEl) {
-        inputEl.placeholder = placeholder;
-        inputEl.value = defaultValue;
-      }
-      if (btnSubmit) btnSubmit.innerText = submitText;
-
-      if (btnCancel) {
-        btnCancel.onclick = function(e) {
-          if (e) { e.preventDefault(); e.stopPropagation(); }
-          modal.style.display = 'none';
-        };
-      }
-
-      if (btnSubmit) {
-        btnSubmit.onclick = function(e) {
-          if (e) { e.preventDefault(); e.stopPropagation(); }
-          var val = inputEl ? inputEl.value : '';
-          modal.style.display = 'none';
-          if (onSubmit) onSubmit(val);
-        };
-      }
-
-      modal.style.display = 'flex';
-      setTimeout(function() {
-        if (inputEl) inputEl.focus();
-      }, 100);
-    }
-    window.showCustomPrompt = showCustomPrompt;
 
     var authMode = 'login';
     var isVIPUser = false;
@@ -1242,62 +1303,6 @@
       const year = new Date().getFullYear();
       document.querySelectorAll('.current-year-span').forEach(el => el.innerText = year);
     }
-
-    function showScreen(screenId) {
-      var rawUser = localStorage.getItem('livelore_active_user');
-      var activeEmail = null;
-      if (rawUser) {
-        try {
-          var uObj = JSON.parse(rawUser);
-          if (uObj && uObj.email) {
-            activeEmail = uObj.email.toLowerCase().trim();
-          }
-        } catch(e) {}
-      }
-
-      // STRICT AUTH GUARD: If not logged in, force auth screen for any protected view
-      if (!activeEmail && screenId !== 'auth' && screenId !== 'terms' && screenId !== 'privacy' && screenId !== 'faq') {
-        screenId = 'auth';
-      }
-
-      // Hide bottom glass nav bar on legal pages or auth screen when logged out
-      document.querySelectorAll('.glass-nav-bar').forEach(function(nav) {
-        if (!activeEmail && (screenId === 'terms' || screenId === 'privacy' || screenId === 'faq' || screenId === 'auth')) {
-          nav.style.display = 'none';
-        } else {
-          nav.style.display = 'flex';
-        }
-      });
-
-      document.querySelectorAll('.screen-view').forEach(function(el) {
-        el.classList.remove('active');
-        el.style.display = 'none';
-      });
-
-      const target = document.getElementById('view-' + screenId);
-      if (target) {
-        target.classList.add('active');
-        target.style.display = 'flex';
-      }
-
-      if (screenId === 'stats') {
-        updateStatsDisplay();
-      }
-
-      if (window.AndroidAdMob) {
-        if (isVIPUser || screenId === 'auth' || screenId === 'terms' || screenId === 'privacy' || screenId === 'faq') {
-          window.AndroidAdMob.hideBannerAd();
-        } else {
-          window.AndroidAdMob.showBannerAd();
-        }
-      }
-
-      const vipSubtitle = document.getElementById('vip-pass-subtitle');
-      if (vipSubtitle) {
-        vipSubtitle.style.display = isVIPUser ? 'none' : 'block';
-      }
-    }
-    window.showScreen = showScreen;
 
     function handleLegalBack() {
       var rawUser = localStorage.getItem('livelore_active_user');
@@ -2294,11 +2299,21 @@
         if (!map[key]) {
           var copy = JSON.parse(JSON.stringify(show));
           if (!copy.id) copy.id = key;
+          if (!Array.isArray(copy.photoUris)) copy.photoUris = [];
           map[key] = copy;
           merged.push(copy);
         } else {
-          if ((!map[key].photoUris || map[key].photoUris.length === 0) && show.photoUris && show.photoUris.length > 0) {
-            map[key].photoUris = JSON.parse(JSON.stringify(show.photoUris));
+          // NEVER LOSE PHOTOS: Preserve photoUris from whichever version has photos
+          if (Array.isArray(show.photoUris) && show.photoUris.length > 0) {
+            if (!Array.isArray(map[key].photoUris) || map[key].photoUris.length === 0) {
+              map[key].photoUris = JSON.parse(JSON.stringify(show.photoUris));
+            } else {
+              show.photoUris.forEach(function(pUri) {
+                if (pUri && map[key].photoUris.indexOf(pUri) < 0) {
+                  map[key].photoUris.push(pUri);
+                }
+              });
+            }
           }
           if (!map[key].notes && show.notes) {
             map[key].notes = show.notes;
@@ -2905,37 +2920,6 @@
     }
     window.switchAuthMode = switchAuthMode;
 
-    function handleGoogleSignIn(e) {
-      if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(ex) {} }
-      if (window.AndroidGoogleAuth && window.AndroidGoogleAuth.launchGoogleSignIn) {
-        try {
-          window.AndroidGoogleAuth.launchGoogleSignIn();
-        } catch (err) {
-          onNativeGoogleAuthFallback();
-        }
-      } else {
-        onNativeGoogleAuthFallback();
-      }
-    }
-    window.handleGoogleSignIn = handleGoogleSignIn;
-
-    function onNativeGoogleAuthFallback() {
-      var inputEmail = prompt("Enter your Google Account email to continue:", "you@gmail.com");
-      if (inputEmail && inputEmail.includes('@')) {
-        onNativeGoogleAuthSuccess(inputEmail);
-      }
-    }
-
-    function onNativeGoogleAuthSuccess(googleEmail) {
-      if (!googleEmail || typeof googleEmail !== 'string' || !googleEmail.includes('@')) return;
-      var cleanedEmail = googleEmail.toLowerCase().trim();
-
-      localStorage.setItem('livelore_active_user', JSON.stringify({ email: cleanedEmail, provider: 'google' }));
-
-      loadSavedShows();
-      showScreen('diary');
-    }
-
         function resetSubmitButton() {
       var submitBtn = document.getElementById('btn-auth-submit');
       if (submitBtn) {
@@ -3275,7 +3259,7 @@
     </div>
 
     <!-- 1-Tap Official Google Sign-In Button with Generous Top Margin Clearing Logo -->
-    <button type="button" class="btn-google" id="btn-google-auth" onclick="handleGoogleSignIn(event)" ontouchstart="handleGoogleSignIn(event)" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+    <button type="button" class="btn-google" id="btn-google-auth" onclick="handleGoogleSignIn(event)" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
       <svg width="18" height="18" viewBox="0 0 24 24">
         <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3h3.88c2.27-2.09 3.665-5.17 3.665-9.12z"/>
         <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3c-1.08.72-2.45 1.16-4.05 1.16-3.1 0-5.73-2.09-6.67-4.91H1.29v3.09C3.27 21.3 7.37 24 12 24z"/>
@@ -3741,7 +3725,7 @@
 
   <script>
     // 5-COLOR RANDOM ASSORTMENT VINTAGE PALETTE
-    const TICKET_COLOR_PALETTE = [
+    var TICKET_COLOR_PALETTE = window.TICKET_COLOR_PALETTE || [
       '#F7C252', // Warm Gold
       '#F7A993', // Vintage Peach
       '#CAE6AB', // Retro Lime Mint
@@ -3749,10 +3733,10 @@
       '#F7E5B3', // Classic Cream
     ];
 
-    let currentTicketTheme = localStorage.getItem('livelore_ticket_theme') || 'multicolor';
-    let currentPhotoUris = [];
-    let modalPhotoUris = [];
-    let modalActiveIdx = 0;
+    var currentTicketTheme = window.currentTicketTheme || localStorage.getItem('livelore_ticket_theme') || 'multicolor';
+    var currentPhotoUris = window.currentPhotoUris || [];
+    var modalPhotoUris = window.modalPhotoUris || [];
+    var modalActiveIdx = window.modalActiveIdx || 0;
 
     function openPhotoModal(index) {
       if (!modalPhotoUris || modalPhotoUris.length === 0) return;

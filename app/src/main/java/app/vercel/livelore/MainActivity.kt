@@ -275,22 +275,35 @@ class MainActivity : ComponentActivity() {
             filePathCallback = null
         } else if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
             if (resultCode == RESULT_OK && data != null) {
-                val accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
+                var extractedEmail: String? = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
                     ?: data.getStringExtra("authAccount")
                     ?: data.getStringExtra("accountName")
-                if (!accountName.isNullOrEmpty()) {
-                    val safeEmail = accountName.lowercase().trim()
+
+                if (extractedEmail.isNullOrEmpty() && data.extras != null) {
+                    try {
+                        for (key in data.extras!!.keySet()) {
+                            val valStr = data.extras!!.get(key)?.toString()
+                            if (!valStr.isNullOrEmpty() && valStr.contains("@")) {
+                                extractedEmail = valStr
+                                break
+                            }
+                        }
+                    } catch (e: Exception) {}
+                }
+
+                if (!extractedEmail.isNullOrEmpty()) {
+                    val safeEmail = extractedEmail.lowercase().trim()
                     webView.post {
-                        webView.evaluateJavascript("onNativeGoogleAuthSuccess('$safeEmail')", null)
+                        webView.evaluateJavascript("if(typeof window.onNativeGoogleAuthSuccess==='function'){window.onNativeGoogleAuthSuccess('$safeEmail');}", null)
                     }
                 } else {
                     webView.post {
-                        webView.evaluateJavascript("onNativeGoogleAuthFallback()", null)
+                        webView.evaluateJavascript("if(typeof window.onNativeGoogleAuthFallback==='function'){window.onNativeGoogleAuthFallback();}", null)
                     }
                 }
             } else {
                 webView.post {
-                    webView.evaluateJavascript("onNativeGoogleAuthFallback()", null)
+                    webView.evaluateJavascript("if(typeof window.onNativeGoogleAuthFallback==='function'){window.onNativeGoogleAuthFallback();}", null)
                 }
             }
         }
@@ -550,22 +563,19 @@ class MainActivity : ComponentActivity() {
         fun launchGoogleSignIn() {
             runOnUiThread {
                 try {
-                    @Suppress("DEPRECATION")
-                    val intent = AccountManager.newChooseAccountIntent(
-                        null, null, arrayOf("com.google"), false, null, null, null, null
-                    )
-                    startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
-                } catch (e: Exception) {
-                    try {
-                        val intent = Intent("com.google.android.gms.common.account.CHOOSE_ACCOUNT").apply {
-                            putExtra("allowableAccountTypes", arrayOf("com.google"))
-                        }
-                        startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
-                    } catch (ex: Exception) {
+                    val am = AccountManager.get(this@MainActivity)
+                    val accounts = am.getAccountsByType("com.google")
+                    if (accounts.isNotEmpty() && !accounts[0].name.isNullOrEmpty()) {
+                        val selectedEmail = accounts[0].name.lowercase().trim()
                         webView.post {
-                            webView.evaluateJavascript("onNativeGoogleAuthFallback()", null)
+                            webView.evaluateJavascript("if(typeof window.onNativeGoogleAuthSuccess==='function'){window.onNativeGoogleAuthSuccess('$selectedEmail');}", null)
                         }
+                        return@runOnUiThread
                     }
+                } catch (e: Exception) {}
+
+                webView.post {
+                    webView.evaluateJavascript("if(typeof window.onNativeGoogleAuthFallback==='function'){window.onNativeGoogleAuthFallback();}", null)
                 }
             }
         }
