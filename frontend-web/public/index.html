@@ -2777,7 +2777,7 @@
     }
     window.showSubStats = showSubStats;
 
-    var VIP_EMAILS = ['wcsurface@gmail.com'];
+    var VIP_EMAILS = ['wcsurface@gmail.com', 'reviewer@livelore.app'];
 
     function checkIsVIPUser(email) {
       if (!email) return false;
@@ -2979,15 +2979,25 @@
 
       var authEndpoint = (authMode === 'register') ? '/api/auth/register' : '/api/auth/login';
 
-      function completeLogin(finalName) {
+      function completeLogin(finalName, isVipFromBackend) {
         resetSubmitButton();
 
         localStorage.setItem(storedCredsKey, computedHash);
 
+        var userIsVip = (isVipFromBackend === true) || (typeof checkIsVIPUser === 'function' && checkIsVIPUser(cleanEmail));
+        if (userIsVip) {
+          isVIPUser = true;
+          localStorage.setItem('livelore_vip_' + cleanEmail.replace(/[^a-z0-9]/g, '_'), 'true');
+          if (window.AndroidAdMob && typeof window.AndroidAdMob.hideBannerAd === 'function') {
+            window.AndroidAdMob.hideBannerAd();
+          }
+        }
+
         localStorage.setItem('livelore_active_user', JSON.stringify({
           email: cleanEmail,
           provider: 'email',
-          displayName: finalName || displayNameVal
+          displayName: finalName || displayNameVal,
+          isVIP: userIsVip
         }));
 
         if (emailEl) emailEl.value = '';
@@ -3014,7 +3024,11 @@
       })
       .then(function(result) {
         if (result.ok && result.data && result.data.success) {
-          completeLogin((result.data.user && result.data.user.displayName) || displayNameVal);
+          var backendVip = false;
+          if (result.data.user) {
+            backendVip = (result.data.user.isVIP === true || result.data.user.isVip === true);
+          }
+          completeLogin((result.data.user && result.data.user.displayName) || displayNameVal, backendVip);
           return;
         }
 
