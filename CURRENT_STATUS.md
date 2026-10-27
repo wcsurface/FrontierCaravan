@@ -10,6 +10,7 @@
 - [x] **Concert Logging & Vault**: Log headline artist, openers, date, venue, city, state, country, general notes, ticket price, and setlists.
 - [x] **Multi-Color Vintage Ticket Stubs**: Automatic ticket color selection with classic or multi-color theme toggle.
 - [x] **Strict Account Vault Isolation**: Each account (`wcsurface@gmail.com`, `reviewer@livelore.app`, `queenie162001@gmail.com`) is strictly isolated to its own cloud/local data vault; no cross-account data leakage. Pre-seeded credentials for `reviewer@livelore.app` (`TestPassword123!`).
+- [x] **Smart Settings UI**: Automatically hides "CHANGE PASSWORD" section in Settings for Google Sign-In users since they authenticate via Google OAuth.
 - [x] **Verified VIP Pass & Ad-Free Experience**: Confirmed `reviewer@livelore.app` recognized as VIP (`✓ VIP CONFIRMED`) with 100% ad-free experience, CSV export unlocked, and empty initial vault (`0 CONCERTS LOGGED`).
 - [x] **Top Scroll Positioning**: Automatic scroll reset to `(0,0)` on all screen transitions, ensuring Logo, Header, Navigation bar, and VIP Pass card display at the top of the Settings view.
 - [x] **Fail-Safe Offline/Cloud Vault Sync**: Immediate local persistence to `localStorage` + `IndexedDB` with non-destructive concert and photo merge (`POST /api/sync/push` & `GET /api/sync/pull`).
