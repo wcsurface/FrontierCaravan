@@ -1,15 +1,15 @@
 # CURRENT_STATUS.md - LiveLore: Concert Diary & Setlist Vault
 
 ## Current Development Status
-**Active Version**: 1.0.13 (versionCode: 14, API Backend v6.1.0)
+**Active Version**: 1.0.15 (versionCode: 16, API Backend v6.1.0)
 **Build Status**: ✅ Passing (`:app:assembleDebug` & `:app:bundleRelease` build cleanly)
 
 ---
 
 ## Completed Features
-- [x] **WebSettings & MobileAds Try-Catch Guards**: Added `try-catch (e: Throwable)` wrappers around `WebSettings` configuration (`databaseEnabled`, `allowFileAccessFromFileURLs`, `allowUniversalAccessFromFileURLs`) and `MobileAds.initialize` / `AdView` in `MainActivity.kt`. This prevents modern Chromium/WebView runtime security policy exceptions from crashing app launch.
-- [x] **100% Release Build Parity**: Set `isMinifyEnabled = false` for release builds to eliminate bytecode/reflection obfuscation differences between debug and release builds.
-- [x] **Release Versioning**: Version bumped to **`1.0.13`** (`versionCode = 14`) for Google Play Store release.
+- [x] **Immediate VIP Upgrade Ad Hiding**: Removed legacy `test@testaccount.com` VIP override block in `checkIsVIPUser()`, persisted `livelore_vip_<cleanEmail>` in local storage, and triggered `window.AndroidAdMob.hideBannerAd()` immediately upon in-app purchase completion.
+- [x] **Persistent Login Sessions**: Removed `webView.clearCache(true)` and changed WebSettings cache mode to `LOAD_DEFAULT` in `MainActivity.kt`. Local storage user session (`livelore_active_user`) and offline vault keys now persist indefinitely across app launches until the user explicitly logs out or switches devices.
+- [x] **Release Versioning**: Version bumped to **`1.0.15`** (`versionCode = 16`) for Google Play Store release.
 
 ---
 
