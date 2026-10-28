@@ -1,15 +1,15 @@
 # CURRENT_STATUS.md - LiveLore: Concert Diary & Setlist Vault
 
 ## Current Development Status
-**Active Version**: 1.0.9 (versionCode: 10, API Backend v6.1.0)
+**Active Version**: 1.0.10 (versionCode: 11, API Backend v6.1.0)
 **Build Status**: ✅ Passing (`:app:assembleDebug` & `:app:bundleRelease` build cleanly)
 
 ---
 
 ## Completed Features
+- [x] **Activity Theme Compatibility**: Updated `app/src/main/res/values/themes.xml` and `AndroidManifest.xml` to inherit from `Theme.AppCompat.NoActionBar` (`Theme.LiveLore`) with dark `#0A0D0E` background. This resolves the `ComponentActivity` / `AdView` theme inflation crash when launching release builds on Android 10-15.
 - [x] **Native NDK Debug Symbols**: Configured `ndk { debugSymbolLevel = "SYMBOL_TABLE" }` in `app/build.gradle.kts` to package native debug symbol tables directly inside release App Bundles (`.aab`) for Google Play crash & ANR symbolication.
-- [x] **R8 Code Shrinking & Deobfuscation**: Re-enabled R8 minification (`isMinifyEnabled = true`) with full Proguard keep rules and `mapping.txt` generation, optimizing APK/AAB size for faster user downloads.
-- [x] **Release Versioning**: Version bumped to **`1.0.9`** (`versionCode = 10`) for Google Play Store release.
+- [x] **Release Versioning**: Version bumped to **`1.0.10`** (`versionCode = 11`) for Google Play Store release.
 
 ---
 

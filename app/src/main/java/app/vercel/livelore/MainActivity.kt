@@ -253,16 +253,22 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        try { adView.resume() } catch (e: Exception) {}
+        try {
+            if (::adView.isInitialized) adView.resume()
+        } catch (e: Throwable) {}
     }
 
     override fun onPause() {
-        try { adView.pause() } catch (e: Exception) {}
+        try {
+            if (::adView.isInitialized) adView.pause()
+        } catch (e: Throwable) {}
         super.onPause()
     }
 
     override fun onDestroy() {
-        try { adView.destroy() } catch (e: Exception) {}
+        try {
+            if (::adView.isInitialized) adView.destroy()
+        } catch (e: Throwable) {}
         super.onDestroy()
     }
 
@@ -336,14 +342,22 @@ class MainActivity : ComponentActivity() {
         @JavascriptInterface
         fun showBannerAd() {
             runOnUiThread {
-                adContainerLayout.visibility = View.VISIBLE
+                try {
+                    if (::adContainerLayout.isInitialized) {
+                        adContainerLayout.visibility = View.VISIBLE
+                    }
+                } catch (e: Throwable) {}
             }
         }
 
         @JavascriptInterface
         fun hideBannerAd() {
             runOnUiThread {
-                adContainerLayout.visibility = View.GONE
+                try {
+                    if (::adContainerLayout.isInitialized) {
+                        adContainerLayout.visibility = View.GONE
+                    }
+                } catch (e: Throwable) {}
             }
         }
     }
@@ -452,88 +466,113 @@ class MainActivity : ComponentActivity() {
     }
 
     inner class AndroidBillingInterface(private val context: Context) : PurchasesUpdatedListener {
-        private var billingClient: BillingClient = BillingClient.newBuilder(context)
-            .setListener(this)
-            .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
-            .build()
-
+        private lateinit var billingClient: BillingClient
         private val VIP_PRODUCT_ID = "vip_pass_499"
 
         init {
-            startConnection()
+            try {
+                billingClient = BillingClient.newBuilder(context)
+                    .setListener(this)
+                    .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
+                    .build()
+                startConnection()
+            } catch (e: Throwable) {
+                e.printStackTrace()
+            }
         }
 
         private fun startConnection(onConnected: (() -> Unit)? = null) {
-            billingClient.startConnection(object : BillingClientStateListener {
-                override fun onBillingSetupFinished(billingResult: BillingResult) {
-                    if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                        queryExistingPurchases()
-                        onConnected?.invoke()
+            if (!::billingClient.isInitialized) return
+            try {
+                billingClient.startConnection(object : BillingClientStateListener {
+                    override fun onBillingSetupFinished(billingResult: BillingResult) {
+                        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                            queryExistingPurchases()
+                            onConnected?.invoke()
+                        }
                     }
-                }
 
-                override fun onBillingServiceDisconnected() {
-                    // Re-connect on next action
-                }
-            })
+                    override fun onBillingServiceDisconnected() {
+                        // Re-connect on next action
+                    }
+                })
+            } catch (e: Throwable) {
+                e.printStackTrace()
+            }
         }
 
         private fun queryExistingPurchases() {
-            if (!billingClient.isReady) return
-            val params = QueryPurchasesParams.newBuilder()
-                .setProductType(BillingClient.ProductType.INAPP)
-                .build()
+            if (!::billingClient.isInitialized || !billingClient.isReady) return
+            try {
+                val params = QueryPurchasesParams.newBuilder()
+                    .setProductType(BillingClient.ProductType.INAPP)
+                    .build()
 
-            billingClient.queryPurchasesAsync(params) { billingResult, purchases ->
-                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                    for (purchase in purchases) {
-                        if (purchase.products.contains(VIP_PRODUCT_ID) && purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
-                            handlePurchaseSuccess(purchase)
+                billingClient.queryPurchasesAsync(params) { billingResult, purchases ->
+                    if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
+                        for (purchase in purchases) {
+                            if (purchase.products.contains(VIP_PRODUCT_ID) && purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
+                                handlePurchaseSuccess(purchase)
+                            }
                         }
                     }
                 }
+            } catch (e: Throwable) {
+                e.printStackTrace()
             }
         }
 
         @JavascriptInterface
         fun launchVipPurchase() {
             runOnUiThread {
+                if (!::billingClient.isInitialized) {
+                    webView.post {
+                        webView.evaluateJavascript("onNativeVipPurchaseFallback()", null)
+                    }
+                    return@runOnUiThread
+                }
+
                 if (!billingClient.isReady) {
                     startConnection { launchVipPurchase() }
                     return@runOnUiThread
                 }
 
-                val productList = listOf(
-                    QueryProductDetailsParams.Product.newBuilder()
-                        .setProductId(VIP_PRODUCT_ID)
-                        .setProductType(BillingClient.ProductType.INAPP)
-                        .build()
-                )
-
-                val params = QueryProductDetailsParams.newBuilder()
-                    .setProductList(productList)
-                    .build()
-
-                billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsResult ->
-                    val list = productDetailsResult.productDetailsList
-                    if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && !list.isNullOrEmpty()) {
-                        val productDetails = list[0]
-                        val flowParams = BillingFlowParams.newBuilder()
-                            .setProductDetailsParamsList(
-                                listOf(
-                                    BillingFlowParams.ProductDetailsParams.newBuilder()
-                                        .setProductDetails(productDetails)
-                                        .build()
-                                )
-                            )
+                try {
+                    val productList = listOf(
+                        QueryProductDetailsParams.Product.newBuilder()
+                            .setProductId(VIP_PRODUCT_ID)
+                            .setProductType(BillingClient.ProductType.INAPP)
                             .build()
+                    )
 
-                        billingClient.launchBillingFlow(this@MainActivity, flowParams)
-                    } else {
-                        // Fallback: Notify JS to execute VIP upgrade if product is pending Play Console review
-                        webView.post {
-                            webView.evaluateJavascript("onNativeVipPurchaseFallback()", null)
+                    val params = QueryProductDetailsParams.newBuilder()
+                        .setProductList(productList)
+                        .build()
+
+                    billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsResult ->
+                        val list = productDetailsResult.productDetailsList
+                        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && !list.isNullOrEmpty()) {
+                            val productDetails = list[0]
+                            val flowParams = BillingFlowParams.newBuilder()
+                                .setProductDetailsParamsList(
+                                    listOf(
+                                        BillingFlowParams.ProductDetailsParams.newBuilder()
+                                            .setProductDetails(productDetails)
+                                            .build()
+                                    )
+                                )
+                                .build()
+
+                            billingClient.launchBillingFlow(this@MainActivity, flowParams)
+                        } else {
+                            webView.post {
+                                webView.evaluateJavascript("onNativeVipPurchaseFallback()", null)
+                            }
                         }
+                    }
+                } catch (e: Throwable) {
+                    webView.post {
+                        webView.evaluateJavascript("onNativeVipPurchaseFallback()", null)
                     }
                 }
             }
@@ -542,6 +581,7 @@ class MainActivity : ComponentActivity() {
         @JavascriptInterface
         fun restoreVipPurchase() {
             runOnUiThread {
+                if (!::billingClient.isInitialized) return@runOnUiThread
                 if (!billingClient.isReady) {
                     startConnection { restoreVipPurchase() }
                     return@runOnUiThread
@@ -566,15 +606,17 @@ class MainActivity : ComponentActivity() {
 
         private fun handlePurchaseSuccess(purchase: Purchase) {
             if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
-                if (!purchase.isAcknowledged) {
-                    val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
-                        .setPurchaseToken(purchase.purchaseToken)
-                        .build()
-                    billingClient.acknowledgePurchase(acknowledgePurchaseParams) { _ -> }
+                if (!purchase.isAcknowledged && ::billingClient.isInitialized) {
+                    try {
+                        val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
+                            .setPurchaseToken(purchase.purchaseToken)
+                            .build()
+                        billingClient.acknowledgePurchase(acknowledgePurchaseParams) { _ -> }
+                    } catch (e: Throwable) {}
                 }
 
                 webView.post {
-                    webView.evaluateJavascript("onNativeVipPurchaseSuccess()", null)
+                    webView.evaluateJavascript("if(typeof window.onNativeVipPurchaseSuccess==='function'){window.onNativeVipPurchaseSuccess();}", null)
                 }
             }
         }
