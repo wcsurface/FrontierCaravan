@@ -67,8 +67,12 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
 
         hideSystemUI()
 
-        // 1. Initialize Google Mobile Ads SDK
-        MobileAds.initialize(this) {}
+        // 1. Initialize Google Mobile Ads SDK safely
+        try {
+            MobileAds.initialize(this) {}
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
 
         // 2. Main Root Layout (Vertical Linear Layout)
         val rootLayout = LinearLayout(this).apply {
@@ -90,21 +94,23 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
         }
 
         val settings: WebSettings = webView.settings
-        settings.javaScriptEnabled = true
-        settings.domStorageEnabled = true
-        settings.databaseEnabled = true
-        settings.allowFileAccess = true
-        settings.allowContentAccess = true
-        @Suppress("DEPRECATION")
-        settings.allowFileAccessFromFileURLs = true
-        @Suppress("DEPRECATION")
-        settings.allowUniversalAccessFromFileURLs = true
-        settings.setSupportZoom(false)
-        settings.builtInZoomControls = false
-        settings.displayZoomControls = false
-        settings.cacheMode = WebSettings.LOAD_NO_CACHE
+        try { settings.javaScriptEnabled = true } catch (e: Throwable) {}
+        try { settings.domStorageEnabled = true } catch (e: Throwable) {}
+        try { settings.databaseEnabled = true } catch (e: Throwable) {}
+        try { settings.allowFileAccess = true } catch (e: Throwable) {}
+        try { settings.allowContentAccess = true } catch (e: Throwable) {}
+        try {
+            @Suppress("DEPRECATION")
+            settings.allowFileAccessFromFileURLs = true
+            @Suppress("DEPRECATION")
+            settings.allowUniversalAccessFromFileURLs = true
+        } catch (e: Throwable) {}
+        try { settings.setSupportZoom(false) } catch (e: Throwable) {}
+        try { settings.builtInZoomControls = false } catch (e: Throwable) {}
+        try { settings.displayZoomControls = false } catch (e: Throwable) {}
+        try { settings.cacheMode = WebSettings.LOAD_NO_CACHE } catch (e: Throwable) {}
 
-        try { webView.clearCache(true) } catch (e: Exception) {}
+        try { webView.clearCache(true) } catch (e: Throwable) {}
 
         // WebChromeClient with onShowFileChooser for Camera vs Camera Roll Photo Selection
         webView.webChromeClient = object : WebChromeClient() {
