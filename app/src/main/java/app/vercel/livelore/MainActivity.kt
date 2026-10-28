@@ -108,9 +108,7 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
         try { settings.setSupportZoom(false) } catch (e: Throwable) {}
         try { settings.builtInZoomControls = false } catch (e: Throwable) {}
         try { settings.displayZoomControls = false } catch (e: Throwable) {}
-        try { settings.cacheMode = WebSettings.LOAD_NO_CACHE } catch (e: Throwable) {}
-
-        try { webView.clearCache(true) } catch (e: Throwable) {}
+        try { settings.cacheMode = WebSettings.LOAD_DEFAULT } catch (e: Throwable) {}
 
         // WebChromeClient with onShowFileChooser for Camera vs Camera Roll Photo Selection
         webView.webChromeClient = object : WebChromeClient() {

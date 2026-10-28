@@ -1,14 +1,15 @@
 # CURRENT_STATUS.md - LiveLore: Concert Diary & Setlist Vault
 
 ## Current Development Status
-**Active Version**: 1.0.11 (versionCode: 12, API Backend v6.1.0)
+**Active Version**: 1.0.13 (versionCode: 14, API Backend v6.1.0)
 **Build Status**: ✅ Passing (`:app:assembleDebug` & `:app:bundleRelease` build cleanly)
 
 ---
 
 ## Completed Features
-- [x] **Lateinit Property Safety Guards**: Added `::isInitialized` checks and `try-catch (e: Throwable)` wrappers around `adView`, `adContainerLayout`, and `billingClient` across `onResume()`, `onPause()`, `onDestroy()`, and JavaScript interfaces. This resolves the `UninitializedPropertyAccessException` startup crash after logo rendering.
-- [x] **Release Versioning**: Version bumped to **`1.0.11`** (`versionCode = 12`) for Google Play Store release.
+- [x] **WebSettings & MobileAds Try-Catch Guards**: Added `try-catch (e: Throwable)` wrappers around `WebSettings` configuration (`databaseEnabled`, `allowFileAccessFromFileURLs`, `allowUniversalAccessFromFileURLs`) and `MobileAds.initialize` / `AdView` in `MainActivity.kt`. This prevents modern Chromium/WebView runtime security policy exceptions from crashing app launch.
+- [x] **100% Release Build Parity**: Set `isMinifyEnabled = false` for release builds to eliminate bytecode/reflection obfuscation differences between debug and release builds.
+- [x] **Release Versioning**: Version bumped to **`1.0.13`** (`versionCode = 14`) for Google Play Store release.
 
 ---
 

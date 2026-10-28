@@ -474,6 +474,12 @@
       if (typeof checkIsVIPUser === 'function') isVIPUser = checkIsVIPUser(activeEmail);
       if (typeof updateProfileVipCard === 'function') updateProfileVipCard();
 
+      // Persistent Session: Automatically transition to Diary screen on app startup if signed in
+      var authView = document.getElementById('view-auth');
+      if (authView && authView.classList.contains('active')) {
+        if (typeof showScreen === 'function') showScreen('diary');
+      }
+
       var vipSubtitle = document.getElementById('vip-pass-subtitle');
       if (vipSubtitle) {
         vipSubtitle.style.display = isVIPUser ? 'none' : 'block';
