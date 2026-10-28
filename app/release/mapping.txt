@@ -3,8 +3,8 @@
 # min_api: 26
 # common_typos_disable
 # {"id":"com.android.tools.r8.mapping","version":"2.2"}
-# pg_map_id: fbf09433c5538caaf64ab38299c8cc97bf570f7b164d202fdbee49d8499a8aed
-# pg_map_hash: SHA-256 fbf09433c5538caaf64ab38299c8cc97bf570f7b164d202fdbee49d8499a8aed
+# pg_map_id: a241b62cd2585b64782f752be9d918adcc267bd0cead359fabe7c5d44a735f87
+# pg_map_hash: SHA-256 a241b62cd2585b64782f752be9d918adcc267bd0cead359fabe7c5d44a735f87
 android.app.AppComponentFactory -> android.app.AppComponentFactory:
 # {"id":"com.android.tools.r8.synthesized"}
     void <clinit>() -> <clinit>
@@ -66333,43 +66333,43 @@ app.vercel.livelore.MainActivity -> app.vercel.livelore.MainActivity:
     1:14:void hideSystemUI():237:237 -> hideSystemUI
     1:4:void $r8$lambda$yrAePyUSlsYiAS1GNU6PVSdaNTQ(com.google.android.gms.ads.initialization.InitializationStatus):0:0 -> i
       # {"id":"com.android.tools.r8.synthesized"}
-    1:3:void onActivityResult(int,int,android.content.Intent):271:271 -> onActivityResult
-    4:11:void onActivityResult(int,int,android.content.Intent):273:273 -> onActivityResult
-    12:21:void onActivityResult(int,int,android.content.Intent):274:274 -> onActivityResult
-    22:34:void onActivityResult(int,int,android.content.Intent):278:278 -> onActivityResult
-    35:40:void onActivityResult(int,int,android.content.Intent):283:283 -> onActivityResult
-    41:51:void onActivityResult(int,int,android.content.Intent):284:284 -> onActivityResult
-    52:59:void onActivityResult(int,int,android.content.Intent):285:285 -> onActivityResult
-    60:83:void onActivityResult(int,int,android.content.Intent):287:287 -> onActivityResult
+    1:3:void onActivityResult(int,int,android.content.Intent):277:277 -> onActivityResult
+    4:11:void onActivityResult(int,int,android.content.Intent):279:279 -> onActivityResult
+    12:21:void onActivityResult(int,int,android.content.Intent):280:280 -> onActivityResult
+    22:34:void onActivityResult(int,int,android.content.Intent):284:284 -> onActivityResult
+    35:40:void onActivityResult(int,int,android.content.Intent):289:289 -> onActivityResult
+    41:51:void onActivityResult(int,int,android.content.Intent):290:290 -> onActivityResult
+    52:59:void onActivityResult(int,int,android.content.Intent):291:291 -> onActivityResult
+    60:83:void onActivityResult(int,int,android.content.Intent):293:293 -> onActivityResult
     84:92:java.lang.Object[] kotlin.collections.ArraysKt__ArraysJVMKt.toTypedArray(java.util.Collection):38:38 -> onActivityResult
-    84:92:void onActivityResult(int,int,android.content.Intent):289 -> onActivityResult
-    93:98:void onActivityResult(int,int,android.content.Intent):290:290 -> onActivityResult
-    99:110:void onActivityResult(int,int,android.content.Intent):291:291 -> onActivityResult
-    111:114:void onActivityResult(int,int,android.content.Intent):279:279 -> onActivityResult
-    115:121:void onActivityResult(int,int,android.content.Intent):280:280 -> onActivityResult
-    122:128:void onActivityResult(int,int,android.content.Intent):296:296 -> onActivityResult
-    129:131:void onActivityResult(int,int,android.content.Intent):297:297 -> onActivityResult
-    132:135:void onActivityResult(int,int,android.content.Intent):298:298 -> onActivityResult
-    136:141:void onActivityResult(int,int,android.content.Intent):299:299 -> onActivityResult
-    142:149:void onActivityResult(int,int,android.content.Intent):300:300 -> onActivityResult
-    150:155:void onActivityResult(int,int,android.content.Intent):301:301 -> onActivityResult
-    156:163:void onActivityResult(int,int,android.content.Intent):302:302 -> onActivityResult
-    164:175:void onActivityResult(int,int,android.content.Intent):304:304 -> onActivityResult
-    176:202:void onActivityResult(int,int,android.content.Intent):306:306 -> onActivityResult
-    203:223:void onActivityResult(int,int,android.content.Intent):307:307 -> onActivityResult
-    224:232:void onActivityResult(int,int,android.content.Intent):308:308 -> onActivityResult
+    84:92:void onActivityResult(int,int,android.content.Intent):295 -> onActivityResult
+    93:98:void onActivityResult(int,int,android.content.Intent):296:296 -> onActivityResult
+    99:110:void onActivityResult(int,int,android.content.Intent):297:297 -> onActivityResult
+    111:114:void onActivityResult(int,int,android.content.Intent):285:285 -> onActivityResult
+    115:121:void onActivityResult(int,int,android.content.Intent):286:286 -> onActivityResult
+    122:128:void onActivityResult(int,int,android.content.Intent):302:302 -> onActivityResult
+    129:131:void onActivityResult(int,int,android.content.Intent):303:303 -> onActivityResult
+    132:135:void onActivityResult(int,int,android.content.Intent):304:304 -> onActivityResult
+    136:141:void onActivityResult(int,int,android.content.Intent):305:305 -> onActivityResult
+    142:149:void onActivityResult(int,int,android.content.Intent):306:306 -> onActivityResult
+    150:155:void onActivityResult(int,int,android.content.Intent):307:307 -> onActivityResult
+    156:163:void onActivityResult(int,int,android.content.Intent):308:308 -> onActivityResult
+    164:175:void onActivityResult(int,int,android.content.Intent):310:310 -> onActivityResult
+    176:202:void onActivityResult(int,int,android.content.Intent):312:312 -> onActivityResult
+    203:223:void onActivityResult(int,int,android.content.Intent):313:313 -> onActivityResult
+    224:232:void onActivityResult(int,int,android.content.Intent):314:314 -> onActivityResult
     233:241:int kotlin.text.StringsKt__StringsKt.indexOf$default(java.lang.CharSequence,java.lang.String,int,boolean,int,java.lang.Object):1128:1128 -> onActivityResult
     233:241:boolean kotlin.text.StringsKt__StringsKt.contains(java.lang.CharSequence,java.lang.CharSequence,boolean):1175 -> onActivityResult
     233:241:boolean kotlin.text.StringsKt__StringsKt.contains$default(java.lang.CharSequence,java.lang.CharSequence,boolean,int,java.lang.Object):1172 -> onActivityResult
-    233:241:void onActivityResult(int,int,android.content.Intent):308 -> onActivityResult
-    242:248:void onActivityResult(int,int,android.content.Intent):316:316 -> onActivityResult
-    249:265:void onActivityResult(int,int,android.content.Intent):317:317 -> onActivityResult
-    266:282:void onActivityResult(int,int,android.content.Intent):318:318 -> onActivityResult
-    283:299:void onActivityResult(int,int,android.content.Intent):322:322 -> onActivityResult
-    300:317:void onActivityResult(int,int,android.content.Intent):327:327 -> onActivityResult
-    1:34:void onActivityResult$lambda$5(app.vercel.livelore.MainActivity,java.lang.String):319:319 -> onActivityResult$lambda$5
-    1:17:void onActivityResult$lambda$6(app.vercel.livelore.MainActivity):323:323 -> onActivityResult$lambda$6
-    1:17:void onActivityResult$lambda$7(app.vercel.livelore.MainActivity):328:328 -> onActivityResult$lambda$7
+    233:241:void onActivityResult(int,int,android.content.Intent):314 -> onActivityResult
+    242:248:void onActivityResult(int,int,android.content.Intent):322:322 -> onActivityResult
+    249:265:void onActivityResult(int,int,android.content.Intent):323:323 -> onActivityResult
+    266:282:void onActivityResult(int,int,android.content.Intent):324:324 -> onActivityResult
+    283:299:void onActivityResult(int,int,android.content.Intent):328:328 -> onActivityResult
+    300:317:void onActivityResult(int,int,android.content.Intent):333:333 -> onActivityResult
+    1:34:void onActivityResult$lambda$5(app.vercel.livelore.MainActivity,java.lang.String):325:325 -> onActivityResult$lambda$5
+    1:17:void onActivityResult$lambda$6(app.vercel.livelore.MainActivity):329:329 -> onActivityResult$lambda$6
+    1:17:void onActivityResult$lambda$7(app.vercel.livelore.MainActivity):334:334 -> onActivityResult$lambda$7
     1:5:void onCreate(android.os.Bundle):66:66 -> onCreate
     6:8:void onCreate(android.os.Bundle):68:68 -> onCreate
     9:16:void onCreate(android.os.Bundle):71:71 -> onCreate
@@ -66432,12 +66432,12 @@ app.vercel.livelore.MainActivity -> app.vercel.livelore.MainActivity:
     390:393:void onCreate(android.os.Bundle):167:167 -> onCreate
     394:397:void onCreate(android.os.Bundle):110:110 -> onCreate
     1:4:void onCreate$lambda$0(com.google.android.gms.ads.initialization.InitializationStatus):0:0 -> onCreate$lambda$0
-    1:15:void onDestroy():265:265 -> onDestroy
-    16:19:void onDestroy():266:266 -> onDestroy
-    1:15:void onPause():260:260 -> onPause
-    16:19:void onPause():261:261 -> onPause
+    1:17:void onDestroy():270:270 -> onDestroy
+    18:21:void onDestroy():272:272 -> onDestroy
+    1:17:void onPause():263:263 -> onPause
+    18:21:void onPause():265:265 -> onPause
     1:3:void onResume():255:255 -> onResume
-    4:19:void onResume():256:256 -> onResume
+    4:21:void onResume():257:257 -> onResume
     1:5:void onWindowFocusChanged(boolean):248:248 -> onWindowFocusChanged
     6:9:void onWindowFocusChanged(boolean):250:250 -> onWindowFocusChanged
 app.vercel.livelore.MainActivity$$ExternalSyntheticLambda0 -> tm:
@@ -66467,296 +66467,313 @@ app.vercel.livelore.MainActivity$$ExternalSyntheticLambda2 -> vm:
       # {"id":"com.android.tools.r8.synthesized"}
     1:8:void MainActivity$$ExternalSyntheticLambda2.<init>(app.vercel.livelore.MainActivity,byte):0:0 -> <init>
       # {"id":"com.android.tools.r8.synthesized"}
-    1:48:void MainActivity$$ExternalSyntheticLambda2.run():0:0 -> run
+    1:56:void MainActivity$$ExternalSyntheticLambda2.run():0:0 -> run
       # {"id":"com.android.tools.r8.synthesized"}
 app.vercel.livelore.MainActivity$AndroidAdMobInterface -> app.vercel.livelore.MainActivity$AndroidAdMobInterface:
 # {"id":"sourceFile","fileName":"MainActivity.kt"}
-    1:6:void <init>(app.vercel.livelore.MainActivity):335:335 -> <init>
+    1:6:void <init>(app.vercel.livelore.MainActivity):341:341 -> <init>
     1:4:void $r8$lambda$UmG-C_u_6b9_XUqvkVNfwTGH3jU(app.vercel.livelore.MainActivity):0:0 -> a
       # {"id":"com.android.tools.r8.synthesized"}
     1:4:void $r8$lambda$fpPr5ncKt0JpE4ggihAojIsKLh4(app.vercel.livelore.MainActivity):0:0 -> b
       # {"id":"com.android.tools.r8.synthesized"}
-    1:12:void hideBannerAd():345:345 -> hideBannerAd
-    1:19:void hideBannerAd$lambda$1(app.vercel.livelore.MainActivity):346:346 -> hideBannerAd$lambda$1
-    1:12:void showBannerAd():338:338 -> showBannerAd
-    1:18:void showBannerAd$lambda$0(app.vercel.livelore.MainActivity):339:339 -> showBannerAd$lambda$0
+    1:12:void hideBannerAd():355:355 -> hideBannerAd
+    1:6:void hideBannerAd$lambda$1(app.vercel.livelore.MainActivity):357:357 -> hideBannerAd$lambda$1
+    7:26:void hideBannerAd$lambda$1(app.vercel.livelore.MainActivity):358:358 -> hideBannerAd$lambda$1
+    1:12:void showBannerAd():344:344 -> showBannerAd
+    1:6:void showBannerAd$lambda$0(app.vercel.livelore.MainActivity):346:346 -> showBannerAd$lambda$0
+    7:25:void showBannerAd$lambda$0(app.vercel.livelore.MainActivity):347:347 -> showBannerAd$lambda$0
 app.vercel.livelore.MainActivity$AndroidBillingInterface -> app.vercel.livelore.MainActivity$AndroidBillingInterface:
 # {"id":"sourceFile","fileName":"MainActivity.kt"}
-    4:10:void <init>(app.vercel.livelore.MainActivity,android.content.Context):454:454 -> <init>
-    11:14:void <init>(app.vercel.livelore.MainActivity,android.content.Context):455:455 -> <init>
-    15:18:void <init>(app.vercel.livelore.MainActivity,android.content.Context):456:456 -> <init>
-    19:34:void <init>(app.vercel.livelore.MainActivity,android.content.Context):457:457 -> <init>
-    35:43:void <init>(app.vercel.livelore.MainActivity,android.content.Context):458:458 -> <init>
-    44:49:void <init>(app.vercel.livelore.MainActivity,android.content.Context):460:460 -> <init>
-    50:53:void <init>(app.vercel.livelore.MainActivity,android.content.Context):463:463 -> <init>
-    1:4:void $r8$lambda$5ESHDNGUkCix9ypb1ZFvFImQC7w(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):0:0 -> a
+    4:10:void <init>(app.vercel.livelore.MainActivity,android.content.Context):468:468 -> <init>
+    11:14:void <init>(app.vercel.livelore.MainActivity,android.content.Context):470:470 -> <init>
+    15:18:void <init>(app.vercel.livelore.MainActivity,android.content.Context):474:474 -> <init>
+    19:22:void <init>(app.vercel.livelore.MainActivity,android.content.Context):475:475 -> <init>
+    23:38:void <init>(app.vercel.livelore.MainActivity,android.content.Context):476:476 -> <init>
+    39:45:void <init>(app.vercel.livelore.MainActivity,android.content.Context):477:477 -> <init>
+    46:49:void <init>(app.vercel.livelore.MainActivity,android.content.Context):474:474 -> <init>
+    50:54:void <init>(app.vercel.livelore.MainActivity,android.content.Context):478:478 -> <init>
+    55:58:void <init>(app.vercel.livelore.MainActivity,android.content.Context):480:480 -> <init>
+    1:4:void $r8$lambda$06_fZqynHbyc92zUXll5Td3HhX4(com.android.billingclient.api.BillingResult):0:0 -> a
       # {"id":"com.android.tools.r8.synthesized"}
-    1:4:void access$queryExistingPurchases(app.vercel.livelore.MainActivity$AndroidBillingInterface):454:454 -> access$queryExistingPurchases
-    1:4:void $r8$lambda$8BZgIwQ7f9iIaOb4BEpZ2Ll1qL0(app.vercel.livelore.MainActivity):0:0 -> b
+    1:4:void access$queryExistingPurchases(app.vercel.livelore.MainActivity$AndroidBillingInterface):468:468 -> access$queryExistingPurchases
+    1:4:void $r8$lambda$3F3ctBDsJvKXvkY5l2Ogs_Mkwtg(app.vercel.livelore.MainActivity):0:0 -> b
       # {"id":"com.android.tools.r8.synthesized"}
-    1:5:Unit $r8$lambda$9kzGK_NLb70qs3i5n4sBRPm6WuM(app.vercel.livelore.MainActivity$AndroidBillingInterface):0:0 -> c
+    1:4:void $r8$lambda$B4Jvt3WdA2sWJmkgclgPyRdBUik(app.vercel.livelore.MainActivity$AndroidBillingInterface,com.android.billingclient.api.BillingResult,java.util.List):0:0 -> c
+      # {"id":"com.android.tools.r8.synthesized"}
+    1:4:void $r8$lambda$HYXCfTu49VAYpP8peuyno5rPfKU(app.vercel.livelore.MainActivity):0:0 -> d
+      # {"id":"com.android.tools.r8.synthesized"}
+    1:4:void $r8$lambda$LyTe24GzHi8MGM6Mi_jB-Dt9w5c(app.vercel.livelore.MainActivity):0:0 -> e
+      # {"id":"com.android.tools.r8.synthesized"}
+    1:4:void $r8$lambda$Onxjmv_Kly4UD1ajQn0UxihiOQY(app.vercel.livelore.MainActivity):0:0 -> f
+      # {"id":"com.android.tools.r8.synthesized"}
+    1:5:Unit $r8$lambda$U4ENSVTqm6jJBiPvZQEx_VR2nEw(app.vercel.livelore.MainActivity$AndroidBillingInterface):0:0 -> g
       # {"id":"com.android.tools.r8.synthesized"}
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lapp/vercel/livelore/MainActivity$AndroidBillingInterface;)Ldz;"}
-    1:4:void $r8$lambda$B4Jvt3WdA2sWJmkgclgPyRdBUik(app.vercel.livelore.MainActivity$AndroidBillingInterface,com.android.billingclient.api.BillingResult,java.util.List):0:0 -> d
+    1:4:void $r8$lambda$Wg8CdpGaHs0T2r4JthdMBLVTOfE(app.vercel.livelore.MainActivity):0:0 -> h
       # {"id":"com.android.tools.r8.synthesized"}
-    1:4:void $r8$lambda$MJqVvSRVhimIk1RSPEIlCnHRAVQ(com.android.billingclient.api.BillingResult):0:0 -> e
+    1:7:void handlePurchaseSuccess(com.android.billingclient.api.Purchase):608:608 -> handlePurchaseSuccess
+    8:18:void handlePurchaseSuccess(com.android.billingclient.api.Purchase):609:609 -> handlePurchaseSuccess
+    19:22:void handlePurchaseSuccess(com.android.billingclient.api.Purchase):611:611 -> handlePurchaseSuccess
+    23:30:void handlePurchaseSuccess(com.android.billingclient.api.Purchase):612:612 -> handlePurchaseSuccess
+    31:37:void handlePurchaseSuccess(com.android.billingclient.api.Purchase):613:613 -> handlePurchaseSuccess
+    38:58:void handlePurchaseSuccess(com.android.billingclient.api.Purchase):614:614 -> handlePurchaseSuccess
+    59:86:void handlePurchaseSuccess(com.android.billingclient.api.Purchase):618:618 -> handlePurchaseSuccess
+    1:4:void handlePurchaseSuccess$lambda$10(com.android.billingclient.api.BillingResult):0:0 -> handlePurchaseSuccess$lambda$10
+    1:19:void handlePurchaseSuccess$lambda$11(app.vercel.livelore.MainActivity):619:619 -> handlePurchaseSuccess$lambda$11
+    1:4:void $r8$lambda$grnfuXxeSnEKrBVINUItdE5MZpA(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):0:0 -> i
       # {"id":"com.android.tools.r8.synthesized"}
-    1:5:Unit $r8$lambda$NYb8FHTXbOYNFQXKZJGswsFKDXc(app.vercel.livelore.MainActivity$AndroidBillingInterface):0:0 -> f
+    1:5:Unit $r8$lambda$jkGIcVMJOVCTdKvEaX0_z3G3Wik(app.vercel.livelore.MainActivity$AndroidBillingInterface):0:0 -> j
       # {"id":"com.android.tools.r8.synthesized"}
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lapp/vercel/livelore/MainActivity$AndroidBillingInterface;)Ldz;"}
-    1:4:void $r8$lambda$XcdMTRqtvLsVW6WxDnA_l9JqWo8(app.vercel.livelore.MainActivity):0:0 -> g
+    1:4:void $r8$lambda$kHA4jhPFVMha6OIgIrnHWyHp5wM(app.vercel.livelore.MainActivity$AndroidBillingInterface):0:0 -> k
       # {"id":"com.android.tools.r8.synthesized"}
-    1:4:void $r8$lambda$b8uUMiVzvmgowbCbcsf-TBtWIag(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):0:0 -> h
+    1:4:void $r8$lambda$w7BT3g8qUXpCiku-pYHZ3vfpVHQ(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):0:0 -> l
       # {"id":"com.android.tools.r8.synthesized"}
-    1:7:void handlePurchaseSuccess(com.android.billingclient.api.Purchase):568:568 -> handlePurchaseSuccess
-    8:13:void handlePurchaseSuccess(com.android.billingclient.api.Purchase):569:569 -> handlePurchaseSuccess
-    14:17:void handlePurchaseSuccess(com.android.billingclient.api.Purchase):570:570 -> handlePurchaseSuccess
-    18:25:void handlePurchaseSuccess(com.android.billingclient.api.Purchase):571:571 -> handlePurchaseSuccess
-    26:32:void handlePurchaseSuccess(com.android.billingclient.api.Purchase):572:572 -> handlePurchaseSuccess
-    33:44:void handlePurchaseSuccess(com.android.billingclient.api.Purchase):573:573 -> handlePurchaseSuccess
-    45:72:void handlePurchaseSuccess(com.android.billingclient.api.Purchase):576:576 -> handlePurchaseSuccess
-    1:4:void handlePurchaseSuccess$lambda$8(com.android.billingclient.api.BillingResult):0:0 -> handlePurchaseSuccess$lambda$8
-    1:19:void handlePurchaseSuccess$lambda$9(app.vercel.livelore.MainActivity):577:577 -> handlePurchaseSuccess$lambda$9
-    1:4:void $r8$lambda$bvBiC7IT-VIvzy81cJJlsq1i3EY(app.vercel.livelore.MainActivity):0:0 -> i
-      # {"id":"com.android.tools.r8.synthesized"}
-    1:4:void $r8$lambda$pxuIpaMxVv2sHCCwLgU3bJ2Uq44(app.vercel.livelore.MainActivity$AndroidBillingInterface):0:0 -> j
-      # {"id":"com.android.tools.r8.synthesized"}
-    1:12:void launchVipPurchase():500:500 -> launchVipPurchase
-    1:9:void launchVipPurchase$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):501:501 -> launchVipPurchase$lambda$4
-    10:18:void launchVipPurchase$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):502:502 -> launchVipPurchase$lambda$4
-    19:22:void launchVipPurchase$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):507:507 -> launchVipPurchase$lambda$4
-    23:28:void launchVipPurchase$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):508:508 -> launchVipPurchase$lambda$4
-    29:34:void launchVipPurchase$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):509:509 -> launchVipPurchase$lambda$4
-    35:38:void launchVipPurchase$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):510:510 -> launchVipPurchase$lambda$4
-    39:42:void launchVipPurchase$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):506:506 -> launchVipPurchase$lambda$4
-    43:46:void launchVipPurchase$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):513:513 -> launchVipPurchase$lambda$4
-    47:50:void launchVipPurchase$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):514:514 -> launchVipPurchase$lambda$4
-    51:57:void launchVipPurchase$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):515:515 -> launchVipPurchase$lambda$4
-    58:68:void launchVipPurchase$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):517:517 -> launchVipPurchase$lambda$4
-    1:6:kotlin.Unit launchVipPurchase$lambda$4$lambda$1(app.vercel.livelore.MainActivity$AndroidBillingInterface):502:502 -> launchVipPurchase$lambda$4$lambda$1
+    1:12:void launchVipPurchase():527:527 -> launchVipPurchase
+    1:9:void launchVipPurchase$lambda$6(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):528:528 -> launchVipPurchase$lambda$6
+    10:29:void launchVipPurchase$lambda$6(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):529:529 -> launchVipPurchase$lambda$6
+    30:35:void launchVipPurchase$lambda$6(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):535:535 -> launchVipPurchase$lambda$6
+    36:45:void launchVipPurchase$lambda$6(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):536:536 -> launchVipPurchase$lambda$6
+    46:49:void launchVipPurchase$lambda$6(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):542:542 -> launchVipPurchase$lambda$6
+    50:55:void launchVipPurchase$lambda$6(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):543:543 -> launchVipPurchase$lambda$6
+    56:61:void launchVipPurchase$lambda$6(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):544:544 -> launchVipPurchase$lambda$6
+    62:65:void launchVipPurchase$lambda$6(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):545:545 -> launchVipPurchase$lambda$6
+    66:69:void launchVipPurchase$lambda$6(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):541:541 -> launchVipPurchase$lambda$6
+    70:73:void launchVipPurchase$lambda$6(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):548:548 -> launchVipPurchase$lambda$6
+    74:77:void launchVipPurchase$lambda$6(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):549:549 -> launchVipPurchase$lambda$6
+    78:84:void launchVipPurchase$lambda$6(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):550:550 -> launchVipPurchase$lambda$6
+    85:102:void launchVipPurchase$lambda$6(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):552:552 -> launchVipPurchase$lambda$6
+    103:122:void launchVipPurchase$lambda$6(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity):574:574 -> launchVipPurchase$lambda$6
+    1:19:void launchVipPurchase$lambda$6$lambda$1(app.vercel.livelore.MainActivity):530:530 -> launchVipPurchase$lambda$6$lambda$1
+    1:6:kotlin.Unit launchVipPurchase$lambda$6$lambda$2(app.vercel.livelore.MainActivity$AndroidBillingInterface):536:536 -> launchVipPurchase$lambda$6$lambda$2
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lapp/vercel/livelore/MainActivity$AndroidBillingInterface;)Ldz;"}
-    7:13:void launchVipPurchase$lambda$4$lambda$3(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):518:518 -> launchVipPurchase$lambda$4$lambda$3
-    14:26:void launchVipPurchase$lambda$4$lambda$3(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):519:519 -> launchVipPurchase$lambda$4$lambda$3
-    27:32:void launchVipPurchase$lambda$4$lambda$3(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):520:520 -> launchVipPurchase$lambda$4$lambda$3
-    33:36:void launchVipPurchase$lambda$4$lambda$3(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):521:521 -> launchVipPurchase$lambda$4$lambda$3
-    37:40:void launchVipPurchase$lambda$4$lambda$3(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):524:524 -> launchVipPurchase$lambda$4$lambda$3
-    41:44:void launchVipPurchase$lambda$4$lambda$3(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):525:525 -> launchVipPurchase$lambda$4$lambda$3
-    45:48:void launchVipPurchase$lambda$4$lambda$3(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):526:526 -> launchVipPurchase$lambda$4$lambda$3
-    49:52:void launchVipPurchase$lambda$4$lambda$3(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):523:523 -> launchVipPurchase$lambda$4$lambda$3
-    53:56:void launchVipPurchase$lambda$4$lambda$3(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):522:522 -> launchVipPurchase$lambda$4$lambda$3
-    57:63:void launchVipPurchase$lambda$4$lambda$3(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):529:529 -> launchVipPurchase$lambda$4$lambda$3
-    64:69:void launchVipPurchase$lambda$4$lambda$3(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):531:531 -> launchVipPurchase$lambda$4$lambda$3
-    70:92:void launchVipPurchase$lambda$4$lambda$3(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):534:534 -> launchVipPurchase$lambda$4$lambda$3
-    1:19:void launchVipPurchase$lambda$4$lambda$3$lambda$2(app.vercel.livelore.MainActivity):535:535 -> launchVipPurchase$lambda$4$lambda$3$lambda$2
-    4:11:void onPurchasesUpdated(com.android.billingclient.api.BillingResult,java.util.List):554:554 -> onPurchasesUpdated
-    12:27:void onPurchasesUpdated(com.android.billingclient.api.BillingResult,java.util.List):555:555 -> onPurchasesUpdated
-    28:31:void onPurchasesUpdated(com.android.billingclient.api.BillingResult,java.util.List):556:556 -> onPurchasesUpdated
-    32:38:void onPurchasesUpdated(com.android.billingclient.api.BillingResult,java.util.List):558:558 -> onPurchasesUpdated
-    39:66:void onPurchasesUpdated(com.android.billingclient.api.BillingResult,java.util.List):561:561 -> onPurchasesUpdated
-    1:19:void onPurchasesUpdated$lambda$7(app.vercel.livelore.MainActivity):562:562 -> onPurchasesUpdated$lambda$7
-    1:9:void queryExistingPurchases():482:482 -> queryExistingPurchases
-    10:13:void queryExistingPurchases():483:483 -> queryExistingPurchases
-    14:19:void queryExistingPurchases():484:484 -> queryExistingPurchases
-    20:26:void queryExistingPurchases():485:485 -> queryExistingPurchases
-    27:38:void queryExistingPurchases():487:487 -> queryExistingPurchases
-    7:12:void queryExistingPurchases$lambda$0(app.vercel.livelore.MainActivity$AndroidBillingInterface,com.android.billingclient.api.BillingResult,java.util.List):488:488 -> queryExistingPurchases$lambda$0
-    13:28:void queryExistingPurchases$lambda$0(app.vercel.livelore.MainActivity$AndroidBillingInterface,com.android.billingclient.api.BillingResult,java.util.List):489:489 -> queryExistingPurchases$lambda$0
-    29:47:void queryExistingPurchases$lambda$0(app.vercel.livelore.MainActivity$AndroidBillingInterface,com.android.billingclient.api.BillingResult,java.util.List):490:490 -> queryExistingPurchases$lambda$0
-    48:52:void queryExistingPurchases$lambda$0(app.vercel.livelore.MainActivity$AndroidBillingInterface,com.android.billingclient.api.BillingResult,java.util.List):491:491 -> queryExistingPurchases$lambda$0
-    1:12:void restoreVipPurchase():544:544 -> restoreVipPurchase
-    1:8:void restoreVipPurchase$lambda$6(app.vercel.livelore.MainActivity$AndroidBillingInterface):545:545 -> restoreVipPurchase$lambda$6
-    9:18:void restoreVipPurchase$lambda$6(app.vercel.livelore.MainActivity$AndroidBillingInterface):546:546 -> restoreVipPurchase$lambda$6
-    19:22:void restoreVipPurchase$lambda$6(app.vercel.livelore.MainActivity$AndroidBillingInterface):549:549 -> restoreVipPurchase$lambda$6
-    1:6:kotlin.Unit restoreVipPurchase$lambda$6$lambda$5(app.vercel.livelore.MainActivity$AndroidBillingInterface):546:546 -> restoreVipPurchase$lambda$6$lambda$5
+    7:13:void launchVipPurchase$lambda$6$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):553:553 -> launchVipPurchase$lambda$6$lambda$4
+    14:27:void launchVipPurchase$lambda$6$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):554:554 -> launchVipPurchase$lambda$6$lambda$4
+    28:33:void launchVipPurchase$lambda$6$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):555:555 -> launchVipPurchase$lambda$6$lambda$4
+    34:37:void launchVipPurchase$lambda$6$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):556:556 -> launchVipPurchase$lambda$6$lambda$4
+    38:41:void launchVipPurchase$lambda$6$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):559:559 -> launchVipPurchase$lambda$6$lambda$4
+    42:45:void launchVipPurchase$lambda$6$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):560:560 -> launchVipPurchase$lambda$6$lambda$4
+    46:49:void launchVipPurchase$lambda$6$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):561:561 -> launchVipPurchase$lambda$6$lambda$4
+    50:53:void launchVipPurchase$lambda$6$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):558:558 -> launchVipPurchase$lambda$6$lambda$4
+    54:57:void launchVipPurchase$lambda$6$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):557:557 -> launchVipPurchase$lambda$6$lambda$4
+    58:64:void launchVipPurchase$lambda$6$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):564:564 -> launchVipPurchase$lambda$6$lambda$4
+    65:78:void launchVipPurchase$lambda$6$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):566:566 -> launchVipPurchase$lambda$6$lambda$4
+    79:100:void launchVipPurchase$lambda$6$lambda$4(app.vercel.livelore.MainActivity$AndroidBillingInterface,app.vercel.livelore.MainActivity,com.android.billingclient.api.BillingResult,com.android.billingclient.api.QueryProductDetailsResult):568:568 -> launchVipPurchase$lambda$6$lambda$4
+    1:19:void launchVipPurchase$lambda$6$lambda$4$lambda$3(app.vercel.livelore.MainActivity):569:569 -> launchVipPurchase$lambda$6$lambda$4$lambda$3
+    1:19:void launchVipPurchase$lambda$6$lambda$5(app.vercel.livelore.MainActivity):575:575 -> launchVipPurchase$lambda$6$lambda$5
+    4:11:void onPurchasesUpdated(com.android.billingclient.api.BillingResult,java.util.List):594:594 -> onPurchasesUpdated
+    12:27:void onPurchasesUpdated(com.android.billingclient.api.BillingResult,java.util.List):595:595 -> onPurchasesUpdated
+    28:31:void onPurchasesUpdated(com.android.billingclient.api.BillingResult,java.util.List):596:596 -> onPurchasesUpdated
+    32:38:void onPurchasesUpdated(com.android.billingclient.api.BillingResult,java.util.List):598:598 -> onPurchasesUpdated
+    39:66:void onPurchasesUpdated(com.android.billingclient.api.BillingResult,java.util.List):601:601 -> onPurchasesUpdated
+    1:19:void onPurchasesUpdated$lambda$9(app.vercel.livelore.MainActivity):602:602 -> onPurchasesUpdated$lambda$9
+    1:13:void queryExistingPurchases():505:505 -> queryExistingPurchases
+    14:17:void queryExistingPurchases():507:507 -> queryExistingPurchases
+    18:23:void queryExistingPurchases():508:508 -> queryExistingPurchases
+    24:30:void queryExistingPurchases():509:509 -> queryExistingPurchases
+    31:50:void queryExistingPurchases():511:511 -> queryExistingPurchases
+    51:54:void queryExistingPurchases():521:521 -> queryExistingPurchases
+    7:12:void queryExistingPurchases$lambda$0(app.vercel.livelore.MainActivity$AndroidBillingInterface,com.android.billingclient.api.BillingResult,java.util.List):512:512 -> queryExistingPurchases$lambda$0
+    13:28:void queryExistingPurchases$lambda$0(app.vercel.livelore.MainActivity$AndroidBillingInterface,com.android.billingclient.api.BillingResult,java.util.List):513:513 -> queryExistingPurchases$lambda$0
+    29:47:void queryExistingPurchases$lambda$0(app.vercel.livelore.MainActivity$AndroidBillingInterface,com.android.billingclient.api.BillingResult,java.util.List):514:514 -> queryExistingPurchases$lambda$0
+    48:52:void queryExistingPurchases$lambda$0(app.vercel.livelore.MainActivity$AndroidBillingInterface,com.android.billingclient.api.BillingResult,java.util.List):515:515 -> queryExistingPurchases$lambda$0
+    1:12:void restoreVipPurchase():583:583 -> restoreVipPurchase
+    1:5:void restoreVipPurchase$lambda$8(app.vercel.livelore.MainActivity$AndroidBillingInterface):584:584 -> restoreVipPurchase$lambda$8
+    6:11:void restoreVipPurchase$lambda$8(app.vercel.livelore.MainActivity$AndroidBillingInterface):585:585 -> restoreVipPurchase$lambda$8
+    12:21:void restoreVipPurchase$lambda$8(app.vercel.livelore.MainActivity$AndroidBillingInterface):586:586 -> restoreVipPurchase$lambda$8
+    22:25:void restoreVipPurchase$lambda$8(app.vercel.livelore.MainActivity$AndroidBillingInterface):589:589 -> restoreVipPurchase$lambda$8
+    1:6:kotlin.Unit restoreVipPurchase$lambda$8$lambda$7(app.vercel.livelore.MainActivity$AndroidBillingInterface):586:586 -> restoreVipPurchase$lambda$8$lambda$7
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lapp/vercel/livelore/MainActivity$AndroidBillingInterface;)Ldz;"}
-    1:11:void startConnection(kotlin.jvm.functions.Function0):467:467 -> startConnection
+    1:7:void startConnection(kotlin.jvm.functions.Function0):485:485 -> startConnection
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lph;)V"}
-    6:9:void startConnection$default(app.vercel.livelore.MainActivity$AndroidBillingInterface,kotlin.jvm.functions.Function0,int,java.lang.Object):466:466 -> startConnection$default
+    8:24:void startConnection(kotlin.jvm.functions.Function0):487:487 -> startConnection
+    25:28:void startConnection(kotlin.jvm.functions.Function0):500:500 -> startConnection
+    6:9:void startConnection$default(app.vercel.livelore.MainActivity$AndroidBillingInterface,kotlin.jvm.functions.Function0,int,java.lang.Object):484:484 -> startConnection$default
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lapp/vercel/livelore/MainActivity$AndroidBillingInterface;Lph;ILjava/lang/Object;)V"}
-app.vercel.livelore.MainActivity$AndroidBillingInterface$$ExternalSyntheticLambda0 -> wm:
+app.vercel.livelore.MainActivity$AndroidBillingInterface$$ExternalSyntheticLambda3 -> wm:
 # {"id":"sourceFile","fileName":"R8$$SyntheticClass"}
 # {"id":"com.android.tools.r8.synthesized"}
-    byte MainActivity$AndroidBillingInterface$$ExternalSyntheticLambda0.$r8$classId -> d
+    byte MainActivity$AndroidBillingInterface$$ExternalSyntheticLambda3.$r8$classId -> d
       # {"id":"com.android.tools.r8.synthesized"}
-    app.vercel.livelore.MainActivity$AndroidBillingInterface app.vercel.livelore.MainActivity$AndroidBillingInterface$$InternalSyntheticLambda$1$07094d6762974067e2be385cbec4f28f5f0a03f6c35be4a620c5a436997a18c4$0.f$0 -> e
+    app.vercel.livelore.MainActivity$AndroidBillingInterface app.vercel.livelore.MainActivity$AndroidBillingInterface$$InternalSyntheticLambda$1$6d9e5094aa4a34e6995e33f82b02074c1cf9a3b53ae853142e12a4975a61ae0d$1.f$0 -> e
       # {"id":"com.android.tools.r8.synthesized"}
-    1:8:void MainActivity$AndroidBillingInterface$$ExternalSyntheticLambda0.<init>(app.vercel.livelore.MainActivity$AndroidBillingInterface,byte):0:0 -> <init>
+    1:8:void MainActivity$AndroidBillingInterface$$ExternalSyntheticLambda3.<init>(app.vercel.livelore.MainActivity$AndroidBillingInterface,byte):0:0 -> <init>
       # {"id":"com.android.tools.r8.synthesized"}
-    1:18:java.lang.Object MainActivity$AndroidBillingInterface$$ExternalSyntheticLambda0.invoke():0:0 -> a
+    1:18:java.lang.Object MainActivity$AndroidBillingInterface$$ExternalSyntheticLambda3.invoke():0:0 -> a
       # {"id":"com.android.tools.r8.synthesized"}
 app.vercel.livelore.MainActivity$AndroidBillingInterface$startConnection$1 -> app.vercel.livelore.MainActivity$AndroidBillingInterface$startConnection$1:
 # {"id":"sourceFile","fileName":"MainActivity.kt"}
     kotlin.jvm.functions.Function0 $onConnected -> $onConnected
       # {"id":"com.android.tools.r8.residualsignature","signature":"Lph;"}
-    5:8:void <init>(app.vercel.livelore.MainActivity$AndroidBillingInterface,kotlin.jvm.functions.Function0):467:467 -> <init>
+    5:8:void <init>(app.vercel.livelore.MainActivity$AndroidBillingInterface,kotlin.jvm.functions.Function0):487:487 -> <init>
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lapp/vercel/livelore/MainActivity$AndroidBillingInterface;Lph;)V"}
     1:1:void onBillingServiceDisconnected():0:0 -> onBillingServiceDisconnected
-    4:9:void onBillingSetupFinished(com.android.billingclient.api.BillingResult):469:469 -> onBillingSetupFinished
-    10:14:void onBillingSetupFinished(com.android.billingclient.api.BillingResult):470:470 -> onBillingSetupFinished
-    15:22:void onBillingSetupFinished(com.android.billingclient.api.BillingResult):471:471 -> onBillingSetupFinished
+    4:9:void onBillingSetupFinished(com.android.billingclient.api.BillingResult):489:489 -> onBillingSetupFinished
+    10:14:void onBillingSetupFinished(com.android.billingclient.api.BillingResult):490:490 -> onBillingSetupFinished
+    15:22:void onBillingSetupFinished(com.android.billingclient.api.BillingResult):491:491 -> onBillingSetupFinished
 app.vercel.livelore.MainActivity$AndroidCSVInterface -> app.vercel.livelore.MainActivity$AndroidCSVInterface:
 # {"id":"sourceFile","fileName":"MainActivity.kt"}
-    4:11:void <init>(app.vercel.livelore.MainActivity,android.content.Context):351:351 -> <init>
+    4:11:void <init>(app.vercel.livelore.MainActivity,android.content.Context):365:365 -> <init>
     1:4:void $r8$lambda$Dwmx7PluzBCzKC3K66a2FUCctsQ(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):0:0 -> a
       # {"id":"com.android.tools.r8.synthesized"}
-    7:18:void shareCsv(java.lang.String,java.lang.String):354:354 -> shareCsv
-    1:5:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):355:355 -> shareCsv$lambda$2
+    7:18:void shareCsv(java.lang.String,java.lang.String):368:368 -> shareCsv
+    1:5:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):369:369 -> shareCsv$lambda$2
     6:8:boolean kotlin.text.StringsKt__StringsJVMKt.endsWith(java.lang.String,java.lang.String,boolean):0:0 -> shareCsv$lambda$2
     6:8:boolean kotlin.text.StringsKt__StringsJVMKt.endsWith$default(java.lang.String,java.lang.String,boolean,int,java.lang.Object):437 -> shareCsv$lambda$2
-    6:8:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):356 -> shareCsv$lambda$2
+    6:8:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):370 -> shareCsv$lambda$2
     9:15:boolean kotlin.text.StringsKt__StringsJVMKt.endsWith(java.lang.String,java.lang.String,boolean):440:440 -> shareCsv$lambda$2
     9:15:boolean kotlin.text.StringsKt__StringsJVMKt.endsWith$default(java.lang.String,java.lang.String,boolean,int,java.lang.Object):437 -> shareCsv$lambda$2
-    9:15:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):356 -> shareCsv$lambda$2
-    16:19:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):356:356 -> shareCsv$lambda$2
-    20:25:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):359:359 -> shareCsv$lambda$2
-    26:31:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):360:360 -> shareCsv$lambda$2
-    32:36:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):361:361 -> shareCsv$lambda$2
-    37:41:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):362:362 -> shareCsv$lambda$2
-    42:48:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):363:363 -> shareCsv$lambda$2
-    49:55:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):364:364 -> shareCsv$lambda$2
-    56:65:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):367:367 -> shareCsv$lambda$2
-    66:71:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):369:369 -> shareCsv$lambda$2
-    72:83:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):370:370 -> shareCsv$lambda$2
+    9:15:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):370 -> shareCsv$lambda$2
+    16:19:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):370:370 -> shareCsv$lambda$2
+    20:25:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):373:373 -> shareCsv$lambda$2
+    26:31:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):374:374 -> shareCsv$lambda$2
+    32:36:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):375:375 -> shareCsv$lambda$2
+    37:41:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):376:376 -> shareCsv$lambda$2
+    42:48:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):377:377 -> shareCsv$lambda$2
+    49:55:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):378:378 -> shareCsv$lambda$2
+    56:65:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):381:381 -> shareCsv$lambda$2
+    66:71:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):383:383 -> shareCsv$lambda$2
+    72:83:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):384:384 -> shareCsv$lambda$2
     84:90:void kotlin.io.CloseableKt.closeFinally(java.io.Closeable,java.lang.Throwable):46:46 -> shareCsv$lambda$2
-    84:90:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):369 -> shareCsv$lambda$2
-    91:92:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):369:369 -> shareCsv$lambda$2
+    84:90:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):383 -> shareCsv$lambda$2
+    91:92:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):383:383 -> shareCsv$lambda$2
     93:97:void kotlin.io.CloseableKt.closeFinally(java.io.Closeable,java.lang.Throwable):49:49 -> shareCsv$lambda$2
-    93:97:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):369 -> shareCsv$lambda$2
+    93:97:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):383 -> shareCsv$lambda$2
     98:100:void kotlin.io.CloseableKt.closeFinally(java.io.Closeable,java.lang.Throwable):51:51 -> shareCsv$lambda$2
-    98:100:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):369 -> shareCsv$lambda$2
-    101:101:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):369:369 -> shareCsv$lambda$2
-    102:113:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):390:390 -> shareCsv$lambda$2
-    114:119:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):376:376 -> shareCsv$lambda$2
-    120:128:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):377:377 -> shareCsv$lambda$2
-    129:133:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):378:378 -> shareCsv$lambda$2
+    98:100:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):383 -> shareCsv$lambda$2
+    101:101:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):383:383 -> shareCsv$lambda$2
+    102:113:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):404:404 -> shareCsv$lambda$2
+    114:119:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):390:390 -> shareCsv$lambda$2
+    120:128:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):391:391 -> shareCsv$lambda$2
+    129:133:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):392:392 -> shareCsv$lambda$2
     134:135:void kotlin.io.FilesKt__FileReadWriteKt.writeText$default(java.io.File,java.lang.String,java.nio.charset.Charset,int,java.lang.Object):140:140 -> shareCsv$lambda$2
-    134:135:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):379 -> shareCsv$lambda$2
+    134:135:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):393 -> shareCsv$lambda$2
     136:141:void kotlin.io.FilesKt__FileReadWriteKt.writeText(java.io.File,java.lang.String,java.nio.charset.Charset):0:0 -> shareCsv$lambda$2
     136:141:void kotlin.io.FilesKt__FileReadWriteKt.writeText$default(java.io.File,java.lang.String,java.nio.charset.Charset,int,java.lang.Object):140 -> shareCsv$lambda$2
-    136:141:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):379 -> shareCsv$lambda$2
+    136:141:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):393 -> shareCsv$lambda$2
     142:149:void kotlin.io.FilesKt__FileReadWriteKt.writeText(java.io.File,java.lang.String,java.nio.charset.Charset):141:141 -> shareCsv$lambda$2
     142:149:void kotlin.io.FilesKt__FileReadWriteKt.writeText$default(java.io.File,java.lang.String,java.nio.charset.Charset,int,java.lang.Object):140 -> shareCsv$lambda$2
-    142:149:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):379 -> shareCsv$lambda$2
+    142:149:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):393 -> shareCsv$lambda$2
     150:152:void kotlin.io.CloseableKt.closeFinally(java.io.Closeable,java.lang.Throwable):46:46 -> shareCsv$lambda$2
     150:152:void kotlin.io.FilesKt__FileReadWriteKt.writeText(java.io.File,java.lang.String,java.nio.charset.Charset):141 -> shareCsv$lambda$2
     150:152:void kotlin.io.FilesKt__FileReadWriteKt.writeText$default(java.io.File,java.lang.String,java.nio.charset.Charset,int,java.lang.Object):140 -> shareCsv$lambda$2
-    150:152:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):379 -> shareCsv$lambda$2
-    153:154:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):385:385 -> shareCsv$lambda$2
-    155:159:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):386:386 -> shareCsv$lambda$2
-    160:163:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):384:384 -> shareCsv$lambda$2
-    164:168:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):388:388 -> shareCsv$lambda$2
+    150:152:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):393 -> shareCsv$lambda$2
+    153:154:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):399:399 -> shareCsv$lambda$2
+    155:159:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):400:400 -> shareCsv$lambda$2
+    160:163:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):398:398 -> shareCsv$lambda$2
+    164:168:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):402:402 -> shareCsv$lambda$2
     169:170:void kotlin.io.FilesKt__FileReadWriteKt.writeText(java.io.File,java.lang.String,java.nio.charset.Charset):141:141 -> shareCsv$lambda$2
     169:170:void kotlin.io.FilesKt__FileReadWriteKt.writeText$default(java.io.File,java.lang.String,java.nio.charset.Charset,int,java.lang.Object):140 -> shareCsv$lambda$2
-    169:170:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):379 -> shareCsv$lambda$2
+    169:170:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):393 -> shareCsv$lambda$2
     171:175:void kotlin.io.CloseableKt.closeFinally(java.io.Closeable,java.lang.Throwable):49:49 -> shareCsv$lambda$2
     171:175:void kotlin.io.FilesKt__FileReadWriteKt.writeText(java.io.File,java.lang.String,java.nio.charset.Charset):141 -> shareCsv$lambda$2
     171:175:void kotlin.io.FilesKt__FileReadWriteKt.writeText$default(java.io.File,java.lang.String,java.nio.charset.Charset,int,java.lang.Object):140 -> shareCsv$lambda$2
-    171:175:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):379 -> shareCsv$lambda$2
+    171:175:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):393 -> shareCsv$lambda$2
     176:178:void kotlin.io.CloseableKt.closeFinally(java.io.Closeable,java.lang.Throwable):51:51 -> shareCsv$lambda$2
     176:178:void kotlin.io.FilesKt__FileReadWriteKt.writeText(java.io.File,java.lang.String,java.nio.charset.Charset):141 -> shareCsv$lambda$2
     176:178:void kotlin.io.FilesKt__FileReadWriteKt.writeText$default(java.io.File,java.lang.String,java.nio.charset.Charset,int,java.lang.Object):140 -> shareCsv$lambda$2
-    176:178:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):379 -> shareCsv$lambda$2
+    176:178:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):393 -> shareCsv$lambda$2
     179:179:void kotlin.io.FilesKt__FileReadWriteKt.writeText(java.io.File,java.lang.String,java.nio.charset.Charset):141:141 -> shareCsv$lambda$2
     179:179:void kotlin.io.FilesKt__FileReadWriteKt.writeText$default(java.io.File,java.lang.String,java.nio.charset.Charset,int,java.lang.Object):140 -> shareCsv$lambda$2
-    179:179:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):379 -> shareCsv$lambda$2
-    180:182:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):393:393 -> shareCsv$lambda$2
-    183:210:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):394:394 -> shareCsv$lambda$2
+    179:179:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):393 -> shareCsv$lambda$2
+    180:182:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):407:407 -> shareCsv$lambda$2
+    183:210:void shareCsv$lambda$2(java.lang.String,app.vercel.livelore.MainActivity$AndroidCSVInterface,java.lang.String):408:408 -> shareCsv$lambda$2
 app.vercel.livelore.MainActivity$AndroidGoogleAuthInterface -> app.vercel.livelore.MainActivity$AndroidGoogleAuthInterface:
 # {"id":"sourceFile","fileName":"MainActivity.kt"}
-    4:11:void <init>(app.vercel.livelore.MainActivity,android.content.Context):583:583 -> <init>
+    4:11:void <init>(app.vercel.livelore.MainActivity,android.content.Context):625:625 -> <init>
     1:4:void $r8$lambda$pl942HijZGuRQKQAfxTDecJcFkw(app.vercel.livelore.MainActivity):0:0 -> a
       # {"id":"com.android.tools.r8.synthesized"}
     1:4:void $r8$lambda$ukn4s7i04K_xT97PMCoQQCR6l7U(app.vercel.livelore.MainActivity,java.lang.String):0:0 -> b
       # {"id":"com.android.tools.r8.synthesized"}
     1:4:void $r8$lambda$yxrUwxeWyznqjOYn2jCRoy7s4zc(app.vercel.livelore.MainActivity):0:0 -> c
       # {"id":"com.android.tools.r8.synthesized"}
-    1:13:void launchGoogleSignIn():586:586 -> launchGoogleSignIn
-    1:3:void launchGoogleSignIn$lambda$2(app.vercel.livelore.MainActivity):587:587 -> launchGoogleSignIn$lambda$2
-    4:7:void launchGoogleSignIn$lambda$2(app.vercel.livelore.MainActivity):588:588 -> launchGoogleSignIn$lambda$2
-    8:16:void launchGoogleSignIn$lambda$2(app.vercel.livelore.MainActivity):589:589 -> launchGoogleSignIn$lambda$2
-    17:34:void launchGoogleSignIn$lambda$2(app.vercel.livelore.MainActivity):590:590 -> launchGoogleSignIn$lambda$2
-    35:58:void launchGoogleSignIn$lambda$2(app.vercel.livelore.MainActivity):591:591 -> launchGoogleSignIn$lambda$2
-    59:78:void launchGoogleSignIn$lambda$2(app.vercel.livelore.MainActivity):592:592 -> launchGoogleSignIn$lambda$2
-    79:98:void launchGoogleSignIn$lambda$2(app.vercel.livelore.MainActivity):599:599 -> launchGoogleSignIn$lambda$2
-    1:36:void launchGoogleSignIn$lambda$2$lambda$0(app.vercel.livelore.MainActivity,java.lang.String):593:593 -> launchGoogleSignIn$lambda$2$lambda$0
-    1:19:void launchGoogleSignIn$lambda$2$lambda$1(app.vercel.livelore.MainActivity):600:600 -> launchGoogleSignIn$lambda$2$lambda$1
+    1:13:void launchGoogleSignIn():628:628 -> launchGoogleSignIn
+    1:3:void launchGoogleSignIn$lambda$2(app.vercel.livelore.MainActivity):629:629 -> launchGoogleSignIn$lambda$2
+    4:7:void launchGoogleSignIn$lambda$2(app.vercel.livelore.MainActivity):630:630 -> launchGoogleSignIn$lambda$2
+    8:16:void launchGoogleSignIn$lambda$2(app.vercel.livelore.MainActivity):631:631 -> launchGoogleSignIn$lambda$2
+    17:34:void launchGoogleSignIn$lambda$2(app.vercel.livelore.MainActivity):632:632 -> launchGoogleSignIn$lambda$2
+    35:58:void launchGoogleSignIn$lambda$2(app.vercel.livelore.MainActivity):633:633 -> launchGoogleSignIn$lambda$2
+    59:78:void launchGoogleSignIn$lambda$2(app.vercel.livelore.MainActivity):634:634 -> launchGoogleSignIn$lambda$2
+    79:99:void launchGoogleSignIn$lambda$2(app.vercel.livelore.MainActivity):641:641 -> launchGoogleSignIn$lambda$2
+    1:36:void launchGoogleSignIn$lambda$2$lambda$0(app.vercel.livelore.MainActivity,java.lang.String):635:635 -> launchGoogleSignIn$lambda$2$lambda$0
+    1:19:void launchGoogleSignIn$lambda$2$lambda$1(app.vercel.livelore.MainActivity):642:642 -> launchGoogleSignIn$lambda$2$lambda$1
 app.vercel.livelore.MainActivity$AndroidHapticsInterface -> app.vercel.livelore.MainActivity$AndroidHapticsInterface:
 # {"id":"sourceFile","fileName":"MainActivity.kt"}
-    4:10:void <init>(app.vercel.livelore.MainActivity,android.content.Context):606:606 -> <init>
-    11:16:void <init>(app.vercel.livelore.MainActivity,android.content.Context):607:607 -> <init>
-    17:29:void <init>(app.vercel.livelore.MainActivity,android.content.Context):608:608 -> <init>
-    30:33:void <init>(app.vercel.livelore.MainActivity,android.content.Context):609:609 -> <init>
-    34:37:void <init>(app.vercel.livelore.MainActivity,android.content.Context):608:608 -> <init>
-    38:48:void <init>(app.vercel.livelore.MainActivity,android.content.Context):612:612 -> <init>
-    49:51:void <init>(app.vercel.livelore.MainActivity,android.content.Context):607:607 -> <init>
-    1:3:void vibrateHeavy():638:638 -> vibrateHeavy
-    4:22:void vibrateHeavy():639:639 -> vibrateHeavy
-    23:26:void vibrateHeavy():638:638 -> vibrateHeavy
-    1:13:void vibrateLight():618:618 -> vibrateLight
-    1:13:void vibrateMedium():628:628 -> vibrateMedium
-    1:3:void vibrateReject():650:650 -> vibrateReject
-    4:20:void vibrateReject():651:651 -> vibrateReject
-    21:24:void vibrateReject():650:650 -> vibrateReject
+    4:10:void <init>(app.vercel.livelore.MainActivity,android.content.Context):648:648 -> <init>
+    11:16:void <init>(app.vercel.livelore.MainActivity,android.content.Context):649:649 -> <init>
+    17:29:void <init>(app.vercel.livelore.MainActivity,android.content.Context):650:650 -> <init>
+    30:33:void <init>(app.vercel.livelore.MainActivity,android.content.Context):651:651 -> <init>
+    34:37:void <init>(app.vercel.livelore.MainActivity,android.content.Context):650:650 -> <init>
+    38:48:void <init>(app.vercel.livelore.MainActivity,android.content.Context):654:654 -> <init>
+    49:51:void <init>(app.vercel.livelore.MainActivity,android.content.Context):649:649 -> <init>
+    1:3:void vibrateHeavy():680:680 -> vibrateHeavy
+    4:22:void vibrateHeavy():681:681 -> vibrateHeavy
+    23:26:void vibrateHeavy():680:680 -> vibrateHeavy
+    1:13:void vibrateLight():660:660 -> vibrateLight
+    1:13:void vibrateMedium():670:670 -> vibrateMedium
+    1:3:void vibrateReject():692:692 -> vibrateReject
+    4:20:void vibrateReject():693:693 -> vibrateReject
+    21:24:void vibrateReject():692:692 -> vibrateReject
 app.vercel.livelore.MainActivity$AndroidShareInterface -> app.vercel.livelore.MainActivity$AndroidShareInterface:
 # {"id":"sourceFile","fileName":"MainActivity.kt"}
-    4:11:void <init>(app.vercel.livelore.MainActivity,android.content.Context):400:400 -> <init>
+    4:11:void <init>(app.vercel.livelore.MainActivity,android.content.Context):414:414 -> <init>
     1:4:void $r8$lambda$1IcWmoLfBIcrgthDUlgrBze5kgU(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String):0:0 -> a
       # {"id":"com.android.tools.r8.synthesized"}
     1:4:void $r8$lambda$9igRyqjbCQhAhiZjohTbV2fIIiQ(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):0:0 -> b
       # {"id":"com.android.tools.r8.synthesized"}
-    10:20:void shareImageAndText(java.lang.String,java.lang.String,java.lang.String):420:420 -> shareImageAndText
-    1:2:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):421:421 -> shareImageAndText$lambda$3
-    3:4:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):423:423 -> shareImageAndText$lambda$3
+    10:20:void shareImageAndText(java.lang.String,java.lang.String,java.lang.String):434:434 -> shareImageAndText
+    1:2:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):435:435 -> shareImageAndText$lambda$3
+    3:4:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):437:437 -> shareImageAndText$lambda$3
     5:7:boolean kotlin.text.StringsKt__StringsJVMKt.startsWith(java.lang.String,java.lang.String,boolean):0:0 -> shareImageAndText$lambda$3
     5:7:boolean kotlin.text.StringsKt__StringsJVMKt.startsWith$default(java.lang.String,java.lang.String,boolean,int,java.lang.Object):415 -> shareImageAndText$lambda$3
-    5:7:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):423 -> shareImageAndText$lambda$3
+    5:7:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):437 -> shareImageAndText$lambda$3
     8:14:boolean kotlin.text.StringsKt__StringsJVMKt.startsWith(java.lang.String,java.lang.String,boolean):418:418 -> shareImageAndText$lambda$3
     8:14:boolean kotlin.text.StringsKt__StringsJVMKt.startsWith$default(java.lang.String,java.lang.String,boolean,int,java.lang.Object):415 -> shareImageAndText$lambda$3
-    8:14:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):423 -> shareImageAndText$lambda$3
-    15:17:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):424:424 -> shareImageAndText$lambda$3
+    8:14:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):437 -> shareImageAndText$lambda$3
+    15:17:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):438:438 -> shareImageAndText$lambda$3
     18:22:int kotlin.text.StringsKt__StringsKt.indexOf$default(java.lang.CharSequence,java.lang.String,int,boolean,int,java.lang.Object):1128:1128 -> shareImageAndText$lambda$3
-    18:22:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):424 -> shareImageAndText$lambda$3
-    23:26:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):424:424 -> shareImageAndText$lambda$3
-    27:30:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):425:425 -> shareImageAndText$lambda$3
-    31:43:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):426:426 -> shareImageAndText$lambda$3
-    44:56:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):427:427 -> shareImageAndText$lambda$3
-    57:82:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):428:428 -> shareImageAndText$lambda$3
-    83:85:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):429:429 -> shareImageAndText$lambda$3
+    18:22:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):438 -> shareImageAndText$lambda$3
+    23:26:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):438:438 -> shareImageAndText$lambda$3
+    27:30:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):439:439 -> shareImageAndText$lambda$3
+    31:43:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):440:440 -> shareImageAndText$lambda$3
+    44:56:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):441:441 -> shareImageAndText$lambda$3
+    57:82:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):442:442 -> shareImageAndText$lambda$3
+    83:85:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):443:443 -> shareImageAndText$lambda$3
     86:93:void kotlin.io.FilesKt__FileReadWriteKt.writeBytes(java.io.File,byte[]):114:114 -> shareImageAndText$lambda$3
-    86:93:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):429 -> shareImageAndText$lambda$3
+    86:93:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):443 -> shareImageAndText$lambda$3
     94:96:void kotlin.io.CloseableKt.closeFinally(java.io.Closeable,java.lang.Throwable):46:46 -> shareImageAndText$lambda$3
     94:96:void kotlin.io.FilesKt__FileReadWriteKt.writeBytes(java.io.File,byte[]):114 -> shareImageAndText$lambda$3
-    94:96:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):429 -> shareImageAndText$lambda$3
-    97:125:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):430:430 -> shareImageAndText$lambda$3
+    94:96:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):443 -> shareImageAndText$lambda$3
+    97:125:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):444:444 -> shareImageAndText$lambda$3
     126:127:void kotlin.io.FilesKt__FileReadWriteKt.writeBytes(java.io.File,byte[]):114:114 -> shareImageAndText$lambda$3
-    126:127:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):429 -> shareImageAndText$lambda$3
+    126:127:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):443 -> shareImageAndText$lambda$3
     128:132:void kotlin.io.CloseableKt.closeFinally(java.io.Closeable,java.lang.Throwable):49:49 -> shareImageAndText$lambda$3
     128:132:void kotlin.io.FilesKt__FileReadWriteKt.writeBytes(java.io.File,byte[]):114 -> shareImageAndText$lambda$3
-    128:132:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):429 -> shareImageAndText$lambda$3
+    128:132:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):443 -> shareImageAndText$lambda$3
     133:135:void kotlin.io.CloseableKt.closeFinally(java.io.Closeable,java.lang.Throwable):51:51 -> shareImageAndText$lambda$3
     133:135:void kotlin.io.FilesKt__FileReadWriteKt.writeBytes(java.io.File,byte[]):114 -> shareImageAndText$lambda$3
-    133:135:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):429 -> shareImageAndText$lambda$3
+    133:135:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):443 -> shareImageAndText$lambda$3
     136:137:void kotlin.io.FilesKt__FileReadWriteKt.writeBytes(java.io.File,byte[]):114:114 -> shareImageAndText$lambda$3
-    136:137:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):429 -> shareImageAndText$lambda$3
-    138:142:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):433:433 -> shareImageAndText$lambda$3
-    143:147:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):434:434 -> shareImageAndText$lambda$3
-    148:154:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):435:435 -> shareImageAndText$lambda$3
-    155:159:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):437:437 -> shareImageAndText$lambda$3
-    160:164:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):438:438 -> shareImageAndText$lambda$3
-    165:168:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):439:439 -> shareImageAndText$lambda$3
-    169:173:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):441:441 -> shareImageAndText$lambda$3
-    174:187:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):444:444 -> shareImageAndText$lambda$3
-    188:193:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):445:445 -> shareImageAndText$lambda$3
-    194:196:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):447:447 -> shareImageAndText$lambda$3
-    197:200:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):448:448 -> shareImageAndText$lambda$3
-    7:18:void shareText(java.lang.String,java.lang.String):403:403 -> shareText
-    1:5:void shareText$lambda$1(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String):405:405 -> shareText$lambda$1
-    6:10:void shareText$lambda$1(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String):406:406 -> shareText$lambda$1
-    11:15:void shareText$lambda$1(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String):407:407 -> shareText$lambda$1
-    16:20:void shareText$lambda$1(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String):408:408 -> shareText$lambda$1
-    21:33:void shareText$lambda$1(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String):410:410 -> shareText$lambda$1
-    34:40:void shareText$lambda$1(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String):411:411 -> shareText$lambda$1
-    41:44:void shareText$lambda$1(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String):413:413 -> shareText$lambda$1
+    136:137:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):443 -> shareImageAndText$lambda$3
+    138:142:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):447:447 -> shareImageAndText$lambda$3
+    143:147:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):448:448 -> shareImageAndText$lambda$3
+    148:154:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):449:449 -> shareImageAndText$lambda$3
+    155:159:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):451:451 -> shareImageAndText$lambda$3
+    160:164:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):452:452 -> shareImageAndText$lambda$3
+    165:168:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):453:453 -> shareImageAndText$lambda$3
+    169:173:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):455:455 -> shareImageAndText$lambda$3
+    174:187:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):458:458 -> shareImageAndText$lambda$3
+    188:193:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):459:459 -> shareImageAndText$lambda$3
+    194:196:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):461:461 -> shareImageAndText$lambda$3
+    197:200:void shareImageAndText$lambda$3(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String,java.lang.String):462:462 -> shareImageAndText$lambda$3
+    7:18:void shareText(java.lang.String,java.lang.String):417:417 -> shareText
+    1:5:void shareText$lambda$1(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String):419:419 -> shareText$lambda$1
+    6:10:void shareText$lambda$1(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String):420:420 -> shareText$lambda$1
+    11:15:void shareText$lambda$1(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String):421:421 -> shareText$lambda$1
+    16:20:void shareText$lambda$1(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String):422:422 -> shareText$lambda$1
+    21:33:void shareText$lambda$1(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String):424:424 -> shareText$lambda$1
+    34:40:void shareText$lambda$1(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String):425:425 -> shareText$lambda$1
+    41:44:void shareText$lambda$1(java.lang.String,app.vercel.livelore.MainActivity$AndroidShareInterface,java.lang.String):427:427 -> shareText$lambda$1
 app.vercel.livelore.MainActivity$AndroidShareInterface$$ExternalSyntheticLambda1 -> xm:
 # {"id":"sourceFile","fileName":"R8$$SyntheticClass"}
 # {"id":"com.android.tools.r8.synthesized"}
