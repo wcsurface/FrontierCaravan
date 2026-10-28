@@ -2800,10 +2800,6 @@
     function checkIsVIPUser(email) {
       if (!email) return false;
       var clean = email.toLowerCase().trim();
-      if (clean === 'test@testaccount.com') {
-        try { localStorage.removeItem('livelore_vip_test_testaccount_com'); } catch(e) {}
-        return false;
-      }
       if (VIP_EMAILS.indexOf(clean) >= 0) return true;
       var storedVip = localStorage.getItem('livelore_vip_' + clean.replace(/[^a-z0-9]/g, '_'));
       return storedVip === 'true';
@@ -2883,6 +2879,22 @@
 
       var cleanEmail = activeEmail.toLowerCase().trim();
       isVIPUser = true;
+
+      // 1. Store VIP flag in LocalStorage for activeEmail
+      localStorage.setItem('livelore_vip_' + cleanEmail.replace(/[^a-z0-9]/g, '_'), 'true');
+
+      // 2. Update active user session object with isVIP = true
+      try {
+        var uObj = JSON.parse(rawUser);
+        uObj.isVIP = true;
+        localStorage.setItem('livelore_active_user', JSON.stringify(uObj));
+      } catch(e) {}
+
+      // 3. Hide AdMob banner ad IMMEDIATELY
+      if (window.AndroidAdMob && typeof window.AndroidAdMob.hideBannerAd === 'function') {
+        window.AndroidAdMob.hideBannerAd();
+      }
+
       updateProfileVipCard();
 
       // Persist $4.99 VIP Status directly in Railway PostgreSQL Database
