@@ -465,7 +465,7 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
                         putExtra(Intent.EXTRA_TEXT, text)
                         if (imageUri != null) {
                             putExtra(Intent.EXTRA_STREAM, imageUri)
-                            type = "image/jpeg"
+                            type = "image/*"
                             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                         } else {
                             type = "text/plain"
@@ -473,6 +473,49 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
                     }
                     val shareIntent = Intent.createChooser(sendIntent, if (title.isNotEmpty()) title else "Share Concert")
                     context.startActivity(shareIntent)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    shareText(text, title)
+                }
+            }
+        }
+
+        @JavascriptInterface
+        fun shareMultipleImagesAndText(dataUrlsJson: String, text: String, title: String) {
+            runOnUiThread {
+                try {
+                    val imageUris = ArrayList<Uri>()
+                    val gson = com.google.gson.Gson()
+                    val typeToken = object : com.google.gson.reflect.TypeToken<List<String>>() {}.type
+                    val dataUrls: List<String> = gson.fromJson(dataUrlsJson, typeToken) ?: emptyList()
+
+                    val imagesDir = File(context.cacheDir, "shared_images")
+                    if (!imagesDir.exists()) imagesDir.mkdirs()
+
+                    for ((index, url) in dataUrls.withIndex()) {
+                        if (url.startsWith("data:image")) {
+                            val base64Data = url.substring(url.indexOf(",") + 1)
+                            val decodedBytes = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT)
+                            val imageFile = File(imagesDir, "concert_share_${System.currentTimeMillis()}_$index.jpg")
+                            imageFile.writeBytes(decodedBytes)
+                            val u = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", imageFile)
+                            imageUris.add(u)
+                        }
+                    }
+
+                    if (imageUris.isNotEmpty()) {
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND_MULTIPLE
+                            putExtra(Intent.EXTRA_TEXT, text)
+                            putParcelableArrayListExtra(Intent.EXTRA_STREAM, imageUris)
+                            type = "image/*"
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        val shareIntent = Intent.createChooser(sendIntent, if (title.isNotEmpty()) title else "Share Concert")
+                        context.startActivity(shareIntent)
+                    } else {
+                        shareText(text, title)
+                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                     shareText(text, title)

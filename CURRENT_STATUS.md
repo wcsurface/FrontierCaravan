@@ -7,8 +7,8 @@
 ---
 
 ## Completed Features
+- [x] **Expanded & Deduplicated Global Venue Database**: Cleaned, standardized, and merged user's venue CSV with LiveLore's existing database, expanding venue autofill from 511 to **2,904 global venues** across North America, Europe, South America, Australia, and Asia. Exported cleaned copy to Desktop (`Cleaned_Venue_Database.csv`).
 - [x] **Immediate VIP Upgrade Ad Hiding**: Removed legacy `test@testaccount.com` VIP override block in `checkIsVIPUser()`, persisted `livelore_vip_<cleanEmail>` in local storage, and triggered `window.AndroidAdMob.hideBannerAd()` immediately upon in-app purchase completion.
-- [x] **Persistent Login Sessions**: Removed `webView.clearCache(true)` and changed WebSettings cache mode to `LOAD_DEFAULT` in `MainActivity.kt`. Local storage user session (`livelore_active_user`) and offline vault keys now persist indefinitely across app launches until the user explicitly logs out or switches devices.
 - [x] **Release Versioning**: Version bumped to **`1.0.15`** (`versionCode = 16`) for Google Play Store release.
 
 ---

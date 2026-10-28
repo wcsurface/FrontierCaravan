@@ -4264,16 +4264,24 @@
       var artist = (show.headline || 'Artist').trim();
       var venue = (show.venue || 'Venue').trim();
       var date = (show.date || '').trim();
+      var city = (show.city || '').trim();
+      var state = (show.state || '').trim();
+      var openers = Array.isArray(show.openersList) ? show.openersList.filter(Boolean).join(', ') : '';
+      var price = (show.price || '').trim();
       var notes = (show.notes || '').trim();
+      var setlist = (show.setlist || '').trim();
 
-      var text = '🎸 ' + artist + ' live at ' + venue;
-      if (date) text += ' (' + date + ')';
-      text += '!';
+      var text = '🎸 ' + artist + '\n';
+      if (openers) text += 'With: ' + openers + '\n';
+      text += '📍 ' + venue;
+      if (city || state) text += ' (' + [city, state].filter(Boolean).join(', ') + ')';
+      text += '\n';
+      if (date) text += '📅 Date: ' + date + '\n';
+      if (price) text += '🎟️ Ticket: ' + price + '\n';
+      if (notes) text += '📝 Notes: ' + notes + '\n';
+      if (setlist) text += '🎶 Setlist:\n' + setlist + '\n';
 
-      if (notes) {
-        text += '\nNotes: ' + notes;
-      }
-      text += '\nLogged in LiveLore: Concert Diary & Setlist Vault';
+      text += '\nLogged in LiveLore: Concert Diary & Setlist Vault\nhttps://livelore-app.vercel.app';
       return text;
     }
 
@@ -4385,7 +4393,7 @@
       if (!show) return;
 
       var shareText = buildShareText(show);
-      var primaryPhoto = (isVIPUser && show && Array.isArray(show.photoUris) && show.photoUris.length > 0) ? show.photoUris[0] : null;
+      var photoUris = (isVIPUser && show && Array.isArray(show.photoUris)) ? show.photoUris.filter(Boolean) : [];
 
       if (shareIncludePhotos && !isVIPUser) {
         promptVipPhotoShare();
@@ -4394,46 +4402,25 @@
 
       closeShareModal();
 
-      if (target === 'instagram') {
-        if (isVIPUser && primaryPhoto && window.AndroidShare && window.AndroidShare.shareImageAndText) {
-          window.AndroidShare.shareImageAndText(primaryPhoto, shareText, "Share Concert to Instagram");
-          return;
-        }
-        copyTextToClipboard(shareText, '✓ Concert summary copied! Open Instagram to paste into your Story or Post.');
-        setTimeout(function() {
-          window.open('https://www.instagram.com/', '_blank');
-        }, 800);
-      } else if (target === 'messages') {
-        if (window.AndroidShare) {
-          if (isVIPUser && primaryPhoto) {
-            window.AndroidShare.shareImageAndText(primaryPhoto, shareText, "Share Concert");
+      // Native Android Share Sheet for ALL targets (Facebook, Instagram, Messages, Reddit, X, Native)
+      if (window.AndroidShare) {
+        if (isVIPUser && photoUris.length > 0 && shareIncludePhotos) {
+          if (photoUris.length === 1 && window.AndroidShare.shareImageAndText) {
+            window.AndroidShare.shareImageAndText(photoUris[0], shareText, "Share Concert: " + show.headline);
+          } else if (photoUris.length > 1 && window.AndroidShare.shareMultipleImagesAndText) {
+            window.AndroidShare.shareMultipleImagesAndText(JSON.stringify(photoUris), shareText, "Share Concert: " + show.headline);
+          } else if (window.AndroidShare.shareImageAndText) {
+            window.AndroidShare.shareImageAndText(photoUris[0], shareText, "Share Concert: " + show.headline);
           } else {
-            window.AndroidShare.shareText(shareText, "Share Concert");
+            window.AndroidShare.shareText(shareText, "Share Concert: " + show.headline);
           }
-        } else if (navigator.share) {
-          navigator.share({ title: show.headline, text: shareText }).catch(function() {});
         } else {
-          window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(shareText), '_blank');
+          window.AndroidShare.shareText(shareText, "Share Concert: " + show.headline);
         }
-      } else if (target === 'facebook') {
-        window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent('https://livelore-app.vercel.app') + '&quote=' + encodeURIComponent(shareText), '_blank');
-      } else if (target === 'reddit') {
-        var redditTitle = '🎸 ' + (show.headline || 'Concert') + ' live at ' + (show.venue || 'Venue');
-        window.open('https://www.reddit.com/submit?title=' + encodeURIComponent(redditTitle) + '&text=' + encodeURIComponent(shareText), '_blank');
-      } else if (target === 'twitter') {
-        window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareText), '_blank');
-      } else if (target === 'native') {
-        if (window.AndroidShare) {
-          if (isVIPUser && primaryPhoto) {
-            window.AndroidShare.shareImageAndText(primaryPhoto, shareText, "Share Concert");
-          } else {
-            window.AndroidShare.shareText(shareText, "Share Concert");
-          }
-        } else if (navigator.share) {
-          navigator.share({ title: show.headline, text: shareText }).catch(function() {});
-        } else {
-          copyTextToClipboard(shareText);
-        }
+      } else if (navigator.share) {
+        navigator.share({ title: show.headline + ' live at ' + show.venue, text: shareText, url: 'https://livelore-app.vercel.app' }).catch(function() {});
+      } else {
+        copyTextToClipboard(shareText, '✓ Concert details copied to clipboard!');
       }
     }
     window.executeShareTarget = executeShareTarget;
