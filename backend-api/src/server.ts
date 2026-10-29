@@ -318,9 +318,10 @@ app.post('/api/auth/upgrade-vip', async (req: Request, res: Response) => {
     const cleanEmail = email.toLowerCase().trim();
 
     if (prisma) {
-      await prisma.user.update({
+      await prisma.user.upsert({
         where: { email: cleanEmail },
-        data: { isVIP: true },
+        update: { isVIP: true },
+        create: { email: cleanEmail, passwordHash: 'GOOGLE_OAUTH_VIP', isVIP: true },
       });
     }
 
