@@ -1,18 +1,15 @@
 # CURRENT_STATUS.md - LiveLore: Concert Diary & Setlist Vault
 
 ## Current Development Status
-**Active Version**: 1.0.17 (versionCode: 18, API Backend v6.1.0)
+**Active Version**: 1.0.18 (versionCode: 19, API Backend v6.1.0)
 **Build Status**: ✅ Passing (`:app:assembleDebug` & `:app:bundleRelease` build cleanly)
 
 ---
 
 ## Completed Features
-- [x] **Visual Concert Details Card Image Generator for Facebook & Social Posts**:
-  - Implemented `generateConcertCardImage()` in JavaScript to render a high-resolution 1080x1350 visual **Concert Details Card Image** (Ticket Stub, Artist, Venue, Date, Location, Openers, Notes, Setlist) onto HTML5 `<canvas>`.
-  - Automatically attaches the visual Concert Card Image + attached photo memories as native image file streams (`Intent.ACTION_SEND_MULTIPLE`).
-  - Solves Facebook's platform limitation (which blocks pre-filled text in `EXTRA_TEXT`), displaying the full visual Concert Details Card directly on Facebook, Instagram, and social posts.
-  - Automatically copies full formatted text to clipboard so users can paste into "What's on your mind?" with 1 tap.
-- [x] **Release Versioning**: Version bumped to **`1.0.17`** (`versionCode = 18`) for Google Play Store release.
+- [x] **Over-The-Air (OTA) Live Updates**: Configured `MainActivity.kt` to load live frontend updates dynamically from Vercel (`https://livelore-app.vercel.app`) when online. All future UI changes, sharing updates, and feature enhancements now take effect **instantly without requiring new APK builds**.
+- [x] **Seamless Offline Asset Fallback**: Automatically falls back to offline local assets (`file:///android_asset/index.html`) if the device is offline or loses connection.
+- [x] **Release Versioning**: Version bumped to **`1.0.18`** (`versionCode = 19`) for Google Play Store release.
 
 ---
 
