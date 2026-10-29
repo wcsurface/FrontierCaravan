@@ -1,17 +1,18 @@
 # CURRENT_STATUS.md - LiveLore: Concert Diary & Setlist Vault
 
 ## Current Development Status
-**Active Version**: 1.0.16 (versionCode: 17, API Backend v6.1.0)
+**Active Version**: 1.0.17 (versionCode: 18, API Backend v6.1.0)
 **Build Status**: ✅ Passing (`:app:assembleDebug` & `:app:bundleRelease` build cleanly)
 
 ---
 
 ## Completed Features
-- [x] **Unified Multi-Platform Concert Sharing**:
-  - Replaced web link sharing with a unified **Native Android System Share Sheet (`AndroidShare`)** across all share targets (Facebook, Instagram, Messages, WhatsApp, Reddit, X/Twitter, Native Share).
-  - Formatted text payload automatically duplicates the full **Concert Details Page** (Headline Artist, Openers, Venue, City, State, Date, Ticket Price, Notes, Setlist, and LiveLore Vault link).
-  - Multi-photo attachment support (`shareMultipleImagesAndText`) decodes and attaches **all attached concert photos** as native image streams when posting to Facebook, Instagram, Messages, or any social app.
-- [x] **Release Versioning**: Version bumped to **`1.0.16`** (`versionCode = 17`) for Google Play Store release.
+- [x] **Visual Concert Details Card Image Generator for Facebook & Social Posts**:
+  - Implemented `generateConcertCardImage()` in JavaScript to render a high-resolution 1080x1350 visual **Concert Details Card Image** (Ticket Stub, Artist, Venue, Date, Location, Openers, Notes, Setlist) onto HTML5 `<canvas>`.
+  - Automatically attaches the visual Concert Card Image + attached photo memories as native image file streams (`Intent.ACTION_SEND_MULTIPLE`).
+  - Solves Facebook's platform limitation (which blocks pre-filled text in `EXTRA_TEXT`), displaying the full visual Concert Details Card directly on Facebook, Instagram, and social posts.
+  - Automatically copies full formatted text to clipboard so users can paste into "What's on your mind?" with 1 tap.
+- [x] **Release Versioning**: Version bumped to **`1.0.17`** (`versionCode = 18`) for Google Play Store release.
 
 ---
 

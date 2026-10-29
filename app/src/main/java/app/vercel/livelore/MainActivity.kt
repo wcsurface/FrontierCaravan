@@ -168,7 +168,25 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
             }
         }
 
+        val onlineUrl = "https://livelore-app.vercel.app"
+        val offlineUrl = "file:///android_asset/index.html"
+
         webView.webViewClient = object : WebViewClient() {
+            @Suppress("DEPRECATION")
+            override fun onReceivedError(
+                view: WebView?,
+                errorCode: Int,
+                description: String?,
+                failingUrl: String?
+            ) {
+                super.onReceivedError(view, errorCode, description, failingUrl)
+                if (failingUrl?.startsWith("https://livelore-app.vercel.app") == true) {
+                    webView.post {
+                        webView.loadUrl(offlineUrl)
+                    }
+                }
+            }
+
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 webView.postDelayed({
@@ -221,8 +239,26 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
             e.printStackTrace()
         }
 
-        val targetUrl = "file:///android_asset/index.html"
+        // OTA Live Updates: Load live Vercel web app if online, fallback to asset HTML if offline
+        val targetUrl = if (isNetworkAvailable(this)) onlineUrl else offlineUrl
         webView.loadUrl(targetUrl)
+    }
+
+    private fun isNetworkAvailable(context: Context): Boolean {
+        try {
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val network = connectivityManager.activeNetwork ?: return false
+                val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+                return capabilities.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            } else {
+                @Suppress("DEPRECATION")
+                val activeNetworkInfo = connectivityManager.activeNetworkInfo
+                return activeNetworkInfo != null && activeNetworkInfo.isConnected
+            }
+        } catch (e: Exception) {
+            return true
+        }
     }
 
     @Throws(IOException::class)
