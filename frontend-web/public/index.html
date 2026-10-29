@@ -2669,7 +2669,7 @@
       var input = document.createElement('input');
       input.type = 'text';
       input.className = 'input-field input-opener';
-      input.placeholder = 'Opener ' + count;
+      input.placeholder = 'Opening Artist ' + count;
       container.appendChild(input);
     }
     window.addOpenerField = addOpenerField;
@@ -3304,7 +3304,7 @@
         var openers = Array.isArray(show.openersList) && show.openersList.length > 0 ? show.openersList : (show.opener ? [show.opener] : []);
         if (openers.length > 0) {
           openersContainer.innerHTML = openers.map(function(op) {
-            return '<input type="text" class="input-field input-opener" value="' + op.trim() + '" placeholder="Opener" />';
+            return '<input type="text" class="input-field input-opener" value="' + op.trim() + '" placeholder="Opening Artist" />';
           }).join('');
         }
       }
@@ -4238,7 +4238,7 @@
       var dropdown = document.getElementById('venue-dropdown');
       if (dropdown) dropdown.style.display = 'none';
       var openers = document.getElementById('openers-container');
-      if (openers) openers.innerHTML = '<input type="text" class="input-field input-opener" placeholder="Opener" />';
+      if (openers) openers.innerHTML = '<input type="text" class="input-field input-opener" placeholder="Opening Artist" />';
       currentPhotoUris = [];
       renderPhotosGrid();
       editingShowId = null;
@@ -4523,11 +4523,11 @@
       <label class="input-label">Headline Band *</label>
       <input type="text" id="input-headline" class="input-field" placeholder="Headline Band" required />
 
-      <label class="input-label">Opener</label>
+      <label class="input-label">Opening Artist</label>
       <div id="openers-container">
-        <input type="text" class="input-field input-opener" placeholder="Opener" />
+        <input type="text" class="input-field input-opener" placeholder="Opening Artist" />
       </div>
-      <button type="button" class="btn-add-opener" onclick="addOpenerField()">+ Add Another Opener</button>
+      <button type="button" class="btn-add-opener" onclick="addOpenerField()">+ Add Another Opening Artist</button>
 
       <label class="input-label">Date (MM/DD/YYYY)</label>
       <input type="text" id="input-date" class="input-field" placeholder="MM/DD/YYYY" oninput="formatDateOnInput(this)" maxlength="10" />
@@ -4595,7 +4595,7 @@
       <div class="detail-val-headline" id="detail-headline">STEVIE RAY VAUGHAN</div>
 
       <div id="detail-openers-box" style="display:none; margin-top:14px; border-top:1px solid #222B30; padding-top:10px;">
-        <div class="detail-label">OPENER(S)</div>
+        <div class="detail-label">OPENING ARTIST(S)</div>
         <div class="detail-val-text" id="detail-openers">The Stray Cats, Duke Tumatoe</div>
       </div>
 
