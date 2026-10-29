@@ -4387,13 +4387,156 @@
       }
     }
 
+    function generateConcertCardImage(show, callback) {
+      if (!show) { callback(null); return; }
+      try {
+        var canvas = document.createElement('canvas');
+        canvas.width = 1080;
+        canvas.height = 1350;
+        var ctx = canvas.getContext('2d');
+
+        // Dark Gradient Background
+        var bgGrad = ctx.createRadialGradient(540, 675, 100, 540, 675, 800);
+        bgGrad.addColorStop(0, '#121619');
+        bgGrad.addColorStop(1, '#0A0D0E');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, 1080, 1350);
+
+        // Outer Borders
+        ctx.strokeStyle = '#FFB300';
+        ctx.lineWidth = 8;
+        ctx.strokeRect(30, 30, 1020, 1290);
+
+        ctx.strokeStyle = '#00E676';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(42, 42, 996, 1266);
+
+        // Header Logo
+        ctx.fillStyle = '#FFB300';
+        ctx.font = 'bold 52px sans-serif';
+        ctx.fillText('🎸 LiveLore', 80, 120);
+
+        ctx.fillStyle = '#00E676';
+        ctx.font = 'bold 24px monospace';
+        ctx.fillText('CONCERT DIARY & SETLIST VAULT', 80, 160);
+
+        // Ticket Stub Card
+        ctx.fillStyle = '#F7C252';
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(80, 200, 920, 420, 32);
+        } else {
+          ctx.rect(80, 200, 920, 420);
+        }
+        ctx.fill();
+
+        // Cutout Notches
+        ctx.fillStyle = '#0A0D0E';
+        ctx.beginPath(); ctx.arc(80, 410, 28, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(1000, 410, 28, 0, Math.PI * 2); ctx.fill();
+
+        // Perforated Tear Line
+        ctx.setLineDash([12, 12]);
+        ctx.strokeStyle = '#0A0D0E';
+        ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(740, 210); ctx.lineTo(740, 610); ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Ticket Stub Content
+        ctx.fillStyle = '#0A0D0E';
+        ctx.font = 'bold 54px serif';
+        var headText = (show.headline || 'Artist').toUpperCase();
+        if (headText.length > 18) headText = headText.substring(0, 18) + '...';
+        ctx.fillText(headText, 130, 310);
+
+        ctx.font = 'bold 26px sans-serif';
+        var venText = (show.venue || 'Venue').toUpperCase();
+        if (venText.length > 28) venText = venText.substring(0, 28) + '...';
+        ctx.fillText(venText, 130, 410);
+
+        ctx.fillStyle = '#E11D48';
+        ctx.font = 'bold 30px sans-serif';
+        ctx.fillText((show.date || ''), 130, 480);
+
+        ctx.fillStyle = '#0A0D0E';
+        ctx.font = 'bold 26px sans-serif';
+        ctx.fillText('ADMIT ONE', 770, 380);
+        ctx.font = 'bold 20px sans-serif';
+        ctx.fillText('SEC 7', 770, 420);
+
+        // Details Section
+        var curY = 680;
+
+        if (show.city || show.state) {
+          ctx.fillStyle = '#00E676';
+          ctx.font = 'bold 32px sans-serif';
+          ctx.fillText('📍 LOCATION', 80, curY);
+          curY += 40;
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '28px sans-serif';
+          ctx.fillText([show.city, show.state, show.country].filter(Boolean).join(', '), 80, curY);
+          curY += 60;
+        }
+
+        if (show.openersList && show.openersList.length > 0) {
+          ctx.fillStyle = '#FFB300';
+          ctx.font = 'bold 32px sans-serif';
+          ctx.fillText('👥 OPENERS', 80, curY);
+          curY += 40;
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '28px sans-serif';
+          ctx.fillText(show.openersList.filter(Boolean).join(', '), 80, curY);
+          curY += 60;
+        }
+
+        if (show.notes) {
+          ctx.fillStyle = '#38BDF8';
+          ctx.font = 'bold 32px sans-serif';
+          ctx.fillText('📝 NOTES', 80, curY);
+          curY += 40;
+          ctx.fillStyle = '#e2e8f0';
+          ctx.font = '26px sans-serif';
+          var noteLines = show.notes.split('\n');
+          for (var i = 0; i < Math.min(noteLines.length, 3); i++) {
+            ctx.fillText(noteLines[i].substring(0, 50), 80, curY);
+            curY += 34;
+          }
+          curY += 20;
+        }
+
+        if (show.setlist) {
+          ctx.fillStyle = '#EC4899';
+          ctx.font = 'bold 32px sans-serif';
+          ctx.fillText('🎶 SETLIST', 80, curY);
+          curY += 40;
+          ctx.fillStyle = '#e2e8f0';
+          ctx.font = '24px monospace';
+          var setLines = show.setlist.split('\n');
+          for (var j = 0; j < Math.min(setLines.length, 5); j++) {
+            ctx.fillText(setLines[j].substring(0, 55), 80, curY);
+            curY += 30;
+          }
+        }
+
+        // Footer
+        ctx.fillStyle = '#FFB300';
+        ctx.font = 'bold 26px monospace';
+        ctx.fillText('Logged in LiveLore: Concert Diary & Setlist Vault', 80, 1260);
+
+        var dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+        callback(dataUrl);
+      } catch (e) {
+        callback(null);
+      }
+    }
+
     function executeShareTarget(target) {
       if (!activeDetailShowId) return;
       var show = userShows.find(function(s) { return s.id === activeDetailShowId; });
       if (!show) return;
 
       var shareText = buildShareText(show);
-      var photoUris = (isVIPUser && show && Array.isArray(show.photoUris)) ? show.photoUris.filter(Boolean) : [];
+      var attachedPhotos = (isVIPUser && show && Array.isArray(show.photoUris)) ? show.photoUris.filter(Boolean) : [];
 
       if (shareIncludePhotos && !isVIPUser) {
         promptVipPhotoShare();
@@ -4402,26 +4545,33 @@
 
       closeShareModal();
 
-      // Native Android Share Sheet for ALL targets (Facebook, Instagram, Messages, Reddit, X, Native)
-      if (window.AndroidShare) {
-        if (isVIPUser && photoUris.length > 0 && shareIncludePhotos) {
-          if (photoUris.length === 1 && window.AndroidShare.shareImageAndText) {
-            window.AndroidShare.shareImageAndText(photoUris[0], shareText, "Share Concert: " + show.headline);
-          } else if (photoUris.length > 1 && window.AndroidShare.shareMultipleImagesAndText) {
-            window.AndroidShare.shareMultipleImagesAndText(JSON.stringify(photoUris), shareText, "Share Concert: " + show.headline);
-          } else if (window.AndroidShare.shareImageAndText) {
-            window.AndroidShare.shareImageAndText(photoUris[0], shareText, "Share Concert: " + show.headline);
+      // Automatically copy formatted text to clipboard for easy 1-tap pasting into Facebook/Instagram text fields
+      copyTextToClipboard(shareText, '✓ Concert text copied! Select Facebook to post photos & card.');
+
+      // Render Visual Concert Details Card Image
+      generateConcertCardImage(show, function(cardDataUrl) {
+        var imagesToShare = [];
+        if (cardDataUrl) imagesToShare.push(cardDataUrl);
+
+        if (shareIncludePhotos && attachedPhotos.length > 0) {
+          imagesToShare = imagesToShare.concat(attachedPhotos);
+        }
+
+        // Send generated Concert Card + attached photos to Native Android Share Sheet
+        if (window.AndroidShare) {
+          if (imagesToShare.length === 1 && window.AndroidShare.shareImageAndText) {
+            window.AndroidShare.shareImageAndText(imagesToShare[0], shareText, "Share Concert: " + show.headline);
+          } else if (imagesToShare.length > 1 && window.AndroidShare.shareMultipleImagesAndText) {
+            window.AndroidShare.shareMultipleImagesAndText(JSON.stringify(imagesToShare), shareText, "Share Concert: " + show.headline);
+          } else if (window.AndroidShare.shareImageAndText && imagesToShare.length > 0) {
+            window.AndroidShare.shareImageAndText(imagesToShare[0], shareText, "Share Concert: " + show.headline);
           } else {
             window.AndroidShare.shareText(shareText, "Share Concert: " + show.headline);
           }
-        } else {
-          window.AndroidShare.shareText(shareText, "Share Concert: " + show.headline);
+        } else if (navigator.share) {
+          navigator.share({ title: show.headline + ' live at ' + show.venue, text: shareText, url: 'https://livelore-app.vercel.app' }).catch(function() {});
         }
-      } else if (navigator.share) {
-        navigator.share({ title: show.headline + ' live at ' + show.venue, text: shareText, url: 'https://livelore-app.vercel.app' }).catch(function() {});
-      } else {
-        copyTextToClipboard(shareText, '✓ Concert details copied to clipboard!');
-      }
+      });
     }
     window.executeShareTarget = executeShareTarget;
 
