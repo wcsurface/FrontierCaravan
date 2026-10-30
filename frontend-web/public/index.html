@@ -2263,16 +2263,18 @@
     }
 
     function toStateAbbr(stateStr) {
-      if (!stateStr) return 'IN';
+      if (!stateStr) return '';
       const clean = stateStr.trim();
+      if (!clean) return '';
       if (clean.length === 2) return clean.toUpperCase();
       const map = {
         'indiana':'IN','illinois':'IL','ohio':'OH','kentucky':'KY','michigan':'MI',
         'california':'CA','new york':'NY','colorado':'CO','texas':'TX','florida':'FL',
         'pennsylvania':'PA','georgia':'GA','tennessee':'TN','massachusetts':'MA',
-        'washington':'WA','virginia':'VA','north carolina':'NC','missouri':'MO'
+        'washington':'WA','virginia':'VA','north carolina':'NC','missouri':'MO','wisconsin':'WI',
+        'nevada':'NV','arizona':'AZ','oregon':'OR','utah':'UT','maryland':'MD','new jersey':'NJ'
       };
-      return map[clean.toLowerCase()] || clean.substring(0,2).toUpperCase();
+      return map[clean.toLowerCase()] || clean.toUpperCase();
     }
 
     function showErrorBanner(msg) {
@@ -2686,11 +2688,11 @@
 
       var headline = headlineEl ? headlineEl.value.trim() : '';
       var venue = venueEl ? venueEl.value.trim() : '';
-      var city = (cityEl && cityEl.value ? cityEl.value : 'Noblesville').trim();
-      var state = toStateAbbr((stateEl && stateEl.value ? stateEl.value : 'IN').trim());
-      var country = (countryEl && countryEl.value ? countryEl.value : 'USA').trim();
-      var date = cleanAndValidateDateString((dateEl && dateEl.value ? dateEl.value : '').trim() || '08/02/88');
-      var notes = (notesEl && notesEl.value ? notesEl.value : '').trim();
+      var city = cityEl ? cityEl.value.trim() : '';
+      var state = stateEl ? toStateAbbr(stateEl.value) : '';
+      var country = countryEl ? countryEl.value.trim() : '';
+      var date = dateEl ? cleanAndValidateDateString(dateEl.value.trim()) : '';
+      var notes = notesEl ? notesEl.value.trim() : '';
 
       var openerInputs = document.querySelectorAll('.input-opener');
       var openersList = Array.from(openerInputs).map(function(inp) { return inp.value.trim(); }).filter(Boolean);
@@ -3344,17 +3346,16 @@
     }
     window.triggerDeleteShow = triggerDeleteShow;
 
+    function escapeHtmlAttr(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
     function handleVenueInput(query) {
       var dropdown = document.getElementById('venue-dropdown');
       if (!dropdown) return;
       if (!query || query.trim().length === 0) {
         dropdown.style.display = 'none';
-        var cityEl = document.getElementById('input-city');
-        var stateEl = document.getElementById('input-state');
-        var countryEl = document.getElementById('input-country');
-        if (cityEl) cityEl.value = '';
-        if (stateEl) stateEl.value = '';
-        if (countryEl) countryEl.value = '';
         return;
       }
       var q = query.toLowerCase().trim();
@@ -3363,23 +3364,16 @@
       });
 
       if (matches.length > 0) {
-        var best = matches[0];
-        var cityEl = document.getElementById('input-city');
-        var stateEl = document.getElementById('input-state');
-        var countryEl = document.getElementById('input-country');
-        if (cityEl) cityEl.value = best.c.trim();
-        if (stateEl) stateEl.value = toStateAbbr(best.s);
-        if (countryEl) countryEl.value = best.co.trim();
-
         dropdown.style.display = 'block';
-        dropdown.innerHTML = matches.map(function(item) {
-          var cleanV = item.v.trim();
-          var cleanC = item.c.trim();
-          var cleanS = toStateAbbr(item.s);
-          var cleanCo = item.co.trim();
-          return '<div style="padding:12px 14px; border-bottom:1px solid #222B30; cursor:pointer;" data-v="' + cleanV + '" data-c="' + cleanC + '" data-s="' + cleanS + '" data-co="' + cleanCo + '" onclick="selectVenueFromElem(this)" ontouchstart="selectVenueFromElem(this)">' +
+        dropdown.innerHTML = matches.slice(0, 25).map(function(item) {
+          var cleanV = (item.v || '').trim();
+          var cleanC = (item.c || '').trim();
+          var cleanS = toStateAbbr(item.s || '');
+          var cleanCo = (item.co || 'USA').trim();
+          var locStr = [cleanC, cleanS, cleanCo].filter(Boolean).join(', ');
+          return '<div style="padding:12px 14px; border-bottom:1px solid #222B30; cursor:pointer;" data-v="' + escapeHtmlAttr(cleanV) + '" data-c="' + escapeHtmlAttr(cleanC) + '" data-s="' + escapeHtmlAttr(cleanS) + '" data-co="' + escapeHtmlAttr(cleanCo) + '" onclick="selectVenueFromElem(this)" ontouchstart="selectVenueFromElem(this)">' +
             '<div style="font-weight:bold; color:#FFB300; font-size:14px;">' + cleanV + '</div>' +
-            '<div style="color:#94a3b8; font-size:11px;">' + cleanC + ', ' + cleanS + ', ' + cleanCo + '</div>' +
+            '<div style="color:#94a3b8; font-size:11px;">' + locStr + '</div>' +
           '</div>';
         }).join('');
       } else {
