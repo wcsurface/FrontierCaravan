@@ -1,17 +1,14 @@
 # CURRENT_STATUS.md - LiveLore: Concert Diary & Setlist Vault
 
 ## Current Development Status
-**Active Version**: 1.0.18 (versionCode: 19, API Backend v6.1.0)
+**Active Version**: 1.0.19 (versionCode: 20, API Backend v6.1.0)
 **Build Status**: ✅ Passing (`:app:assembleDebug` & `:app:bundleRelease` build cleanly)
 
 ---
 
 ## Completed Features
-- [x] **Multi-Photo Vault Storage Optimization & IndexedDB Fallback**:
-  - Optimized image compression (`600x600` @ `0.55` quality) so 5 photo attachments take ~200 KB instead of 2.5 MB, preventing `QuotaExceededError` in WebStorage.
-  - Wrapped `localStorage.setItem` in a `try-catch` safety block to prevent `QuotaExceededError` from stopping cloud push or IndexedDB storage.
-  - Increased Express body parser limit to **25 MB** in `backend-api/src/server.ts` for large multi-photo cloud vault syncs.
-- [x] **Release Versioning**: Version **`1.0.18`** (`versionCode = 19`) active.
+- [x] **Live Camera Photo Capture Fix**: Updated `onActivityResult()` in `MainActivity.kt` to check `cameraImageUri` first with file descriptor validation (`isFileNotEmpty`). Live camera photos captured directly with the device camera app now pass directly to WebView `<input type="file">`, compressing and displaying in `CONCERT PHOTOS (1/5)` instantly.
+- [x] **Release Versioning**: Version bumped to **`1.0.19`** (`versionCode = 20`) for Google Play Store release.
 - [x] **Over-The-Air (OTA) Live Updates**: Configured `MainActivity.kt` to load live frontend updates dynamically from Vercel (`https://livelore-app.vercel.app`) when online. All future UI changes and feature enhancements now take effect **instantly without requiring new APK builds**.
 - [x] **Release Versioning**: Version **`1.0.18`** (`versionCode = 19`) active.
 

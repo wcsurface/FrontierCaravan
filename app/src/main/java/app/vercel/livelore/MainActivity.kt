@@ -121,25 +121,29 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
                 this@MainActivity.filePathCallback = filePathCallback
 
                 var takePictureIntent: Intent? = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                if (takePictureIntent?.resolveActivity(packageManager) != null) {
-                    var photoFile: File? = null
-                    try {
-                        photoFile = createImageFile()
-                        takePictureIntent.putExtra("PhotoPath", photoFile.absolutePath)
-                    } catch (ex: IOException) {
-                        // Error occurred while creating the File
-                    }
+                var photoFile: File? = null
+                try {
+                    photoFile = createImageFile()
+                } catch (ex: IOException) {
+                    ex.printStackTrace()
+                }
 
-                    if (photoFile != null) {
+                if (photoFile != null) {
+                    try {
                         cameraImageUri = FileProvider.getUriForFile(
                             this@MainActivity,
                             "${applicationContext.packageName}.fileprovider",
                             photoFile
                         )
-                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraImageUri)
-                    } else {
+                        takePictureIntent?.putExtra(MediaStore.EXTRA_OUTPUT, cameraImageUri)
+                        takePictureIntent?.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                    } catch (ex: Exception) {
+                        ex.printStackTrace()
+                        cameraImageUri = null
                         takePictureIntent = null
                     }
+                } else {
+                    takePictureIntent = null
                 }
 
                 val galleryIntent: Intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
