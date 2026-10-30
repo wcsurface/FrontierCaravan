@@ -7,9 +7,10 @@
 ---
 
 ## Completed Features
-- [x] **Photo Selector VIP Check Fix**: Updated `handlePhotoSelect()` to evaluate `isVIPUser` dynamically against the active user session email, ensuring selected photos compress and push to `currentPhotoUris` without redirecting.
-- [x] **Attached Photo to Jack Johnson Show**: Successfully attached photo memory to Jack Johnson's show in Railway PostgreSQL cloud database.
-- [x] **Clean 1,388 Canonical Global Venue Database Active**: Stripped all corrupt quote artifacts and consolidated venue variants down to 1,388 unique canonical global venues.
+- [x] **Multi-Photo Vault Storage Optimization & IndexedDB Fallback**:
+  - Optimized image compression (`600x600` @ `0.55` quality) so 5 photo attachments take ~200 KB instead of 2.5 MB, preventing `QuotaExceededError` in WebStorage.
+  - Wrapped `localStorage.setItem` in a `try-catch` safety block to prevent `QuotaExceededError` from stopping cloud push or IndexedDB storage.
+  - Increased Express body parser limit to **25 MB** in `backend-api/src/server.ts` for large multi-photo cloud vault syncs.
 - [x] **Release Versioning**: Version **`1.0.18`** (`versionCode = 19`) active.
 - [x] **Over-The-Air (OTA) Live Updates**: Configured `MainActivity.kt` to load live frontend updates dynamically from Vercel (`https://livelore-app.vercel.app`) when online. All future UI changes and feature enhancements now take effect **instantly without requiring new APK builds**.
 - [x] **Release Versioning**: Version **`1.0.18`** (`versionCode = 19`) active.

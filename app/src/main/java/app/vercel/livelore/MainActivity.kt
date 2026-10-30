@@ -324,6 +324,17 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
         super.onDestroy()
     }
 
+    private fun isFileNotEmpty(uri: Uri): Boolean {
+        return try {
+            val pfd = contentResolver.openFileDescriptor(uri, "r")
+            val size = pfd?.statSize ?: 0L
+            pfd?.close()
+            size > 0L
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -333,11 +344,9 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
             var results: Array<Uri>? = null
 
             if (resultCode == RESULT_OK) {
-                if (data == null || (data.data == null && data.clipData == null)) {
-                    if (cameraImageUri != null) {
-                        results = arrayOf(cameraImageUri!!)
-                    }
-                } else {
+                if (cameraImageUri != null && isFileNotEmpty(cameraImageUri!!)) {
+                    results = arrayOf(cameraImageUri!!)
+                } else if (data != null) {
                     if (data.clipData != null) {
                         val count = data.clipData!!.itemCount
                         val uriList = mutableListOf<Uri>()
@@ -348,11 +357,14 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
                     } else if (data.data != null) {
                         results = arrayOf(data.data!!)
                     }
+                } else if (cameraImageUri != null) {
+                    results = arrayOf(cameraImageUri!!)
                 }
             }
 
             filePathCallback?.onReceiveValue(results)
             filePathCallback = null
+            cameraImageUri = null
         } else if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
             if (resultCode == RESULT_OK && data != null) {
                 var extractedEmail: String? = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
