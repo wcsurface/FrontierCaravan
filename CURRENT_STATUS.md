@@ -7,6 +7,7 @@
 ---
 
 ## Completed Features
+- [x] **2,498 Cleaned Global Venues Active**: Re-injected all 2,498 cleaned, deduplicated, and formatted global venues from `Venue Database.csv` into `VENUE_DB` across both `frontend-web` and `app/src/main/assets/index.html`.
 - [x] **Updated Concert Logging Terminology**: Updated form labels, input placeholders, dynamic field addition buttons, and detail view labels from "Opener" to **"Opening Artist"** and **"+ Add Another Opening Artist"**.
 - [x] **Clean Removal of Social Sharing (OTA Deployment)**: Safely removed the `🚀 SHARE CONCERT` button and share modal sheet from the frontend. The update deployed live to Vercel (`https://livelore-app.vercel.app`) Over-The-Air (OTA) without requiring a new APK build or Play Console update.
 - [x] **Over-The-Air (OTA) Live Updates**: Configured `MainActivity.kt` to load live frontend updates dynamically from Vercel (`https://livelore-app.vercel.app`) when online. All future UI changes and feature enhancements now take effect **instantly without requiring new APK builds**.
