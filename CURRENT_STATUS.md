@@ -7,8 +7,9 @@
 ---
 
 ## Completed Features
-- [x] **Clean 1,388 Canonical Global Venue Database Active**: Stripped all corrupt quote artifacts and consolidated venue variants down to 1,388 unique canonical global venues. Typing "Fid" now displays **`Fiddler's Green Amphitheatre (Greenwood Village, CO, USA)`** as a single clean entry.
-- [x] **Updated Concert Logging Terminology**: Updated form labels, input placeholders, dynamic field addition buttons, and detail view labels from "Opener" to **"Opening Artist"** and **"+ Add Another Opening Artist"**.
+- [x] **Photo Selector VIP Check Fix**: Updated `handlePhotoSelect()` to evaluate `isVIPUser` dynamically against the active user session email, ensuring selected photos compress and push to `currentPhotoUris` without redirecting.
+- [x] **Attached Photo to Jack Johnson Show**: Successfully attached photo memory to Jack Johnson's show in Railway PostgreSQL cloud database.
+- [x] **Clean 1,388 Canonical Global Venue Database Active**: Stripped all corrupt quote artifacts and consolidated venue variants down to 1,388 unique canonical global venues.
 - [x] **Release Versioning**: Version **`1.0.18`** (`versionCode = 19`) active.
 - [x] **Over-The-Air (OTA) Live Updates**: Configured `MainActivity.kt` to load live frontend updates dynamically from Vercel (`https://livelore-app.vercel.app`) when online. All future UI changes and feature enhancements now take effect **instantly without requiring new APK builds**.
 - [x] **Release Versioning**: Version **`1.0.18`** (`versionCode = 19`) active.

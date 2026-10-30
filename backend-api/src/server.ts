@@ -85,7 +85,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.options('*', cors());
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '25mb' }));
+app.use(express.urlencoded({ limit: '25mb', extended: true }));
 
 // In-memory user & vault fallback if Railway DATABASE_URL is temporarily unconnected
 const memoryUsers = new Map<string, any>();

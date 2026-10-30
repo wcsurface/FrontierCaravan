@@ -2482,7 +2482,7 @@
         var reader = new FileReader();
         reader.onload = function(evt) {
           if (evt.target && evt.target.result && currentPhotoUris.length < 5) {
-            compressImageDataUrl(evt.target.result, 800, 800, 0.7, function(compressed) {
+            compressImageDataUrl(evt.target.result, 600, 600, 0.55, function(compressed) {
               if (currentPhotoUris.length < 5) {
                 currentPhotoUris.push(compressed || evt.target.result);
                 renderPhotosGrid();
@@ -3402,9 +3402,11 @@
         var localKey = 'livelore_vault_' + userEmail.replace(/[^a-z0-9]/g, '_');
 
         // 1. Save to LocalStorage IMMEDIATELY (Fail-Safe Local Persistence)
-        localStorage.setItem(localKey, JSON.stringify(userShows || []));
+        try {
+          localStorage.setItem(localKey, JSON.stringify(userShows || []));
+        } catch (eQuota) {}
 
-        // 2. Save to IndexedDB
+        // 2. Save to IndexedDB (500MB+ Capacity)
         saveToIndexedDB(localKey, { concerts: userShows || [] });
 
         // PROTECT USER DATA: Never push empty [] to cloud on startup unless user explicitly deleted all or vault loaded
