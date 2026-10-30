@@ -7,7 +7,7 @@
 ---
 
 ## Completed Features
-- [x] **Clean 2,495 Global Venue Database Active**: Fixed string single-quote corruption in `VENUE_DB` and re-injected all 2,495 cleaned, deduplicated, and formatted global venues. Autofill now instantly matches venues *(e.g. typing "Fiddl" displays "Fiddler's Green Amphitheatre, Greenwood Village, CO, USA")* and sets Venue, City, State, and Country automatically upon selection.
+- [x] **Canonicalized & Deduplicated Venue Database**: Ran a canonicalization pass over the venue database, merging name variants *(e.g. "Fiddlers Green Amphitheatre", "Fiddlers Green Amphitheater", "The Fiddlers Green Amphitheatre" ➔ "Fiddler's Green Amphitheatre")*, removing leading "The" prefixes, and standardizing truncated city/state names.
 - [x] **Updated Concert Logging Terminology**: Updated form labels, input placeholders, dynamic field addition buttons, and detail view labels from "Opener" to **"Opening Artist"** and **"+ Add Another Opening Artist"**.
 - [x] **Release Versioning**: Version **`1.0.18`** (`versionCode = 19`) active.
 - [x] **Over-The-Air (OTA) Live Updates**: Configured `MainActivity.kt` to load live frontend updates dynamically from Vercel (`https://livelore-app.vercel.app`) when online. All future UI changes and feature enhancements now take effect **instantly without requiring new APK builds**.
