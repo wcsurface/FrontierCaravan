@@ -2453,10 +2453,27 @@
     }
 
     function handlePhotoSelect(e) {
-      if (!isVIPUser) {
-        navigateToProfileVip();
+      var rawUser = localStorage.getItem('livelore_active_user');
+      var activeEmail = '';
+      if (rawUser) {
+        try { activeEmail = JSON.parse(rawUser).email; } catch(ex) {}
+      }
+      var userIsVip = isVIPUser || (typeof checkIsVIPUser === 'function' && checkIsVIPUser(activeEmail));
+
+      if (!userIsVip) {
+        showCustomConfirm({
+          title: 'VIP VAULT FEATURE',
+          message: 'Attaching photo memories to concerts is a LiveLore VIP Pass feature. Upgrade to attach up to 5 photos per concert!',
+          confirmText: 'VIEW VIP PASS',
+          cancelText: 'CANCEL',
+          icon: '👑',
+          confirmColor: 'linear-gradient(90deg, #FFB300, #FF6F00)'
+        }, function() {
+          navigateToProfileVip();
+        });
         return;
       }
+
       if (!e || !e.target || !e.target.files || e.target.files.length === 0) return;
       var files = Array.from(e.target.files);
 
@@ -2467,7 +2484,7 @@
           if (evt.target && evt.target.result && currentPhotoUris.length < 5) {
             compressImageDataUrl(evt.target.result, 800, 800, 0.7, function(compressed) {
               if (currentPhotoUris.length < 5) {
-                currentPhotoUris.push(compressed);
+                currentPhotoUris.push(compressed || evt.target.result);
                 renderPhotosGrid();
               }
             });
