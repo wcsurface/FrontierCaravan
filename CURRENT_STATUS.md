@@ -7,11 +7,9 @@
 ---
 
 ## Completed Features
-- [x] **Camera Package Visibility & FileProvider Permission Fix**:
-  - Added `<queries><intent><action android:name="android.media.action.IMAGE_CAPTURE" /></intent></queries>` to `AndroidManifest.xml` so Android 11+ (API 30+) package visibility policy does not strip camera intents.
-  - Added `FLAG_GRANT_READ_URI_PERMISSION` and `FLAG_GRANT_WRITE_URI_PERMISSION` flags when launching the camera intent.
-  - Expanded `file_paths.xml` to include all external, internal, and cache paths (`external_files`, `cache`, `pictures`, `files`).
-- [x] **Release Versioning**: Version bumped to **`1.0.20`** (`versionCode = 21`) for Google Play Store release.
+- [x] **Ticket Stub Photo Rendering Fix**: Replaced inline CSS `background-image: url(...)` on ticket stubs with explicit `<img src="..." style="width:100%; height:100%; object-fit:cover;">` HTML element tags. This prevents CSS attribute string interpolation bugs when displaying Base64 photo memories on ticket stubs.
+- [x] **Camera Package Visibility & FileProvider Permission Fix**: Added `<queries>` to `AndroidManifest.xml` and `FLAG_GRANT_READ_URI_PERMISSION` / `FLAG_GRANT_WRITE_URI_PERMISSION` to camera intent.
+- [x] **Release Versioning**: Version **`1.0.20`** (`versionCode = 21`) active.
 - [x] **Over-The-Air (OTA) Live Updates**: Configured `MainActivity.kt` to load live frontend updates dynamically from Vercel (`https://livelore-app.vercel.app`) when online. All future UI changes and feature enhancements now take effect **instantly without requiring new APK builds**.
 - [x] **Release Versioning**: Version **`1.0.18`** (`versionCode = 19`) active.
 

@@ -559,7 +559,11 @@
           if (hasCloudRecord) {
             // Merge cloud & local shows without losing any new local entries
             userShows = mergeConcerts(cloudShows, localShows);
-            localStorage.setItem(localKey, JSON.stringify(userShows));
+            try {
+              localStorage.setItem(localKey, JSON.stringify(userShows));
+            } catch (eQuota) {}
+
+            saveToIndexedDB(localKey, { concerts: userShows || [] });
 
             // If local shows had new entries that were not in cloud yet, push merged vault to cloud
             if (userShows.length > cloudShows.length) {
