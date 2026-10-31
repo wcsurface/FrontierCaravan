@@ -1,14 +1,17 @@
 # CURRENT_STATUS.md - LiveLore: Concert Diary & Setlist Vault
 
 ## Current Development Status
-**Active Version**: 1.0.19 (versionCode: 20, API Backend v6.1.0)
+**Active Version**: 1.0.20 (versionCode: 21, API Backend v6.1.0)
 **Build Status**: ✅ Passing (`:app:assembleDebug` & `:app:bundleRelease` build cleanly)
 
 ---
 
 ## Completed Features
-- [x] **Live Camera Photo Capture Fix**: Updated `onActivityResult()` in `MainActivity.kt` to check `cameraImageUri` first with file descriptor validation (`isFileNotEmpty`). Live camera photos captured directly with the device camera app now pass directly to WebView `<input type="file">`, compressing and displaying in `CONCERT PHOTOS (1/5)` instantly.
-- [x] **Release Versioning**: Version bumped to **`1.0.19`** (`versionCode = 20`) for Google Play Store release.
+- [x] **Camera Package Visibility & FileProvider Permission Fix**:
+  - Added `<queries><intent><action android:name="android.media.action.IMAGE_CAPTURE" /></intent></queries>` to `AndroidManifest.xml` so Android 11+ (API 30+) package visibility policy does not strip camera intents.
+  - Added `FLAG_GRANT_READ_URI_PERMISSION` and `FLAG_GRANT_WRITE_URI_PERMISSION` flags when launching the camera intent.
+  - Expanded `file_paths.xml` to include all external, internal, and cache paths (`external_files`, `cache`, `pictures`, `files`).
+- [x] **Release Versioning**: Version bumped to **`1.0.20`** (`versionCode = 21`) for Google Play Store release.
 - [x] **Over-The-Air (OTA) Live Updates**: Configured `MainActivity.kt` to load live frontend updates dynamically from Vercel (`https://livelore-app.vercel.app`) when online. All future UI changes and feature enhancements now take effect **instantly without requiring new APK builds**.
 - [x] **Release Versioning**: Version **`1.0.18`** (`versionCode = 19`) active.
 

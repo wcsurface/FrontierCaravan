@@ -701,14 +701,10 @@
             bandStackHtml += '<div class="ticket-artist-and">and</div><div class="ticket-artist-openers">' + openersText + '</div>';
           }
 
-          var stubInnerHtml = '<div>ADMIT ONE</div><div style="font-size:8px; color:#221508; margin-top:4px;">SEC 7</div>';
-          var stubExtraStyle = '';
-
-          if (Array.isArray(show.photoUris) && show.photoUris.length > 0 && show.photoUris[0]) {
-            var primaryPhoto = show.photoUris[0];
-            stubExtraStyle = "background-image: url('" + primaryPhoto + "'); background-size: cover; background-position: center; border-radius: 0 10px 10px 0; overflow: hidden; position: relative;";
-            stubInnerHtml = '';
-          }
+          var primaryPhoto = (Array.isArray(show.photoUris) && show.photoUris.length > 0 && show.photoUris[0]) ? show.photoUris[0] : null;
+          var stubContentHtml = primaryPhoto
+            ? '<img src="' + primaryPhoto + '" style="width:100%; height:100%; object-fit:cover; display:block;" alt="Concert Photo" />'
+            : '<div>ADMIT ONE</div><div style="font-size:8px; color:#221508; margin-top:4px;">SEC 7</div>';
 
           card.innerHTML = `
             <div class="ticket-left">
@@ -720,8 +716,8 @@
                 <span class="ticket-date">${show.date || ''}</span>
               </div>
             </div>
-            <div class="ticket-stub" style="${stubExtraStyle}">
-              ${stubInnerHtml}
+            <div class="ticket-stub" style="border-radius:0 10px 10px 0; overflow:hidden; position:relative; padding:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+              ${stubContentHtml}
             </div>
           `;
           list.appendChild(card);
@@ -3111,14 +3107,10 @@
           bandStackHtmlPreview += '<div class="ticket-artist-and">and</div><div class="ticket-artist-openers">' + openersTextPreview + '</div>';
         }
 
-        var stubInnerHtmlPreview = '<div>ADMIT ONE</div><div style="font-size:8px; color:#221508; margin-top:4px;">SEC 7</div>';
-        var stubExtraStylePreview = '';
-
-        if (Array.isArray(show.photoUris) && show.photoUris.length > 0 && show.photoUris[0]) {
-          var primaryPhotoPreview = show.photoUris[0];
-          stubExtraStylePreview = 'background-image: url(\'' + primaryPhotoPreview + '\'); background-size: cover; background-position: center; border-radius: 0 10px 10px 0; overflow: hidden; position: relative;';
-          stubInnerHtmlPreview = '';
-        }
+        var primaryPhotoPreview = (Array.isArray(show.photoUris) && show.photoUris.length > 0 && show.photoUris[0]) ? show.photoUris[0] : null;
+        var stubInnerHtmlPreview = primaryPhotoPreview
+          ? '<img src="' + primaryPhotoPreview + '" style="width:100%; height:100%; object-fit:cover; display:block;" alt="Concert Photo" />'
+          : '<div>ADMIT ONE</div><div style="font-size:8px; color:#221508; margin-top:4px;">SEC 7</div>';
 
         ticketPreviewBox.innerHTML = '<div class="ticket-card" style="background-color:' + ticketColor + '; margin-bottom:0;">' +
           '<div class="ticket-left">' +
@@ -3128,7 +3120,9 @@
               '<span class="ticket-date">' + (show.date || '') + '</span>' +
             '</div>' +
           '</div>' +
-          '<div class="ticket-stub" style="' + stubExtraStylePreview + '">' + stubInnerHtmlPreview + '</div>' +
+          '<div class="ticket-stub" style="border-radius:0 10px 10px 0; overflow:hidden; position:relative; padding:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">' +
+            stubInnerHtmlPreview +
+          '</div>' +
         '</div>';
       }
 
