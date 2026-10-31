@@ -348,9 +348,8 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
             var results: Array<Uri>? = null
 
             if (resultCode == RESULT_OK) {
-                if (cameraImageUri != null && isFileNotEmpty(cameraImageUri!!)) {
-                    results = arrayOf(cameraImageUri!!)
-                } else if (data != null) {
+                if (data != null && (data.data != null || data.clipData != null)) {
+                    // User selected photo(s) from Gallery
                     if (data.clipData != null) {
                         val count = data.clipData!!.itemCount
                         val uriList = mutableListOf<Uri>()
@@ -362,6 +361,7 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
                         results = arrayOf(data.data!!)
                     }
                 } else if (cameraImageUri != null) {
+                    // User took a live photo with Camera
                     results = arrayOf(cameraImageUri!!)
                 }
             }

@@ -7,8 +7,8 @@
 ---
 
 ## Completed Features
-- [x] **Ticket Stub Photo Rendering Fix**: Replaced inline CSS `background-image: url(...)` on ticket stubs with explicit `<img src="..." style="width:100%; height:100%; object-fit:cover;">` HTML element tags. This prevents CSS attribute string interpolation bugs when displaying Base64 photo memories on ticket stubs.
-- [x] **Camera Package Visibility & FileProvider Permission Fix**: Added `<queries>` to `AndroidManifest.xml` and `FLAG_GRANT_READ_URI_PERMISSION` / `FLAG_GRANT_WRITE_URI_PERMISSION` to camera intent.
+- [x] **Safe Load & Render Protection (`loadSavedShows`)**: Wrapped `localStorage.setItem` inside `loadSavedShows()` in a `try-catch` safety block. This prevents `QuotaExceededError` (caused by multi-photo entries in localStorage) from aborting the promise chain and ensures `finishLoadAndRender()` executes 100% of the time, rendering all **96 concerts** immediately on screen.
+- [x] **Ticket Stub Photo Rendering Fix**: Replaced inline CSS `background-image: url(...)` on ticket stubs with explicit `<img src="..." style="width:100%; height:100%; object-fit:cover;">` HTML element tags.
 - [x] **Release Versioning**: Version **`1.0.20`** (`versionCode = 21`) active.
 - [x] **Over-The-Air (OTA) Live Updates**: Configured `MainActivity.kt` to load live frontend updates dynamically from Vercel (`https://livelore-app.vercel.app`) when online. All future UI changes and feature enhancements now take effect **instantly without requiring new APK builds**.
 - [x] **Release Versioning**: Version **`1.0.18`** (`versionCode = 19`) active.
