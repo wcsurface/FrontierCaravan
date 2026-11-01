@@ -1,15 +1,16 @@
 # CURRENT_STATUS.md - LiveLore: Concert Diary & Setlist Vault
 
 ## Current Development Status
-**Active Version**: 1.0.20 (versionCode: 21, API Backend v6.1.0)
+**Active Version**: 1.0.21 (versionCode: 22, API Backend v6.1.0)
 **Build Status**: ✅ Passing (`:app:assembleDebug` & `:app:bundleRelease` build cleanly)
 
 ---
 
 ## Completed Features
-- [x] **Safe Load & Render Protection (`loadSavedShows`)**: Wrapped `localStorage.setItem` inside `loadSavedShows()` in a `try-catch` safety block. This prevents `QuotaExceededError` (caused by multi-photo entries in localStorage) from aborting the promise chain and ensures `finishLoadAndRender()` executes 100% of the time, rendering all **96 concerts** immediately on screen.
-- [x] **Ticket Stub Photo Rendering Fix**: Replaced inline CSS `background-image: url(...)` on ticket stubs with explicit `<img src="..." style="width:100%; height:100%; object-fit:cover;">` HTML element tags.
-- [x] **Release Versioning**: Version **`1.0.20`** (`versionCode = 21`) active.
+- [x] **Live Camera Capture Result Handler Fix**:
+  - Simplified `onActivityResult` logic in `MainActivity.kt`: If `data?.data` is null (standard camera app output when `EXTRA_OUTPUT` is specified), `onActivityResult` returns `arrayOf(cameraImageUri!!)` directly to `filePathCallback`.
+  - Live camera photos captured via device camera now pass directly to WebView `<input type="file">`, compressing and displaying in `CONCERT PHOTOS (1/5)` instantly.
+- [x] **Release Versioning**: Version bumped to **`1.0.21`** (`versionCode = 22`) for Google Play Store release.
 - [x] **Over-The-Air (OTA) Live Updates**: Configured `MainActivity.kt` to load live frontend updates dynamically from Vercel (`https://livelore-app.vercel.app`) when online. All future UI changes and feature enhancements now take effect **instantly without requiring new APK builds**.
 - [x] **Release Versioning**: Version **`1.0.18`** (`versionCode = 19`) active.
 
