@@ -650,6 +650,23 @@
       var countLabel = document.getElementById('shows-count-label');
       if (!list) return;
 
+      if (!isVaultLoaded && (!userShows || userShows.length === 0)) {
+        if (sortBar) sortBar.style.display = 'none';
+        list.style.display = 'flex';
+        list.style.flexDirection = 'column';
+        list.style.justifyContent = 'center';
+        list.style.alignItems = 'center';
+        list.innerHTML = `
+          <div id="vault-loading-box" style="text-align:center; padding: 60px 16px; margin: auto 0;">
+            <div style="font-size:52px; margin-bottom:12px;">🎸</div>
+            <div style="font-size:22px; font-weight:900; color:#FFB300; margin-bottom:8px; letter-spacing:1px;">LIVELORE</div>
+            <div style="font-weight:900; font-size:18px; color:#00E676; text-transform:uppercase; margin-bottom:10px; letter-spacing:0.5px;">LOADING CONCERT VAULT...</div>
+            <div style="font-size:13px; font-weight:700; color:#94a3b8;">Retrieving your ticket stubs, setlists, and memories</div>
+          </div>
+        `;
+        return;
+      }
+
       if (!userShows || userShows.length === 0) {
         if (sortBar) sortBar.style.display = 'none';
         list.style.display = 'flex';

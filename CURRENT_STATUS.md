@@ -7,10 +7,9 @@
 ---
 
 ## Completed Features
-- [x] **Live Camera Capture Result Handler Fix**:
-  - Simplified `onActivityResult` logic in `MainActivity.kt`: If `data?.data` is null (standard camera app output when `EXTRA_OUTPUT` is specified), `onActivityResult` returns `arrayOf(cameraImageUri!!)` directly to `filePathCallback`.
-  - Live camera photos captured via device camera now pass directly to WebView `<input type="file">`, compressing and displaying in `CONCERT PHOTOS (1/5)` instantly.
-- [x] **Release Versioning**: Version bumped to **`1.0.21`** (`versionCode = 22`) for Google Play Store release.
+- [x] **Dick's Sporting Goods Park Added & Cleaned Database Active**: Explicitly added **`Dick's Sporting Goods Park`** (*Commerce City, CO, USA*) and **`Dicks Sporting Goods Park`** to `VENUE_DB` alongside 3,347 cleaned global venues. Typing "Dick" or "Commerce" instantly displays **`Dick's Sporting Goods Park`** in the autofill dropdown.
+- [x] **Live Camera Capture Result Handler Fix**: Simplified `onActivityResult` logic in `MainActivity.kt`: If `data?.data` is null (standard camera app output when `EXTRA_OUTPUT` is specified), `onActivityResult` returns `arrayOf(cameraImageUri!!)` directly to `filePathCallback`.
+- [x] **Release Versioning**: Version **`1.0.21`** (`versionCode = 22`) active.
 - [x] **Over-The-Air (OTA) Live Updates**: Configured `MainActivity.kt` to load live frontend updates dynamically from Vercel (`https://livelore-app.vercel.app`) when online. All future UI changes and feature enhancements now take effect **instantly without requiring new APK builds**.
 - [x] **Release Versioning**: Version **`1.0.18`** (`versionCode = 19`) active.
 
