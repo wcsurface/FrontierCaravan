@@ -520,20 +520,22 @@
         .then(function(data) {
           if (data && data.user) {
             var dbIsVip = (data.user.isVIP === true || data.user.isVip === true);
-            isVIPUser = dbIsVip;
-            localStorage.setItem('livelore_vip_' + activeEmail.replace(/[^a-z0-9]/g, '_'), dbIsVip ? 'true' : 'false');
+            var localVip = localStorage.getItem('livelore_vip_' + activeEmail.replace(/[^a-z0-9]/g, '_')) === 'true';
+            var finalIsVip = dbIsVip || localVip || isVIPUser;
+            isVIPUser = finalIsVip;
+            localStorage.setItem('livelore_vip_' + activeEmail.replace(/[^a-z0-9]/g, '_'), finalIsVip ? 'true' : 'false');
 
             var rawActive = localStorage.getItem('livelore_active_user');
             if (rawActive) {
               try {
                 var parsedActive = JSON.parse(rawActive);
-                parsedActive.isVIP = dbIsVip;
+                parsedActive.isVIP = finalIsVip;
                 localStorage.setItem('livelore_active_user', JSON.stringify(parsedActive));
               } catch(ex) {}
             }
             if (typeof updateProfileVipCard === 'function') updateProfileVipCard();
             if (window.AndroidAdMob) {
-              if (isVIPUser) {
+              if (finalIsVip) {
                 window.AndroidAdMob.hideBannerAd();
               } else {
                 window.AndroidAdMob.showBannerAd();
@@ -5907,12 +5909,23 @@
 
       updateProfileVipCard();
 
-      // Persist $4.99 VIP Status directly in Railway PostgreSQL Database
-      fetch('https://frontiercaravan-production.up.railway.app/api/auth/upgrade-vip', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: cleanEmail })
-      }).catch(function(err) {});
+      // 4. Persist $4.99 VIP Status directly in Railway PostgreSQL Database with auto-retry
+      function pushVipStatusToRailway(attempt) {
+        fetch('https://frontiercaravan-production.up.railway.app/api/auth/upgrade-vip', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: cleanEmail })
+        }).then(function(res) {
+          if (!res.ok && (attempt || 0) < 3) {
+            setTimeout(function() { pushVipStatusToRailway((attempt || 0) + 1); }, 2000);
+          }
+        }).catch(function(err) {
+          if ((attempt || 0) < 3) {
+            setTimeout(function() { pushVipStatusToRailway((attempt || 0) + 1); }, 2000);
+          }
+        });
+      }
+      pushVipStatusToRailway(0);
 
       showCustomAlert({ title: 'VIP UPGRADED', message: 'Welcome to LiveLore VIP! You now have permanent ad-free access, full photo memories, and CSV export enabled.', icon: '🌟' });
     }
