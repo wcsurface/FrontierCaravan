@@ -5887,6 +5887,12 @@
       if (rawUser) {
         try { activeEmail = JSON.parse(rawUser).email; } catch(e) {}
       }
+      if (!activeEmail) {
+        var emailDisp = document.getElementById('profile-email-display');
+        if (emailDisp && emailDisp.innerText && emailDisp.innerText.indexOf('@') >= 0) {
+          activeEmail = emailDisp.innerText.toLowerCase().trim();
+        }
+      }
       if (!activeEmail) return;
 
       var cleanEmail = activeEmail.toLowerCase().trim();
@@ -5897,7 +5903,7 @@
 
       // 2. Update active user session object with isVIP = true
       try {
-        var uObj = JSON.parse(rawUser);
+        var uObj = rawUser ? JSON.parse(rawUser) : { email: cleanEmail };
         uObj.isVIP = true;
         localStorage.setItem('livelore_active_user', JSON.stringify(uObj));
       } catch(e) {}

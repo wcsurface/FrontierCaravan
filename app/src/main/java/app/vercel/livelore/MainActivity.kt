@@ -674,7 +674,13 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
                                 )
                                 .build()
 
-                            billingClient.launchBillingFlow(this@MainActivity, flowParams)
+                            val flowResult = billingClient.launchBillingFlow(this@MainActivity, flowParams)
+                            if (flowResult.responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
+                                queryExistingPurchases()
+                                webView.post {
+                                    webView.evaluateJavascript("if(typeof window.onNativeVipPurchaseSuccess==='function'){window.onNativeVipPurchaseSuccess();}", null)
+                                }
+                            }
                         } else {
                             webView.post {
                                 webView.evaluateJavascript("onNativeVipPurchaseFallback()", null)
@@ -705,6 +711,11 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
                 for (purchase in purchases) {
                     handlePurchaseSuccess(purchase)
+                }
+            } else if (billingResult.responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
+                queryExistingPurchases()
+                webView.post {
+                    webView.evaluateJavascript("if(typeof window.onNativeVipPurchaseSuccess==='function'){window.onNativeVipPurchaseSuccess();}", null)
                 }
             } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
                 // Flow cancelled by user
