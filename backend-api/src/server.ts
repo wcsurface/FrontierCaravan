@@ -337,6 +337,26 @@ app.post('/api/auth/upgrade-vip', async (req: Request, res: Response) => {
   }
 });
 
+// 3.2 POST /api/auth/test-set-vip - Toggle VIP Status for Testing
+app.post('/api/auth/test-set-vip', async (req: Request, res: Response) => {
+  try {
+    const { email, isVIP } = req.body;
+    if (!email || typeof email !== 'string') {
+      return res.status(400).json({ error: 'email required' });
+    }
+    const cleanEmail = email.toLowerCase().trim();
+    if (prisma) {
+      await prisma.user.update({
+        where: { email: cleanEmail },
+        data: { isVIP: Boolean(isVIP) }
+      });
+    }
+    return res.json({ success: true, email: cleanEmail, isVIP: Boolean(isVIP) });
+  } catch (err: unknown) {
+    return res.status(500).json({ error: String(err) });
+  }
+});
+
 const resetCodesStore = new Map<string, { code: string; expires: number }>();
 
 // 3.4 POST /api/auth/forgot-password - Request 6-Digit Verification Code via Email
