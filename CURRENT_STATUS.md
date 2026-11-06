@@ -7,8 +7,10 @@
 ---
 
 ## Completed Features
-- [x] **Dynamic Railway Database VIP Status Sync**: Fixed `GET /api/sync/pull` in `backend-api/src/server.ts` to return `data.user` (`isVIP: true`). Removed all hardcoded email lists completely. VIP status for `emacho@gmail.com` (and all purchasing users) now dynamically syncs directly from Railway PostgreSQL database.
-- [x] **Zero Data Loss Integrity (Rule #1 Guaranteed)**: All 58 concerts for `emacho@gmail.com`, 96 concerts for `wcsurface@gmail.com`, and all user vaults/photos in Railway PostgreSQL remain 100% untouched and preserved.
+- [x] **VIP Purchase Upgrade Race Condition & Retry Protection**:
+  - Updated `loadSavedShows()` to perform a non-destructive fail-safe VIP merge (`finalIsVip = dbIsVip || localVip || isVIPUser`). If a user upgrades locally or offline, an in-flight server response can never overwrite their VIP status back to `false`.
+  - Added auto-retry (`pushVipStatusToRailway`) to `executeVipUpgradeSuccess()` to ensure `POST /api/auth/upgrade-vip` retries up to 3 times if network latency delays the initial push.
+- [x] **Zero Data Loss Integrity (Rule #1 Guaranteed)**: All user vaults in Railway PostgreSQL remain 100% untouched and preserved.
 - [x] **Release Versioning**: Version **`1.0.21`** (`versionCode = 22`) active.
 - [x] **Over-The-Air (OTA) Live Updates**: Configured `MainActivity.kt` to load live frontend updates dynamically from Vercel (`https://livelore-app.vercel.app`) when online. All future UI changes and feature enhancements now take effect **instantly without requiring new APK builds**.
 - [x] **Release Versioning**: Version **`1.0.18`** (`versionCode = 19`) active.

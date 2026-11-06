@@ -565,6 +565,30 @@ app.get('/api/sync/pull', async (req: Request, res: Response) => {
         userRecord = await prisma.user.findUnique({ where: { id: rawUserId } }).catch(() => null);
       }
 
+      // If userRecord missing, resolve derived email from rawUserId if applicable
+      if (!userRecord && rawUserId && rawUserId.startsWith('u_cloud_')) {
+        const derivedEmail = rawUserId.replace('u_cloud_', '').replace(/_/g, '.');
+        if (derivedEmail.includes('.')) {
+          userRecord = await prisma.user.findFirst({
+            where: { email: { equals: derivedEmail, mode: 'insensitive' } }
+          }).catch(() => null);
+        }
+      }
+
+      // Automatically ensure userRecord exists in User table
+      if (!userRecord && targetEmail) {
+        userRecord = await prisma.user.upsert({
+          where: { email: targetEmail },
+          update: {},
+          create: {
+            email: targetEmail,
+            passwordHash: 'GOOGLE_OAUTH_VIP',
+            displayName: targetEmail.split('@')[0],
+            isVIP: false
+          }
+        }).catch(() => null);
+      }
+
       const effectiveUserId = userRecord ? userRecord.id : rawUserId;
 
       if (targetEmail) {
