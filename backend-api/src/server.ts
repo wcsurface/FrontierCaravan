@@ -588,6 +588,12 @@ app.get('/api/sync/pull', async (req: Request, res: Response) => {
 
       return res.json({
         success: true,
+        user: userRecord ? {
+          id: userRecord.id,
+          email: userRecord.email,
+          displayName: userRecord.displayName,
+          isVIP: userRecord.isVIP
+        } : null,
         concertsData: { concerts },
         updatedAt: vault ? vault.updatedAt.toISOString() : new Date().toISOString(),
       });

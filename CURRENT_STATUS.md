@@ -7,8 +7,8 @@
 ---
 
 ## Completed Features
-- [x] **Dick's Sporting Goods Park Added & Cleaned Database Active**: Explicitly added **`Dick's Sporting Goods Park`** (*Commerce City, CO, USA*) and **`Dicks Sporting Goods Park`** to `VENUE_DB` alongside 3,347 cleaned global venues. Typing "Dick" or "Commerce" instantly displays **`Dick's Sporting Goods Park`** in the autofill dropdown.
-- [x] **Live Camera Capture Result Handler Fix**: Simplified `onActivityResult` logic in `MainActivity.kt`: If `data?.data` is null (standard camera app output when `EXTRA_OUTPUT` is specified), `onActivityResult` returns `arrayOf(cameraImageUri!!)` directly to `filePathCallback`.
+- [x] **Vault Loading Screen Indicator**: Added a glowing startup indicator (`🎸 LIVELORE - LOADING CONCERT VAULT... Retrieving your ticket stubs, setlists, and memories`) while the app initializes and pulls cloud data, providing clear visual feedback before ticket stubs render.
+- [x] **Dick's Sporting Goods Park Added**: Explicitly added **`Dick's Sporting Goods Park`** (*Commerce City, CO, USA*) and **`Dicks Sporting Goods Park`** to `VENUE_DB` alongside 3,347 cleaned global venues.
 - [x] **Release Versioning**: Version **`1.0.21`** (`versionCode = 22`) active.
 - [x] **Over-The-Air (OTA) Live Updates**: Configured `MainActivity.kt` to load live frontend updates dynamically from Vercel (`https://livelore-app.vercel.app`) when online. All future UI changes and feature enhancements now take effect **instantly without requiring new APK builds**.
 - [x] **Release Versioning**: Version **`1.0.18`** (`versionCode = 19`) active.

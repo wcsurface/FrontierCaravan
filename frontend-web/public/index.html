@@ -5808,12 +5808,9 @@
     }
     window.showSubStats = showSubStats;
 
-    var VIP_EMAILS = ['wcsurface@gmail.com', 'reviewer@livelore.app', 'jbzlive76@gmail.com'];
-
     function checkIsVIPUser(email) {
       if (!email) return false;
       var clean = email.toLowerCase().trim();
-      if (VIP_EMAILS.indexOf(clean) >= 0) return true;
       var storedVip = localStorage.getItem('livelore_vip_' + clean.replace(/[^a-z0-9]/g, '_'));
       return storedVip === 'true';
     }
