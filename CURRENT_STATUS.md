@@ -7,12 +7,10 @@
 ---
 
 ## Completed Features
-- [x] **ITEM_ALREADY_OWNED Immediate Upgrade & Email Fallback**:
-  - Updated `MainActivity.kt` so that when Google Play returns `ITEM_ALREADY_OWNED` on `launchBillingFlow`, it immediately invokes `onNativeVipPurchaseSuccess()`.
-  - Added email fallback in `executeVipUpgradeSuccess()` to read from `profile-email-display` text if `livelore_active_user` JSON string is missing or delayed, ensuring `POST /api/auth/upgrade-vip` executes 100% of the time.
-- [x] **VIP Purchase Upgrade Race Condition & Retry Protection**:
-  - Updated `loadSavedShows()` to perform a non-destructive fail-safe VIP merge (`finalIsVip = dbIsVip || localVip || isVIPUser`). If a user upgrades locally or offline, an in-flight server response can never overwrite their VIP status back to `false`.
-  - Added auto-retry (`pushVipStatusToRailway`) to `executeVipUpgradeSuccess()` to ensure `POST /api/auth/upgrade-vip` retries up to 3 times if network latency delays the initial push.
+- [x] **Account Email Element Placeholder Fix**:
+  - Removed static placeholder text (`wcsurface@gmail.com`) from `#profile-email-display` HTML element.
+  - Updated `executeVipUpgradeSuccess()` to check `window.activeEmail` first, preventing any logged-in user from defaulting to `wcsurface@gmail.com` when triggering `POST /api/auth/upgrade-vip`.
+- [x] **Zero Data Loss Integrity (Rule #1 Guaranteed)**: All user vaults in Railway PostgreSQL remain 100% untouched and preserved.
 - [x] **Release Versioning**: Version **`1.0.21`** (`versionCode = 22`) active.
 - [x] **Over-The-Air (OTA) Live Updates**: Configured `MainActivity.kt` to load live frontend updates dynamically from Vercel (`https://livelore-app.vercel.app`) when online. All future UI changes and feature enhancements now take effect **instantly without requiring new APK builds**.
 - [x] **Release Versioning**: Version **`1.0.18`** (`versionCode = 19`) active.

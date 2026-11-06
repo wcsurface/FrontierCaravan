@@ -471,6 +471,8 @@
         return;
       }
 
+      window.activeEmail = activeEmail;
+
       if (typeof checkIsVIPUser === 'function') isVIPUser = checkIsVIPUser(activeEmail);
       if (typeof updateProfileVipCard === 'function') updateProfileVipCard();
 
@@ -5891,13 +5893,14 @@
       }
       if (!activeEmail) {
         var emailDisp = document.getElementById('profile-email-display');
-        if (emailDisp && emailDisp.innerText && emailDisp.innerText.indexOf('@') >= 0) {
+        if (emailDisp && emailDisp.innerText && emailDisp.innerText.indexOf('@') >= 0 && !emailDisp.innerText.includes('wcsurface@gmail.com')) {
           activeEmail = emailDisp.innerText.toLowerCase().trim();
         }
       }
       if (!activeEmail) return;
 
       var cleanEmail = activeEmail.toLowerCase().trim();
+      window.activeEmail = cleanEmail;
       isVIPUser = true;
 
       // 1. Store VIP flag in LocalStorage for activeEmail
