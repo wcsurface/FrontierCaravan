@@ -5882,10 +5882,12 @@
     window.navigateToProfileVip = navigateToProfileVip;
 
     function executeVipUpgradeSuccess() {
-      var rawUser = localStorage.getItem('livelore_active_user');
-      var activeEmail = null;
-      if (rawUser) {
-        try { activeEmail = JSON.parse(rawUser).email; } catch(e) {}
+      var activeEmail = (typeof window.activeEmail === 'string' && window.activeEmail) ? window.activeEmail : null;
+      if (!activeEmail) {
+        var rawUser = localStorage.getItem('livelore_active_user');
+        if (rawUser) {
+          try { activeEmail = JSON.parse(rawUser).email; } catch(e) {}
+        }
       }
       if (!activeEmail) {
         var emailDisp = document.getElementById('profile-email-display');
@@ -5903,6 +5905,7 @@
 
       // 2. Update active user session object with isVIP = true
       try {
+        var rawUser = localStorage.getItem('livelore_active_user');
         var uObj = rawUser ? JSON.parse(rawUser) : { email: cleanEmail };
         uObj.isVIP = true;
         localStorage.setItem('livelore_active_user', JSON.stringify(uObj));
@@ -6582,7 +6585,7 @@
     <!-- 4. Account Details Card -->
     <div class="detail-card" style="padding: 22px; margin-bottom: 20px;">
       <div class="detail-label">ACCOUNT EMAIL</div>
-      <div style="font-size:18px; font-weight:900; color:#ffffff; margin-bottom:20px;" id="profile-email-display">wcsurface@gmail.com</div>
+      <div style="font-size:18px; font-weight:900; color:#ffffff; margin-bottom:20px;" id="profile-email-display"></div>
 
       <div id="profile-change-pass-box" style="border-top: 1px solid #222B30; padding-top: 16px;">
         <div class="detail-label">CHANGE PASSWORD</div>
