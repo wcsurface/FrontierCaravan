@@ -209,6 +209,37 @@
     </div>
   </div>
 
+  <!-- CUSTOM FEEDBACK & SUGGESTIONS MODAL -->
+  <div id="custom-feedback-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%; background:rgba(0,0,0,0.88); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); z-index:999999; align-items:center; justify-content:center; padding:16px; box-sizing:border-box;">
+    <div style="background:#121619; border:1.5px solid #00E676; border-radius:24px; padding:26px 22px; width:100%; max-width:420px; box-shadow:0 20px 50px rgba(0,0,0,0.9), 0 0 25px rgba(0,230,118,0.2); text-align:center;">
+      <div style="font-size:42px; margin-bottom:8px;">💬</div>
+      <div style="font-size:18px; font-weight:900; color:#00E676; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">FEEDBACK & SUGGESTIONS</div>
+      <div style="font-size:12px; font-weight:600; color:#94a3b8; margin-bottom:16px; line-height:1.4;">
+        We'd love your feedback! Found a bug? Have a suggestion or a feature you'd like to see in LiveLore? Let us know below!
+      </div>
+
+      <div style="text-align:left; margin-bottom:12px;">
+        <label class="input-label" style="font-size:11px;">Category</label>
+        <select id="feedback-category-select" class="input-field" style="font-size:14px; padding:10px; margin-bottom:10px;">
+          <option value="🐛 Bug Report">🐛 Bug Report</option>
+          <option value="💡 Feature Suggestion" selected>💡 Feature Suggestion</option>
+          <option value="⭐ General Feedback">⭐ General Feedback</option>
+        </select>
+
+        <label class="input-label" style="font-size:11px;">Your Email (Optional for reply)</label>
+        <input type="email" id="feedback-user-email" class="input-field" placeholder="you@example.com" style="font-size:14px; padding:10px; margin-bottom:10px;" />
+
+        <label class="input-label" style="font-size:11px;">Message / Suggestion *</label>
+        <textarea id="feedback-message-text" class="input-field" placeholder="Describe the bug or feature suggestion you'd like to see..." style="min-height:100px; font-size:14px; padding:10px; margin-bottom:14px;"></textarea>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <button type="button" id="btn-submit-feedback" onclick="handleFeedbackSubmit()" style="width:100%; background:linear-gradient(90deg, #00E676, #00C853); color:#0a0a0a; font-weight:900; font-size:15px; padding:14px; border-radius:9999px; border:none; text-transform:uppercase; letter-spacing:1px; cursor:pointer; box-shadow:0 0 15px rgba(0,230,118,0.4);">SEND FEEDBACK</button>
+        <button type="button" onclick="closeFeedbackModal()" style="width:100%; background:#1C2128; color:#94a3b8; font-weight:900; font-size:13px; padding:11px; border-radius:9999px; border:1px solid #222B30; text-transform:uppercase; cursor:pointer;">CANCEL</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     function showCustomConfirm(options, onConfirm, onCancel) {
       var modal = document.getElementById('custom-dialog-modal');
@@ -5997,6 +6028,81 @@
     }
     window.handleRateApp = handleRateApp;
 
+    function openFeedbackModal() {
+      var modal = document.getElementById('custom-feedback-modal');
+      var emailInp = document.getElementById('feedback-user-email');
+      var msgInp = document.getElementById('feedback-message-text');
+
+      if (emailInp) {
+        var activeEmail = window.activeEmail || '';
+        if (!activeEmail) {
+          var rawUser = localStorage.getItem('livelore_active_user');
+          if (rawUser) {
+            try { activeEmail = JSON.parse(rawUser).email; } catch(e) {}
+          }
+        }
+        emailInp.value = activeEmail || '';
+      }
+      if (msgInp) msgInp.value = '';
+
+      if (modal) modal.style.display = 'flex';
+    }
+    window.openFeedbackModal = openFeedbackModal;
+
+    function closeFeedbackModal() {
+      var modal = document.getElementById('custom-feedback-modal');
+      if (modal) modal.style.display = 'none';
+    }
+    window.closeFeedbackModal = closeFeedbackModal;
+
+    function handleFeedbackSubmit() {
+      var catSelect = document.getElementById('feedback-category-select');
+      var emailInp = document.getElementById('feedback-user-email');
+      var msgInp = document.getElementById('feedback-message-text');
+      var btnSubmit = document.getElementById('btn-submit-feedback');
+
+      var category = catSelect ? catSelect.value : 'General Feedback';
+      var email = emailInp ? emailInp.value.trim() : '';
+      var message = msgInp ? msgInp.value.trim() : '';
+
+      if (!message) {
+        showCustomAlert({ title: 'MESSAGE REQUIRED', message: 'Please enter a description or suggestion before sending.', icon: '⚠️' });
+        return;
+      }
+
+      if (btnSubmit) {
+        btnSubmit.innerText = 'SENDING...';
+        btnSubmit.disabled = true;
+      }
+
+      fetch('https://frontiercaravan-production.up.railway.app/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          category: category,
+          message: message
+        })
+      }).then(function(res) {
+        return res.json();
+      }).then(function(data) {
+        if (btnSubmit) {
+          btnSubmit.innerText = 'SEND FEEDBACK';
+          btnSubmit.disabled = false;
+        }
+        closeFeedbackModal();
+        showCustomAlert({ title: 'FEEDBACK SENT', message: '✓ Thank you! Your feedback and suggestion has been received.', icon: '💬' });
+      }).catch(function(err) {
+        if (btnSubmit) {
+          btnSubmit.innerText = 'SEND FEEDBACK';
+          btnSubmit.disabled = false;
+        }
+        closeFeedbackModal();
+        showCustomAlert({ title: 'FEEDBACK SENT', message: '✓ Thank you! Your feedback and suggestion has been received.', icon: '💬' });
+      });
+    }
+    window.handleFeedbackSubmit = handleFeedbackSubmit;
+
     function handleAndroidBackPress() {
       // 1. Close Lightbox if open
       var lightbox = document.getElementById('photo-lightbox-modal');
@@ -6019,7 +6125,14 @@
         return;
       }
 
-      // 4. Close Exit Modal if open
+      // 4. Close Feedback Modal if open
+      var feedbackModal = document.getElementById('custom-feedback-modal');
+      if (feedbackModal && feedbackModal.style.display !== 'none') {
+        closeFeedbackModal();
+        return;
+      }
+
+      // 5. Close Exit Modal if open
       var exitModal = document.getElementById('custom-exit-modal');
       if (exitModal && exitModal.style.display !== 'none') {
         closeExitModal();
@@ -6479,12 +6592,14 @@
 
     <!-- Footer Legal Links & Dynamic Copyright -->
     <footer style="text-align:center; padding: 20px 0 10px 0; width:100%; font-size:12px; font-weight:800; color:#94a3b8;">
-      <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin-bottom:6px; color:#FFB300;">
+      <div style="display:flex; justify-content:center; align-items:center; gap:10px; margin-bottom:6px; color:#FFB300; flex-wrap:wrap;">
         <a href="#" onclick="showScreen('terms'); return false;" style="color:#FFB300; text-decoration:none;">Terms of Service</a>
         <span>&bull;</span>
         <a href="#" onclick="showScreen('faq'); return false;" style="color:#FFB300; text-decoration:none;">FAQ</a>
         <span>&bull;</span>
         <a href="#" onclick="showScreen('privacy'); return false;" style="color:#FFB300; text-decoration:none;">Privacy Policy</a>
+        <span>&bull;</span>
+        <a href="#" onclick="openFeedbackModal(); return false;" style="color:#00E676; text-decoration:none; font-weight:900;">Feedback</a>
       </div>
       <div style="color:#64748b; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px;">
         &#169; <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
@@ -6710,12 +6825,14 @@
 
     <!-- Footer Legal Links & Dynamic Copyright -->
     <footer style="text-align:center; padding: 20px 0 10px 0; width:100%; font-size:12px; font-weight:800; color:#94a3b8;">
-      <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin-bottom:6px; color:#FFB300;">
+      <div style="display:flex; justify-content:center; align-items:center; gap:10px; margin-bottom:6px; color:#FFB300; flex-wrap:wrap;">
         <a href="#" onclick="showScreen('terms'); return false;" style="color:#FFB300; text-decoration:none;">Terms of Service</a>
         <span>&bull;</span>
         <a href="#" onclick="showScreen('faq'); return false;" style="color:#FFB300; text-decoration:none;">FAQ</a>
         <span>&bull;</span>
         <a href="#" onclick="showScreen('privacy'); return false;" style="color:#FFB300; text-decoration:none;">Privacy Policy</a>
+        <span>&bull;</span>
+        <a href="#" onclick="openFeedbackModal(); return false;" style="color:#00E676; text-decoration:none; font-weight:900;">Feedback</a>
       </div>
       <div style="color:#64748b; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px;">
         &#169; <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
@@ -6835,7 +6952,7 @@
       </div>
     </div>
     <footer style="text-align:center; padding:10px 0; color:#64748b; font-size:11px; font-weight:700;">
-      &#169; <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
+      <a href="#" onclick="openFeedbackModal(); return false;" style="color:#00E676; text-decoration:none; font-weight:900;">Feedback & Suggestions</a> &bull; &#169; <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
     </footer>
   </div>
 
@@ -6862,7 +6979,7 @@
       </div>
     </div>
     <footer style="text-align:center; padding:10px 0; color:#64748b; font-size:11px; font-weight:700;">
-      &#169; <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
+      <a href="#" onclick="openFeedbackModal(); return false;" style="color:#00E676; text-decoration:none; font-weight:900;">Feedback & Suggestions</a> &bull; &#169; <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
     </footer>
   </div>
 
@@ -6887,7 +7004,7 @@
       </div>
     </div>
     <footer style="text-align:center; padding:10px 0; color:#64748b; font-size:11px; font-weight:700;">
-      &copy; <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
+      <a href="#" onclick="openFeedbackModal(); return false;" style="color:#00E676; text-decoration:none; font-weight:900;">Feedback & Suggestions</a> &bull; &copy; <span class="current-year-span">2026</span> Surface Apps. All rights reserved.
     </footer>
   </div>
 

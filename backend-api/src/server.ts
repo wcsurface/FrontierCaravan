@@ -357,6 +357,64 @@ app.post('/api/auth/test-set-vip', async (req: Request, res: Response) => {
   }
 });
 
+// 3.3 POST /api/feedback - Send User Feedback & Bug Reports to Developer Email
+app.post('/api/feedback', async (req: Request, res: Response) => {
+  try {
+    const { email, category, message } = req.body;
+    if (!message || typeof message !== 'string' || message.trim().length === 0) {
+      return res.status(400).json({ error: 'Feedback message required' });
+    }
+
+    const cleanUserEmail = (email || 'anonymous@livelore.app').toLowerCase().trim();
+    const cleanCategory = category || 'General Feedback';
+    const cleanMessage = message.trim();
+
+    // Developer recipient email kept strictly server-side
+    const DEVELOPER_EMAIL = 'wcsurface@gmail.com';
+    const RESEND_API_KEY = process.env.RESEND_API_KEY;
+
+    if (RESEND_API_KEY) {
+      try {
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${RESEND_API_KEY}`,
+          },
+          body: JSON.stringify({
+            from: 'LiveLore Feedback <onboarding@resend.dev>',
+            to: [DEVELOPER_EMAIL],
+            reply_to: cleanUserEmail,
+            subject: `[LiveLore Feedback] ${cleanCategory} from ${cleanUserEmail}`,
+            html: `
+              <div style="font-family: sans-serif; background: #0A0D0E; color: #ffffff; padding: 24px; border-radius: 12px; border: 1px solid #FFB300;">
+                <h2 style="color: #FFB300; margin-top: 0;">🎸 New LiveLore User Feedback Received!</h2>
+                <p><strong>Category:</strong> ${cleanCategory}</p>
+                <p><strong>User Email:</strong> <a href="mailto:${cleanUserEmail}" style="color: #00E676;">${cleanUserEmail}</a></p>
+                <p><strong>Timestamp:</strong> ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })}</p>
+                <hr style="border: 0; border-top: 1px solid #222B30; margin: 20px 0;" />
+                <h3 style="color: #00E676;">User Message:</h3>
+                <div style="background: #121619; padding: 16px; border-radius: 8px; border: 1px solid #222B30; font-size: 15px; line-height: 1.6; white-space: pre-wrap; color: #f1f5f9;">
+                  ${cleanMessage.replace(/</g, '&lt;').replace(/>/g, '&gt;')}
+                </div>
+              </div>
+            `,
+          }),
+        });
+      } catch (e) {
+        console.error('[Resend Feedback Email Error]', e);
+      }
+    } else {
+      console.log(`[Feedback Received locally] Category: ${cleanCategory} | From: ${cleanUserEmail}\nMessage: ${cleanMessage}`);
+    }
+
+    return res.json({ success: true, message: 'Feedback sent successfully.' });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Failed to send feedback';
+    return res.status(500).json({ error: message });
+  }
+});
+
 const resetCodesStore = new Map<string, { code: string; expires: number }>();
 
 // 3.4 POST /api/auth/forgot-password - Request 6-Digit Verification Code via Email
