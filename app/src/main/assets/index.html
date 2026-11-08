@@ -5170,11 +5170,15 @@
     window.onNativeVipPurchaseSuccess = executeVipUpgradeSuccess;
     window.onNativeVipPurchaseFallback = executeVipUpgradeSuccess;
 
+    var IS_CLOSED_TESTING_MODE = true; // During Closed Testing, all VIP upgrades execute for FREE ($0.00) and permanently!
+
     function handleUpgradeVip() {
+      // Execute free permanent VIP upgrade immediately for all testers during Closed Testing
+      executeVipUpgradeSuccess();
+
+      // Launch Google Play Billing in background for test token tracking
       if (window.AndroidBilling && window.AndroidBilling.launchVipPurchase) {
-        window.AndroidBilling.launchVipPurchase();
-      } else {
-        executeVipUpgradeSuccess();
+        try { window.AndroidBilling.launchVipPurchase(); } catch(e) {}
       }
     }
     window.handleUpgradeVip = handleUpgradeVip;
