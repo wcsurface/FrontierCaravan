@@ -5988,6 +5988,15 @@
     }
     window.confirmExitApp = confirmExitApp;
 
+    function handleRateApp() {
+      if (window.AndroidNative && typeof window.AndroidNative.rateApp === 'function') {
+        window.AndroidNative.rateApp();
+      } else {
+        window.open('https://play.google.com/store/apps/details?id=app.vercel.livelore', '_blank');
+      }
+    }
+    window.handleRateApp = handleRateApp;
+
     function handleAndroidBackPress() {
       // 1. Close Lightbox if open
       var lightbox = document.getElementById('photo-lightbox-modal');
@@ -6668,7 +6677,16 @@
       </div>
     </div>
 
-    <!-- 4. Account Details Card -->
+    <!-- 4. RATE YOUR APP CARD -->
+    <div class="detail-card" style="padding: 20px; margin-bottom: 20px; text-align: center;">
+      <div class="detail-label" style="color:#FFB300;">ENJOYING LIVELORE?</div>
+      <div style="font-size:13px; color:#e2e8f0; font-weight:600; margin-bottom:14px; line-height:1.5;">
+        Support LiveLore by leaving a 5-star rating and review on Google Play Store!
+      </div>
+      <button type="button" class="btn-cta" style="font-size:15px; padding:14px; background:linear-gradient(90deg, #FFB300, #FF6F00); color:#0a0a0a; border:none; box-shadow:0 0 15px rgba(255,179,0,0.3); margin:0;" onclick="handleRateApp()">⭐ RATE LIVELORE ON PLAY STORE</button>
+    </div>
+
+    <!-- 5. Account Details Card -->
     <div class="detail-card" style="padding: 22px; margin-bottom: 20px;">
       <div class="detail-label">ACCOUNT EMAIL</div>
       <div style="font-size:18px; font-weight:900; color:#ffffff; margin-bottom:20px;" id="profile-email-display"></div>

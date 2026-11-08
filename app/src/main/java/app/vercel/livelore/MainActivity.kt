@@ -351,6 +351,26 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
                 }
             }
         }
+
+        @JavascriptInterface
+        fun rateApp() {
+            runOnUiThread {
+                try {
+                    val appPackageName = context.packageName
+                    try {
+                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName")).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        })
+                    } catch (anfe: android.content.ActivityNotFoundException) {
+                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        })
+                    }
+                } catch (e: Throwable) {
+                    e.printStackTrace()
+                }
+            }
+        }
     }
 
     private fun isFileNotEmpty(uri: Uri): Boolean {

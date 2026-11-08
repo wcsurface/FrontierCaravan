@@ -7,11 +7,12 @@
 ---
 
 ## Completed Features
-- [x] **Global `window.activeEmail` Assignment & VIP Sync Fix**:
-  - Assigned `window.activeEmail = activeEmail` globally in `loadSavedShows()` upon app initialization.
-  - Updated `executeVipUpgradeSuccess()` to read `window.activeEmail` first, guaranteeing that whenever any logged-in user (`justlancerhere@gmail.com`, `queenie162001@gmail.com`, etc.) triggers the upgrade flow, `POST /api/auth/upgrade-vip` posts for their exact active account email.
-  - Verified `justlancerhere@gmail.com` and `queenie162001@gmail.com` active as **`isVIP: true`** in Railway PostgreSQL.
-- [x] **Zero Data Loss Integrity (Rule #1 Guaranteed)**: All user vaults in Railway PostgreSQL remain 100% untouched and preserved.
+- [x] **Exit Confirmation Dialog & State Preservation**:
+  - Implemented `handleAndroidBackPress()` and `onBackPressed()` in `MainActivity.kt` and `index.html`.
+  - Pressing the Android System Back button on sub-screens or modals safely navigates back or closes popups **without losing any entered form inputs or photos**.
+  - Pressing Back on the Home/Diary screen displays the glassmorphic **`EXIT LIVELORE?`** confirmation dialog.
+  - Tapping **`KEEP VAULT OPEN`** dismisses the dialog and preserves all current activities and unsaved data seamlessly.
+  - Tapping **`EXIT APP`** safely calls `finishAffinity()` via `AndroidNative.exitApp()`.
 - [x] **Release Versioning**: Version **`1.0.21`** (`versionCode = 22`) active.
 - [x] **Over-The-Air (OTA) Live Updates**: Configured `MainActivity.kt` to load live frontend updates dynamically from Vercel (`https://livelore-app.vercel.app`) when online. All future UI changes and feature enhancements now take effect **instantly without requiring new APK builds**.
 - [x] **Release Versioning**: Version **`1.0.18`** (`versionCode = 19`) active.
