@@ -239,6 +239,7 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
             webView.addJavascriptInterface(AndroidCSVInterface(this), "AndroidCSV")
             webView.addJavascriptInterface(AndroidShareInterface(this), "AndroidShare")
             webView.addJavascriptInterface(AndroidBillingInterface(this), "AndroidBilling")
+            webView.addJavascriptInterface(AndroidNativeBridge(this), "AndroidNative")
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -326,6 +327,30 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
             if (::adView.isInitialized) adView.destroy()
         } catch (e: Throwable) {}
         super.onDestroy()
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        if (::webView.isInitialized) {
+            webView.post {
+                webView.evaluateJavascript("if(typeof window.handleAndroidBackPress==='function'){window.handleAndroidBackPress();}else{window.history.back();}", null)
+            }
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    inner class AndroidNativeBridge(private val context: Context) {
+        @JavascriptInterface
+        fun exitApp() {
+            runOnUiThread {
+                try {
+                    finishAffinity()
+                } catch (e: Throwable) {
+                    finish()
+                }
+            }
+        }
     }
 
     private fun isFileNotEmpty(uri: Uri): Boolean {

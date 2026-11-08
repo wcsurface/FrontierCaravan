@@ -194,6 +194,21 @@
     </div>
   </div>
 
+  <!-- CUSTOM EXIT CONFIRMATION MODAL -->
+  <div id="custom-exit-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%; background:rgba(0,0,0,0.88); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); z-index:999999; align-items:center; justify-content:center; padding:16px; box-sizing:border-box;">
+    <div style="background:#121619; border:1.5px solid #FFB300; border-radius:24px; padding:28px 22px; width:100%; max-width:380px; box-shadow:0 20px 50px rgba(0,0,0,0.9), 0 0 25px rgba(255,179,0,0.2); text-align:center;">
+      <div style="font-size:48px; margin-bottom:12px;">🎸</div>
+      <div style="font-size:20px; font-weight:900; color:#FFB300; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">EXIT LIVELORE?</div>
+      <div style="font-size:14px; font-weight:600; color:#e2e8f0; line-height:1.5; margin-bottom:22px; background:#0A0D0E; padding:14px; border-radius:12px; border:1px solid #222B30;">
+        Are you sure you want to exit the app? Your logged concerts, ticket stubs, and photo memories remain safely saved in your vault.
+      </div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <button type="button" onclick="closeExitModal()" style="width:100%; background:linear-gradient(90deg, #00E676, #00C853); color:#0a0a0a; font-weight:900; font-size:15px; padding:15px; border-radius:9999px; border:none; text-transform:uppercase; letter-spacing:1px; cursor:pointer; box-shadow:0 0 15px rgba(0,230,118,0.4);">KEEP VAULT OPEN</button>
+        <button type="button" onclick="confirmExitApp()" style="width:100%; background:#1C2128; color:#ef4444; font-weight:900; font-size:14px; padding:13px; border-radius:9999px; border:1px solid #ef4444; text-transform:uppercase; letter-spacing:1px; cursor:pointer;">EXIT APP</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     function showCustomConfirm(options, onConfirm, onCancel) {
       var modal = document.getElementById('custom-dialog-modal');
@@ -5952,6 +5967,74 @@
       }
     }
     window.handleUpgradeVip = handleUpgradeVip;
+
+    function openExitModal() {
+      var modal = document.getElementById('custom-exit-modal');
+      if (modal) modal.style.display = 'flex';
+    }
+    window.openExitModal = openExitModal;
+
+    function closeExitModal() {
+      var modal = document.getElementById('custom-exit-modal');
+      if (modal) modal.style.display = 'none';
+    }
+    window.closeExitModal = closeExitModal;
+
+    function confirmExitApp() {
+      closeExitModal();
+      if (window.AndroidNative && typeof window.AndroidNative.exitApp === 'function') {
+        window.AndroidNative.exitApp();
+      }
+    }
+    window.confirmExitApp = confirmExitApp;
+
+    function handleAndroidBackPress() {
+      // 1. Close Lightbox if open
+      var lightbox = document.getElementById('photo-lightbox-modal');
+      if (lightbox && lightbox.style.display !== 'none') {
+        closePhotoModal();
+        return;
+      }
+
+      // 2. Close Custom Confirm/Alert if open
+      var dialogModal = document.getElementById('custom-dialog-modal');
+      if (dialogModal && dialogModal.style.display !== 'none') {
+        closeCustomDialog();
+        return;
+      }
+
+      // 3. Close Share Modal if open
+      var shareModal = document.getElementById('custom-share-modal');
+      if (shareModal && shareModal.style.display !== 'none') {
+        closeShareModal();
+        return;
+      }
+
+      // 4. Close Exit Modal if open
+      var exitModal = document.getElementById('custom-exit-modal');
+      if (exitModal && exitModal.style.display !== 'none') {
+        closeExitModal();
+        return;
+      }
+
+      // 5. Hide Venue Dropdown if open
+      var venueDropdown = document.getElementById('venue-dropdown');
+      if (venueDropdown && venueDropdown.style.display !== 'none') {
+        venueDropdown.style.display = 'none';
+        return;
+      }
+
+      // 6. If on any sub-screen (log, detail, profile, stats, terms, privacy, faq), navigate back to Home/Diary
+      var activeScreen = document.querySelector('.screen-view.active');
+      if (activeScreen && activeScreen.id !== 'view-diary' && activeScreen.id !== 'view-auth') {
+        showScreen('diary');
+        return;
+      }
+
+      // 7. If on Home/Diary screen, show Exit Confirmation Dialog
+      openExitModal();
+    }
+    window.handleAndroidBackPress = handleAndroidBackPress;
 
     function hashPassword(email, password) {
       var str = (email || '').toLowerCase().trim() + ":" + (password || '');

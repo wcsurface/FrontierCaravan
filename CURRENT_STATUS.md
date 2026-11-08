@@ -7,9 +7,10 @@
 ---
 
 ## Completed Features
-- [x] **Account Email Element Placeholder Fix**:
-  - Removed static placeholder text (`wcsurface@gmail.com`) from `#profile-email-display` HTML element.
-  - Updated `executeVipUpgradeSuccess()` to check `window.activeEmail` first, preventing any logged-in user from defaulting to `wcsurface@gmail.com` when triggering `POST /api/auth/upgrade-vip`.
+- [x] **Global `window.activeEmail` Assignment & VIP Sync Fix**:
+  - Assigned `window.activeEmail = activeEmail` globally in `loadSavedShows()` upon app initialization.
+  - Updated `executeVipUpgradeSuccess()` to read `window.activeEmail` first, guaranteeing that whenever any logged-in user (`justlancerhere@gmail.com`, `queenie162001@gmail.com`, etc.) triggers the upgrade flow, `POST /api/auth/upgrade-vip` posts for their exact active account email.
+  - Verified `justlancerhere@gmail.com` and `queenie162001@gmail.com` active as **`isVIP: true`** in Railway PostgreSQL.
 - [x] **Zero Data Loss Integrity (Rule #1 Guaranteed)**: All user vaults in Railway PostgreSQL remain 100% untouched and preserved.
 - [x] **Release Versioning**: Version **`1.0.21`** (`versionCode = 22`) active.
 - [x] **Over-The-Air (OTA) Live Updates**: Configured `MainActivity.kt` to load live frontend updates dynamically from Vercel (`https://livelore-app.vercel.app`) when online. All future UI changes and feature enhancements now take effect **instantly without requiring new APK builds**.
