@@ -7,10 +7,12 @@
 ---
 
 ## Completed Features
-- [x] **Rate Your App Settings Button**:
-  - Integrated **`⭐ RATE LIVELORE ON PLAY STORE`** card and button on the Settings / Profile screen (`#view-profile`).
-  - Native Android Bridge `AndroidNative.rateApp()` opens the Google Play Store app directly to `app.vercel.livelore`'s rating listing (`market://details?id=app.vercel.livelore`) with automatic fallback to Chrome web store URL.
-- [x] **Exit Confirmation Dialog & State Preservation**: Implemented `handleAndroidBackPress()` and `onBackPressed()` with layered back navigation and glassmorphic `#custom-exit-modal` confirmation dialog.
+- [x] **Feedback & Suggestions Modal + Server-Side Email Delivery**:
+  - Added `Feedback` link to all screen footers next to Privacy, Terms, and FAQ.
+  - Implemented glassmorphic `#custom-feedback-modal` form allowing users to select categories (`🐛 Bug Report`, `💡 Feature Suggestion`, `⭐ General Feedback`), pre-filling their email, and entering suggestions/bug descriptions.
+  - Backend API endpoint `POST /api/feedback` in `backend-api/src/server.ts` uses Resend API to send user messages directly to **`wcsurface@gmail.com`**.
+  - **Developer Email Privacy**: Developer recipient email is defined strictly server-side in Railway and is **never exposed or visible** in client HTML or JavaScript.
+- [x] **Rate Your App Settings Button**: Integrated **`⭐ RATE LIVELORE ON PLAY STORE`** card and button on Settings screen.
 - [x] **Release Versioning**: Version **`1.0.21`** (`versionCode = 22`) active.
 - [x] **Over-The-Air (OTA) Live Updates**: Configured `MainActivity.kt` to load live frontend updates dynamically from Vercel (`https://livelore-app.vercel.app`) when online. All future UI changes and feature enhancements now take effect **instantly without requiring new APK builds**.
 - [x] **Release Versioning**: Version **`1.0.18`** (`versionCode = 19`) active.
