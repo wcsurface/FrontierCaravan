@@ -1,18 +1,16 @@
 # CURRENT_STATUS.md - LiveLore: Concert Diary & Setlist Vault
 
 ## Current Development Status
-**Active Version**: 1.0.21 (versionCode: 22, API Backend v6.1.0)
+**Active Version**: 1.0.22 (versionCode: 23, API Backend v6.1.0)
 **Build Status**: ✅ Passing (`:app:assembleDebug` & `:app:bundleRelease` build cleanly)
 
 ---
 
 ## Completed Features
-- [x] **Instant Free Permanent VIP Upgrades for Closed Testing**:
-  - Configured `handleUpgradeVip()` to execute `executeVipUpgradeSuccess()` immediately for all users during closed testing (`$0.00` free permanent upgrade).
-  - Immediately writes `isVIP: true` for the user in Railway PostgreSQL database.
-  - Hides all ads instantly (`window.AndroidAdMob.hideBannerAd()`), unlocks multi-photo attachments, and unlocks CSV data export on the spot.
+- [x] **Production $4.99 In-App Billing Mode Enabled**: Set `IS_CLOSED_TESTING_MODE = false` in `index.html`. All VIP purchases now route 100% through Google Play's real $4.99 billing flow and post `isVIP: true` to Railway PostgreSQL for every buyer.
+- [x] **Production Release Versioning**: Version bumped to **`1.0.22`** (**`versionCode = 23`**).
 - [x] **Strict USA Country Standardization & Venue Deduplication**: Converted all `"United States"` entries in `VENUE_DB` to `"USA"`.
-- [x] **Release Versioning**: Version **`1.0.21`** (`versionCode = 22`) active.
+- [x] **Release Versioning**: Version **`1.0.22`** (`versionCode = 23`) active.
 - [x] **Over-The-Air (OTA) Live Updates**: Configured `MainActivity.kt` to load live frontend updates dynamically from Vercel (`https://livelore-app.vercel.app`) when online. All future UI changes and feature enhancements now take effect **instantly without requiring new APK builds**.
 - [x] **Release Versioning**: Version **`1.0.18`** (`versionCode = 19`) active.
 

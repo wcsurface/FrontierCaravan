@@ -32,10 +32,10 @@
         android:theme="@style/Theme.LiveLore"
         tools:targetApi="35">
 
-        <!-- Google AdMob Official Test Application ID -->
+        <!-- Google AdMob Official Production Application ID -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="ca-app-pub-8950953113865975~5956735260" />
 
         <activity
             android:name=".MainActivity"

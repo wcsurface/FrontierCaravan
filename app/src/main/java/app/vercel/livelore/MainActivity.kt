@@ -58,8 +58,8 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
     private var cameraImageUri: Uri? = null
 
-    // Official Google AdMob Test Banner Unit ID
-    private val ADMOB_BANNER_TEST_UNIT_ID = "ca-app-pub-3940256099942544/6300978111"
+    // Official Google AdMob Production Banner Unit ID
+    private val ADMOB_BANNER_TEST_UNIT_ID = "ca-app-pub-8950953113865975/4438484517"
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
