@@ -7,11 +7,11 @@
 ---
 
 ## Completed Features
-- [x] **Strict USA Country Standardization & Venue Deduplication**:
-  - Converted all `"United States"`, `"U.S.A."`, `"U.S."`, and `"US"` entries in `VENUE_DB` to **`"USA"`**.
-  - Merged and deduplicated all duplicate venue rows that previously differed only by country format *(e.g. Deer Creek Music Center now appears as a single clean `"USA"` entry)*.
-  - Exported the updated 2,529 venue CSV to Desktop (`Cleaned_Venue_Database.csv`).
-- [x] **Feedback & Suggestions Modal**: Integrated glassmorphic feedback modal form next to Privacy/Terms/FAQ with server-side Resend API email delivery to `wcsurface@gmail.com`.
+- [x] **Instant Free Permanent VIP Upgrades for Closed Testing**:
+  - Configured `handleUpgradeVip()` to execute `executeVipUpgradeSuccess()` immediately for all users during closed testing (`$0.00` free permanent upgrade).
+  - Immediately writes `isVIP: true` for the user in Railway PostgreSQL database.
+  - Hides all ads instantly (`window.AndroidAdMob.hideBannerAd()`), unlocks multi-photo attachments, and unlocks CSV data export on the spot.
+- [x] **Strict USA Country Standardization & Venue Deduplication**: Converted all `"United States"` entries in `VENUE_DB` to `"USA"`.
 - [x] **Release Versioning**: Version **`1.0.21`** (`versionCode = 22`) active.
 - [x] **Over-The-Air (OTA) Live Updates**: Configured `MainActivity.kt` to load live frontend updates dynamically from Vercel (`https://livelore-app.vercel.app`) when online. All future UI changes and feature enhancements now take effect **instantly without requiring new APK builds**.
 - [x] **Release Versioning**: Version **`1.0.18`** (`versionCode = 19`) active.
