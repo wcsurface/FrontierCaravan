@@ -7,9 +7,9 @@
 ---
 
 ## Completed Features
+- [x] **Production AdMob Configuration**: Configured official production AdMob App ID (`ca-app-pub-8950953113865975~5956735260`) in `AndroidManifest.xml` and official production AdMob Banner Unit ID (`ca-app-pub-8950953113865975/4438484517`) in `MainActivity.kt`.
 - [x] **Production $4.99 In-App Billing Mode Enabled**: Set `IS_CLOSED_TESTING_MODE = false` in `index.html`. All VIP purchases now route 100% through Google Play's real $4.99 billing flow and post `isVIP: true` to Railway PostgreSQL for every buyer.
 - [x] **Production Release Versioning**: Version bumped to **`1.0.22`** (**`versionCode = 23`**).
-- [x] **Strict USA Country Standardization & Venue Deduplication**: Converted all `"United States"` entries in `VENUE_DB` to `"USA"`.
 - [x] **Release Versioning**: Version **`1.0.22`** (`versionCode = 23`) active.
 - [x] **Over-The-Air (OTA) Live Updates**: Configured `MainActivity.kt` to load live frontend updates dynamically from Vercel (`https://livelore-app.vercel.app`) when online. All future UI changes and feature enhancements now take effect **instantly without requiring new APK builds**.
 - [x] **Release Versioning**: Version **`1.0.18`** (`versionCode = 19`) active.
